@@ -1,16 +1,16 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "id": "http://json-schema.org/geojson/geojson.json#",
+    "id": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/fixtures/geojson.json",
     "title": "Geo JSON object",
     "description": "Schema for a Geo JSON object",
     "type": "object",
     "required": [ "type" ],
     "properties": {
-        "crs": { "$ref": "http://json-schema.org/geojson/crs.json#" },
-        "bbox": { "$ref": "http://json-schema.org/geojson/bbox.json#" }
+        "crs": { "$ref": "hcrs.json" },
+        "bbox": { "$ref": "bbox.json" }
     },
     "oneOf": [
-        { "$ref": "http://json-schema.org/geojson/geometry.json#" },
+        { "$ref": "geometry.json" },
         { "$ref": "#/definitions/geometryCollection" },
         { "$ref": "#/definitions/feature" },
         { "$ref": "#/definitions/featureCollection" }
@@ -24,7 +24,7 @@
                 "type": { "enum": [ "GeometryCollection" ] },
                 "geometries": {
                     "type": "array",
-                    "items": { "$ref": "http://json-schema.org/geojson/geometry.json#" }
+                    "items": { "$ref": "geometry.json" }
                 }
             }
         },
@@ -37,7 +37,7 @@
                 "geometry": {
                     "oneOf": [
                         { "type": "null" },
-                        { "$ref": "http://json-schema.org/geojson/geometry.json#" }
+                        { "$ref": "geometry.json" }
                     ]
                 },
                 "properties": { "type": [ "object", "null" ] },
