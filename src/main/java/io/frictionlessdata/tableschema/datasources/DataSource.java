@@ -5,15 +5,14 @@
  */
 package io.frictionlessdata.tableschema.datasources;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
  *
- * @author pechorin
  */
-public interface DataSource {
-    
-    public String[] readNext() throws Exception;
-    public List<String[]> readAll() throws Exception;
+public interface DataSource {  
+    public Iterator<String[]> iterator();
+    public List<String[]> data();
     public void save(String filename) throws Exception ;  
 }

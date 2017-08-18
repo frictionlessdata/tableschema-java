@@ -1,10 +1,12 @@
 package io.frictionlessdata.tableschema.datasources;
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
-import java.io.FileNotFoundException;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
 /**
  *
@@ -12,21 +14,28 @@ import java.util.List;
  */
 public class CsvDataSource extends AbstractDataSource {
     private CSVReader reader = null;
+    private List<String[]> data = null;
     
-    public CsvDataSource(String dataSource) throws FileNotFoundException{
+    public CsvDataSource(String dataSource) throws Exception{
         FileReader fileReader = new FileReader(dataSource);
-        this.reader = new CSVReader(fileReader);  
+        this.reader = new CSVReader(fileReader);
+        this.data = this.reader.readAll();
     }
-
-
-    @Override
-    public String[] readNext() throws Exception {
-       return this.reader.readNext();
+    
+    public CsvDataSource(URL url) throws Exception{
+        InputStreamReader inputStreamReader = new InputStreamReader(url.openStream(), "UTF-8");
+        this.reader = new CSVReader(inputStreamReader);
+        this.data = this.reader.readAll();
     }
     
     @Override
-    public List<String[]> readAll() throws Exception {
-       return this.reader.readAll();
+    public Iterator<String[]> iterator(){
+        return this.data.iterator();
+    }
+    
+    @Override
+    public List<String[]> data(){
+       return data;
     }
 
     @Override
@@ -34,7 +43,7 @@ public class CsvDataSource extends AbstractDataSource {
         CSVWriter writer = new CSVWriter(new FileWriter(outputDataSource));
         
         //Write all the rows to file
-        writer.writeAll(this.readAll());
+        writer.writeAll(this.data());
         
         //close the writer
         writer.close();
