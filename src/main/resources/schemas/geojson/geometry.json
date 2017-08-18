@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "id": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/fixtures/geometry.json",
+    "id": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/fixtures/geojson/geometry.json",
     "title": "Geometry objects",
     "description": "A Geometry object as defined by TopoJSON",
     "type": "object",

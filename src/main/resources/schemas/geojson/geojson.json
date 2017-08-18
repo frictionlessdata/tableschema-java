@@ -1,12 +1,12 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "id": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/fixtures/geojson.json",
+    "id": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/schemas/geojson/geojson.json",
     "title": "Geo JSON object",
     "description": "Schema for a Geo JSON object",
     "type": "object",
     "required": [ "type" ],
     "properties": {
-        "crs": { "$ref": "hcrs.json" },
+        "crs": { "$ref": "crs.json" },
         "bbox": { "$ref": "bbox.json" }
     },
     "oneOf": [

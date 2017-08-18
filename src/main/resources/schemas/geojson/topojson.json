@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "id": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/fixtures/topojson.json",
+    "id": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/fixtures/geojson/topojson.json",
     "title": "TopoJSON object",
     "description": "Schema for a TopoJSON object",
     "type": "object",
