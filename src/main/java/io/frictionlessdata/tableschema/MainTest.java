@@ -7,6 +7,8 @@ package io.frictionlessdata.tableschema;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 /**
  *
@@ -39,7 +41,13 @@ public class MainTest {
             System.out.println(table.read());
             System.out.println(table.read());**/
             
-            table.inferSchema();
+            //table.inferSchema();
+            
+            TypeInferer typeInferer = new TypeInferer();
+            String validDatetimeString = "2008-08-25T01:45:36.123Z";
+            DateTime dt = typeInferer.castDatetime("default", validDatetimeString);
+            
+            System.out.println(dt.withZone(DateTimeZone.UTC).toString());
 
         }catch(Exception e){
             e.printStackTrace();

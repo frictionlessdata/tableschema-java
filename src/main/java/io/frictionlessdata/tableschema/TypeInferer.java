@@ -20,6 +20,9 @@ import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeMap;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 
 /**
@@ -38,6 +41,8 @@ public class TypeInferer {
     // Once a type is successfully inferred, we do not bother with the remaining types.
     private static final List<String[]> TYPE_INFERRAL_ORDER_LIST = new ArrayList<>(Arrays.asList(
         new String[]{"duration", "default"}, // No different formats, just use default.
+        new String[]{"year", "default"}, // No different formats, just use default.
+        new String[]{"yearmonth", "default"}, // No different formats, just use default.
         new String[]{"geojson", "default"},
         new String[]{"geojson", "topojson"},
         new String[]{"geopoint", "default"},
@@ -55,8 +60,24 @@ public class TypeInferer {
         new String[]{"any", "default"})); // No different formats, just use default.
     
 
-    private static final String REGEX_DURATION = "(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])(T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?)?";
-      
+    // Duration is the ISO 8601 extended format PnYnMnDTnHnMnS
+    private static final String REGEX_DURATION = "P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T?(([0-9]+H)?([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?))";
+    
+    // ISO 8601 format of yyyy-MM-dd'T'HH:mm:ss.SSSZ in UTC time
+    private static final String REGEX_DATETIME = "(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?";
+    
+    // ISO8601 format yyyy-MM-dd
+    private static final String REGEX_DATE = "([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|0[1-9]|[1-2][0-9])";
+    
+    // An ISO8601 time string e.g. HH:mm:ss
+    private static final String REGEX_TIME = "(2[0-3]|[01]?[0-9]):?([0-5]?[0-9]):?([0-5]?[0-9])";
+    
+    // yyyy
+    private static final String REGEX_YEAR = "([0-9]{4})";
+    
+    // yyyy-MM
+    private static final String REGEX_YEARMONTH = "([0-9]{4})-(1[0-2]|0[1-9])";
+    
     public TypeInferer(){
         
         // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
@@ -213,9 +234,11 @@ public class TypeInferer {
     public Duration castDuration(String format, String value) throws TypeInferringException{
         Pattern pattern = Pattern.compile(REGEX_DURATION);
         Matcher matcher = pattern.matcher(value);
-        matcher.matches();
-        
-        throw new TypeInferringException();
+        if(matcher.matches()){
+            return null; //TODO: Build Duration object.
+        }else{
+            throw new TypeInferringException();
+        }  
     }
     
     /**
@@ -263,7 +286,7 @@ public class TypeInferer {
      * @return 
      * @throws TypeInferringException
      */
-    public Integer[] castGeopoint(String format, String value) throws TypeInferringException{
+    public int[] castGeopoint(String format, String value) throws TypeInferringException{
         try{
             if(format.equalsIgnoreCase("default")){
                 String[] geopoint = value.split(",");
@@ -273,7 +296,7 @@ public class TypeInferer {
                     int lat = Integer.parseInt(geopoint[1]);
                     
                     // No exceptions? It's a valid geopoint object.
-                    return new Integer[]{lon, lat};
+                    return new int[]{lon, lat};
                     
                 }else{
                     throw new TypeInferringException();
@@ -289,7 +312,7 @@ public class TypeInferer {
                     int lat = jsonArray.getInt(1);
 
                     // No exceptions? It's a valid geopoint object.
-                    return new Integer[]{lon, lat};
+                    return new int[]{lon, lat};
 
                 }else{
                     throw new TypeInferringException();
@@ -305,7 +328,7 @@ public class TypeInferer {
                     int lat = jsonObj.getInt("lat");
 
                     // No exceptions? It's a valid geopoint object.
-                    return new Integer[]{lon, lat};
+                    return new int[]{lon, lat};
 
                 }else{
                     throw new TypeInferringException();
@@ -337,16 +360,79 @@ public class TypeInferer {
         } 
     }
     
-    public boolean castDatetime(String format, String value) throws TypeInferringException{
-        throw new TypeInferringException();
+    public DateTime castDatetime(String format, String value) throws TypeInferringException{
+   
+        Pattern pattern = Pattern.compile(REGEX_DATETIME);
+        Matcher matcher = pattern.matcher(value);
+        
+        if(matcher.matches()){
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+            DateTime dt = formatter.parseDateTime(value);
+            
+            return dt;
+            
+        }else{
+            throw new TypeInferringException();
+        }  
     }
     
-    public boolean castTime(String format, String value) throws TypeInferringException{
-        throw new TypeInferringException();
+    public DateTime castTime(String format, String value) throws TypeInferringException{
+        Pattern pattern = Pattern.compile(REGEX_DATE);
+        Matcher matcher = pattern.matcher(value);
+        
+        if(matcher.matches()){
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("HH:mm:ss");
+            DateTime dt = formatter.parseDateTime(value);
+            
+            return dt;
+            
+        }else{
+            throw new TypeInferringException();
+        } 
     }
     
-    public boolean castDate(String format, String value) throws TypeInferringException{
-        throw new TypeInferringException();
+    public DateTime castDate(String format, String value) throws TypeInferringException{
+        
+        Pattern pattern = Pattern.compile(REGEX_DATE);
+        Matcher matcher = pattern.matcher(value);
+        
+        if(matcher.matches()){
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+            DateTime dt = formatter.parseDateTime(value);
+            
+            return dt;
+            
+        }else{
+            throw new TypeInferringException();
+        } 
+    }
+    
+    public int castYear(String format, String value) throws TypeInferringException{
+        Pattern pattern = Pattern.compile(REGEX_YEAR);
+        Matcher matcher = pattern.matcher(value);
+        
+        if(matcher.matches()){
+            int year = Integer.parseInt(value);
+            return year;
+            
+        }else{
+            throw new TypeInferringException();
+        } 
+    }
+    
+    public DateTime castYearmonth(String format, String value) throws TypeInferringException{
+        Pattern pattern = Pattern.compile(REGEX_YEARMONTH);
+        Matcher matcher = pattern.matcher(value);
+        
+        if(matcher.matches()){
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("YYYY-MM");
+            DateTime dt = formatter.parseDateTime(value);
+            
+            return dt;
+            
+        }else{
+            throw new TypeInferringException();
+        } 
     }
     
     public int castInteger(String format, String value) throws TypeInferringException{
