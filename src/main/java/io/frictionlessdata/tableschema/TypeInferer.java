@@ -40,9 +40,7 @@ public class TypeInferer {
     // The order in which the types will be attempted to be inferred.
     // Once a type is successfully inferred, we do not bother with the remaining types.
     private static final List<String[]> TYPE_INFERRAL_ORDER_LIST = new ArrayList<>(Arrays.asList(
-        new String[]{"duration", "default"}, // No different formats, just use default.
-        new String[]{"year", "default"}, // No different formats, just use default.
-        new String[]{"yearmonth", "default"}, // No different formats, just use default.
+        
         new String[]{"geojson", "default"},
         new String[]{"geojson", "topojson"},
         new String[]{"geopoint", "default"},
@@ -50,9 +48,12 @@ public class TypeInferer {
         new String[]{"geopoint", "object"},
         new String[]{"object", "default"},
         new String[]{"array", "default"},
-        new String[]{"datetime", "default"}, // No different formats, just use default.
-        new String[]{"time", "default"}, // No different formats, just use default.
+        new String[]{"duration", "default"}, // No different formats, just use default.
+        new String[]{"year", "default"}, // No different formats, just use default.
+        new String[]{"yearmonth", "default"}, // No different formats, just use default.
         new String[]{"date", "default"}, // No different formats, just use default.
+        new String[]{"time", "default"}, // No different formats, just use default.
+        new String[]{"datetime", "default"}, // No different formats, just use default.
         new String[]{"integer", "default"}, // No different formats, just use default.
         new String[]{"number", "default"}, // No different formats, just use default.
         new String[]{"boolean", "default"}, // No different formats, just use default.
@@ -377,7 +378,7 @@ public class TypeInferer {
     }
     
     public DateTime castTime(String format, String value) throws TypeInferringException{
-        Pattern pattern = Pattern.compile(REGEX_DATE);
+        Pattern pattern = Pattern.compile(REGEX_TIME);
         Matcher matcher = pattern.matcher(value);
         
         if(matcher.matches()){

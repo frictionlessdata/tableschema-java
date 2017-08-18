@@ -1,7 +1,6 @@
 package io.frictionlessdata.tableschema;
 
 
-import io.frictionlessdata.tableschema.TypeInferer;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Assert;
@@ -148,7 +147,7 @@ public class TypeInfererTest {
         
     }
     
-        @Test
+    @Test
     public void testCastObject(){
         
     }

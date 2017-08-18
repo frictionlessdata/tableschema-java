@@ -57,8 +57,7 @@ public class Table{
     
     public JSONObject inferSchema() throws TypeInferringException{
         try{
-            this.typeInferer.infer(this.read(), this.headers());
-            return null;
+            return this.typeInferer.infer(this.read(), this.headers());
         }catch(Exception e){
             throw new TypeInferringException();
         }
