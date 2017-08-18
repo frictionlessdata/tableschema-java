@@ -18,10 +18,11 @@ public class MainTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String sourceFileAbsPath = MainTest.class.getResource("/fixtures/simple_data.csv").getPath();
+        String sourceFileAbsPath = MainTest.class.getResource("/fixtures/int_string_bool_geopoint_data.csv").getPath();
         try{
             Table table = new Table(sourceFileAbsPath);
             
+            /**
             System.out.println(Arrays.toString(table.headers()));
             
             //System.out.println(table.read());
@@ -36,7 +37,9 @@ public class MainTest {
             }
 
             System.out.println(table.read());
-            System.out.println(table.read());
+            System.out.println(table.read());**/
+            
+            table.inferSchema();
 
         }catch(Exception e){
             e.printStackTrace();

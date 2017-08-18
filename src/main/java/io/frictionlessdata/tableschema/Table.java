@@ -14,22 +14,25 @@ import java.util.List;
 public class Table{
     private DataSource dataSource = null;
     private JSONObject schema = null;
-    private TypeInferer typeInferer = new TypeInferer();
+    private TypeInferer typeInferer = null;
     
     public Table(String dataSourceFilename) throws Exception{
         // FIXME: Don't assume it is always CSV.
         this.dataSource = new CsvDataSource(dataSourceFilename);
+        this.typeInferer = new TypeInferer();
         // Infer schema?
     }
     
     public Table(URL url) throws Exception{
         this.dataSource = new CsvDataSource(url);
+        this.typeInferer = new TypeInferer();
         // Infer schema?
     }
     
     public Table(String dataSourceFilename, JSONObject schema) throws Exception{
         // FIXME: Don't assume it is always CSV.
         this.dataSource = new CsvDataSource(dataSourceFilename);
+        this.typeInferer = new TypeInferer();
     }
     
     public Iterator<String[]> iterator(){
@@ -52,9 +55,18 @@ public class Table{
        return this.dataSource.data();
     }
     
+    public JSONObject inferSchema() throws TypeInferringException{
+        try{
+            this.typeInferer.infer(this.read(), this.headers());
+            return null;
+        }catch(Exception e){
+            throw new TypeInferringException();
+        }
+    }
+    
     public JSONObject inferSchema(int rowLimit) throws TypeInferringException{
         try{
-            typeInferer.infer(this.read(), rowLimit);
+            this.typeInferer.infer(this.read(), this.headers(), rowLimit);
             return null;
         }catch(Exception e){
             throw new TypeInferringException();
