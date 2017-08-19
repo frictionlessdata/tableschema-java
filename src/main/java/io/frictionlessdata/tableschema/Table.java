@@ -14,25 +14,25 @@ import java.util.List;
 public class Table{
     private DataSource dataSource = null;
     private JSONObject schema = null;
-    private TypeInferer typeInferer = null;
+    private TypeInferrer typeInferrer = null;
     
     public Table(String dataSourceFilename) throws Exception{
         // FIXME: Don't assume it is always CSV.
         this.dataSource = new CsvDataSource(dataSourceFilename);
-        this.typeInferer = new TypeInferer();
+        this.typeInferrer = new TypeInferrer();
         // Infer schema?
     }
     
     public Table(URL url) throws Exception{
         this.dataSource = new CsvDataSource(url);
-        this.typeInferer = new TypeInferer();
+        this.typeInferrer = new TypeInferrer();
         // Infer schema?
     }
     
     public Table(String dataSourceFilename, JSONObject schema) throws Exception{
         // FIXME: Don't assume it is always CSV.
         this.dataSource = new CsvDataSource(dataSourceFilename);
-        this.typeInferer = new TypeInferer();
+        this.typeInferrer = new TypeInferrer();
     }
     
     public Iterator<String[]> iterator(){
@@ -57,7 +57,7 @@ public class Table{
     
     public JSONObject inferSchema() throws TypeInferringException{
         try{
-            return this.typeInferer.infer(this.read(), this.headers());
+            return this.typeInferrer.infer(this.read(), this.headers());
         }catch(Exception e){
             throw new TypeInferringException();
         }
@@ -65,7 +65,7 @@ public class Table{
     
     public JSONObject inferSchema(int rowLimit) throws TypeInferringException{
         try{
-            this.typeInferer.infer(this.read(), this.headers(), rowLimit);
+            this.typeInferrer.infer(this.read(), this.headers(), rowLimit);
             return null;
         }catch(Exception e){
             throw new TypeInferringException();

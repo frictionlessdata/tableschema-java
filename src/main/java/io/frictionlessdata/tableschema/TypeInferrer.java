@@ -29,7 +29,7 @@ import org.joda.time.format.DateTimeFormatter;
  *
  * 
  */
-public class TypeInferer {
+public class TypeInferrer {
     
     private Schema geoJsonSchema = null;
     private Schema topoJsonSchema = null;
@@ -76,16 +76,16 @@ public class TypeInferer {
     // yyyy-MM
     private static final String REGEX_YEARMONTH = "([0-9]{4})-(1[0-2]|0[1-9])";
     
-    public TypeInferer(){
+    public TypeInferrer(){
         // FIXME: Maybe this infering against geojson and topojson scheme is too much.
         // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
-        InputStream geoJsonSchemaInputStream = TypeInferer.class.getResourceAsStream("/schemas/geojson/geojson.json");
+        InputStream geoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/geojson.json");
         JSONObject rawGeoJsonSchema = new JSONObject(new JSONTokener(geoJsonSchemaInputStream));
         //this.geoJsonSchema = SchemaLoader.load(rawGeoJsonSchema);
         
         // FIXME: Maybe this infering against geojson and topojson scheme is too much.
         // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema
-        InputStream topoJsonSchemaInputStream = TypeInferer.class.getResourceAsStream("/schemas/geojson/topojson.json");
+        InputStream topoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/topojson.json");
         JSONObject rawTopoJsonSchema = new JSONObject(new JSONTokener(topoJsonSchemaInputStream));
         //this.topoJsonSchema = SchemaLoader.load(rawTopoJsonSchema);
     }
@@ -179,8 +179,8 @@ public class TypeInferer {
                 String castMethodName = "cast" + (dataType.substring(0, 1).toUpperCase() + dataType.substring(1));
                 String format = typeInferralDefinition[1];
                  
-                Method method = TypeInferer.class.getMethod(castMethodName, String.class, String.class);
-                method.invoke(new TypeInferer(), format, datum);
+                Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class);
+                method.invoke(new TypeInferrer(), format, datum);
                 
                 // If no exception is thrown, in means that a type has been inferred.
                 // Let's keep track of it in the inferral map.

@@ -29,7 +29,7 @@ public class Schema {
     
     private void initValidator(){
         // Init for validation
-        InputStream tableSchemaInputStream = TypeInferer.class.getResourceAsStream("/schemas/table-schema.json");
+        InputStream tableSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/table-schema.json");
         JSONObject rawTableJsonSchema = new JSONObject(new JSONTokener(tableSchemaInputStream));
         this.tableJsonSchema = SchemaLoader.load(rawTableJsonSchema);
     }

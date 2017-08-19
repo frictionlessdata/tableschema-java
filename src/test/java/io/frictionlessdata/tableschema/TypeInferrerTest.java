@@ -10,9 +10,9 @@ import org.junit.Test;
  *
  * 
  */
-public class TypeInfererTest {
+public class TypeInferrerTest {
     
-    TypeInferer typeInferer = new TypeInferer();
+    TypeInferrer typeInferrer = new TypeInferrer();
     
     @Test
     public void testCastDatetime(){
@@ -21,7 +21,7 @@ public class TypeInfererTest {
         String validDatetimeString = "2008-08-30T01:45:36.123Z";
         
         try{
-            DateTime dt = this.typeInferer.castDatetime("default", validDatetimeString).withZone(DateTimeZone.UTC);
+            DateTime dt = this.typeInferrer.castDatetime("default", validDatetimeString).withZone(DateTimeZone.UTC);
             Assert.assertEquals(2008, dt.getYear());
             Assert.assertEquals(8, dt.getMonthOfYear());
             Assert.assertEquals(30, dt.getDayOfMonth());
@@ -41,7 +41,7 @@ public class TypeInfererTest {
         String validDateString = "2008-08-30";
         
         try{
-            DateTime dt = this.typeInferer.castDate("default", validDateString);
+            DateTime dt = this.typeInferrer.castDate("default", validDateString);
             Assert.assertEquals(2008, dt.getYear());
             Assert.assertEquals(8, dt.getMonthOfYear());
             Assert.assertEquals(30, dt.getDayOfMonth());
@@ -58,7 +58,7 @@ public class TypeInfererTest {
         String validYearString = "2008";
         
         try{
-            int year = this.typeInferer.castYear("default", validYearString);
+            int year = this.typeInferrer.castYear("default", validYearString);
             Assert.assertEquals(2008, year);
 
         }catch(TypeInferringException tie){
@@ -73,7 +73,7 @@ public class TypeInfererTest {
         String validYearmonthString = "2008-08";
         
         try{
-            DateTime dt = this.typeInferer.castYearmonth("default", validYearmonthString);
+            DateTime dt = this.typeInferrer.castYearmonth("default", validYearmonthString);
             Assert.assertEquals(2008, dt.getYear());
             Assert.assertEquals(8, dt.getMonthOfYear());
 
@@ -85,15 +85,15 @@ public class TypeInfererTest {
     @Test
     public void testCastGeopoint(){
         try{
-            int[] geopointDefault = this.typeInferer.castGeopoint("default", "34,23");
+            int[] geopointDefault = this.typeInferrer.castGeopoint("default", "34,23");
             Assert.assertEquals(34, geopointDefault[0]);
             Assert.assertEquals(23, geopointDefault[1]);
             
-            int[] geopointArray = this.typeInferer.castGeopoint("array", "[10,67]");
+            int[] geopointArray = this.typeInferrer.castGeopoint("array", "[10,67]");
             Assert.assertEquals(10, geopointArray[0]);
             Assert.assertEquals(67, geopointArray[1]);
             
-            int[] geopointObject = this.typeInferer.castGeopoint("object", "{\"lon\": 12, \"lat\": 44}");
+            int[] geopointObject = this.typeInferrer.castGeopoint("object", "{\"lon\": 12, \"lat\": 44}");
             Assert.assertEquals(12, geopointObject[0]);
             Assert.assertEquals(44, geopointObject[1]);
             
@@ -105,9 +105,9 @@ public class TypeInfererTest {
     @Test
     public void testCastInteger(){
         try{
-            Assert.assertEquals(2, this.typeInferer.castInteger("default", "2"));
-            Assert.assertEquals(10, this.typeInferer.castInteger("default", "10"));
-            Assert.assertEquals(123123, this.typeInferer.castInteger("default", "123123"));
+            Assert.assertEquals(2, this.typeInferrer.castInteger("default", "2"));
+            Assert.assertEquals(10, this.typeInferrer.castInteger("default", "10"));
+            Assert.assertEquals(123123, this.typeInferrer.castInteger("default", "123123"));
             
         }catch(TypeInferringException tie){
             Assert.fail("Failed to cast valid Integer String into primitive int type.");
@@ -117,25 +117,25 @@ public class TypeInfererTest {
     @Test
     public void testCastBoolean(){
         try{
-            Assert.assertFalse(this.typeInferer.castBoolean("default", "f"));
-            Assert.assertFalse(this.typeInferer.castBoolean("default", "F"));
-            Assert.assertFalse(this.typeInferer.castBoolean("default", "False"));
-            Assert.assertFalse(this.typeInferer.castBoolean("default", "FALSE"));
-            Assert.assertFalse(this.typeInferer.castBoolean("default", "0"));
-            Assert.assertFalse(this.typeInferer.castBoolean("default", "no"));
-            Assert.assertFalse(this.typeInferer.castBoolean("default", "NO"));
-            Assert.assertFalse(this.typeInferer.castBoolean("default", "n"));
-            Assert.assertFalse(this.typeInferer.castBoolean("default", "N"));
+            Assert.assertFalse(this.typeInferrer.castBoolean("default", "f"));
+            Assert.assertFalse(this.typeInferrer.castBoolean("default", "F"));
+            Assert.assertFalse(this.typeInferrer.castBoolean("default", "False"));
+            Assert.assertFalse(this.typeInferrer.castBoolean("default", "FALSE"));
+            Assert.assertFalse(this.typeInferrer.castBoolean("default", "0"));
+            Assert.assertFalse(this.typeInferrer.castBoolean("default", "no"));
+            Assert.assertFalse(this.typeInferrer.castBoolean("default", "NO"));
+            Assert.assertFalse(this.typeInferrer.castBoolean("default", "n"));
+            Assert.assertFalse(this.typeInferrer.castBoolean("default", "N"));
             
-            Assert.assertTrue(this.typeInferer.castBoolean("default", "t"));
-            Assert.assertTrue(this.typeInferer.castBoolean("default", "T"));
-            Assert.assertTrue(this.typeInferer.castBoolean("default", "True"));
-            Assert.assertTrue(this.typeInferer.castBoolean("default", "TRUE"));
-            Assert.assertTrue(this.typeInferer.castBoolean("default", "1"));
-            Assert.assertTrue(this.typeInferer.castBoolean("default", "yes"));
-            Assert.assertTrue(this.typeInferer.castBoolean("default", "YES"));
-            Assert.assertTrue(this.typeInferer.castBoolean("default", "y"));
-            Assert.assertTrue(this.typeInferer.castBoolean("default", "Y"));
+            Assert.assertTrue(this.typeInferrer.castBoolean("default", "t"));
+            Assert.assertTrue(this.typeInferrer.castBoolean("default", "T"));
+            Assert.assertTrue(this.typeInferrer.castBoolean("default", "True"));
+            Assert.assertTrue(this.typeInferrer.castBoolean("default", "TRUE"));
+            Assert.assertTrue(this.typeInferrer.castBoolean("default", "1"));
+            Assert.assertTrue(this.typeInferrer.castBoolean("default", "yes"));
+            Assert.assertTrue(this.typeInferrer.castBoolean("default", "YES"));
+            Assert.assertTrue(this.typeInferrer.castBoolean("default", "y"));
+            Assert.assertTrue(this.typeInferrer.castBoolean("default", "Y"));
 
         }catch(TypeInferringException tie){
             Assert.fail("Failed to cast valid boolean String into boolean object.");
