@@ -149,3 +149,9 @@ System.out.print("lon: " + geopointVal[0] + ", lat: " + geopointVal[1]);
 
 // lon: 12, lat: 21
 ```
+
+Casting a value will check the value is of the expected type, is in the correct format, and complies with any constraints imposed in the descriptor.
+
+Value that can't be cast will raise an InvalidCast exception.
+
+Casting a value that doesn't meet the constraints will raise a ConstraintError exception.
