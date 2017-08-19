@@ -60,9 +60,6 @@ public class TypeInferer {
         new String[]{"string", "default"}, // No different formats, just use default.
         new String[]{"any", "default"})); // No different formats, just use default.
     
-
-    // Duration is the ISO 8601 extended format PnYnMnDTnHnMnS
-    private static final String REGEX_DURATION = "P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T?(([0-9]+H)?([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?))";
     
     // ISO 8601 format of yyyy-MM-dd'T'HH:mm:ss.SSSZ in UTC time
     private static final String REGEX_DATETIME = "(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?";
@@ -80,12 +77,13 @@ public class TypeInferer {
     private static final String REGEX_YEARMONTH = "([0-9]{4})-(1[0-2]|0[1-9])";
     
     public TypeInferer(){
-        
+        // FIXME: Maybe this infering against geojson and topojson scheme is too much.
         // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
         InputStream geoJsonSchemaInputStream = TypeInferer.class.getResourceAsStream("/schemas/geojson/geojson.json");
         JSONObject rawGeoJsonSchema = new JSONObject(new JSONTokener(geoJsonSchemaInputStream));
         //this.geoJsonSchema = SchemaLoader.load(rawGeoJsonSchema);
         
+        // FIXME: Maybe this infering against geojson and topojson scheme is too much.
         // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema
         InputStream topoJsonSchemaInputStream = TypeInferer.class.getResourceAsStream("/schemas/geojson/topojson.json");
         JSONObject rawTopoJsonSchema = new JSONObject(new JSONTokener(topoJsonSchemaInputStream));
@@ -233,13 +231,12 @@ public class TypeInferer {
      * @throws TypeInferringException 
      */
     public Duration castDuration(String format, String value) throws TypeInferringException{
-        Pattern pattern = Pattern.compile(REGEX_DURATION);
-        Matcher matcher = pattern.matcher(value);
-        if(matcher.matches()){
-            return null; //TODO: Build Duration object.
-        }else{
+        try{
+            return Duration.parse(value); 
+        }catch(Exception e){
             throw new TypeInferringException();
-        }  
+        }    
+        
     }
     
     /**
