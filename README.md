@@ -47,3 +47,50 @@ System.out.println(schema);
 ```
 
 ### Build a Schema
+
+You can also build a schema from scratch or modify an existing one:
+
+```java
+Schema schema = new Schema();
+
+Field nameField = new Field("name", "string");
+schema.addField(nameField);
+
+Field coordinatesField = new Field("coordinates", "geopoint");
+schema.addField(coordinatesField);
+
+System.out.println(schema.getJson());
+
+// {"fields":[{"name":"name","format":"default","description":"","type":"string","title":"","constraints":{}},{"name":"coordinates","format":"default","description":"","type":"geopoint","title":"","constraints":{}}]}
+```
+
+You can also buid a Schema with JSONObject instances instead of Field instances:
+
+```java
+Schema schema = new Schema();
+
+JSONObject nameFieldJsonObject = new JSONObject();
+nameFieldJsonObject.put("name", "name");
+nameFieldJsonObject.put("type", "string");
+schema.addField(nameFieldJsonObject);
+
+// An invalid Field definition, will be ignored.
+JSONObject invalidFieldJsonObject = new JSONObject();
+invalidFieldJsonObject.put("name", "id");
+invalidFieldJsonObject.put("type", "integer");
+invalidFieldJsonObject.put("format", "invalid");
+schema.addField(invalidFieldJsonObject);
+
+JSONObject coordinatesFieldJsonObject = new JSONObject();
+coordinatesFieldJsonObject.put("name", "coordinates");
+coordinatesFieldJsonObject.put("type", "geopoint");
+coordinatesFieldJsonObject.put("format", "array");
+schema.addField(coordinatesFieldJsonObject);
+
+System.out.println(schema.getJson());
+
+// {"fields":[{"name":"name","type":"string"},{"name":"coordinates","format":"array","type":"geopoint"}]}
+```
+
+Every time a field is added, the schema does a validation test.
+If adding a field causes the schema to fail validation, then the field is automatically removed.
