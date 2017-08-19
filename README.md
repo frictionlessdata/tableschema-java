@@ -35,7 +35,7 @@ List<String[]> allData = table.read();
 
 Cast data from a CSV with a schema:
 ```java
-TODO: Implement and document this.
+//TODO: Implement and document this.
 ```
 
 ### Infer a Schema
@@ -103,7 +103,7 @@ When using the addField method, the schema undergoes validation after every fiel
 If adding a field causes the schema to fail validation, then the field is automatically removed.
 
 ### Validate a Schema
-A validate method can be called to validate the schema at any time:
+To make sure a schema complies with [Table Schema specifications](https://specs.frictionlessdata.io/table-schema/), we can validate each custom schema against the official [Table Schema schema](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/schemas/table-schema.json):
 
 ```java
 JSONObject schemaJsonObj = new JSONObject();
@@ -125,4 +125,12 @@ isValid = schema.validate();
 System.out.println(isValid);
 
 // false
+```
+
+### Field Casting
+Data values can be cast to native Java objects with a Field instance. This allows formats and constraints to be defined for the field in the [field descriptor](https://specs.frictionlessdata.io/table-schema/#field-descriptors):
+
+```java
+// TODO: Casting has mostly been implemented in the TypeInferer class.
+// Need to hook up with Field class and document.
 ```
