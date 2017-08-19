@@ -145,7 +145,7 @@ System.out.print(datetimeVal.getYear());
 
 Field geopointField = new Field("coordinates", "geopoint", "array");
 int[] geopointVal = geopointField.castValue("[12,21]");
-System.out.print("lon: " + geopointVal[0] + ", geopointVal: " + val[1]);
+System.out.print("lon: " + geopointVal[0] + ", lat: " + geopointVal[1]);
 
 // lon: 12, lat: 21
 ```
