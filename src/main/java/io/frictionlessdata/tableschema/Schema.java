@@ -19,13 +19,21 @@ public class Schema {
     public Schema(){
         this.schema = new JSONObject();
         schema.put("fields", new JSONArray());
-        
+        initValidator();
+    }
+    
+    public Schema(JSONObject schema){
+        this.schema = schema;
+        initValidator();    
+    }
+    
+    private void initValidator(){
         // Init for validation
         InputStream tableSchemaInputStream = TypeInferer.class.getResourceAsStream("/schemas/table-schema.json");
         JSONObject rawTableJsonSchema = new JSONObject(new JSONTokener(tableSchemaInputStream));
         this.tableJsonSchema = SchemaLoader.load(rawTableJsonSchema);
-        
     }
+           
     
     public void addField(Field fieldObj){
         this.addField(fieldObj.getJson());
@@ -44,17 +52,15 @@ public class Schema {
             // Simply remove last item that was added
             int position = this.schema.getJSONArray("fields").length();
             this.schema.getJSONArray("fields").remove(position-1);
-            ve.getViolatedSchema();
-            ve.getErrorMessage();
-            String blah = "as;";
         }
     }
     
-    public void validate() throws ValidationException{
+    public boolean validate(){
         try{
             this.tableJsonSchema.validate(this.schema);
+            return true;
         }catch(ValidationException ve){
-            throw ve;
+            return false;
         }
     }
     

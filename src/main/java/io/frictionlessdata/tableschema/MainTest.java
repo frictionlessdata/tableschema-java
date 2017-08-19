@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -77,6 +78,23 @@ public class MainTest {
             
             System.out.println(schema2.getJson());
             **/
+            
+            JSONObject schemaJsonObj3 = new JSONObject();
+            Field nameField3 = new Field("id", "integer");
+            schemaJsonObj3.put("fields", new JSONArray());
+            schemaJsonObj3.getJSONArray("fields").put(nameField3.getJson());
+            
+            Schema schema3 = new Schema(schemaJsonObj3);
+            
+            boolean isValid = schema3.validate();
+            System.out.println(isValid);
+            
+            Field invalidField3 = new Field("coordinates", "invalid");
+            schemaJsonObj3.getJSONArray("fields").put(invalidField3.getJson());
+            
+            isValid = schema3.validate();
+            System.out.println(isValid);
+            
             
          
         }catch(Exception e){

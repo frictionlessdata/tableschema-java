@@ -92,5 +92,30 @@ System.out.println(schema.getJson());
 // {"fields":[{"name":"name","type":"string"},{"name":"coordinates","format":"array","type":"geopoint"}]}
 ```
 
-Every time a field is added, the schema undergoes validation.
+When using the addField method, the schema undergoes validation after every field addition.
 If adding a field causes the schema to fail validation, then the field is automatically removed.
+
+### Validate a Schema
+A validate method can be called to validate the schema at any time:
+
+```java
+JSONObject schemaJsonObj = new JSONObject();
+Field nameField = new Field("id", "integer");
+schemaJsonObj.put("fields", new JSONArray());
+schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
+
+Schema schema = new Schema(schemaJsonObj);
+
+boolean isValid = schema.validate();
+System.out.println(isValid);
+
+// true
+
+Field invalidField = new Field("coordinates", "invalid");
+schemaJsonObj.getJSONArray("fields").put(invalidField.getJson());
+
+isValid = schema.validate();
+System.out.println(isValid);
+
+// false
+```

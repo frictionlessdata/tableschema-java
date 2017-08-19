@@ -14,6 +14,10 @@ public class Field {
     private String description = "";
     private JSONObject constraints = new JSONObject();
     
+    public Field(String name){
+        this.name = name;
+    }
+    
     public Field(String name, String type){
         this.name = name;
         this.type = type;
