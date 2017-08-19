@@ -92,5 +92,5 @@ System.out.println(schema.getJson());
 // {"fields":[{"name":"name","type":"string"},{"name":"coordinates","format":"array","type":"geopoint"}]}
 ```
 
-Every time a field is added, the schema does a validation test.
+Every time a field is added, the schema undergoes validation.
 If adding a field causes the schema to fail validation, then the field is automatically removed.
