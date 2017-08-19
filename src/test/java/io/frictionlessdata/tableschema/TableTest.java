@@ -25,16 +25,14 @@ public class TableTest {
     @Test
     public void testReadFromValidUrl() throws Exception{
         // get path of test CSV file
-        /**
-        URL url = new URL("https://github.com/frictionlessdata/tableschema-java/raw/master/spec/fixtures/simple_data.csv");
+        URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
         Table table = new Table(url);
         
         Assert.assertEquals(4, table.read().size());
-        ***/
     }
     
     @Test
-    public void testInferTypesIntAndDate() throws Exception{
+    public void testInferTypesIntAndDates() throws Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/dates_data.csv").getPath();
         Table table = new Table(sourceFileAbsPath);
         
@@ -67,7 +65,7 @@ public class TableTest {
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
         Table table = new Table(sourceFileAbsPath);
         
-        String[] expectedResults = new String[]{"[integer, string]", "[1, foo]", "[2, bar]", "[3, baz]"};
+        String[] expectedResults = new String[]{"[id, title]", "[1, foo]", "[2, bar]", "[3, baz]"};
         
         Iterator<String[]> iter = table.iterator();
         int loopCounter = 0;
@@ -84,6 +82,6 @@ public class TableTest {
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
         Table table = new Table(sourceFileAbsPath);
         
-        Assert.assertEquals("[integer, string]", Arrays.toString(table.headers()));
+        Assert.assertEquals("[id, title]", Arrays.toString(table.headers()));
     }
 }

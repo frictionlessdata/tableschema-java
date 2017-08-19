@@ -129,7 +129,10 @@ public class TypeInferer {
             JSONObject fieldObj = new JSONObject();
             fieldObj.put("name", header);
             fieldObj.put("title", ""); // This will stay blank.
-            fieldObj.put("type", ""); // We wil set this after type inferring is complete.
+            fieldObj.put("description", ""); // This will stay blank.
+            fieldObj.put("constraints", new JSONObject()); // This will stay blank.
+            fieldObj.put("format", ""); // This will bet set post inferral.
+            fieldObj.put("type", ""); // This will bet set post inferral.
             
             // Wrap it all in an array.
             tableFieldJsonArray.put(fieldObj);

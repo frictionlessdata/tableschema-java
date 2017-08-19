@@ -5,6 +5,12 @@
  */
 package io.frictionlessdata.tableschema;
 
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import org.json.JSONObject;
+
 /**
  *
  * @author pechorin
@@ -17,9 +23,20 @@ public class MainTest {
     public static void main(String[] args) {
         String sourceFileAbsPath = MainTest.class.getResource("/fixtures/dates_data.csv").getPath();
         try{
-            Table table = new Table(sourceFileAbsPath);
+            URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
+            Table table = new Table(url);
             
-            System.out.println(table.inferSchema().toString());
+            Iterator<String[]> iter = table.iterator();
+            while(iter.hasNext()){
+                String[] row = iter.next();
+                System.out.println(Arrays.toString(row));
+            }
+            
+            List<String[]> allData = table.read();
+            
+            JSONObject schema = table.inferSchema();
+            System.out.print(schema);
+   
             
 
         }catch(Exception e){
