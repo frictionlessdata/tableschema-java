@@ -131,6 +131,21 @@ System.out.println(isValid);
 Data values can be cast to native Java objects with a Field instance. This allows formats and constraints to be defined for the field in the [field descriptor](https://specs.frictionlessdata.io/table-schema/#field-descriptors):
 
 ```java
-// TODO: Casting has mostly been implemented in the TypeInferer class.
-// Need to hook up with Field class and document.
+Field intField = new Field("id", "integer");
+int intVal = intField.castValue("242");
+System.out.print(intVal);
+
+// 242
+
+Field datetimeField = new Field("date", "datetime");
+DateTime datetimeVal = datetimeField.castValue("2008-08-30T01:45:36.123Z");
+System.out.print(datetimeVal.getYear());
+
+// 2008
+
+Field geopointField = new Field("coordinates", "geopoint", "array");
+int[] geopointVal = geopointField.castValue("[12,21]");
+System.out.print("lon: " + geopointVal[0] + ", geopointVal: " + val[1]);
+
+// lon: 12, lat: 21
 ```

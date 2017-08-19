@@ -1,5 +1,8 @@
 package io.frictionlessdata.tableschema;
 
+import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
+import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import java.lang.reflect.Method;
 import org.json.JSONObject;
 
 /**
@@ -7,6 +10,7 @@ import org.json.JSONObject;
  * 
  */
 public class Field {
+  
     private String name = "";
     private String type = "";
     private String format = "default";
@@ -46,6 +50,36 @@ public class Field {
         this.constraints = constraints;
     }
     
+    /**
+     * Use the Field definition to cast a value into the Field type.
+     * @param <Any>
+     * @param value
+     * @return
+     * @throws InvalidCastException
+     * @throws ConstraintsException 
+     */
+    public <Any> Any castValue(String value) throws InvalidCastException, ConstraintsException{
+        if(this.type.isEmpty()){
+            throw new InvalidCastException();
+        }else{
+            try{
+                // Using reflection to invoke appropriate type casting method from the TypeInferrer class
+                String castMethodName = "cast" + (this.type.substring(0, 1).toUpperCase() + this.type.substring(1));
+                Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class);
+                Object castValue = method.invoke(new TypeInferrer(), this.format, value);
+            
+                return (Any)castValue;
+                
+            }catch(Exception e){
+                throw new InvalidCastException();
+            }
+        } 
+    }
+    
+    /**
+     * Get the JSON representation of the Field.
+     * @return 
+     */
     public JSONObject getJson(){
         JSONObject json = new JSONObject();
         json.put("name", this.name);
@@ -56,8 +90,5 @@ public class Field {
         json.put("constraints", this.constraints);
         
         return json;
-    }
-    
-    
-       
+    }  
 }

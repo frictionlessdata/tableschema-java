@@ -1,6 +1,7 @@
 package io.frictionlessdata.tableschema;
 
 
+import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Assert;
@@ -49,6 +50,11 @@ public class TypeInferrerTest {
         }catch(TypeInferringException tie){
             Assert.fail("Failed to cast valid Date string into DateTime object.");
         }  
+    }
+    
+    @Test
+    public void testCastTime(){
+        //TODO: Implement
     }
     
     @Test
@@ -140,6 +146,18 @@ public class TypeInferrerTest {
         }catch(TypeInferringException tie){
             Assert.fail("Failed to cast valid boolean String into boolean object.");
         } 
+    }
+    
+    @Test
+    public void testDuration(){
+        try{
+            Assert.assertEquals(183840, this.typeInferrer.castDuration("default", "P2DT3H4M").getSeconds());
+            Assert.assertEquals(900, this.typeInferrer.castDuration("default", "PT15M").getSeconds());
+            Assert.assertEquals(20, this.typeInferrer.castDuration("default", "PT20.345S").getSeconds());  
+            
+        }catch(TypeInferringException tie){
+            Assert.fail("Failed to cast valid Duration String into Duration object.");
+        }
     }
     
     @Test

@@ -3,28 +3,28 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package io.frictionlessdata.tableschema;
+package io.frictionlessdata.tableschema.exceptions;
 
 /**
  *
  * @author pechorin
  */
-public class TypeInferringException extends Exception {
+public class InvalidCastException extends Exception {
 
     /**
-     * Creates a new instance of <code>TypeInferringException</code> without
+     * Creates a new instance of <code>InvalidCastException</code> without
      * detail message.
      */
-    public TypeInferringException() {
+    public InvalidCastException() {
     }
 
     /**
-     * Constructs an instance of <code>TypeInferringException</code> with the
+     * Constructs an instance of <code>InvalidCastException</code> with the
      * specified detail message.
      *
      * @param msg the detail message.
      */
-    public TypeInferringException(String msg) {
+    public InvalidCastException(String msg) {
         super(msg);
     }
 }

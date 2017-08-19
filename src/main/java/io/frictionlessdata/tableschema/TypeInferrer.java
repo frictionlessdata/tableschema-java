@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema;
 
+import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -173,8 +174,10 @@ public class TypeInferrer {
     
     private void findType(String header, String datum){
         
+        // Invoke all the type casting methods using reflection.
         for(String[] typeInferralDefinition: TYPE_INFERRAL_ORDER_LIST){
             try{
+                // Keep invoking the type casting methods until one doesn't throw an exception
                 String dataType = typeInferralDefinition[0];
                 String castMethodName = "cast" + (dataType.substring(0, 1).toUpperCase() + dataType.substring(1));
                 String format = typeInferralDefinition[1];
@@ -238,8 +241,7 @@ public class TypeInferrer {
             return Duration.parse(value); 
         }catch(Exception e){
             throw new TypeInferringException();
-        }    
-        
+        }
     }
     
     /**

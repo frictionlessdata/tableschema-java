@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema;
 
+import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
 import io.frictionlessdata.tableschema.datasources.CsvDataSource;
 import io.frictionlessdata.tableschema.datasources.DataSource;
 import org.json.*;
