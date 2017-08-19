@@ -8,9 +8,9 @@ A Java library for working with Table Schema.
 
 ## Usage
 
-### Parse a CSV
+### Parse a CSV Without a Schema
 
-Cast data from a CSV without a schema
+Cast data from a CSV without a schema:
 
 ```java
 URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
@@ -29,6 +29,13 @@ while(iter.hasNext()){
 
 // Read the entire CSV and output it as a List:
 List<String[]> allData = table.read();
+```
+
+### Parse a CSV With a Schema
+
+Cast data from a CSV with a schema:
+```java
+TODO: Implement and document this.
 ```
 
 ### Infer a Schema
