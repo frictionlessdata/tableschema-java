@@ -31,7 +31,7 @@ while(iter.hasNext()){
 List<String[]> allData = table.read();
 ```
 
-### Infer a schema
+### Infer a Schema
 
 If you don't have a schema for a CSV, and want to generate one, you can infer a schema like so:
 
