@@ -57,7 +57,7 @@ public class MainTest {
             **/
             
             // Build Schema with JSONObject instances
-            /**
+
             Schema schema2 = new Schema();
             
             JSONObject nameFieldJsonObject = new JSONObject();
@@ -79,9 +79,8 @@ public class MainTest {
             schema2.addField(coordinatesFieldJsonObject);
             
             System.out.println(schema2.getJson());
-            **/
             
-            /**
+  
             JSONObject schemaJsonObj3 = new JSONObject();
             Field nameField3 = new Field("id", "integer");
             schemaJsonObj3.put("fields", new JSONArray());
@@ -97,13 +96,14 @@ public class MainTest {
             
             isValid = schema3.validate();
             System.out.println(isValid);
-            **/
+ 
             
+            /**
             Field field = new Field("name", "geopoint", "default");
             int[] val = field.castValue("12,21");
             System.out.print("YPYOOY: " + val[0]);
             
-            /**
+            
             Field field2 = new Field("name", "geopoint", "array");
             int[] val2 = field2.castValue("[12,21]");
             System.out.print(val2[0]);

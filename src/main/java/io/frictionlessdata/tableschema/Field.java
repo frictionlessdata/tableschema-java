@@ -16,7 +16,9 @@ public class Field {
     private String format = "default";
     private String title = "";
     private String description = "";
-    private JSONObject constraints = new JSONObject();
+    
+    //FIXME: Change this to Map
+    private JSONObject constraints = null;
     
     public Field(String name){
         this.name = name;
@@ -50,6 +52,18 @@ public class Field {
         this.constraints = constraints;
     }
     
+    public Field(JSONObject field){
+        //TODO: Maybe use Gson serializer for this instead? Is it worth importing library just for this?      
+        this.name = field.has("name") ? field.getString("name") : "";
+        this.type = field.has("type") ? field.getString("type") : "";
+        this.format = field.has("format") ? field.getString("format") : "default";
+        this.title = field.has("title") ? field.getString("title") : "";
+        this.description = field.has("description") ? field.getString("description") : "";
+        
+        //FIXME: Handle with Map instead of JSONObject.
+        this.constraints = field.has("constraints") ? field.getJSONObject("constraints") : null;
+    }
+    
     /**
      * Use the Field definition to cast a value into the Field type.
      * @param <Any>
@@ -81,6 +95,7 @@ public class Field {
      * @return 
      */
     public JSONObject getJson(){
+        //FIXME: Maybe we should use JSON serializer like Gson?
         JSONObject json = new JSONObject();
         json.put("name", this.name);
         json.put("type", this.type);
@@ -90,5 +105,9 @@ public class Field {
         json.put("constraints", this.constraints);
         
         return json;
-    }  
+    }
+    
+    public String getName(){
+        return this.name;
+    }
 }
