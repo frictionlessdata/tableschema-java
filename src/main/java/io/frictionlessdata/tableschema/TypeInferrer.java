@@ -27,8 +27,8 @@ import org.joda.time.format.DateTimeFormatter;
 
 
 /**
- *
- * 
+ * The algorithm tries to cast to availables types and each type has a popularity score.
+ * At the end, the best score so far is returned.
  */
 public class TypeInferrer {
     
@@ -187,7 +187,7 @@ public class TypeInferrer {
                 
                 // If no exception is thrown, in means that a type has been inferred.
                 // Let's keep track of it in the inferral map.
-                this.updateInferralMap(header, dataType);
+                this.updateInferralScoreMap(header, dataType);
                 
                 // We no longer need to try to infer other types.
                 // Let's break out of the loop.
@@ -206,7 +206,7 @@ public class TypeInferrer {
      * @param header
      * @param typeKey 
      */
-    private void updateInferralMap(String header, String typeKey){
+    private void updateInferralScoreMap(String header, String typeKey){
         if(this.typeInferralMap.get(header).containsKey(typeKey)){
             int newCount = this.typeInferralMap.get(header).get(typeKey) + 1;
             this.typeInferralMap.get(header).replace(typeKey, newCount);
