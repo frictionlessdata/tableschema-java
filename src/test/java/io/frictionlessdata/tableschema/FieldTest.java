@@ -15,7 +15,7 @@ import org.junit.Test;
 public class FieldTest {
     @Test
     public void testFieldCastGeopointDefault() throws Exception{   
-        Field field = new Field("name", "geopoint", "default");
+        Field field = new Field("name", Field.FIELD_TYPE_GEOPOINT, "default");
         int[] val = field.castValue("12,21");
         Assert.assertEquals(12, val[0]);
         Assert.assertEquals(21, val[1]);   
@@ -23,7 +23,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastGeopointArray() throws Exception{   
-        Field field = new Field("name", "geopoint", "array");
+        Field field = new Field("name", Field.FIELD_TYPE_GEOPOINT, "array");
         int[] val = field.castValue("[45,32]");
         Assert.assertEquals(45, val[0]);
         Assert.assertEquals(32, val[1]);   
@@ -31,7 +31,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastGeopointObject() throws Exception{   
-        Field field = new Field("name", "geopoint", "object");
+        Field field = new Field("name", Field.FIELD_TYPE_GEOPOINT, "object");
         int[] val = field.castValue("{\"lon\": 67, \"lat\": 19}");
         Assert.assertEquals(67, val[0]);
         Assert.assertEquals(19, val[1]);   
@@ -39,14 +39,14 @@ public class FieldTest {
     
     @Test
     public void testFieldCastInteger() throws Exception{   
-        Field field = new Field("name", "integer");
+        Field field = new Field("name", Field.FIELD_TYPE_INTEGER);
         int val = field.castValue("123");
         Assert.assertEquals(123, val); 
     }
     
     @Test
     public void testFieldCastDuration() throws Exception{   
-        Field field = new Field("name", "duration");
+        Field field = new Field("name", Field.FIELD_TYPE_DURATION);
         Duration val = field.castValue("P2DT3H4M");
         Assert.assertEquals(183840, val.getSeconds()); 
     }
@@ -63,7 +63,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastObject() throws Exception{   
-        Field field = new Field("name", "object");
+        Field field = new Field("name", Field.FIELD_TYPE_OBJECT);
         JSONObject val = field.castValue("{\"one\": 1, \"two\": 2, \"three\": 3}");
         Assert.assertEquals(3, val.length()); 
         Assert.assertEquals(1, val.getInt("one")); 
@@ -73,7 +73,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastArray() throws Exception{   
-        Field field = new Field("name", "array"); 
+        Field field = new Field("name", Field.FIELD_TYPE_ARRAY); 
         JSONArray val = field.castValue("[1,2,3,4]");
         
         Assert.assertEquals(4, val.length()); 
@@ -85,7 +85,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastDateTime() throws Exception{   
-        Field field = new Field("name", "datetime"); 
+        Field field = new Field("name", Field.FIELD_TYPE_DATETIME); 
         DateTime val = field.castValue("2008-08-30T01:45:36.123Z");
         
         Assert.assertEquals(2008, val.withZone(DateTimeZone.UTC).getYear());
@@ -98,7 +98,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastDate() throws Exception{   
-        Field field = new Field("name", "date"); 
+        Field field = new Field("name", Field.FIELD_TYPE_DATE); 
         DateTime val = field.castValue("2008-08-30");
         
         Assert.assertEquals(2008, val.getYear());
@@ -115,14 +115,14 @@ public class FieldTest {
     
     @Test
     public void testFieldCastYear() throws Exception{   
-        Field field = new Field("name", "year"); 
+        Field field = new Field("name", Field.FIELD_TYPE_YEAR); 
         int val = field.castValue("2008");
         Assert.assertEquals(2008, val);
     }
     
     @Test
     public void testFieldCastYearmonth() throws Exception{   
-        Field field = new Field("name", "yearmonth"); 
+        Field field = new Field("name", Field.FIELD_TYPE_YEARMONTH); 
         DateTime val = field.castValue("2008-08");
         
         Assert.assertEquals(2008, val.getYear());
@@ -136,7 +136,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastBoolean() throws Exception{  
-        Field field = new Field("name", "boolean");
+        Field field = new Field("name", Field.FIELD_TYPE_BOOLEAN);
         
         Assert.assertFalse(field.castValue("f"));
         Assert.assertFalse(field.castValue("F"));

@@ -26,18 +26,32 @@ public class Field {
     private String format = "default";
     private String title = "";
     private String description = "";
-    
-    //FIXME: Change this to Map
     private Map<String, Object> constraints = null;
     
-    private static final String CONSTRAINT_KEY_REQUIRED = "required";
-    private static final String CONSTRAINT_KEY_UNIQUE = "unique";
-    private static final String CONSTRAINT_KEY_MIN_LENGTH = "minLength";
-    private static final String CONSTRAINT_KEY_MAX_LENGTH = "maxLength";
-    private static final String CONSTRAINT_KEY_MINIMUM = "minimum";
-    private static final String CONSTRAINT_KEY_MAXIMUM = "maximum";
-    private static final String CONSTRAINT_KEY_PATTERN = "pattern";
-    private static final String CONSTRAINT_KEY_ENUM = "enum";
+    public static final String FIELD_TYPE_STRING = "string";
+    public static final String FIELD_TYPE_INTEGER = "integer";
+    public static final String FIELD_TYPE_NUMBER = "number";
+    public static final String FIELD_TYPE_BOOLEAN = "boolean";
+    public static final String FIELD_TYPE_OBJECT = "object";
+    public static final String FIELD_TYPE_ARRAY = "array";
+    public static final String FIELD_TYPE_DATE = "date";
+    public static final String FIELD_TYPE_TIME = "time";
+    public static final String FIELD_TYPE_DATETIME = "datetime";
+    public static final String FIELD_TYPE_YEAR = "year";
+    public static final String FIELD_TYPE_YEARMONTH = "yearmonth";
+    public static final String FIELD_TYPE_DURATION = "duration";
+    public static final String FIELD_TYPE_GEOPOINT = "geopoint";
+    public static final String FIELD_TYPE_GEOJSON = "geojson";
+    public static final String FIELD_TYPE_ANY = "any";
+    
+    public static final String CONSTRAINT_KEY_REQUIRED = "required";
+    public static final String CONSTRAINT_KEY_UNIQUE = "unique";
+    public static final String CONSTRAINT_KEY_MIN_LENGTH = "minLength";
+    public static final String CONSTRAINT_KEY_MAX_LENGTH = "maxLength";
+    public static final String CONSTRAINT_KEY_MINIMUM = "minimum";
+    public static final String CONSTRAINT_KEY_MAXIMUM = "maximum";
+    public static final String CONSTRAINT_KEY_PATTERN = "pattern";
+    public static final String CONSTRAINT_KEY_ENUM = "enum";
     
     public Field(String name){
         this.name = name;
@@ -147,17 +161,17 @@ public class Field {
             int minLength = (int)this.constraints.get(CONSTRAINT_KEY_MIN_LENGTH);
  
             if(value instanceof String){
-                if(((String)value).length() <= minLength){
+                if(((String)value).length() < minLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MIN_LENGTH, minLength);
                 }
                 
             }else if (value instanceof JSONObject){
-                if(((JSONObject)value).length() <= minLength){
+                if(((JSONObject)value).length() < minLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MIN_LENGTH, minLength);
                 }
                  
             }else if (value instanceof JSONArray){
-                if(((JSONArray)value).length() <= minLength){
+                if(((JSONArray)value).length() < minLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MIN_LENGTH, minLength);
                 }                
             }
@@ -168,17 +182,17 @@ public class Field {
             int maxLength = (int)this.constraints.get(CONSTRAINT_KEY_MAX_LENGTH);
             
             if(value instanceof String){
-                if(((String)value).length() >= maxLength){
+                if(((String)value).length() > maxLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MAX_LENGTH, maxLength);
                 }
                 
             }else if (value instanceof JSONObject){
-                if(((JSONObject)value).length() >= maxLength){
+                if(((JSONObject)value).length() > maxLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MAX_LENGTH, maxLength);
                 }
                  
             }else if (value instanceof JSONArray){
-                if(((JSONArray)value).length() >= maxLength){
+                if(((JSONArray)value).length() > maxLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MAX_LENGTH, maxLength);
                 }                
             }  
@@ -330,7 +344,7 @@ public class Field {
             }
             
             if(violatesEnumConstraint){
-                violatedConstraints.put(CONSTRAINT_KEY_PATTERN, this.constraints.get(CONSTRAINT_KEY_ENUM));
+                violatedConstraints.put(CONSTRAINT_KEY_ENUM, this.constraints.get(CONSTRAINT_KEY_ENUM));
             }
         }
         

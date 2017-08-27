@@ -7,9 +7,12 @@ package io.frictionlessdata.tableschema;
 
 import java.net.URL;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -58,6 +61,7 @@ public class MainTest {
             
             // Build Schema with JSONObject instances
 
+            /**
             Schema schema2 = new Schema();
             
             JSONObject nameFieldJsonObject = new JSONObject();
@@ -96,6 +100,7 @@ public class MainTest {
             
             isValid = schema3.validate();
             System.out.println(isValid);
+            **/
  
             
             /**
@@ -117,7 +122,69 @@ public class MainTest {
             System.out.print(val4.getSeconds());
             **/
             
-  
+            /**
+            Map<String, Object> violatedConstraints = null;
+
+            Map<String, Object> constraints = new HashMap();
+            constraints.put("required", true);
+
+            Field field = new Field("name", Field.FIELD_TYPE_STRING, null, null, null, constraints);
+            String valueNotNull = field.castValue("This is a string value");
+            
+            System.out.println(valueNotNull);
+            
+            String valueNull = field.castValue(null); 
+            violatedConstraints = field.checkConstraintViolations(valueNull);
+            
+            System.out.println(violatedConstraints.toString());
+            ***/
+            
+            /**
+            Map<String, Object> violatedConstraints = null;
+        
+            Map<String, Object> constraints = new HashMap();
+
+            List<String> enumStrings = new ArrayList();
+            enumStrings.add("one");
+            enumStrings.add("two");
+            enumStrings.add("four");
+
+            constraints.put(Field.CONSTRAINT_KEY_ENUM, enumStrings);
+        
+            Field field = new Field("test", Field.FIELD_TYPE_STRING, null, null, null, constraints);
+            violatedConstraints = field.checkConstraintViolations("three");
+            System.out.println(violatedConstraints);
+            
+            violatedConstraints = field.checkConstraintViolations("two");
+            System.out.println(violatedConstraints);
+            **/
+            
+            Map<String, Object> violatedConstraints = null;
+        
+            Map<String, Object> constraints = new HashMap();
+            List<JSONObject> enumObjs = new ArrayList();
+
+            JSONObject obj1 = new JSONObject();
+            obj1.put("one", 1);
+            enumObjs.add(obj1);
+
+            JSONObject obj2 = new JSONObject();
+            obj1.put("one", 1);
+            obj1.put("two", 2);
+            enumObjs.add(obj2);
+
+            JSONObject obj3 = new JSONObject();
+            obj1.put("one", 1);
+            obj1.put("two", 2);
+            obj1.put("four", 4);
+            enumObjs.add(obj3);
+            
+            constraints.put(Field.CONSTRAINT_KEY_ENUM, enumObjs);
+            Field field = new Field("test", Field.FIELD_TYPE_OBJECT, null, null, null, constraints);     
+            
+            violatedConstraints = field.checkConstraintViolations(obj3);
+            System.out.println(violatedConstraints);
+
         }catch(Exception e){
             e.printStackTrace();
         }

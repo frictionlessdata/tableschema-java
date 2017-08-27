@@ -428,7 +428,7 @@ public class TypeInferrer {
         Matcher matcher = pattern.matcher(value);
         
         if(matcher.matches()){
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("YYYY-MM");
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM");
             DateTime dt = formatter.parseDateTime(value);
             
             return dt;
@@ -470,7 +470,7 @@ public class TypeInferrer {
      * @throws TypeInferringException 
      */
     public String castString(String format, String value) throws TypeInferringException{
-        throw new TypeInferringException();
+        return value;
     }
     
     public String isAny(String format, String value) throws TypeInferringException{
