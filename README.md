@@ -55,7 +55,7 @@ System.out.println(schema);
 
 ### Build a Schema
 
-You can also build a schema from scratch or modify an existing one:
+You can also build a `Schema` instance from scratch or modify an existing one:
 
 ```java
 Schema schema = new Schema();
@@ -71,7 +71,7 @@ System.out.println(schema.getJson());
 // {"fields":[{"name":"name","format":"default","description":"","type":"string","title":"","constraints":{}},{"name":"coordinates","format":"default","description":"","type":"geopoint","title":"","constraints":{}}]}
 ```
 
-You can also buid a Schema with `JSONObject` instances instead of Field instances:
+You can also build a `Schema` instance with `JSONObject` instances instead of `Field` instances:
 
 ```java
 Schema schema = new Schema();
@@ -99,7 +99,7 @@ System.out.println(schema.getJson());
 // {"fields":[{"name":"name","type":"string"},{"name":"coordinates","format":"array","type":"geopoint"}]}
 ```
 
-When using the addField method, the schema undergoes validation after every field addition.
+When using the `addField` method, the schema undergoes validation after every field addition.
 If adding a field causes the schema to fail validation, then the field is automatically removed.
 
 ### Validate a Schema
@@ -171,7 +171,7 @@ field.castValue("This string length is greater than 45 characters.", false); // 
 // ConstraintsException will not be thrown despite casting a value that does not meet the constraints.
 ```
 
-You can call the `checkConstraintViolations` to find out which constraints are being validated.
+You can call the `checkConstraintViolations` method to find out which constraints are being validated.
 The method returns a map of violated constraints:
 
 ```java
