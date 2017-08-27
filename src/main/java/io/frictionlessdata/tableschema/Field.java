@@ -97,6 +97,19 @@ public class Field {
         //this.constraints = field.has("constraints") ? field.getJSONObject("constraints") : null;
     }
     
+        /**
+     * Use the Field definition to cast a value into the Field type.
+     * Enforces constraints by default.
+     * @param <Any>
+     * @param value
+     * @return
+     * @throws InvalidCastException
+     * @throws ConstraintsException 
+     */
+    public <Any> Any castValue(String value) throws InvalidCastException, ConstraintsException{
+        return this.castValue(value, true);
+    }
+    
     /**
      * 
      * @param <Any>
@@ -117,7 +130,7 @@ public class Field {
                 Object castValue = method.invoke(new TypeInferrer(), this.format, value);
             
                 // Check for constraint violations
-                if(enforceConstraints){
+                if(enforceConstraints && this.constraints != null){
                     Map<String, Object> violatedConstraints = checkConstraintViolations(castValue);
                     if(!violatedConstraints.isEmpty()){
                         throw new ConstraintsException();
@@ -125,6 +138,9 @@ public class Field {
                 }
                 
                 return (Any)castValue;
+                
+            }catch(ConstraintsException ce){
+                throw ce;
                 
             }catch(Exception e){
                 throw new InvalidCastException();
@@ -349,18 +365,6 @@ public class Field {
         }
         
         return violatedConstraints;
-    }
-    
-    /**
-     * Use the Field definition to cast a value into the Field type.
-     * @param <Any>
-     * @param value
-     * @return
-     * @throws InvalidCastException
-     * @throws ConstraintsException 
-     */
-    public <Any> Any castValue(String value) throws InvalidCastException, ConstraintsException{
-        return this.castValue(value, false);
     }
     
     /**

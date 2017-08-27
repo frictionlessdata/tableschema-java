@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema;
 
+import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,13 +12,18 @@ import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  *
  * 
  */
 public class FieldConstraintsTest {
+    
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testRequiredTrue() throws Exception{
@@ -33,10 +39,13 @@ public class FieldConstraintsTest {
         violatedConstraints = field.checkConstraintViolations(valueNotNull);
         Assert.assertTrue(violatedConstraints.isEmpty());
         
-        String valueNull = field.castValue(null); 
-        violatedConstraints = field.checkConstraintViolations(valueNull);
+        String valueNullConstraintNotEnforce = field.castValue(null, false); 
+        violatedConstraints = field.checkConstraintViolations(valueNullConstraintNotEnforce);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_REQUIRED));
         Assert.assertTrue((boolean)violatedConstraints.get(Field.CONSTRAINT_KEY_REQUIRED));
+        
+        exception.expect(ConstraintsException.class);
+        field.castValue(null); 
     }
     
     @Test
@@ -84,14 +93,19 @@ public class FieldConstraintsTest {
         Assert.assertTrue(violatedConstraints.isEmpty());
         
         // 35 characters
-        String valueLength35 = field.castValue("This string length is less than 36.");
+        String valueLength35 = field.castValue("This string length is less than 36.", false);
         violatedConstraints = field.checkConstraintViolations(valueLength35);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MIN_LENGTH));
         
         // 49 characters
-        String valueLength49 = field.castValue("This string length is greater than 45 characters.");
+        String valueLength49 = field.castValue("This string length is greater than 45 characters.", false);
         violatedConstraints = field.checkConstraintViolations(valueLength49);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAX_LENGTH));
+        
+        exception.expect(ConstraintsException.class);
+        field.castValue("This string length is greater than 45 characters.");
+        
+        
     }
     
     @Test

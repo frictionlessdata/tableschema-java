@@ -16,7 +16,7 @@ public class SchemaTest {
         JSONObject schemaJsonObj = new JSONObject();
        
         schemaJsonObj.put("fields", new JSONArray());
-        Field nameField = new Field("id", "integer");
+        Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
         schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
         
         Schema validSchema = new Schema(schemaJsonObj);
@@ -28,7 +28,7 @@ public class SchemaTest {
         JSONObject schemaJsonObj = new JSONObject();
        
         schemaJsonObj.put("fields", new JSONArray());
-        Field nameField = new Field("id", "integer");
+        Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
         Field invalidField = new Field("coordinates", "invalid");
         schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
         schemaJsonObj.getJSONArray("fields").put(invalidField.getJson());
@@ -39,7 +39,7 @@ public class SchemaTest {
      
     @Test
     public void testAddValidField(){
-        Field nameField = new Field("id", "integer");
+        Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
         Schema validSchema = new Schema();
         validSchema.addField(nameField);
         
@@ -48,9 +48,9 @@ public class SchemaTest {
     
     @Test
     public void testAddInvalidField(){
-        Field nameField = new Field("id", "integer");
+        Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
         Field invalidField = new Field("title", "invalid");
-        Field geopointField = new Field("coordinates", "geopoint"); 
+        Field geopointField = new Field("coordinates", Field.FIELD_TYPE_GEOPOINT); 
         
         Schema validSchema = new Schema();
         validSchema.addField(nameField);

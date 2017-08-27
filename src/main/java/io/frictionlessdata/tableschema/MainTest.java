@@ -159,6 +159,7 @@ public class MainTest {
             System.out.println(violatedConstraints);
             **/
             
+            /**
             Map<String, Object> violatedConstraints = null;
         
             Map<String, Object> constraints = new HashMap();
@@ -184,6 +185,27 @@ public class MainTest {
             
             violatedConstraints = field.checkConstraintViolations(obj3);
             System.out.println(violatedConstraints);
+            **/
+            
+            /**
+            Map<String, Object> violatedConstraints = null;
+        
+            Map<String, Object> constraints = new HashMap();
+            constraints.put(Field.CONSTRAINT_KEY_MIN_LENGTH, 36);
+            constraints.put(Field.CONSTRAINT_KEY_MAX_LENGTH, 45);
+            
+            Field field = new Field("test", Field.FIELD_TYPE_STRING, null, null, null, constraints);
+            String valueLength35 = field.castValue("This string length is less than 36.");
+            **/
+            
+            Map<String, Object> violatedConstraints = null;
+        
+            Map<String, Object> constraints = new HashMap();
+            constraints.put(Field.CONSTRAINT_KEY_MIN_LENGTH, 36);
+            constraints.put(Field.CONSTRAINT_KEY_MAX_LENGTH, 45);
+
+            Field field = new Field("test", Field.FIELD_TYPE_STRING, null, null, null, constraints);
+            field.castValue("This string length is greater than 45 characters.");
 
         }catch(Exception e){
             e.printStackTrace();
