@@ -60,10 +60,10 @@ You can also build a schema from scratch or modify an existing one:
 ```java
 Schema schema = new Schema();
 
-Field nameField = new Field("name", "string");
+Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
 schema.addField(nameField);
 
-Field coordinatesField = new Field("coordinates", "geopoint");
+Field coordinatesField = new Field("coordinates",  Field.FIELD_TYPE_GEOPOINT);
 schema.addField(coordinatesField);
 
 System.out.println(schema.getJson());
@@ -71,27 +71,27 @@ System.out.println(schema.getJson());
 // {"fields":[{"name":"name","format":"default","description":"","type":"string","title":"","constraints":{}},{"name":"coordinates","format":"default","description":"","type":"geopoint","title":"","constraints":{}}]}
 ```
 
-You can also buid a Schema with JSONObject instances instead of Field instances:
+You can also buid a Schema with `JSONObject` instances instead of Field instances:
 
 ```java
 Schema schema = new Schema();
 
 JSONObject nameFieldJsonObject = new JSONObject();
 nameFieldJsonObject.put("name", "name");
-nameFieldJsonObject.put("type", "string");
+nameFieldJsonObject.put("type", Field.FIELD_TYPE_STRING);
 schema.addField(nameFieldJsonObject);
 
 // An invalid Field definition, will be ignored.
 JSONObject invalidFieldJsonObject = new JSONObject();
 invalidFieldJsonObject.put("name", "id");
-invalidFieldJsonObject.put("type", "integer");
+invalidFieldJsonObject.put("type", Field.FIELD_TYPE_INTEGER);
 invalidFieldJsonObject.put("format", "invalid");
 schema.addField(invalidFieldJsonObject);
 
 JSONObject coordinatesFieldJsonObject = new JSONObject();
 coordinatesFieldJsonObject.put("name", "coordinates");
-coordinatesFieldJsonObject.put("type", "geopoint");
-coordinatesFieldJsonObject.put("format", "array");
+coordinatesFieldJsonObject.put("type", Field.FIELD_TYPE_GEOPOINT);
+coordinatesFieldJsonObject.put("format", Field.FIELD_FORMAT_ARRAY);
 schema.addField(coordinatesFieldJsonObject);
 
 System.out.println(schema.getJson());
@@ -107,7 +107,7 @@ To make sure a schema complies with [Table Schema specifications](https://specs.
 
 ```java
 JSONObject schemaJsonObj = new JSONObject();
-Field nameField = new Field("id", "integer");
+Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
 schemaJsonObj.put("fields", new JSONArray());
 schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
 
@@ -131,19 +131,19 @@ System.out.println(isValid);
 Data values can be cast to native Java objects with a Field instance. This allows formats and constraints to be defined for the field in the [field descriptor](https://specs.frictionlessdata.io/table-schema/#field-descriptors):
 
 ```java
-Field intField = new Field("id", "integer");
+Field intField = new Field("id", Field.FIELD_TYPE_INTEGER);
 int intVal = intField.castValue("242");
 System.out.print(intVal);
 
 // 242
 
-Field datetimeField = new Field("date", "datetime");
+Field datetimeField = new Field("date", Field.FIELD_TYPE_DATETIME);
 DateTime datetimeVal = datetimeField.castValue("2008-08-30T01:45:36.123Z");
 System.out.print(datetimeVal.getYear());
 
 // 2008
 
-Field geopointField = new Field("coordinates", "geopoint", "array");
+Field geopointField = new Field("coordinates", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_ARRAY);
 int[] geopointVal = geopointField.castValue("[12,21]");
 System.out.print("lon: " + geopointVal[0] + ", lat: " + geopointVal[1]);
 
@@ -152,9 +152,10 @@ System.out.print("lon: " + geopointVal[0] + ", lat: " + geopointVal[1]);
 
 Casting a value will check the value is of the expected type, is in the correct format, and complies with any constraints imposed in the descriptor.
 
-Value that can't be cast will raise an InvalidCastException.
+Value that can't be cast will raise an `InvalidCastException`.
 
-By default, casting a value that does not meet the constraints will raise a ConstraintsException. Constraints can be ignored with by setting a boolean flag to true:
+By default, casting a value that does not meet the constraints will raise a `ConstraintsException`.
+Constraints can be ignored with by setting a boolean flag to false:
 
 ```java
 // Define constraint limiting String length between 30 and 40 characters:
@@ -162,11 +163,28 @@ Map<String, Object> constraints = new HashMap();
 constraints.put(Field.CONSTRAINT_KEY_MIN_LENGTH, 30);
 constraints.put(Field.CONSTRAINT_KEY_MAX_LENGTH, 40);
 
-// Cast a field value that violates the above constraint.
+// Cast a field and cast a value that violates the above constraint.
 // Disable constrain enforcement by setting the enforceConstraints boolean flag to false.
 Field field = new Field("name", Field.FIELD_TYPE_STRING, null, null, null, constraints);
-field.castValue("This string length is greater than 45 characters.", false);
+field.castValue("This string length is greater than 45 characters.", false); // Setting false here ignores constraints during cast.
 
 // ConstraintsException will not be thrown despite casting a value that does not meet the constraints.
 ```
 
+You can call the `checkConstraintViolations` to find out which constraints are being validated.
+The method returns a map of violated constraints:
+
+```java
+Map<String, Object> constraints = new HashMap();
+constraints.put(Field.CONSTRAINT_KEY_MINIMUM, 5);
+constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, 15);
+
+Field field = new Field("name", Field.FIELD_TYPE_INTEGER, null, null, null, constraints);
+
+int constraintViolatingValue = 16;
+Map<String, Object> violatedConstraints = field.checkConstraintViolations(constraintViolatingValue);
+
+System.out.println(violatedConstraints);
+
+// {maximum=15}
+```

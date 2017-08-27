@@ -4,7 +4,6 @@ import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -20,14 +19,6 @@ import org.json.JSONObject;
  * 
  */
 public class Field {
-  
-    private String name = "";
-    private String type = "";
-    private String format = "default";
-    private String title = "";
-    private String description = "";
-    private Map<String, Object> constraints = null;
-    
     public static final String FIELD_TYPE_STRING = "string";
     public static final String FIELD_TYPE_INTEGER = "integer";
     public static final String FIELD_TYPE_NUMBER = "number";
@@ -44,6 +35,10 @@ public class Field {
     public static final String FIELD_TYPE_GEOJSON = "geojson";
     public static final String FIELD_TYPE_ANY = "any";
     
+    public static final String FIELD_FORMAT_DEFAULT = "default";
+    public static final String FIELD_FORMAT_ARRAY = "array";
+    public static final String FIELD_FORMAT_OBJECT = "object";
+    
     public static final String CONSTRAINT_KEY_REQUIRED = "required";
     public static final String CONSTRAINT_KEY_UNIQUE = "unique";
     public static final String CONSTRAINT_KEY_MIN_LENGTH = "minLength";
@@ -52,6 +47,13 @@ public class Field {
     public static final String CONSTRAINT_KEY_MAXIMUM = "maximum";
     public static final String CONSTRAINT_KEY_PATTERN = "pattern";
     public static final String CONSTRAINT_KEY_ENUM = "enum";
+  
+    private String name = "";
+    private String type = "";
+    private String format = FIELD_FORMAT_DEFAULT;
+    private String title = "";
+    private String description = "";
+    private Map<String, Object> constraints = null;
     
     public Field(String name){
         this.name = name;
@@ -89,12 +91,10 @@ public class Field {
         //TODO: Maybe use Gson serializer for this instead? Is it worth importing library just for this?      
         this.name = field.has("name") ? field.getString("name") : "";
         this.type = field.has("type") ? field.getString("type") : "";
-        this.format = field.has("format") ? field.getString("format") : "default";
+        this.format = field.has("format") ? field.getString("format") : FIELD_FORMAT_DEFAULT;
         this.title = field.has("title") ? field.getString("title") : "";
         this.description = field.has("description") ? field.getString("description") : "";
-        
-        //FIXME: Handle with Map instead of JSONObject.
-        //this.constraints = field.has("constraints") ? field.getJSONObject("constraints") : null;
+        this.constraints = field.has("constraints") ? field.getJSONObject("constraints").toMap() : null;
     }
     
         /**

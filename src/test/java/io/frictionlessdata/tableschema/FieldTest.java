@@ -15,7 +15,7 @@ import org.junit.Test;
 public class FieldTest {
     @Test
     public void testFieldCastGeopointDefault() throws Exception{   
-        Field field = new Field("name", Field.FIELD_TYPE_GEOPOINT, "default", "title", "description");
+        Field field = new Field("name", Field.FIELD_TYPE_GEOPOINT,  Field.FIELD_FORMAT_DEFAULT, "title", "description");
         int[] val = field.castValue("12,21");
         Assert.assertEquals(12, val[0]);
         Assert.assertEquals(21, val[1]);   
@@ -23,7 +23,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastGeopointArray() throws Exception{   
-        Field field = new Field("name", Field.FIELD_TYPE_GEOPOINT, "array", "title", "description");
+        Field field = new Field("name", Field.FIELD_TYPE_GEOPOINT,  Field.FIELD_FORMAT_ARRAY, "title", "description");
         int[] val = field.castValue("[45,32]");
         Assert.assertEquals(45, val[0]);
         Assert.assertEquals(32, val[1]);   
@@ -31,7 +31,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastGeopointObject() throws Exception{   
-        Field field = new Field("name", Field.FIELD_TYPE_GEOPOINT, "object");
+        Field field = new Field("name", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT);
         int[] val = field.castValue("{\"lon\": 67, \"lat\": 19}");
         Assert.assertEquals(67, val[0]);
         Assert.assertEquals(19, val[1]);   
