@@ -612,6 +612,7 @@ public class FieldConstraintsTest {
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_ENUM));  
     }
     
+    @Test
     public void testEnumDatetime(){
         Map<String, Object> violatedConstraints = null;
         
@@ -636,7 +637,7 @@ public class FieldConstraintsTest {
         Assert.assertTrue(violatedConstraints.isEmpty());
         
         DateTime datetime3 = formatter.parseDateTime("2003-01-15T13:44:33.000Z");
-        enumDatetimes.add(datetime3);
+        violatedConstraints = field.checkConstraintViolations(datetime3);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_ENUM));
     }
 }
