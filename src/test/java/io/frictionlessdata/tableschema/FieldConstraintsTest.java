@@ -435,6 +435,43 @@ public class FieldConstraintsTest {
     }
     
     @Test
+    public void testMinimumAndMaximumDuration(){
+        Map<String, Object> violatedConstraints = null;
+        
+        final String DURATION_STRING_MINIMUM = "P2DT3H4M";
+        final String DURATION_STRING_MAXIMUM = "P2DT5H4M";
+        
+        Duration durationMin = Duration.parse(DURATION_STRING_MINIMUM);
+        Duration durationMax = Duration.parse(DURATION_STRING_MAXIMUM);
+        
+        Map<String, Object> constraints = new HashMap();
+        constraints.put(Field.CONSTRAINT_KEY_MINIMUM, durationMin);
+        constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, durationMax);
+        
+        Field field = new Field("test", Field.FIELD_TYPE_DURATION, null, null, null, constraints);
+        
+        Duration duration = Duration.parse("P2DT4H4M");
+        violatedConstraints = field.checkConstraintViolations(duration);
+        Assert.assertTrue(violatedConstraints.isEmpty());
+        
+        Duration durationEqualMin = Duration.parse(DURATION_STRING_MINIMUM);
+        violatedConstraints = field.checkConstraintViolations(durationEqualMin);
+        Assert.assertTrue(violatedConstraints.isEmpty());
+        
+        Duration durationEqualMax = Duration.parse(DURATION_STRING_MAXIMUM);
+        violatedConstraints = field.checkConstraintViolations(durationEqualMax);
+        Assert.assertTrue(violatedConstraints.isEmpty());
+        
+        Duration durationLesserThanMinBy1Min = Duration.parse("P2DT3H3M");
+        violatedConstraints = field.checkConstraintViolations(durationLesserThanMinBy1Min);
+        Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
+        
+        Duration durationGreaterThanMaxBy1Min = Duration.parse("P2DT5H5M");
+        violatedConstraints = field.checkConstraintViolations(durationGreaterThanMaxBy1Min);
+        Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
+    }
+    
+    @Test
     public void testPattern(){
         Map<String, Object> violatedConstraints = null;
         
