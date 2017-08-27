@@ -154,4 +154,19 @@ Casting a value will check the value is of the expected type, is in the correct 
 
 Value that can't be cast will raise an InvalidCastException.
 
-Casting a value that doesn't meet the constraints will raise a ConstraintsException (Not implemented yet).
+By default, casting a value that does not meet the constraints will raise a ConstraintsException. Constraints can be ignored with by setting a boolean flag to true:
+
+```java
+// Define constraint limiting String length between 30 and 40 characters:
+Map<String, Object> constraints = new HashMap();
+constraints.put(Field.CONSTRAINT_KEY_MIN_LENGTH, 30);
+constraints.put(Field.CONSTRAINT_KEY_MAX_LENGTH, 40);
+
+// Cast a field value that violates the above constraint.
+// Disable constrain enforcement by setting the enforceConstraints boolean flag to false.
+Field field = new Field("name", Field.FIELD_TYPE_STRING, null, null, null, constraints);
+field.castValue("This string length is greater than 45 characters.", false);
+
+// ConstraintsException will not be thrown despite casting a value that does not meet the constraints.
+```
+
