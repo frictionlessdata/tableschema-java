@@ -63,7 +63,7 @@ Schema schema = new Schema();
 Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
 schema.addField(nameField);
 
-Field coordinatesField = new Field("coordinates",  Field.FIELD_TYPE_GEOPOINT);
+Field coordinatesField = new Field("coordinates", Field.FIELD_TYPE_GEOPOINT);
 schema.addField(coordinatesField);
 
 System.out.println(schema.getJson());
