@@ -1,6 +1,8 @@
 package io.frictionlessdata.tableschema;
 
+import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -15,8 +17,7 @@ import org.json.JSONTokener;
  * 
  */
 public class Schema {
-    
-    //private JSONObject schema = null;
+   
     private org.everit.json.schema.Schema tableJsonSchema = null;
     private List<Field> fields = new ArrayList();
     
@@ -100,5 +101,31 @@ public class Schema {
         }
         
         return schemaJson;
+    }
+    
+    public Object[] castRow(String[] row) throws InvalidCastException{
+        
+        if(row.length != this.fields.size()){
+            throw new InvalidCastException("Row length is not equal to the number of defined fields.");
+        }
+        
+        try{
+            Object[] castRow = new Object[this.fields.size()];
+        
+            for(int i=0; i<row.length; i++){
+                Field field = this.fields.get(i);
+
+                String castMethodName = "cast" + (field.getType().substring(0, 1).toUpperCase() + field.getType().substring(1));;
+                Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class);
+
+                castRow[i] = method.invoke(new TypeInferrer(), field.getFormat(), row[i]);
+            }
+
+            return castRow;
+            
+        }catch(Exception e){
+            throw new InvalidCastException();
+        }
+        
     }
 }

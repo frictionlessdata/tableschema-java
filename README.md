@@ -127,6 +127,33 @@ System.out.println(isValid);
 // false
 ```
 
+### Row Casting
+To check if a given set of values complies with the schema, you can use `castRow`:
+
+```java
+Schema schema = new Schema();
+        
+// A String field.
+Field stringField = new Field("stringField", Field.FIELD_TYPE_STRING);
+schema.addField(stringField);
+
+// An Integer field.
+Field integerField = new Field("integerField", Field.FIELD_TYPE_INTEGER);
+schema.addField(integerField);
+
+// A Boolean field.
+Field booleanField = new Field("booleanField", Field.FIELD_TYPE_BOOLEAN);
+schema.addField(booleanField);
+
+// Define a given set of values:
+String[] row = new String[]{"John Doe", "25", "T"}
+
+// Cast the row's values into their schema defined type: 
+Object[] castRow = schema.castRow(row);
+```
+
+If a value in the given set of values cannot be cast to its expected type as defined by the schema, then an `InvalidCastException` is thrown.
+
 ### Field Casting
 Data values can be cast to native Java objects with a Field instance. This allows formats and constraints to be defined for the field in the [field descriptor](https://specs.frictionlessdata.io/table-schema/#field-descriptors):
 

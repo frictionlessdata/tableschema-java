@@ -209,6 +209,7 @@ public class MainTest {
             field.castValue("This string length is greater than 45 characters.");
             **/
             
+            /**
             Map<String, Object> constraints = new HashMap();
             constraints.put(Field.CONSTRAINT_KEY_MINIMUM, 5);
             constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, 15);
@@ -219,6 +220,24 @@ public class MainTest {
             Map<String, Object> violatedConstraints = field.checkConstraintViolations(constraintViolatingValue);
 
             System.out.println(violatedConstraints);
+            **/
+            
+            Schema schema = new Schema();
+        
+            Field fieldString = new Field("name", Field.FIELD_TYPE_STRING);
+            schema.addField(fieldString);
+
+            Field fieldInteger = new Field("id", Field.FIELD_TYPE_INTEGER);
+            schema.addField(fieldInteger);
+
+            Field fieldBoolean = new Field("isAdmin", Field.FIELD_TYPE_BOOLEAN);
+            schema.addField(fieldBoolean);
+
+            String[] row = new String[]{"John Doe", "25", "True"};
+
+            Object[] castRow = schema.castRow(row);
+            
+            System.out.println(Arrays.asList(castRow));
 
         }catch(Exception e){
             e.printStackTrace();

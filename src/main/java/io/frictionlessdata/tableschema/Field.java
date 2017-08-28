@@ -55,10 +55,6 @@ public class Field {
     private String description = "";
     private Map<String, Object> constraints = null;
     
-    public Field(String name){
-        this.name = name;
-    }
-    
     public Field(String name, String type){
         this.name = name;
         this.type = type;
@@ -386,5 +382,13 @@ public class Field {
     
     public String getName(){
         return this.name;
+    }
+    
+    public String getType(){
+        return this.type;
+    }
+    
+    public String getFormat(){
+        return this.format;
     }
 }

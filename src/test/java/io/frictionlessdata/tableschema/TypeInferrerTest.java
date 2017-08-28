@@ -4,11 +4,14 @@ package io.frictionlessdata.tableschema;
 import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
- *
+ * The usefulness of these test case is dubious since the same code blocks
+ * are also tested through FieldTest.
  * 
  */
 public class TypeInferrerTest {
@@ -54,7 +57,18 @@ public class TypeInferrerTest {
     
     @Test
     public void testCastTime(){
-        //TODO: Implement
+        // Test with valid time
+        String validTimeString = "14:22:33";
+        
+        try{
+            DateTime time = this.typeInferrer.castTime("default", validTimeString);
+            Assert.assertEquals(14, time.getHourOfDay());
+            Assert.assertEquals(22, time.getMinuteOfHour());
+            Assert.assertEquals(33, time.getSecondOfMinute());
+        
+        }catch(TypeInferringException tie){
+            Assert.fail("Failed to cast valid Time string into DateTime.");
+        } 
     }
     
     @Test
@@ -161,13 +175,24 @@ public class TypeInferrerTest {
     }
     
     @Test
-    public void testCastArray(){
+    public void testCastArray() throws Exception{
+        String arrStr = "[1,2,3,4]";
+        JSONArray arr = this.typeInferrer.castArray("default", arrStr);
         
+        Assert.assertEquals(1, arr.get(0));
+        Assert.assertEquals(2, arr.get(1));
+        Assert.assertEquals(3, arr.get(2));
+        Assert.assertEquals(4, arr.get(3));
     }
     
     @Test
-    public void testCastObject(){
+    public void testCastObject() throws Exception{
+        String objStr = "{\"one\": 1, \"two\": 2, \"three\": 3}";
+        JSONObject obj = this.typeInferrer.castObject("default", objStr);
         
+        Assert.assertEquals(1, obj.get("one"));
+        Assert.assertEquals(2, obj.get("two"));
+        Assert.assertEquals(3, obj.get("three"));
     }
 
 }
