@@ -10,9 +10,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * The usefulness of these test case is dubious since the same code blocks
- * are also tested through FieldTest.
- * 
+ * The usefulness of these test cases is dubious since pretty much
+ * the same code blocks are also tested in FieldTest.
  */
 public class TypeInferrerTest {
     
