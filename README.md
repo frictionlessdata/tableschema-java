@@ -148,7 +148,7 @@ schema.addField(booleanField);
 // Define a given set of values:
 String[] row = new String[]{"John Doe", "25", "T"}
 
-// Cast the row's values into their schema defined type: 
+// Cast the row's values into their schema defined types: 
 Object[] castRow = schema.castRow(row);
 ```
 
