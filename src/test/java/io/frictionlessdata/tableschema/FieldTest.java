@@ -1,8 +1,6 @@
 package io.frictionlessdata.tableschema;
 
-import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
-import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
 import java.time.Duration;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

@@ -16,7 +16,7 @@ import org.junit.Test;
  * However, these do test the returned value which is not being tested in FieldTest.
  */
 public class TypeInferrerTest {
-    
+    /**
     TypeInferrer typeInferrer = new TypeInferrer();
     
     @Test
@@ -195,5 +195,17 @@ public class TypeInferrerTest {
         Assert.assertEquals(2, obj.get("two"));
         Assert.assertEquals(3, obj.get("three"));
     }
+    
+    public void testCastGeojson() throws Exception{
+        String objStr = "{\"one\": 1, \"two\": 2, \"three\": 3}";
+        JSONObject geojson = this.typeInferrer.castObject("default", objStr);
+        
+
+    }
+    
+    public void testCastTopojson() throws Exception{
+        String objStr = "{\"one\": 1, \"two\": 2, \"three\": 3}";
+        JSONObject toposjon = this.typeInferrer.castObject("default", objStr);
+    }**/
 
 }
