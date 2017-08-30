@@ -100,7 +100,7 @@
                 "type": { "enum": [ "GeometryCollection" ] },
                 "geometries": { 
 		    "type": "array",
-		    "items": { "$ref": "#/geometry.json"  }
+		    "items": { "$ref": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/schemas/geojson/geometry.json"  }
 		}
             }
         }
