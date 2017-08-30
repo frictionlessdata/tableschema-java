@@ -88,7 +88,7 @@ public class TypeInferrer {
         // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema
         InputStream topoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/topojson.json");
         JSONObject rawTopoJsonSchema = new JSONObject(new JSONTokener(topoJsonSchemaInputStream));
-        //this.topoJsonSchema = SchemaLoader.load(rawTopoJsonSchema);
+        this.topoJsonSchema = SchemaLoader.load(rawTopoJsonSchema);
     }
     
     /**

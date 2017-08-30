@@ -99,7 +99,7 @@ public class FieldTest {
             "}");
     }
     
-    //@Test
+    @Test
     public void testFieldCastValidTopojson() throws Exception{   
         Field field = new Field("test", Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_TOPOJSON);
         JSONObject val = field.castValue("{\n" +
@@ -127,7 +127,7 @@ public class FieldTest {
         Assert.assertEquals(5901, val.getJSONArray("arcs").getJSONArray(0).get(1));
     }
     
-    //@Test
+    @Test
     public void testFieldCastInvalidTopojson() throws Exception{   
         Field field = new Field("test", Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_TOPOJSON);
         
