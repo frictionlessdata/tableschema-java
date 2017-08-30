@@ -28,17 +28,53 @@ public class MainTest {
     public static void main(String[] args) {
         String sourceFileAbsPath = MainTest.class.getResource("/fixtures/dates_data.csv").getPath();
         try{
-            // Creat table from URL
+            
+            
+            Schema schema = new Schema();
+        
+            Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+            schema.addField(idField);
+
+            Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+            schema.addField(nameField);
+
+            Field dobField = new Field("dateOfBirth", Field.FIELD_TYPE_DATE); 
+            schema.addField(dobField);
+
+            Field isAdminField = new Field("isAdmin", Field.FIELD_TYPE_BOOLEAN);
+            schema.addField(isAdminField);
+
+            Field addressCoordinates = new Field("addressCoordinates", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT);
+            schema.addField(addressCoordinates);
+
+            Field contractLengthField = new Field("contractLength", Field.FIELD_TYPE_DURATION);
+            schema.addField(contractLengthField);
+
+            Field infoField = new Field("info", Field.FIELD_TYPE_OBJECT);
+            schema.addField(infoField);
+            
+            Iterator<Object[]> iter = table.iterator();
+            while(iter.hasNext()){
+                Object[] row = iter.next();
+                for(int i=0; i<row.length; i++){
+                    System.out.print(" " + row[i].getClass());
+                }
+                System.out.println("");
+            }
+            
+            
+
+            // Iterate table
+            /**
+            // Create table from URL
             URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
             Table table = new Table(url);
             
-            
-            // Iterate table
-            Iterator<String[]> iter = table.iterator();
+            Iterator<Object[]> iter = table.iterator();
             while(iter.hasNext()){
-                String[] row = iter.next();
+                Object[] row = iter.next();
                 System.out.println(Arrays.toString(row));
-            }
+            }**/
             /**
             // Load entire table
             List<String[]> allData = table.read();

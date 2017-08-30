@@ -39,6 +39,11 @@ public class Schema {
         }
     }
     
+    public Schema(List<Field> fields){
+        initValidator(); 
+        this.fields = fields;
+    }
+    
     private void initValidator(){
         // Init for validation
         InputStream tableSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/table-schema.json");
@@ -128,4 +133,5 @@ public class Schema {
         }
         
     }
+   
 }

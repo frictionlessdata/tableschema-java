@@ -1,7 +1,9 @@
 package io.frictionlessdata.tableschema;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Iterator;
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -36,7 +38,7 @@ public class TableTest {
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/dates_data.csv").getPath();
         Table table = new Table(sourceFileAbsPath);
         
-        JSONObject schema = table.inferSchema();
+        JSONObject schema = table.inferSchema().getJson();
         JSONArray schemaFiles = schema.getJSONArray("fields");
         
         // The field names are the same as the name of the type we are expecting to be inferred.
@@ -50,7 +52,7 @@ public class TableTest {
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/int_bool_geopoint_data.csv").getPath();
         Table table = new Table(sourceFileAbsPath);
         
-        JSONObject schema = table.inferSchema();
+        JSONObject schema = table.inferSchema().getJson();
         JSONArray schemaFiles = schema.getJSONArray("fields");
         
         // The field names are the same as the name of the type we are expecting to be inferred.
@@ -67,13 +69,66 @@ public class TableTest {
         
         String[] expectedResults = new String[]{"[1, foo]", "[2, bar]", "[3, baz]"};
         
-        Iterator<String[]> iter = table.iterator();
+        Iterator<Object[]> iter = table.iterator();
         int loopCounter = 0;
         while (iter.hasNext()) {
             String stringifiedRow = Arrays.toString(iter.next());
             Assert.assertEquals(expectedResults[loopCounter], stringifiedRow);
             loopCounter++;
         }
+    }
+    
+    @Test
+    public void testIterateTableWithSchema() throws Exception{
+        
+        // Let's start by defining and building the schema:
+        Schema schema = new Schema();
+        
+        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        schema.addField(idField);
+        
+        Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+        schema.addField(nameField);
+        
+        Field dobField = new Field("dateOfBirth", Field.FIELD_TYPE_DATE); 
+        schema.addField(dobField);
+        
+        Field isAdminField = new Field("isAdmin", Field.FIELD_TYPE_BOOLEAN);
+        schema.addField(isAdminField);
+        
+        Field addressCoordinates = new Field("addressCoordinates", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT);
+        schema.addField(addressCoordinates);
+        
+        Field contractLengthField = new Field("contractLength", Field.FIELD_TYPE_DURATION);
+        schema.addField(contractLengthField);
+        
+        Field infoField = new Field("info", Field.FIELD_TYPE_OBJECT);
+        schema.addField(infoField);
+        
+        // Fetch the data and apply the schema
+        String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
+        Table employeeTable = new Table(employeeDataSourceFile, schema);
+        
+        // We will iterate the rows and these are the values classes we expect:
+        Class[] expectedTypes = new Class[]{
+            Integer.class,
+            String.class,
+            DateTime.class,
+            Boolean.class,
+            JSONArray.class,
+            Duration.class,
+            JSONObject.class
+        };
+        
+        // Let's iterate and assert row value classes against the expected classes
+        Iterator<Object[]> iter = employeeTable.iterator();
+        int loopCounter = 0;
+        while (iter.hasNext()) {
+            Object obj = iter.next();
+            Assert.assertTrue(obj.getClass() == expectedTypes[loopCounter]);
+            loopCounter++;
+        }
+  
     }
     
     @Test

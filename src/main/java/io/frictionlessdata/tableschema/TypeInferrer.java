@@ -42,14 +42,9 @@ public class TypeInferrer {
     // The order in which the types will be attempted to be inferred.
     // Once a type is successfully inferred, we do not bother with the remaining types.
     private static final List<String[]> TYPE_INFERRAL_ORDER_LIST = new ArrayList<>(Arrays.asList(
-        
-        new String[]{"geojson", "default"},
-        new String[]{"geojson", "topojson"},
         new String[]{"geopoint", "default"},
         new String[]{"geopoint", "array"},
         new String[]{"geopoint", "object"},
-        new String[]{"object", "default"},
-        new String[]{"array", "default"},
         new String[]{"duration", "default"}, // No different formats, just use default.
         new String[]{"year", "default"}, // No different formats, just use default.
         new String[]{"yearmonth", "default"}, // No different formats, just use default.
@@ -60,7 +55,11 @@ public class TypeInferrer {
         new String[]{"number", "default"}, // No different formats, just use default.
         new String[]{"boolean", "default"}, // No different formats, just use default.
         new String[]{"string", "default"}, // No different formats, just use default.
-        new String[]{"any", "default"})); // No different formats, just use default.
+        new String[]{"any", "default"}, // No different formats, just use default.
+        new String[]{"object", "default"},
+        new String[]{"array", "default"},
+        new String[]{"geojson", "default"},
+        new String[]{"geojson", "topojson"}));
     
     
     // ISO 8601 format of yyyy-MM-dd'T'HH:mm:ss.SSSZ in UTC time
