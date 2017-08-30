@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "id": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/fixtures/geojson/bbox.json",
+    "id": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/schemas/geojson/bbox.json",
     "description": "A bounding box as defined by GeoJSON",
     "FIXME": "unenforceable constraint: even number of elements in array",
     "type": "array",

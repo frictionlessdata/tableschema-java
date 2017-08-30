@@ -82,7 +82,7 @@ public class TypeInferrer {
         // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
         InputStream geoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/geojson.json");
         JSONObject rawGeoJsonSchema = new JSONObject(new JSONTokener(geoJsonSchemaInputStream));
-        //this.geoJsonSchema = SchemaLoader.load(rawGeoJsonSchema);
+        this.geoJsonSchema = SchemaLoader.load(rawGeoJsonSchema);
         
         // FIXME: Maybe this infering against geojson and topojson scheme is too much.
         // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema

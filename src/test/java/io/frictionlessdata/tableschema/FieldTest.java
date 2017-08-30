@@ -1,18 +1,25 @@
 package io.frictionlessdata.tableschema;
 
+import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
+import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
 import java.time.Duration;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  *
  * 
  */
 public class FieldTest {
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+    
     @Test
     public void testFieldCastGeopointDefault() throws Exception{   
         Field field = new Field("test", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_DEFAULT, "title", "description");
@@ -52,13 +59,93 @@ public class FieldTest {
     }
     
     @Test
-    public void testFieldCastGeojson() throws Exception{   
-        Assert.fail("Test case not implemented yet.");
+    public void testFieldCastValidGeojson() throws Exception{
+        Field field = new Field("test", Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_DEFAULT);
+        JSONObject val = field.castValue("{\n" +
+            "    \"type\": \"Feature\",\n" +
+            "    \"properties\": {\n" +
+            "        \"name\": \"Coors Field\",\n" +
+            "        \"amenity\": \"Baseball Stadium\",\n" +
+            "        \"popupContent\": \"This is where the Rockies play!\"\n" +
+            "    },\n" +
+            "    \"geometry\": {\n" +
+            "        \"type\": \"Point\",\n" +
+            "        \"coordinates\": [-104.99404, 39.75621]\n" +
+            "    }\n" +
+            "}");
+        
+        Assert.assertEquals("Feature", val.getString("type"));
+        Assert.assertEquals("Baseball Stadium", val.getJSONObject("properties").getString("amenity"));
+        Assert.assertEquals(-104.99404, val.getJSONObject("geometry").getJSONArray("coordinates").get(0));
+        Assert.assertEquals(39.75621, val.getJSONObject("geometry").getJSONArray("coordinates").get(1));
     }
     
     @Test
-    public void testFieldCastTopojson() throws Exception{   
-        Assert.fail("Test case not implemented yet.");
+    public void testFieldCastInvalidGeojson() throws Exception{
+        Field field = new Field("test", Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_DEFAULT);
+        
+        exception.expect(TypeInferringException.class);
+        JSONObject val = field.castValue("{\n" +
+            "    \"type\": \"INVALID_TYPE\",\n" + // The invalidity is here.
+            "    \"properties\": {\n" +
+            "        \"name\": \"Coors Field\",\n" +
+            "        \"amenity\": \"Baseball Stadium\",\n" +
+            "        \"popupContent\": \"This is where the Rockies play!\"\n" +
+            "    },\n" +
+            "    \"geometry\": {\n" +
+            "        \"type\": \"Point\",\n" +
+            "        \"coordinates\": [-104.99404, 39.75621]\n" +
+            "    }\n" +
+            "}");
+    }
+    
+    //@Test
+    public void testFieldCastValidTopojson() throws Exception{   
+        Field field = new Field("test", Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_TOPOJSON);
+        JSONObject val = field.castValue("{\n" +
+            "  \"type\": \"Topology\",\n" +
+            "  \"transform\": {\n" +
+            "    \"scale\": [0.036003600360036005, 0.017361589674592462],\n" +
+            "    \"translate\": [-180, -89.99892578124998]\n" +
+            "  },\n" +
+            "  \"objects\": {\n" +
+            "    \"aruba\": {\n" +
+            "      \"type\": \"Polygon\",\n" +
+            "      \"arcs\": [[0]],\n" +
+            "      \"id\": 533\n" +
+            "    }\n" +
+            "  },\n" +
+            "  \"arcs\": [\n" +
+            "    [[3058, 5901], [0, -2], [-2, 1], [-1, 3], [-2, 3], [0, 3], [1, 1], [1, -3], [2, -5], [1, -1]]\n" +
+            "  ]\n" +
+            "}");
+        
+        Assert.assertEquals("Topology", val.getString("type"));
+        Assert.assertEquals(0.036003600360036005, val.getJSONObject("transform").getJSONArray("scale").get(0));
+        Assert.assertEquals(0.017361589674592462, val.getJSONObject("transform").getJSONArray("translate").get(1));    
+        Assert.assertEquals(3058, val.getJSONArray("arcs").getJSONArray(0).get(0));
+        Assert.assertEquals(5901, val.getJSONArray("arcs").getJSONArray(0).get(1));
+    }
+    
+    //@Test
+    public void testFieldCastInvalidTopojson() throws Exception{   
+        Field field = new Field("test", Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_TOPOJSON);
+        
+        // This is an invalid Topojson, it's a Geojson:
+        exception.expect(TypeInferringException.class);
+        JSONObject val = field.castValue("{\n" +
+            "    \"type\": \"Feature\",\n" +
+            "    \"properties\": {\n" +
+            "        \"name\": \"Coors Field\",\n" +
+            "        \"amenity\": \"Baseball Stadium\",\n" +
+            "        \"popupContent\": \"This is where the Rockies play!\"\n" +
+            "    },\n" +
+            "    \"geometry\": {\n" +
+            "        \"type\": \"Point\",\n" +
+            "        \"coordinates\": [-104.99404, 39.75621]\n" +
+            "    }\n" +
+            "}");
+        
     }
     
     @Test

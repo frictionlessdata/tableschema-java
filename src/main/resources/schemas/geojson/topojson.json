@@ -1,15 +1,15 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "id": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/fixtures/geojson/topojson.json",
+    "id": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/schemas/geojson/topojson.json",
     "title": "TopoJSON object",
     "description": "Schema for a TopoJSON object",
     "type": "object",
     "required": [ "type" ],
     "properties": {
-        "bbox": { "$ref": "bbox.json" }
+        "bbox": { "$ref": "#/bbox.json" }
     },
     "oneOf": [
-        { "$ref": "topology.json"  },
-        { "$ref": "geometry.json" }
+        { "$ref": "#/topology.json"  },
+        { "$ref": "#/geometry.json" }
     ]
 }

@@ -38,6 +38,7 @@ public class Field {
     public static final String FIELD_FORMAT_DEFAULT = "default";
     public static final String FIELD_FORMAT_ARRAY = "array";
     public static final String FIELD_FORMAT_OBJECT = "object";
+    public static final String FIELD_FORMAT_TOPOJSON = "topojson";
     
     public static final String CONSTRAINT_KEY_REQUIRED = "required";
     public static final String CONSTRAINT_KEY_UNIQUE = "unique";
