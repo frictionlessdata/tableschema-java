@@ -96,7 +96,7 @@ public class Schema {
         JSONObject schemaJson = new JSONObject();
         schemaJson.put("fields", new JSONArray());
         
-        for (Field field : fields) {
+        for(Field field : fields) {
             schemaJson.getJSONArray("fields").put(field.getJson());   
         }
         

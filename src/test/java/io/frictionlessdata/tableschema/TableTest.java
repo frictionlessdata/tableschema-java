@@ -19,7 +19,7 @@ public class TableTest {
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
         Table table = new Table(sourceFileAbsPath);
         
-        Assert.assertEquals(4, table.read().size()); 
+        Assert.assertEquals(3, table.read().size()); 
     }
     
     @Test
@@ -28,7 +28,7 @@ public class TableTest {
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
         Table table = new Table(url);
         
-        Assert.assertEquals(4, table.read().size());
+        Assert.assertEquals(3, table.read().size());
     }
     
     @Test
@@ -65,7 +65,7 @@ public class TableTest {
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
         Table table = new Table(sourceFileAbsPath);
         
-        String[] expectedResults = new String[]{"[id, title]", "[1, foo]", "[2, bar]", "[3, baz]"};
+        String[] expectedResults = new String[]{"[1, foo]", "[2, bar]", "[3, baz]"};
         
         Iterator<String[]> iter = table.iterator();
         int loopCounter = 0;

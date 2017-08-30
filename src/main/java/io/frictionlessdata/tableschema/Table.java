@@ -41,11 +41,7 @@ public class Table{
     }
     
     public String[] headers(){
-        if(!this.dataSource.data().isEmpty()){
-            return this.dataSource.data().get(0);
-        }else{
-            return null;
-        }
+        return this.dataSource.getHeaders();
     }
     
     public void save(String filename) throws Exception{
@@ -66,8 +62,7 @@ public class Table{
     
     public JSONObject inferSchema(int rowLimit) throws TypeInferringException{
         try{
-            this.typeInferrer.infer(this.read(), this.headers(), rowLimit);
-            return null;
+            return this.typeInferrer.infer(this.read(), this.headers(), rowLimit);
         }catch(Exception e){
             throw new TypeInferringException();
         }

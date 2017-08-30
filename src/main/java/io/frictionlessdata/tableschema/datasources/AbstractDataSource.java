@@ -13,6 +13,9 @@ public abstract class AbstractDataSource implements DataSource {
     abstract public Iterator<String[]> iterator();
     
     @Override
+    abstract public String[] getHeaders();
+    
+    @Override
     abstract public List<String[]> data();
     
     @Override

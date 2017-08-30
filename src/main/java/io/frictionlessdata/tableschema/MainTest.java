@@ -32,14 +32,14 @@ public class MainTest {
             URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
             Table table = new Table(url);
             
-            /**
+            
             // Iterate table
             Iterator<String[]> iter = table.iterator();
             while(iter.hasNext()){
                 String[] row = iter.next();
-                //System.out.println(Arrays.toString(row));
+                System.out.println(Arrays.toString(row));
             }
-            
+            /**
             // Load entire table
             List<String[]> allData = table.read();
             
@@ -222,6 +222,7 @@ public class MainTest {
             System.out.println(violatedConstraints);
             **/
             
+            /**
             Schema schema = new Schema();
         
             Field fieldString = new Field("name", Field.FIELD_TYPE_STRING);
@@ -238,6 +239,7 @@ public class MainTest {
             Object[] castRow = schema.castRow(row);
             
             System.out.println(Arrays.asList(castRow));
+            **/
 
         }catch(Exception e){
             e.printStackTrace();

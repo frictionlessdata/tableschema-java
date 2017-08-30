@@ -53,6 +53,14 @@ System.out.println(schema);
 
 ```
 
+The type inferral algorithm tries to cast to available types and each successful type casting increments a popularity score for the successful type cast in question. At the end, the best score so far is returned.
+The inferral algorithm traverse all of the table's rows and attempts to cast every single value of the table. When dealing with large table, you might want to limit the number of rows that the inferral algorithm processes:
+
+```java
+// Only process the first 25 rows for type inferral.
+JSONObject schema = table.inferSchema(25);
+```
+
 ### Build a Schema
 
 You can also build a `Schema` instance from scratch or modify an existing one:

@@ -13,6 +13,7 @@ import java.util.List;
  */
 public interface DataSource {  
     public Iterator<String[]> iterator();
+    public String[] getHeaders();
     public List<String[]> data();
-    public void save(String filename) throws Exception ;  
+    public void save(String filename) throws Exception;
 }
