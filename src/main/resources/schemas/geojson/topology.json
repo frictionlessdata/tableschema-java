@@ -9,11 +9,11 @@
         "type": { "enum": [ "Topology"] },
         "objects": {
 	    "type": "object",
-	    "additionalProperties": {"$ref": "#/geometry.json"}
+	    "additionalProperties": {"$ref": "geometry.json"}
         },
         "arcs": {"$ref": "#/definitions/arcs"},
         "transform": {"$ref": "#/definitions/transform"},
-        "bbox": { "$ref": "#/bbox.json" }
+        "bbox": { "$ref": "bbox.json" }
     },
     "definitions": {
 	"transform": {
