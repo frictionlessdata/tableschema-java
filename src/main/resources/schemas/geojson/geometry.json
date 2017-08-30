@@ -100,7 +100,7 @@
                 "type": { "enum": [ "GeometryCollection" ] },
                 "geometries": { 
 		    "type": "array",
-		    "items": { "$ref": "https://raw.githubusercontent.com/nhuebel/TopoJSON_schema/master/geometry.json"  }
+		    "items": { "$ref": "#/geometry.json"  }
 		}
             }
         }
