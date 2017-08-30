@@ -27,7 +27,8 @@ import org.joda.time.format.DateTimeFormatter;
 
 
 /**
- * The algorithm tries to cast to availables types and each type has a popularity score.
+ * The type inferral algorithm tries to cast to available types and each successful
+ * type casting increments a popularity score for the successful type cast in question.
  * At the end, the best score so far is returned.
  */
 public class TypeInferrer {
