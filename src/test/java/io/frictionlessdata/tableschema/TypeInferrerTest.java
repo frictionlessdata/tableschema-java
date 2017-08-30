@@ -12,6 +12,8 @@ import org.junit.Test;
 /**
  * The usefulness of these test cases is dubious since pretty much
  * the same code blocks are also tested in FieldTest.
+ * 
+ * However, these do test the returned value which is not being tested in FieldTest.
  */
 public class TypeInferrerTest {
     
