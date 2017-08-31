@@ -80,7 +80,7 @@ System.out.println(schema.getJson());
 When using the `addField` method, the schema undergoes validation after every field addition.
 If adding a field causes the schema to fail validation, then the field is automatically removed.
 
-Alternatively, you might want to build your `Schema` instead by loading the schema definition from a JSON file:
+Alternatively, you might want to build your `Schema` by loading the schema definition from a JSON file:
 
 ```java
 String schemaFilePath = "/path/to/schema/file/shema.json";
