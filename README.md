@@ -80,16 +80,39 @@ System.out.println(schema.getJson());
 When using the `addField` method, the schema undergoes validation after every field addition.
 If adding a field causes the schema to fail validation, then the field is automatically removed.
 
-Alternatively, you might want to load your schema from a JSON file:
+Alternatively, you might want to build your `Schema` instead by loading the schema definition from a JSON file:
 
 ```java
 String schemaFilePath = "/path/to/schema/file/shema.json";
 Schema schema = new Schema(schemaFilePath);
 ```
 
+### Infer a Schema
+
+If you don't have a schema for a CSV and don't want to manually define one then you can generate it:
+
+```java
+URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
+Table table = new Table(url);
+
+Schema schema = table.inferSchema();
+System.out.println(schema.getJson());
+
+// {"fields":[{"name":"id","format":"","description":"","title":"","type":"integer","constraints":{}},{"name":"title","format":"","description":"","title":"","type":"string","constraints":{}}]}
+
+```
+
+The type inferral algorithm tries to cast to available types and each successful type casting increments a popularity score for the successful type cast in question. At the end, the best score so far is returned.
+The inferral algorithm traverses all of the table's rows and attempts to cast every single value of the table. When dealing with large tables, you might want to limit the number of rows that the inferral algorithm processes:
+
+```java
+// Only process the first 25 rows for type inferral.
+Schema schema = table.inferSchema(25);
+```
+
 ### Parse a CSV With a Schema
 
-Cast [data](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/employee_data.csv) from a CSV with a schema:
+If you have a schema, you can input it as parameter when creating the `Table` instance so that the [data](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/employee_data.csv) from the CSV will be cast into the field types defined in the schema:
 
 ```java
 // Let's start by defining and building the schema of a table that contains data on employees:
@@ -135,29 +158,6 @@ while(iter.hasNext()){
     Duration contractLength = (Duration)row[5];
     JSONObject info = (JSONObject)row[6];
 }
-```
-
-### Infer a Schema
-
-If you don't have a schema for a CSV, and want to generate one, you can infer a schema like so:
-
-```java
-URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
-Table table = new Table(url);
-
-Schema schema = table.inferSchema();
-System.out.println(schema.getJson());
-
-// {"fields":[{"name":"id","format":"","description":"","title":"","type":"integer","constraints":{}},{"name":"title","format":"","description":"","title":"","type":"string","constraints":{}}]}
-
-```
-
-The type inferral algorithm tries to cast to available types and each successful type casting increments a popularity score for the successful type cast in question. At the end, the best score so far is returned.
-The inferral algorithm traverses all of the table's rows and attempts to cast every single value of the table. When dealing with large tables, you might want to limit the number of rows that the inferral algorithm processes:
-
-```java
-// Only process the first 25 rows for type inferral.
-Schema schema = table.inferSchema(25);
 ```
 
 ### Validate a Schema
