@@ -115,7 +115,7 @@ public class TableTest {
             String.class,
             DateTime.class,
             Boolean.class,
-            Integer[].class,
+            int[].class,
             Duration.class,
             JSONObject.class
         };

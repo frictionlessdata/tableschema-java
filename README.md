@@ -10,7 +10,7 @@ A Java library for working with Table Schema.
 
 ### Parse a CSV Without a Schema
 
-Cast data from a CSV without a schema:
+Cast [data](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv) from a CSV without a schema:
 
 ```java
 URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
@@ -33,7 +33,8 @@ List<String[]> allData = table.read();
 
 ### Parse a CSV With a Schema
 
-Cast data from a CSV with a schema:
+Cast [data](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/employee_data.csv) from a CSV with a schema:
+
 ```java
 // Let's start by defining and building the schema of a table that contains data on employees:
 Schema schema = new Schema();
@@ -59,9 +60,9 @@ schema.addField(contractLengthField);
 Field infoField = new Field("info", Field.FIELD_TYPE_OBJECT);
 schema.addField(infoField);
 
-// Load the data from a file
-String sourceFileAbsPath = this.getClass().getResource("/fixtures/employee_data.csv").getPath();
-Table table = new Table(sourceFileAbsPath, schema);
+// Load the data from URL
+URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/employee_data.csv");
+Table table = new Table(url);
 
 Iterator<Object[]> iter = table.iterator();
 while(iter.hasNext()){
@@ -88,8 +89,8 @@ If you don't have a schema for a CSV, and want to generate one, you can infer a 
 URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
 Table table = new Table(url);
 
-JSONObject schema = table.inferSchema();
-System.out.println(schema);
+Schema schema = table.inferSchema();
+System.out.println(schema.getJson());
 
 // {"fields":[{"name":"id","format":"","description":"","title":"","type":"integer","constraints":{}},{"name":"title","format":"","description":"","title":"","type":"string","constraints":{}}]}
 
@@ -100,7 +101,7 @@ The inferral algorithm traverses all of the table's rows and attempts to cast ev
 
 ```java
 // Only process the first 25 rows for type inferral.
-JSONObject schema = table.inferSchema(25);
+Schema schema = table.inferSchema(25);
 ```
 
 ### Build a Schema
