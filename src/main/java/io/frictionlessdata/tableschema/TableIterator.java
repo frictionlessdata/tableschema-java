@@ -12,10 +12,19 @@ public class TableIterator<T> implements Iterator<Object[]> {
     
     private Schema schema = null;
     private Iterator<String[]> iter = null;
+    private boolean keyed = false;
+    private boolean extended = false; 
+    private boolean cast = false;
+    private boolean relations = false;
     
-    public TableIterator(Schema schema, Iterator iter){
+    public TableIterator(Schema schema, Iterator iter, boolean keyed, boolean extended, boolean cast, boolean relations){
         this.schema = schema;
         this.iter = iter;
+        this.keyed = keyed;
+        this.extended = extended;
+        this.cast = cast;
+        this.relations = relations;
+        
     }
     
     @Override
@@ -33,9 +42,7 @@ public class TableIterator<T> implements Iterator<Object[]> {
             try{
                 for(int i=0; i<row.length; i++){
                     Field field = this.schema.getFields().get(i);
-                    
-                    // TODO: Figure out if we should or should not enforce constraints.
-                    castedRow[i] = field.castValue(row[i], false);
+                    castedRow[i] = field.castValue(row[i], this.cast);
                 }
             }catch(InvalidCastException | ConstraintsException e){
                 // The row data types do not match schema definition.

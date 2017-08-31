@@ -175,5 +175,9 @@ public class Schema {
             file.write(this.getJson().toString());
         }
     }
+    
+    public boolean hasFields(){
+        return !this.getFields().isEmpty();
+    }
    
 }

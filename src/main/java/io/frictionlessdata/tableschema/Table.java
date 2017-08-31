@@ -3,8 +3,10 @@ package io.frictionlessdata.tableschema;
 import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
 import io.frictionlessdata.tableschema.datasources.CsvDataSource;
 import io.frictionlessdata.tableschema.datasources.DataSource;
+import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import org.json.*;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -58,8 +60,12 @@ public class Table{
         this.schema = schema;
     }
     
+    public Iterator<Object[]> iterator(boolean keyed, boolean extended, boolean cast, boolean relations){
+       return new TableIterator(this.schema, this.dataSource.iterator(), keyed, extended, cast, relations);
+    }
+    
     public Iterator<Object[]> iterator(){
-       return new TableIterator(this.schema, this.dataSource.iterator());
+       return this.iterator(false, false, false, false);
     }
     
     public String[] headers(){
@@ -69,9 +75,33 @@ public class Table{
     public void write(String outputFilePath) throws Exception{
        this.dataSource.write(outputFilePath);
     }
+    public List<Object[]> read(boolean cast) throws Exception{
+        if(cast && !this.schema.hasFields()){
+            throw new InvalidCastException();
+        }
+        
+        List<Object[]> rows = new ArrayList();
+        
+        Iterator<Object[]> iter = this.iterator(false, false, cast, false);
+        while(iter.hasNext()){
+            Object[] row = iter.next();
+            
+            // If casting is enabled, then cast all the rows.
+            if(cast){
+                for(int i=0; i<row.length; i++){
+                    Field field = this.schema.getFields().get(i);
+                    row[i] = field.castValue(row[i].toString(), true);
+                }
+            }
+            
+            rows.add(row);
+        }
+
+        return rows;
+    }
     
-    public List<String[]> read() throws Exception{
-       return this.dataSource.data();
+    public List<Object[]> read() throws Exception{
+        return this.read(false);
     }
     
     public Schema inferSchema() throws TypeInferringException{

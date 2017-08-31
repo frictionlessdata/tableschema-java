@@ -4,6 +4,7 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -88,32 +89,11 @@ public class TableTest {
     public void testIterateTableWithSchema() throws Exception{
         
         // Let's start by defining and building the schema:
-        Schema schema = new Schema();
-        
-        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
-        schema.addField(idField);
-        
-        Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
-        schema.addField(nameField);
-        
-        Field dobField = new Field("dateOfBirth", Field.FIELD_TYPE_DATE); 
-        schema.addField(dobField);
-        
-        Field isAdminField = new Field("isAdmin", Field.FIELD_TYPE_BOOLEAN);
-        schema.addField(isAdminField);
-        
-        Field addressCoordinatesField = new Field("addressCoordinatesField", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT);
-        schema.addField(addressCoordinatesField);
-
-        Field contractLengthField = new Field("contractLength", Field.FIELD_TYPE_DURATION);
-        schema.addField(contractLengthField);
-        
-        Field infoField = new Field("info", Field.FIELD_TYPE_OBJECT);
-        schema.addField(infoField);
+        Schema employeeTableSchema = getEmployeeTableSchema();
         
         // Fetch the data and apply the schema
         String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
-        Table employeeTable = new Table(employeeDataSourceFile, schema);
+        Table employeeTable = new Table(employeeDataSourceFile, employeeTableSchema);
         
         // We will iterate the rows and these are the values classes we expect:
         Class[] expectedTypes = new Class[]{
@@ -148,6 +128,47 @@ public class TableTest {
     }
     
     @Test
+    public void testReadUncastedData() throws Exception{
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
+        Table table = new Table(sourceFileAbsPath);
+        
+        Assert.assertEquals(3, table.read().size());
+    }
+    
+    @Test
+    public void testReadCastedData() throws Exception{
+
+        // Let's start by defining and building the schema:
+        Schema employeeTableSchema = getEmployeeTableSchema();
+        
+        // Fetch the data and apply the schema
+        String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
+        Table employeeTable = new Table(employeeDataSourceFile, employeeTableSchema);
+        
+        // We will iterate the rows and these are the values classes we expect:
+        Class[] expectedTypes = new Class[]{
+            Integer.class,
+            String.class,
+            DateTime.class,
+            Boolean.class,
+            int[].class,
+            Duration.class,
+            JSONObject.class
+        };
+        
+        List<Object[]> data = employeeTable.read(true);
+        Iterator<Object[]> iter = data.iterator();
+        
+        while(iter.hasNext()){
+            Object[] row = iter.next();
+            
+            for(int i=0; i<row.length; i++){
+                Assert.assertEquals(expectedTypes[i], row[i].getClass());
+            }
+        }
+    }
+    
+    @Test
     public void writeTable() throws Exception{
         File createdFile = folder.newFile("test_data_table.csv");
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
@@ -159,5 +180,32 @@ public class TableTest {
         Assert.assertEquals(loadedTable.headers()[0], "id");
         Assert.assertEquals(loadedTable.headers()[1], "title");
         Assert.assertEquals(loadedTable.read().size(), readTable.read().size());   
+    }
+    
+    private Schema getEmployeeTableSchema(){
+        Schema schema = new Schema();
+        
+        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        schema.addField(idField);
+        
+        Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+        schema.addField(nameField);
+        
+        Field dobField = new Field("dateOfBirth", Field.FIELD_TYPE_DATE); 
+        schema.addField(dobField);
+        
+        Field isAdminField = new Field("isAdmin", Field.FIELD_TYPE_BOOLEAN);
+        schema.addField(isAdminField);
+        
+        Field addressCoordinatesField = new Field("addressCoordinatesField", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT);
+        schema.addField(addressCoordinatesField);
+
+        Field contractLengthField = new Field("contractLength", Field.FIELD_TYPE_DURATION);
+        schema.addField(contractLengthField);
+        
+        Field infoField = new Field("info", Field.FIELD_TYPE_OBJECT);
+        schema.addField(infoField);
+        
+        return schema;
     }
 }
