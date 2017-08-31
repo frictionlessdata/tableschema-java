@@ -30,7 +30,7 @@ public class MainTest {
         String sourceFileAbsPath = MainTest.class.getResource("/fixtures/dates_data.csv").getPath();
         
         try{
-            /**
+            
             Schema schema = new Schema();
         
             Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
@@ -53,7 +53,7 @@ public class MainTest {
 
             Field infoField = new Field("info", Field.FIELD_TYPE_OBJECT);
             schema.addField(infoField);
-            
+            /**
             sourceFileAbsPath = MainTest.class.getResource("/fixtures/employee_data.csv").getPath();
             Table table = new Table(sourceFileAbsPath, schema);
             
@@ -295,6 +295,33 @@ public class MainTest {
             
             System.out.println(Arrays.asList(castRow));
             **/
+
+
+            // Fetch the data and apply the schema
+            sourceFileAbsPath = MainTest.class.getResource("/fixtures/employee_data.csv").getPath();
+            Table employeeTable = new Table(sourceFileAbsPath, schema);
+
+            // We will iterate the rows and these are the values classes we expect:
+            Class[] expectedTypes = new Class[]{
+                Integer.class,
+                String.class,
+                DateTime.class,
+                Boolean.class,
+                int[].class,
+                Duration.class,
+                JSONObject.class
+            };
+
+            List<Object[]> data = employeeTable.read(true);
+            Iterator<Object[]> iter = data.iterator();
+
+            while(iter.hasNext()){
+                Object[] row = iter.next();
+
+                for(int i=0; i<row.length; i++){
+                    System.out.println(row[i].getClass());
+                }
+            }
 
         }catch(Exception e){
             e.printStackTrace();

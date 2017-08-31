@@ -85,15 +85,6 @@ public class Table{
         Iterator<Object[]> iter = this.iterator(false, false, cast, false);
         while(iter.hasNext()){
             Object[] row = iter.next();
-            
-            // If casting is enabled, then cast all the rows.
-            if(cast){
-                for(int i=0; i<row.length; i++){
-                    Field field = this.schema.getFields().get(i);
-                    row[i] = field.castValue(row[i].toString(), true);
-                }
-            }
-            
             rows.add(row);
         }
 
