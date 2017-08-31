@@ -29,7 +29,7 @@ public class MainTest {
     public static void main(String[] args) {
         String sourceFileAbsPath = MainTest.class.getResource("/fixtures/dates_data.csv").getPath();
         
-        try{ 
+        try{
             /**
             Schema schema = new Schema();
         

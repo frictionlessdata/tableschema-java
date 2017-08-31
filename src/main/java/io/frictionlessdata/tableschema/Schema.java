@@ -1,7 +1,10 @@
 package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,21 +30,40 @@ public class Schema {
     
     public Schema(JSONObject schema){
         initValidator(); 
+        setFieldsFromSchemaJson(schema);
+    }
+    
+    public Schema(String schemaFilePath) throws Exception{
+        InputStream is = new FileInputStream(schemaFilePath);
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        String line = br.readLine();
+
+        StringBuilder sb = new StringBuilder();
+        while(line != null){
+            sb.append(line).append("\n");
+            line = br.readLine();
+        }
+
+        String schemaString = sb.toString();
+        JSONObject schemaJson = new JSONObject(schemaString);
         
+        setFieldsFromSchemaJson(schemaJson);
+    }
+    
+    public Schema(List<Field> fields){
+        initValidator(); 
+        this.fields = fields;
+    }
+    
+    private void setFieldsFromSchemaJson(JSONObject schema){
         if(schema.has("fields")){
             Iterator iter = schema.getJSONArray("fields").iterator();
             while(iter.hasNext()){
                 JSONObject fieldJsonObj = (JSONObject)iter.next();
                 Field field = new Field(fieldJsonObj);
                 this.fields.add(field);
-            }
-            
+            }  
         }
-    }
-    
-    public Schema(List<Field> fields){
-        initValidator(); 
-        this.fields = fields;
     }
     
     private void initValidator(){
