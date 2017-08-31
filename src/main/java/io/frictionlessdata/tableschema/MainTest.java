@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -27,9 +28,9 @@ public class MainTest {
      */
     public static void main(String[] args) {
         String sourceFileAbsPath = MainTest.class.getResource("/fixtures/dates_data.csv").getPath();
-        try{
-            
-            
+        
+        try{ 
+            /**
             Schema schema = new Schema();
         
             Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
@@ -43,9 +44,9 @@ public class MainTest {
 
             Field isAdminField = new Field("isAdmin", Field.FIELD_TYPE_BOOLEAN);
             schema.addField(isAdminField);
-
-            Field addressCoordinates = new Field("addressCoordinates", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT);
-            schema.addField(addressCoordinates);
+            
+            Field addressCoordinatesField = new Field("addressCoordinatesField", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT);
+            schema.addField(addressCoordinatesField);
 
             Field contractLengthField = new Field("contractLength", Field.FIELD_TYPE_DURATION);
             schema.addField(contractLengthField);
@@ -53,15 +54,33 @@ public class MainTest {
             Field infoField = new Field("info", Field.FIELD_TYPE_OBJECT);
             schema.addField(infoField);
             
+            sourceFileAbsPath = MainTest.class.getResource("/fixtures/employee_data.csv").getPath();
+            Table table = new Table(sourceFileAbsPath, schema);
+            
             Iterator<Object[]> iter = table.iterator();
             while(iter.hasNext()){
                 Object[] row = iter.next();
+                
+               
                 for(int i=0; i<row.length; i++){
                     System.out.print(" " + row[i].getClass());
                 }
                 System.out.println("");
+                
+                System.out.println(row[0].getClass());
+                int id = (int)row[0];
+                
+                System.out.println(row[1].getClass());
+                String name = (String)row[1];
+                
+                System.out.println(row[2].getClass());
+                DateTime dob = (DateTime)row[2];
+                boolean isAdmin = (boolean)row[3];
+                int[] coords = (int[])row[4];
+                Duration contractLength = (Duration)row[5];
+                JSONObject info = (JSONObject)row[6];
             }
-            
+            **/
             
 
             // Iterate table

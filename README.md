@@ -17,9 +17,9 @@ URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschem
 Table table = new Table(url);
 
 // Iterate through rows          
-Iterator<String[]> iter = table.iterator();
+Iterator<Object[]> iter = table.iterator();
 while(iter.hasNext()){
-    String[] row = iter.next();
+    Object[] row = iter.next();
     System.out.println(Arrays.toString(row));
 }
 
@@ -35,7 +35,49 @@ List<String[]> allData = table.read();
 
 Cast data from a CSV with a schema:
 ```java
-//TODO: Implement and document this.
+// Let's start by defining and building the schema of a table that contains data on employees:
+Schema schema = new Schema();
+
+Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+schema.addField(idField);
+
+Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+schema.addField(nameField);
+
+Field dobField = new Field("dateOfBirth", Field.FIELD_TYPE_DATE); 
+schema.addField(dobField);
+
+Field isAdminField = new Field("isAdmin", Field.FIELD_TYPE_BOOLEAN);
+schema.addField(isAdminField);
+
+Field addressCoordinatesField = new Field("addressCoordinates", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT);
+schema.addField(addressCoordinatesField);
+
+Field contractLengthField = new Field("contractLength", Field.FIELD_TYPE_DURATION);
+schema.addField(contractLengthField);
+
+Field infoField = new Field("info", Field.FIELD_TYPE_OBJECT);
+schema.addField(infoField);
+
+// Load the data from a file
+String sourceFileAbsPath = this.getClass().getResource("/fixtures/employee_data.csv").getPath();
+Table table = new Table(sourceFileAbsPath, schema);
+
+Iterator<Object[]> iter = table.iterator();
+while(iter.hasNext()){
+
+    // The fetched array will contain row values that have been cast into their
+    // appropriate types as per field definitions in the schema.
+    Object[] row = iter.next();
+
+    int id = (int)row[0];
+    String name = (String)row[1];
+    DateTime dob = (DateTime)row[2];
+    boolean isAdmin = (boolean)row[3];
+    int[] addressCoordinates = (int[])row[4];
+    Duration contractLength = (Duration)row[5];
+    JSONObject info = (JSONObject)row[6];
+}
 ```
 
 ### Infer a Schema

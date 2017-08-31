@@ -96,9 +96,9 @@ public class TableTest {
         Field isAdminField = new Field("isAdmin", Field.FIELD_TYPE_BOOLEAN);
         schema.addField(isAdminField);
         
-        Field addressCoordinates = new Field("addressCoordinates", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT);
-        schema.addField(addressCoordinates);
-        
+        Field addressCoordinatesField = new Field("addressCoordinatesField", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT);
+        schema.addField(addressCoordinatesField);
+
         Field contractLengthField = new Field("contractLength", Field.FIELD_TYPE_DURATION);
         schema.addField(contractLengthField);
         
@@ -115,18 +115,19 @@ public class TableTest {
             String.class,
             DateTime.class,
             Boolean.class,
-            JSONArray.class,
+            Integer[].class,
             Duration.class,
             JSONObject.class
         };
         
         // Let's iterate and assert row value classes against the expected classes
         Iterator<Object[]> iter = employeeTable.iterator();
-        int loopCounter = 0;
+        
         while (iter.hasNext()) {
-            Object obj = iter.next();
-            Assert.assertTrue(obj.getClass() == expectedTypes[loopCounter]);
-            loopCounter++;
+            Object[] row = iter.next();
+            for(int i=0; i<row.length; i++){
+                Assert.assertEquals(expectedTypes[i], row[i].getClass());
+            }
         }
   
     }
