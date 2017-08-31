@@ -1,4 +1,5 @@
 package io.frictionlessdata.tableschema;
+import java.io.File;
 import java.net.URL;
 import java.time.Duration;
 import java.util.Arrays;
@@ -7,13 +8,18 @@ import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 /**
  *
  * 
  */
 public class TableTest {
+    
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
     
     @Test
     public void testReadFromValidFilePath() throws Exception{
@@ -139,5 +145,19 @@ public class TableTest {
         Table table = new Table(sourceFileAbsPath);
         
         Assert.assertEquals("[id, title]", Arrays.toString(table.headers()));
+    }
+    
+    @Test
+    public void writeTable() throws Exception{
+        File createdFile = folder.newFile("test_data_table.csv");
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
+        Table loadedTable = new Table(sourceFileAbsPath);
+        
+        loadedTable.write(createdFile.getAbsolutePath());
+        
+        Table readTable = new Table(createdFile.getAbsolutePath());
+        Assert.assertEquals(loadedTable.headers()[0], "id");
+        Assert.assertEquals(loadedTable.headers()[1], "title");
+        Assert.assertEquals(loadedTable.read().size(), readTable.read().size());   
     }
 }

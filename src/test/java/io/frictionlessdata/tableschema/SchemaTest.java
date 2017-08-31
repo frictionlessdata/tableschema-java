@@ -1,7 +1,11 @@
 package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -11,12 +15,16 @@ import org.junit.rules.ExpectedException;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import org.joda.time.DateTime;
 import static org.junit.Assert.assertThat;
+import org.junit.rules.TemporaryFolder;
 
 /**
  *
  * 
  */
 public class SchemaTest {
+    
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
     
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -194,6 +202,43 @@ public class SchemaTest {
         
         exception.expect(InvalidCastException.class);
         schema.castRow(row);
+    }
+    
+    @Test
+    public void testWrite() throws Exception{
+        File createdFile = folder.newFile("test_schema.json");
+        
+        Schema createdSchema = new Schema(); 
+        
+        Map<String, Object> intFieldConstraints = new HashMap();
+        intFieldConstraints.put(Field.CONSTRAINT_KEY_REQUIRED, true);
+                
+        Field intField = new Field("id", Field.FIELD_TYPE_INTEGER, Field.FIELD_FORMAT_DEFAULT, null, null, intFieldConstraints);
+        createdSchema.addField(intField);
+        
+        Map<String, Object> stringFieldConstraints = new HashMap();
+        stringFieldConstraints.put(Field.CONSTRAINT_KEY_MIN_LENGTH, 36);
+        stringFieldConstraints.put(Field.CONSTRAINT_KEY_MAX_LENGTH, 45);
+        
+        Field stringField = new Field("name", Field.FIELD_TYPE_STRING, Field.FIELD_FORMAT_DEFAULT, "the title", "the description", stringFieldConstraints);
+        createdSchema.addField(stringField);
+        
+        createdSchema.write(createdFile.getAbsolutePath());
+        
+        Schema readSchema = new Schema(createdFile.getAbsolutePath());
+        
+        Assert.assertEquals(readSchema.getField("id").getType(), Field.FIELD_TYPE_INTEGER);
+        Assert.assertEquals(readSchema.getField("id").getFormat(), Field.FIELD_FORMAT_DEFAULT);
+        Assert.assertEquals(readSchema.getField("id").getTitle(), "");
+        Assert.assertEquals(readSchema.getField("id").getDescription(), "");
+        Assert.assertTrue((boolean)readSchema.getField("id").getConstraints().get(Field.CONSTRAINT_KEY_REQUIRED));
+        
+        Assert.assertEquals(readSchema.getField("name").getType(), Field.FIELD_TYPE_STRING);
+        Assert.assertEquals(readSchema.getField("name").getFormat(), Field.FIELD_FORMAT_DEFAULT);
+        Assert.assertEquals(readSchema.getField("name").getTitle(), "the title");
+        Assert.assertEquals(readSchema.getField("name").getDescription(), "the description");
+        Assert.assertEquals(36, readSchema.getField("name").getConstraints().get(Field.CONSTRAINT_KEY_MIN_LENGTH));
+        Assert.assertEquals(45, readSchema.getField("name").getConstraints().get(Field.CONSTRAINT_KEY_MAX_LENGTH));
     }
 
 }

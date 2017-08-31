@@ -31,6 +31,16 @@ while(iter.hasNext()){
 List<String[]> allData = table.read();
 ```
 
+### Write a Table Into a File
+
+You can write the table into a CSV file:
+
+```java
+URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
+Table table = new Table(url);
+table.write("/desired/path/to/file.csv");
+```
+
 ### Build a Schema
 
 You can build a `Schema` instance from scratch or modify an existing one:
@@ -108,6 +118,22 @@ The inferral algorithm traverses all of the table's rows and attempts to cast ev
 ```java
 // Only process the first 25 rows for type inferral.
 Schema schema = table.inferSchema(25);
+```
+
+### Write a Schema Into a File:
+
+You can write a Schema into a JSON file:
+
+```java
+Schema schema = new Schema();
+
+Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+schema.addField(nameField);
+
+Field coordinatesField = new Field("coordinates", Field.FIELD_TYPE_GEOPOINT);
+schema.addField(coordinatesField);
+
+schema.write("/path/to/write/schema.json");
 ```
 
 ### Parse a CSV With a Schema

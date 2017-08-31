@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.datasources;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,5 +20,5 @@ public abstract class AbstractDataSource implements DataSource {
     abstract public List<String[]> data();
     
     @Override
-    abstract public void save(String outputDataSource) throws Exception;
+    abstract public void write(String outputFilePath) throws IOException;
 }

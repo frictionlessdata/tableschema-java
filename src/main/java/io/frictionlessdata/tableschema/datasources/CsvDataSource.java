@@ -4,6 +4,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Iterator;
@@ -42,10 +43,11 @@ public class CsvDataSource extends AbstractDataSource {
     }
 
     @Override
-    public void save(String outputDataSource) throws Exception {
-        CSVWriter writer = new CSVWriter(new FileWriter(outputDataSource));
+    public void write(String outputFilePath) throws IOException {
+        CSVWriter writer = new CSVWriter(new FileWriter(outputFilePath));
         
-        //FIXME: Write header
+        // Write header
+        writer.writeNext(this.headers);
         
         //Write all the rows to file
         writer.writeAll(this.data());

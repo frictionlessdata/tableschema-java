@@ -66,8 +66,8 @@ public class Table{
         return this.dataSource.getHeaders();
     }
     
-    public void save(String filename) throws Exception{
-       this.dataSource.save(filename);
+    public void write(String outputFilePath) throws Exception{
+       this.dataSource.write(outputFilePath);
     }
     
     public List<String[]> read() throws Exception{

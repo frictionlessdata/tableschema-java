@@ -3,6 +3,8 @@ package io.frictionlessdata.tableschema;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
@@ -109,6 +111,18 @@ public class Schema {
         return null;
     }
     
+    public boolean hasField(String name){
+        Iterator<Field> iter = this.fields.iterator();
+        while(iter.hasNext()){
+            Field field = iter.next();
+            if(field.getName().equalsIgnoreCase(name)){
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     public boolean validate(){
         try{
             this.tableJsonSchema.validate(this.getJson());
@@ -154,6 +168,12 @@ public class Schema {
             throw new InvalidCastException();
         }
         
+    }
+    
+    public void write(String outputFilePath) throws IOException{
+        try (FileWriter file = new FileWriter(outputFilePath)) {
+            file.write(this.getJson().toString());
+        }
     }
    
 }
