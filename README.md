@@ -33,12 +33,12 @@ List<String[]> allData = table.read();
 
 ### Write a Table Into a File
 
-You can write the table into a CSV file:
+You can write a `Table` into a CSV file:
 
 ```java
 URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
 Table table = new Table(url);
-table.write("/desired/path/to/file.csv");
+table.write("/path/to/write/table.csv");
 ```
 
 ### Build a Schema
@@ -122,7 +122,7 @@ Schema schema = table.inferSchema(25);
 
 ### Write a Schema Into a File:
 
-You can write a Schema into a JSON file:
+You can write a `Schema` into a JSON file:
 
 ```java
 Schema schema = new Schema();
