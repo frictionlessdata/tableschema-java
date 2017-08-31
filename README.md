@@ -33,7 +33,7 @@ List<String[]> allData = table.read();
 
 ### Build a Schema
 
-You can also build a `Schema` instance from scratch or modify an existing one:
+You can build a `Schema` instance from scratch or modify an existing one:
 
 ```java
 Schema schema = new Schema();
