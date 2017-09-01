@@ -61,12 +61,15 @@ public class TableTest {
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/int_bool_geopoint_data.csv").getPath();
         Table table = new Table(sourceFileAbsPath);
         
-        JSONObject schema = table.inferSchema().getJson();
-        JSONArray schemaFiles = schema.getJSONArray("fields");
+        // Infer
+        Schema schema = table.inferSchema();
+        
+        Iterator<Field> iter = schema.getFields().iterator();
         
         // The field names are the same as the name of the type we are expecting to be inferred.
-        for(int i=0; i<schemaFiles.length(); i++){
-            Assert.assertEquals(schemaFiles.getJSONObject(i).get("name"), schemaFiles.getJSONObject(i).get("type"));
+        // So if type is set then in means that inferral worked.
+        while(iter.hasNext()){
+            Assert.assertEquals(iter.next().getName(), iter.next().getType());
         }
     }
     
