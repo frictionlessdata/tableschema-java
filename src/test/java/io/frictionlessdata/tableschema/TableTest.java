@@ -2,9 +2,11 @@ package io.frictionlessdata.tableschema;
 import java.io.File;
 import java.net.URL;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -74,19 +76,23 @@ public class TableTest {
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
         Table table = new Table(sourceFileAbsPath);
         
-        String[] expectedResults = new String[]{"[1, foo]", "[2, bar]", "[3, baz]"};
-        
-        Iterator<Object[]> iter = table.iterator();
+        List<String[]> expectedResults = new ArrayList();
+        expectedResults.add(new String[]{"1", "foo"});
+        expectedResults.add(new String[]{"2", "bar"});
+        expectedResults.add(new String[]{"3", "baz"});
+
+        TableIterator<Object[]> iter = table.iterator();
         int loopCounter = 0;
         while (iter.hasNext()) {
-            String stringifiedRow = Arrays.toString(iter.next());
-            Assert.assertEquals(expectedResults[loopCounter], stringifiedRow);
+            Object[] row = iter.next();
+            Assert.assertEquals(expectedResults.get(loopCounter)[0], row[0]);
+            Assert.assertEquals(expectedResults.get(loopCounter)[1], row[1]);
             loopCounter++;
         }
     }
     
     @Test
-    public void testIterateTableWithSchema() throws Exception{
+    public void testIterateCastData() throws Exception{
         
         // Let's start by defining and building the schema:
         Schema employeeTableSchema = getEmployeeTableSchema();
@@ -107,7 +113,7 @@ public class TableTest {
         };
         
         // Let's iterate and assert row value classes against the expected classes
-        Iterator<Object[]> iter = employeeTable.iterator();
+        TableIterator<Object[]> iter = employeeTable.iterator();
         
         while (iter.hasNext()) {
             Object[] row = iter.next();
@@ -119,24 +125,106 @@ public class TableTest {
     }
     
     @Test
+    public void testIterateCastKeyedData() throws Exception{
+        // Let's start by defining and building the schema:
+        Schema employeeTableSchema = getEmployeeTableSchema();
+        
+        // Fetch the data and apply the schema
+        String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
+        Table employeeTable = new Table(employeeDataSourceFile, employeeTableSchema);
+        
+        TableIterator<Map> iter = employeeTable.iterator(true, false, false, false);
+
+        while(iter.hasNext()){
+            Map row = iter.next();
+
+            Assert.assertEquals(Integer.class, row.get("id").getClass());
+            Assert.assertEquals(String.class, row.get("name").getClass());
+            Assert.assertEquals(DateTime.class, row.get("dateOfBirth").getClass());
+            Assert.assertEquals(Boolean.class, row.get("isAdmin").getClass());
+            Assert.assertEquals(int[].class, row.get("addressCoordinates").getClass());
+            Assert.assertEquals(Duration.class, row.get("contractLength").getClass());
+            Assert.assertEquals(JSONObject.class, row.get("info").getClass());      
+        }
+    }
+    
+    @Test
+    public void testIterateCastExtendedData() throws Exception{
+        // Let's start by defining and building the schema:
+        Schema employeeTableSchema = getEmployeeTableSchema();
+        
+        // Fetch the data and apply the schema
+        String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
+        Table employeeTable = new Table(employeeDataSourceFile, employeeTableSchema);
+        
+        Class[] expectedTypes = new Class[]{
+            Integer.class,
+            String.class,
+            DateTime.class,
+            Boolean.class,
+            int[].class,
+            Duration.class,
+            JSONObject.class
+        };
+        
+        TableIterator<Object[]> iter = employeeTable.iterator(false, true, false, false);
+        
+        int rowIndex = 0;
+        while(iter.hasNext()){
+            Object[] row = iter.next();
+
+            Assert.assertEquals(rowIndex, row[0]);
+            Assert.assertEquals(employeeTable.getHeaders(), row[1]);
+           
+            Object[] dataArray = (Object[])row[2];
+            Assert.assertEquals(Integer.class, dataArray[0].getClass());
+            Assert.assertEquals(String.class, dataArray[1].getClass());
+            Assert.assertEquals(DateTime.class, dataArray[2].getClass());
+            Assert.assertEquals(Boolean.class, dataArray[3].getClass());
+            Assert.assertEquals(int[].class, dataArray[4].getClass());
+            Assert.assertEquals(Duration.class, dataArray[5].getClass());
+            Assert.assertEquals(JSONObject.class, dataArray[6].getClass());
+            
+            rowIndex++;
+        }
+    }
+    
+    @Test
+    public void testIterateUncastData() throws Exception{
+        
+    }
+    
+    @Test
+    public void testIterateUncastKeyedData() throws Exception{
+        
+    }
+    
+    @Test
+    public void testIterateUncastExtendedData() throws Exception{
+        
+    }
+    
+    @Test
     public void testFetchHeaders() throws Exception{
         // get path of test CSV file
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
         Table table = new Table(sourceFileAbsPath);
         
-        Assert.assertEquals("[id, title]", Arrays.toString(table.headers()));
+        Assert.assertEquals("[id, title]", Arrays.toString(table.getHeaders()));
     }
     
     @Test
-    public void testReadUncastedData() throws Exception{
+    public void testReadUncastData() throws Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
         Table table = new Table(sourceFileAbsPath);
         
         Assert.assertEquals(3, table.read().size());
+        Assert.assertEquals("1", table.read().get(0)[0]);
+        Assert.assertEquals("foo", table.read().get(0)[1]);
     }
-    
+
     @Test
-    public void testReadCastedData() throws Exception{
+    public void testReadCastData() throws Exception{
 
         // Let's start by defining and building the schema:
         Schema employeeTableSchema = getEmployeeTableSchema();
@@ -177,8 +265,8 @@ public class TableTest {
         loadedTable.write(createdFile.getAbsolutePath());
         
         Table readTable = new Table(createdFile.getAbsolutePath());
-        Assert.assertEquals(loadedTable.headers()[0], "id");
-        Assert.assertEquals(loadedTable.headers()[1], "title");
+        Assert.assertEquals(loadedTable.getHeaders()[0], "id");
+        Assert.assertEquals(loadedTable.getHeaders()[1], "title");
         Assert.assertEquals(loadedTable.read().size(), readTable.read().size());   
     }
     

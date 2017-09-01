@@ -60,15 +60,27 @@ public class Table{
         this.schema = schema;
     }
     
-    public Iterator<Object[]> iterator(boolean keyed, boolean extended, boolean cast, boolean relations){
-       return new TableIterator(this.schema, this.dataSource.iterator(), keyed, extended, cast, relations);
+    public TableIterator iterator(){
+       return new TableIterator(this);
     }
     
-    public Iterator<Object[]> iterator(){
-       return this.iterator(false, false, false, false);
+    public TableIterator iterator(boolean keyed){
+       return new TableIterator(this, keyed);
     }
     
-    public String[] headers(){
+    public TableIterator iterator(boolean keyed, boolean extended){
+       return new TableIterator(this, keyed, extended);
+    }
+    
+    public TableIterator iterator(boolean keyed, boolean extended, boolean cast){
+       return new TableIterator(this, keyed, extended, cast);
+    }
+    
+    public TableIterator iterator(boolean keyed, boolean extended, boolean cast, boolean relations){
+       return new TableIterator(this, keyed, extended, cast, relations);
+    }
+    
+    public String[] getHeaders(){
         return this.dataSource.getHeaders();
     }
     
@@ -82,7 +94,7 @@ public class Table{
         
         List<Object[]> rows = new ArrayList();
         
-        Iterator<Object[]> iter = this.iterator(false, false, cast, false);
+        TableIterator<Object[]> iter = this.iterator(false, false, cast, false);
         while(iter.hasNext()){
             Object[] row = iter.next();
             rows.add(row);
@@ -97,7 +109,7 @@ public class Table{
     
     public Schema inferSchema() throws TypeInferringException{
         try{
-            JSONObject schemaJson = this.typeInferrer.infer(this.read(), this.headers());
+            JSONObject schemaJson = this.typeInferrer.infer(this.read(), this.getHeaders());
             this.schema = new Schema(schemaJson);
             return this.schema;
             
@@ -108,7 +120,7 @@ public class Table{
     
     public Schema inferSchema(int rowLimit) throws TypeInferringException{
         try{
-            JSONObject schemaJson = this.typeInferrer.infer(this.read(), this.headers(), rowLimit);
+            JSONObject schemaJson = this.typeInferrer.infer(this.read(), this.getHeaders(), rowLimit);
             this.schema = new Schema(schemaJson);
             return this.schema;
             
@@ -119,5 +131,9 @@ public class Table{
     
     public Schema getSchema(){
         return this.schema;
+    }
+    
+    public DataSource getDataSource(){
+        return this.dataSource;
     }
 }

@@ -77,6 +77,8 @@ public class TypeInferrer {
     // yyyy-MM
     private static final String REGEX_YEARMONTH = "([0-9]{4})-(1[0-2]|0[1-9])";
     
+    //private static final String REGEX_OBJECT = "{(.|\\n)*}";
+    
     public TypeInferrer(){
         // FIXME: Maybe this infering against geojson and topojson scheme is too much.
         // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
@@ -256,21 +258,33 @@ public class TypeInferrer {
         JSONObject jsonObj = null;
         
         try {
-            jsonObj = new JSONObject(value);
+            // TODO: FIX?
+            //Pattern pattern = Pattern.compile(REGEX_OBJECT);
+            //Matcher matcher = pattern.matcher(value);
         
-            try{
-                if(format.equalsIgnoreCase("default")){
-                    this.geoJsonSchema.validate(jsonObj);
+            // TODO: FIX?
+            if(true){
+            //if(matcher.matches()){
+                jsonObj = new JSONObject(value);
 
-                }else if(format.equalsIgnoreCase("topojson")){
-                    this.topoJsonSchema.validate(jsonObj);
+                try{
+                    if(format.equalsIgnoreCase("default")){
+                        this.geoJsonSchema.validate(jsonObj);
 
-                }else{
+                    }else if(format.equalsIgnoreCase("topojson")){
+                        this.topoJsonSchema.validate(jsonObj);
+
+                    }else{
+                        throw new TypeInferringException();
+                    }
+
+                }catch(ValidationException ve){
+                    // Not a valid GeoJSON or TopoJSON.
                     throw new TypeInferringException();
                 }
-
-            }catch(ValidationException ve){
-                // Not a valid GeoJSON or TopoJSON.
+            
+            }else{
+                // String not formatted like a JSON.
                 throw new TypeInferringException();
             }
         }catch(JSONException je){
@@ -474,6 +488,6 @@ public class TypeInferrer {
     }
     
     public String isAny(String format, String value) throws TypeInferringException{
-        throw new TypeInferringException();
+        return value;
     }
 }

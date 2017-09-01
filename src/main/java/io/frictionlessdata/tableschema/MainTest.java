@@ -295,6 +295,11 @@ public class MainTest {
             
             System.out.println(Arrays.asList(castRow));
             **/
+            /**
+            String sf = MainTest.class.getResource("/fixtures/int_bool_geopoint_data.csv").getPath();
+            Table table = new Table(sf);
+
+            table.inferSchema().getJson();
 
 
             // Fetch the data and apply the schema
@@ -312,17 +317,39 @@ public class MainTest {
                 JSONObject.class
             };
 
-            List<Object[]> data = employeeTable.read(true);
-            Iterator<Object[]> iter = data.iterator();
+            System.out.println("CASTED ROW:");        
+            TableIterator<Object[]> iter = employeeTable.iterator();
 
             while(iter.hasNext()){
                 Object[] row = iter.next();
-
-                for(int i=0; i<row.length; i++){
-                    System.out.println(row[i].getClass());
-                }
+                System.out.println(Arrays.asList(row));
             }
+            System.out.println("");
+            
+            
+            System.out.println("\n\nCASTED ROW AND KEYED:");            
+            TableIterator<Map> iter2 = employeeTable.iterator(true);
 
+            while(iter2.hasNext()){
+                Map row = iter2.next();
+
+                Iterator<Map.Entry<String, Object>> it = row.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<String, Object> pair = it.next();
+                    System.out.println(pair);
+                }
+                System.out.println("");
+            }
+            
+            System.out.println("CASTED ROW AND EXTENDED:");
+            TableIterator<Object[]> iter3 = employeeTable.iterator(false, true);
+
+            while(iter3.hasNext()){
+                Object[] row = iter3.next();
+                System.out.println(Arrays.asList(row));
+            }
+            System.out.println("");
+            **/
         }catch(Exception e){
             e.printStackTrace();
         }
