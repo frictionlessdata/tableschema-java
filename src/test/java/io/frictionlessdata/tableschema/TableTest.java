@@ -71,7 +71,7 @@ public class TableTest {
     }
     
     @Test
-    public void testIterate() throws Exception{
+    public void testIterateUncastData() throws Exception{
         // get path of test CSV file
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
         Table table = new Table(sourceFileAbsPath);
@@ -88,6 +88,55 @@ public class TableTest {
             Assert.assertEquals(expectedResults.get(loopCounter)[0], row[0]);
             Assert.assertEquals(expectedResults.get(loopCounter)[1], row[1]);
             loopCounter++;
+        }
+    }
+    
+    @Test
+    public void testIterateUncastKeyedData() throws Exception{
+        // Fetch the data
+        String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
+        Table employeeTable = new Table(employeeDataSourceFile);
+        
+        TableIterator<Map> iter = employeeTable.iterator(true);
+
+        while(iter.hasNext()){
+            Map row = iter.next();
+
+            Assert.assertEquals(String.class, row.get("id").getClass());
+            Assert.assertEquals(String.class, row.get("name").getClass());
+            Assert.assertEquals(String.class, row.get("dateOfBirth").getClass());
+            Assert.assertEquals(String.class, row.get("isAdmin").getClass());
+            Assert.assertEquals(String.class, row.get("addressCoordinates").getClass());
+            Assert.assertEquals(String.class, row.get("contractLength").getClass());
+            Assert.assertEquals(String.class, row.get("info").getClass());      
+        }
+    }
+    
+    @Test
+    public void testIterateUncastExtendedData() throws Exception{
+        // Fetch the data.
+        String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
+        Table employeeTable = new Table(employeeDataSourceFile);
+   
+        TableIterator<Object[]> iter = employeeTable.iterator(false, true);
+        
+        int rowIndex = 0;
+        while(iter.hasNext()){
+            Object[] row = iter.next();
+
+            Assert.assertEquals(rowIndex, row[0]);
+            Assert.assertEquals(employeeTable.getHeaders(), row[1]);
+           
+            Object[] dataArray = (Object[])row[2];
+            Assert.assertEquals(String.class, dataArray[0].getClass());
+            Assert.assertEquals(String.class, dataArray[1].getClass());
+            Assert.assertEquals(String.class, dataArray[2].getClass());
+            Assert.assertEquals(String.class, dataArray[3].getClass());
+            Assert.assertEquals(String.class, dataArray[4].getClass());
+            Assert.assertEquals(String.class, dataArray[5].getClass());
+            Assert.assertEquals(String.class, dataArray[6].getClass());
+            
+            rowIndex++;
         }
     }
     
@@ -187,21 +236,6 @@ public class TableTest {
             
             rowIndex++;
         }
-    }
-    
-    @Test
-    public void testIterateUncastData() throws Exception{
-        
-    }
-    
-    @Test
-    public void testIterateUncastKeyedData() throws Exception{
-        
-    }
-    
-    @Test
-    public void testIterateUncastExtendedData() throws Exception{
-        
     }
     
     @Test
