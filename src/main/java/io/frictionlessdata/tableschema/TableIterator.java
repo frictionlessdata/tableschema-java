@@ -97,37 +97,42 @@ public class TableIterator<T> {
                 if(extended){
                     extendedRow = new Object[]{index, this.headers, castRow}; 
                     index++;
+                    return (T)extendedRow;
+                    
+                }else if(keyed && !extended){
+                    return (T)keyedRow;
+
+                }else if(!keyed && !extended){
+                    return (T)castRow;
+
+                }else{
+                    return (T)row;
                 }
             
             }catch(InvalidCastException | ConstraintsException e){
                 // The row data types do not match schema definition.
                 // Or the row values do not respect the Constraint rules.
-                // Do noting and string with String[] typed row.
-                extendedRow = null;
-                keyedRow = null;
-                castRow = null;     
+                // Do noting and string with String[] typed row.                
+                return (T)row;
             }
             
         }else{
-            extendedRow = null;
-            keyedRow = null;
-            castRow = null;
-            
-            return (T)row;
-        }
-        
-        if(extended){
-            return (T)extendedRow; 
-            
-        }else if(keyed && !extended){
-            return (T)keyedRow;
-            
-        }else if(!keyed && !extended){
-            return (T)castRow;
-            
-        }else{
-            return (T)row;
-        }
-    }
+            // Enter here of no Schema has been defined.            
+            if(extended){
+                extendedRow = new Object[]{index, this.headers, row}; 
+                index++;
+                return (T)extendedRow;
 
+            }else if(keyed && !extended){
+                keyedRow = new HashMap();
+                for(int i=0; i<row.length; i++){
+                    keyedRow.put(this.headers[i], row[i]);
+                }  
+                return (T)keyedRow;
+
+            }else{
+                return (T)row;
+            }
+        }  
+    }
 }

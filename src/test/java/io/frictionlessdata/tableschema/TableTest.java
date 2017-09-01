@@ -108,7 +108,7 @@ public class TableTest {
             Assert.assertEquals(String.class, row.get("isAdmin").getClass());
             Assert.assertEquals(String.class, row.get("addressCoordinates").getClass());
             Assert.assertEquals(String.class, row.get("contractLength").getClass());
-            Assert.assertEquals(String.class, row.get("info").getClass());      
+            Assert.assertEquals(String.class, row.get("info").getClass());     
         }
     }
     
