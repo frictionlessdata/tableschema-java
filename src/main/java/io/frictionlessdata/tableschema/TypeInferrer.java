@@ -265,33 +265,22 @@ public class TypeInferrer {
         JSONObject jsonObj = null;
         
         try {
-            // TODO: FIX?
-            //Pattern pattern = Pattern.compile(REGEX_OBJECT);
-            //Matcher matcher = pattern.matcher(value);
-        
-            // TODO: FIX?
-            if(true){
-            //if(matcher.matches()){
-                jsonObj = new JSONObject(value);
 
-                try{
-                    if(format.equalsIgnoreCase("default")){
-                        validateGeoJsonSchema(jsonObj);
+            jsonObj = new JSONObject(value);
 
-                    }else if(format.equalsIgnoreCase("topojson")){
-                        validateTopoJsonSchema(jsonObj);
-                        
-                    }else{
-                        throw new TypeInferringException();
-                    }
+            try{
+                if(format.equalsIgnoreCase("default")){
+                    validateGeoJsonSchema(jsonObj);
 
-                }catch(ValidationException ve){
-                    // Not a valid GeoJSON or TopoJSON.
+                }else if(format.equalsIgnoreCase("topojson")){
+                    validateTopoJsonSchema(jsonObj);
+
+                }else{
                     throw new TypeInferringException();
                 }
-            
-            }else{
-                // String not formatted like a JSON.
+
+            }catch(ValidationException ve){
+                // Not a valid GeoJSON or TopoJSON.
                 throw new TypeInferringException();
             }
         }catch(JSONException je){
