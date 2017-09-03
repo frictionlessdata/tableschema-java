@@ -48,24 +48,24 @@ public class TypeInferrer {
     // The order in which the types will be attempted to be inferred.
     // Once a type is successfully inferred, we do not bother with the remaining types.
     private static final List<String[]> TYPE_INFERRAL_ORDER_LIST = new ArrayList<>(Arrays.asList(
-        new String[]{"geopoint", "default"},
-        new String[]{"geopoint", "array"},
-        new String[]{"geopoint", "object"},
-        new String[]{"duration", "default"}, // No different formats, just use default.
-        new String[]{"year", "default"}, // No different formats, just use default.
-        new String[]{"yearmonth", "default"}, // No different formats, just use default.
-        new String[]{"date", "default"}, // No different formats, just use default.
-        new String[]{"time", "default"}, // No different formats, just use default.
-        new String[]{"datetime", "default"}, // No different formats, just use default.
-        new String[]{"integer", "default"}, // No different formats, just use default.
-        new String[]{"number", "default"}, // No different formats, just use default.
-        new String[]{"boolean", "default"}, // No different formats, just use default.
-        new String[]{"string", "default"}, // No different formats, just use default.
-        new String[]{"any", "default"}, // No different formats, just use default.
-        new String[]{"object", "default"},
-        new String[]{"array", "default"},
-        new String[]{"geojson", "default"},
-        new String[]{"geojson", "topojson"}));
+        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_DEFAULT},
+        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_ARRAY},
+        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT},
+        new String[]{Field.FIELD_TYPE_DURATION, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_YEAR, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_YEARMONTH, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_DATE, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_TIME, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_DATETIME, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_INTEGER, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_NUMBER, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_BOOLEAN, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_STRING, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_ANY, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_OBJECT, Field.FIELD_FORMAT_DEFAULT},
+        new String[]{Field.FIELD_TYPE_ARRAY, Field.FIELD_FORMAT_DEFAULT},
+        new String[]{Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_DEFAULT},
+        new String[]{Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_TOPOJSON}));
     
     
     // ISO 8601 format of yyyy-MM-dd'T'HH:mm:ss.SSSZ in UTC time
@@ -352,7 +352,7 @@ public class TypeInferrer {
                     throw new TypeInferringException();
                 }
 
-            }else if(format.equalsIgnoreCase("array")){
+            }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_ARRAY)){
 
                 // This will throw an exception if the value is not an array.
                 JSONArray jsonArray = new JSONArray(value);
@@ -368,7 +368,7 @@ public class TypeInferrer {
                     throw new TypeInferringException();
                 }     
 
-            }else if(format.equalsIgnoreCase("object")){
+            }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_OBJECT)){
 
                 // This will throw an exception if the value is not an object.
                 JSONObject jsonObj = new JSONObject(value);
