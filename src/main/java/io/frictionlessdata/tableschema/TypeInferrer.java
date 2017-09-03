@@ -42,7 +42,6 @@ public class TypeInferrer {
     
     private Schema geoJsonSchema = null;
     private Schema topoJsonSchema = null;
-    private JSONObject tableSchema = null;
     
     private Map<String, Map<String, Integer>> typeInferralMap = new HashMap();
     
@@ -130,7 +129,7 @@ public class TypeInferrer {
         // Init the type inferral map and init the schema objects
         for (String header : headers) {
             // Init the type inferral map to track our inferences for each row.
-            this.typeInferralMap.put(header, new HashMap());
+            this.getTypeInferralMap().put(header, new HashMap());
             
             // Init the schema objects
             JSONObject fieldObj = new JSONObject();
@@ -161,7 +160,7 @@ public class TypeInferrer {
         // as the final type for the field.
         for(int j=0; j < tableFieldJsonArray.length(); j++){
             String fieldName = tableFieldJsonArray.getJSONObject(j).getString("name");
-            HashMap<String, Integer> typeInferralCountMap = (HashMap<String, Integer>)this.typeInferralMap.get(fieldName);
+            HashMap<String, Integer> typeInferralCountMap = (HashMap<String, Integer>)this.getTypeInferralMap().get(fieldName);
             TreeMap<String, Integer> typeInferralCountMapSortedByCount = sortMapByValue(typeInferralCountMap); 
            
             if(!typeInferralCountMapSortedByCount.isEmpty()){
@@ -172,7 +171,7 @@ public class TypeInferrer {
         }
         
         // Need to clear the inferral map for the next inferral call:
-        this.typeInferralMap.clear();
+        this.getTypeInferralMap().clear();
         
         // Now that the types have been inferred and set, we build and return the schema object.
         JSONObject schemaJsonObject = new JSONObject();
@@ -217,11 +216,11 @@ public class TypeInferrer {
      * @param typeKey 
      */
     private void updateInferralScoreMap(String header, String typeKey){
-        if(this.typeInferralMap.get(header).containsKey(typeKey)){
+        if(this.getTypeInferralMap().get(header).containsKey(typeKey)){
             int newCount = this.typeInferralMap.get(header).get(typeKey) + 1;
-            this.typeInferralMap.get(header).replace(typeKey, newCount);
+            this.getTypeInferralMap().get(header).replace(typeKey, newCount);
         }else{
-            this.typeInferralMap.get(header).put(typeKey, 1);
+            this.getTypeInferralMap().get(header).put(typeKey, 1);
         }
     }
     
@@ -312,14 +311,14 @@ public class TypeInferrer {
      * @throws ValidationException 
      */
     private void validateGeoJsonSchema(JSONObject geoJson) throws ValidationException{
-        if(this.geoJsonSchema == null){
+        if(this.getGeoJsonSchema() == null){
             // FIXME: Maybe this infering against geojson scheme is too much.
             // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
             InputStream geoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/geojson.json");
             JSONObject rawGeoJsonSchema = new JSONObject(new JSONTokener(geoJsonSchemaInputStream));
-            this.geoJsonSchema = SchemaLoader.load(rawGeoJsonSchema);
+            this.setGeoJsonSchema(SchemaLoader.load(rawGeoJsonSchema));
         }
-        this.geoJsonSchema.validate(geoJson);
+        this.getGeoJsonSchema().validate(geoJson);
     }
     
     /**
@@ -330,14 +329,14 @@ public class TypeInferrer {
      * @param topoJson 
      */
     private void validateTopoJsonSchema(JSONObject topoJson){
-        if(this.topoJsonSchema == null){
+        if(this.getTopoJsonSchema() == null){
             // FIXME: Maybe this infering against topojson scheme is too much.
             // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema
             InputStream topoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/topojson.json");
             JSONObject rawTopoJsonSchema = new JSONObject(new JSONTokener(topoJsonSchemaInputStream));
-            this.topoJsonSchema = SchemaLoader.load(rawTopoJsonSchema);
+            this.setTopoJsonSchema(SchemaLoader.load(rawTopoJsonSchema));
         }
-        this.topoJsonSchema.validate(topoJson);
+        this.getTopoJsonSchema().validate(topoJson);
     }
     
     /**
@@ -534,5 +533,25 @@ public class TypeInferrer {
     
     public String isAny(String format, String value) throws TypeInferringException{
         return value;
+    }
+    
+    private Schema getGeoJsonSchema(){
+        return this.geoJsonSchema;
+    }
+    
+    private void setGeoJsonSchema(Schema geoJsonSchema){
+        this.geoJsonSchema = geoJsonSchema;
+    }
+    
+    private Schema getTopoJsonSchema(){
+        return this.topoJsonSchema;
+    }
+    
+    private void setTopoJsonSchema(Schema topoJsonSchema){
+        this.topoJsonSchema = topoJsonSchema;
+    }
+    
+    synchronized Map<String, Map<String, Integer>> getTypeInferralMap(){
+        return this.typeInferralMap;
     }
 }
