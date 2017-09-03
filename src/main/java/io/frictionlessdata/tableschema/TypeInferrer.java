@@ -33,6 +33,13 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class TypeInferrer {
     
+    /**
+     * We are using reflection to go through the cast methods
+     * so we want to make this a Singleton to avoid instanciating
+     * a new class for every cast method call attempt.
+     */
+    private static TypeInferrer instance = null;
+    
     private Schema geoJsonSchema = null;
     private Schema topoJsonSchema = null;
     private JSONObject tableSchema = null;
@@ -79,19 +86,16 @@ public class TypeInferrer {
     
     //private static final String REGEX_OBJECT = "{(.|\\n)*}";
     
-    public TypeInferrer(){
-        // FIXME: Maybe this infering against geojson and topojson scheme is too much.
-        // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
-        InputStream geoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/geojson.json");
-        JSONObject rawGeoJsonSchema = new JSONObject(new JSONTokener(geoJsonSchemaInputStream));
-        this.geoJsonSchema = SchemaLoader.load(rawGeoJsonSchema);
-        
-        // FIXME: Maybe this infering against geojson and topojson scheme is too much.
-        // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema
-        InputStream topoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/topojson.json");
-        JSONObject rawTopoJsonSchema = new JSONObject(new JSONTokener(topoJsonSchemaInputStream));
-        this.topoJsonSchema = SchemaLoader.load(rawTopoJsonSchema);
+    private TypeInferrer(){
+        // Private to inforce use of Singleton pattern.
     }
+    
+    public static TypeInferrer getInstance() {
+      if(instance == null) {
+         instance = new TypeInferrer();
+      }
+      return instance;
+   }
     
     /**
      * Infer the data types and return the generated schema.
@@ -167,6 +171,9 @@ public class TypeInferrer {
             
         }
         
+        // Need to clear the inferral map for the next inferral call:
+        this.typeInferralMap.clear();
+        
         // Now that the types have been inferred and set, we build and return the schema object.
         JSONObject schemaJsonObject = new JSONObject();
         schemaJsonObject.put("fields", tableFieldJsonArray);
@@ -185,13 +192,14 @@ public class TypeInferrer {
                 String format = typeInferralDefinition[1];
                  
                 Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class);
-                method.invoke(new TypeInferrer(), format, datum);
+                // Single pattern is useful here:
+                method.invoke(TypeInferrer.getInstance(), format, datum);
                 
                 // If no exception is thrown, in means that a type has been inferred.
                 // Let's keep track of it in the inferral map.
                 this.updateInferralScoreMap(header, dataType);
                 
-                // We no longer need to try to infer other types.
+                // We no longer need to try to infer other types. 
                 // Let's break out of the loop.
                 break;
 
@@ -269,11 +277,11 @@ public class TypeInferrer {
 
                 try{
                     if(format.equalsIgnoreCase("default")){
-                        this.geoJsonSchema.validate(jsonObj);
+                        validateGeoJsonSchema(jsonObj);
 
                     }else if(format.equalsIgnoreCase("topojson")){
-                        this.topoJsonSchema.validate(jsonObj);
-
+                        validateTopoJsonSchema(jsonObj);
+                        
                     }else{
                         throw new TypeInferringException();
                     }
@@ -293,6 +301,43 @@ public class TypeInferrer {
         }
         
         return jsonObj;
+    }
+    
+    /**
+     * We only want to go through this initialization if we have to because it's a
+     * performance issue the first time it is executed.
+     * Because of this, so we don't include this logic in the constructor and only
+     * call it when it is actually required after trying all other type inferral.
+     * @param geoJson
+     * @throws ValidationException 
+     */
+    private void validateGeoJsonSchema(JSONObject geoJson) throws ValidationException{
+        if(this.geoJsonSchema == null){
+            // FIXME: Maybe this infering against geojson scheme is too much.
+            // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
+            InputStream geoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/geojson.json");
+            JSONObject rawGeoJsonSchema = new JSONObject(new JSONTokener(geoJsonSchemaInputStream));
+            this.geoJsonSchema = SchemaLoader.load(rawGeoJsonSchema);
+        }
+        this.geoJsonSchema.validate(geoJson);
+    }
+    
+    /**
+     * We only want to go through this initialization if we have to because it's a
+     * performance issue the first time it is executed.
+     * Because of this, so we don't include this logic in the constructor and only
+     * call it when it is actually required after trying all other type inferral.
+     * @param topoJson 
+     */
+    private void validateTopoJsonSchema(JSONObject topoJson){
+        if(this.topoJsonSchema == null){
+            // FIXME: Maybe this infering against topojson scheme is too much.
+            // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema
+            InputStream topoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/topojson.json");
+            JSONObject rawTopoJsonSchema = new JSONObject(new JSONTokener(topoJsonSchemaInputStream));
+            this.topoJsonSchema = SchemaLoader.load(rawTopoJsonSchema);
+        }
+        this.topoJsonSchema.validate(topoJson);
     }
     
     /**

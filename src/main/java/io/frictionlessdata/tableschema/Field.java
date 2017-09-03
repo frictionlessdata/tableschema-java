@@ -124,7 +124,7 @@ public class Field {
                 // Using reflection to invoke appropriate type casting method from the TypeInferrer class
                 String castMethodName = "cast" + (this.type.substring(0, 1).toUpperCase() + this.type.substring(1));
                 Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class);
-                Object castValue = method.invoke(new TypeInferrer(), this.format, value);
+                Object castValue = method.invoke(TypeInferrer.getInstance(), this.format, value);
             
                 // Check for constraint violations
                 if(enforceConstraints && this.constraints != null){

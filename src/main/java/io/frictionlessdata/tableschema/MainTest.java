@@ -53,11 +53,15 @@ public class MainTest {
 
             Field infoField = new Field("info", Field.FIELD_TYPE_OBJECT);
             schema.addField(infoField);
-            /**
+           
+            long start = System.currentTimeMillis();
             sourceFileAbsPath = MainTest.class.getResource("/fixtures/employee_data.csv").getPath();
             Table table = new Table(sourceFileAbsPath, schema);
+            long end = System.currentTimeMillis();
             
-            Iterator<Object[]> iter = table.iterator();
+            System.out.println(end-start);
+            
+             /**Iterator<Object[]> iter = table.iterator();
             while(iter.hasNext()){
                 Object[] row = iter.next();
                 

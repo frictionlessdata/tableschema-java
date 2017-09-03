@@ -17,45 +17,45 @@ import java.util.List;
 public class Table{
     private DataSource dataSource = null;
     private Schema schema = null;
-    private TypeInferrer typeInferrer = null;
+    //private TypeInferrer typeInferrer = null;
     
     public Table(String dataSourceFilename) throws Exception{
         // FIXME: Don't assume it is always CSV.
         this.dataSource = new CsvDataSource(dataSourceFilename);
-        this.typeInferrer = new TypeInferrer();
+        //this.typeInferrer = new TypeInferrer();
         // Infer schema?
     }
     
     public Table(String dataSourceFilename, JSONObject schemaJson) throws Exception{
         // FIXME: Don't assume it is always CSV.
         this.dataSource = new CsvDataSource(dataSourceFilename);
-        this.typeInferrer = new TypeInferrer();
+        //this.typeInferrer = new TypeInferrer();
         this.schema = new Schema(schemaJson);
     }
     
     public Table(String dataSourceFilename, Schema schema) throws Exception{
         // FIXME: Don't assume it is always CSV.
         this.dataSource = new CsvDataSource(dataSourceFilename);
-        this.typeInferrer = new TypeInferrer();
+        //this.typeInferrer = new TypeInferrer();
         this.schema = schema;
     }
     
     public Table(URL url) throws Exception{
         this.dataSource = new CsvDataSource(url);
-        this.typeInferrer = new TypeInferrer();
+        //this.typeInferrer = new TypeInferrer();
         // Infer schema?
     }
     
     public Table(URL url, JSONObject schemaJson) throws Exception{
         this.dataSource = new CsvDataSource(url);
-        this.typeInferrer = new TypeInferrer();
+        //this.typeInferrer = new TypeInferrer();
         // Infer schema?
         this.schema = new Schema(schemaJson);
     }
     
     public Table(URL url, Schema schema) throws Exception{
         this.dataSource = new CsvDataSource(url);
-        this.typeInferrer = new TypeInferrer();
+        //this.typeInferrer = new TypeInferrer();
         // Infer schema?
         this.schema = schema;
     }
@@ -109,7 +109,7 @@ public class Table{
     
     public Schema inferSchema() throws TypeInferringException{
         try{
-            JSONObject schemaJson = this.typeInferrer.infer(this.read(), this.getHeaders());
+            JSONObject schemaJson = TypeInferrer.getInstance().infer(this.read(), this.getHeaders());
             this.schema = new Schema(schemaJson);
             return this.schema;
             
@@ -120,7 +120,7 @@ public class Table{
     
     public Schema inferSchema(int rowLimit) throws TypeInferringException{
         try{
-            JSONObject schemaJson = this.typeInferrer.infer(this.read(), this.getHeaders(), rowLimit);
+            JSONObject schemaJson = TypeInferrer.getInstance().infer(this.read(), this.getHeaders(), rowLimit);
             this.schema = new Schema(schemaJson);
             return this.schema;
             
