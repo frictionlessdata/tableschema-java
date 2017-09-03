@@ -103,7 +103,7 @@ public class TypeInferrer {
      * @return
      * @throws TypeInferringException 
      */
-    public JSONObject infer(List<Object[]> data, String[] headers) throws TypeInferringException{
+    public synchronized JSONObject infer(List<Object[]> data, String[] headers) throws TypeInferringException{
         return this.infer(data, headers, data.size()-1);
     }
     
@@ -115,7 +115,7 @@ public class TypeInferrer {
      * @return
      * @throws TypeInferringException 
      */
-    public JSONObject infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
+    public synchronized JSONObject infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
         
         // If the given row limit is bigger than the length of the data
         // then just use the length of the data.
@@ -551,7 +551,7 @@ public class TypeInferrer {
         this.topoJsonSchema = topoJsonSchema;
     }
     
-    synchronized Map<String, Map<String, Integer>> getTypeInferralMap(){
+    private Map<String, Map<String, Integer>> getTypeInferralMap(){
         return this.typeInferralMap;
     }
 }
