@@ -353,6 +353,9 @@ public class MainTest {
             
             Field intField = new Field("intNum", Field.FIELD_TYPE_NUMBER);
             Field floatField = new Field("floatNum", Field.FIELD_TYPE_NUMBER);
+            
+            float floatValPositive1 = floatField.castValue("123.9902");
+            System.out.println(floatValPositive1);
         
         }catch(Exception e){
             e.printStackTrace();

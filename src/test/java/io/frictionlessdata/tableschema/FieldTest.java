@@ -248,17 +248,16 @@ public class FieldTest {
         
         int intValNegative = intField.castValue("-765");
         Assert.assertEquals(-765, intValNegative);
-        
-        /**
+             
         float floatValPositive1 = floatField.castValue("123.9902");
-        Assert.assertEquals(123.9902, floatValPositive1, 0.0000);
+        Assert.assertEquals(123.9902, floatValPositive1, 0.01);
         
         float floatValPositive2 = floatField.castValue("+128127.1929");
-        Assert.assertEquals(128127.1929, floatValPositive2, 0.0000);
+        Assert.assertEquals(128127.1929, floatValPositive2, 0.01);
         
         float floatValNegative = floatField.castValue("-765.929");
-        Assert.assertEquals(-765.929, floatValNegative, 0.000);
-        **/
+        Assert.assertEquals(-765.929, floatValNegative, 0.01);
+        
     }
     
     @Test
