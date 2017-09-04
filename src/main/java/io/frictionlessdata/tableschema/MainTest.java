@@ -351,11 +351,19 @@ public class MainTest {
             System.out.println("");
             **/
             
+            /**
             Field intField = new Field("intNum", Field.FIELD_TYPE_NUMBER);
             Field floatField = new Field("floatNum", Field.FIELD_TYPE_NUMBER);
             
             float floatValPositive1 = floatField.castValue("123.9902");
             System.out.println(floatValPositive1);
+            **/
+            
+            Map<String, Object> options = new HashMap();
+            options.put("decimalChar", ",");
+            float num = (float)TypeInferrer.getInstance().castNumber(Field.FIELD_FORMAT_DEFAULT, "1020,123", options);
+
+            System.out.println(num);
         
         }catch(Exception e){
             e.printStackTrace();
