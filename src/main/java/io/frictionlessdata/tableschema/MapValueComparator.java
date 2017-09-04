@@ -2,6 +2,7 @@ package io.frictionlessdata.tableschema;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -9,9 +10,9 @@ import java.util.HashMap;
  */
 public class MapValueComparator implements Comparator<String>{
  
-	HashMap<String, Integer> map = new HashMap<String, Integer>();
+	Map<String, Integer> map = new HashMap<String, Integer>();
  
-	public MapValueComparator(HashMap<String, Integer> map){
+	public MapValueComparator(Map<String, Integer> map){
             this.map.putAll(map);
 	}
  

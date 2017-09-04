@@ -237,7 +237,28 @@ public class FieldTest {
     
     @Test
     public void testFieldCastNumber() throws Exception{   
-        //Assert.fail("Test case not implemented yet.");
+        Field intField = new Field("intNum", Field.FIELD_TYPE_NUMBER);
+        Field floatField = new Field("floatNum", Field.FIELD_TYPE_NUMBER);
+        
+        int intValPositive1 = intField.castValue("123");
+        Assert.assertEquals(123, intValPositive1);
+        
+        int intValPositive2 = intField.castValue("+128127");
+        Assert.assertEquals(128127, intValPositive2);
+        
+        int intValNegative = intField.castValue("-765");
+        Assert.assertEquals(-765, intValNegative);
+        
+        /**
+        float floatValPositive1 = floatField.castValue("123.9902");
+        Assert.assertEquals(123.9902, floatValPositive1, 0.0000);
+        
+        float floatValPositive2 = floatField.castValue("+128127.1929");
+        Assert.assertEquals(128127.1929, floatValPositive2, 0.0000);
+        
+        float floatValNegative = floatField.castValue("-765.929");
+        Assert.assertEquals(-765.929, floatValNegative, 0.000);
+        **/
     }
     
     @Test

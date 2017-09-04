@@ -94,9 +94,8 @@ public class Field {
         this.constraints = field.has("constraints") ? field.getJSONObject("constraints").toMap() : null;
     }
     
-        /**
-     * Use the Field definition to cast a value into the Field type.
-     * Enforces constraints by default.
+    /**
+     * 
      * @param <Any>
      * @param value
      * @return
@@ -104,7 +103,21 @@ public class Field {
      * @throws ConstraintsException 
      */
     public <Any> Any castValue(String value) throws InvalidCastException, ConstraintsException{
-        return this.castValue(value, true);
+        return this.castValue(value, true, null);
+    }
+    
+        /**
+     * Use the Field definition to cast a value into the Field type.
+     * Enforces constraints by default.
+     * @param <Any>
+     * @param value
+     * @param value options
+     * @return
+     * @throws InvalidCastException
+     * @throws ConstraintsException 
+     */
+    public <Any> Any castValue(String value, HashMap<String, Object> options) throws InvalidCastException, ConstraintsException{
+        return this.castValue(value, true, options);
     }
     
     /**
@@ -117,14 +130,27 @@ public class Field {
      * @throws ConstraintsException 
      */
     public <Any> Any castValue(String value, boolean enforceConstraints) throws InvalidCastException, ConstraintsException{
+        return this.castValue(value, enforceConstraints, null);
+    }
+    
+    /**
+     * 
+     * @param <Any>
+     * @param value
+     * @param enforceConstraints
+     * @return
+     * @throws InvalidCastException
+     * @throws ConstraintsException 
+     */
+    public <Any> Any castValue(String value, boolean enforceConstraints, Map<String, Object> options) throws InvalidCastException, ConstraintsException{
         if(this.type.isEmpty()){
             throw new InvalidCastException();
         }else{
             try{
                 // Using reflection to invoke appropriate type casting method from the TypeInferrer class
                 String castMethodName = "cast" + (this.type.substring(0, 1).toUpperCase() + this.type.substring(1));
-                Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class);
-                Object castValue = method.invoke(TypeInferrer.getInstance(), this.format, value);
+                Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class, Map.class);
+                Object castValue = method.invoke(TypeInferrer.getInstance(), this.format, value, options);
             
                 // Check for constraint violations
                 if(enforceConstraints && this.constraints != null){

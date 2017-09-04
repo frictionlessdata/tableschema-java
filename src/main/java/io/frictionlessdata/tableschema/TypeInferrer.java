@@ -60,13 +60,15 @@ public class TypeInferrer {
         new String[]{Field.FIELD_TYPE_INTEGER, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
         new String[]{Field.FIELD_TYPE_NUMBER, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
         new String[]{Field.FIELD_TYPE_BOOLEAN, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_STRING, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_ANY, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_DEFAULT},
+        new String[]{Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_TOPOJSON},
         new String[]{Field.FIELD_TYPE_OBJECT, Field.FIELD_FORMAT_DEFAULT},
         new String[]{Field.FIELD_TYPE_ARRAY, Field.FIELD_FORMAT_DEFAULT},
-        new String[]{Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_DEFAULT},
-        new String[]{Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_TOPOJSON}));
+        new String[]{Field.FIELD_TYPE_STRING, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_ANY, Field.FIELD_FORMAT_DEFAULT})); // No different formats, just use default.
     
+    private static final String NUMBER_DEFAULT_DECIMAL_CHAR = ".";
+    private static final String NUMBER_DEFAULT_GROUP_CHAR = "";
     
     // ISO 8601 format of yyyy-MM-dd'T'HH:mm:ss.SSSZ in UTC time
     private static final String REGEX_DATETIME = "(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?";
@@ -83,7 +85,9 @@ public class TypeInferrer {
     // yyyy-MM
     private static final String REGEX_YEARMONTH = "([0-9]{4})-(1[0-2]|0[1-9])";
     
-    //private static final String REGEX_OBJECT = "{(.|\\n)*}";
+    private static final String REGEX_FLOAT = "([+-]?\\d*\\.?\\d*)";
+    private static final String REGEX_INTEGER = "[+-]?\\d+";
+    private static final String REGEX_BARE_NUMBER = "((^\\D*)|(\\D*$))";
     
     private TypeInferrer(){
         // Private to inforce use of Singleton pattern.
@@ -230,12 +234,16 @@ public class TypeInferrer {
      * @param map
      * @return 
      */
-    private TreeMap<String, Integer> sortMapByValue(HashMap<String, Integer> map){
+    private TreeMap<String, Integer> sortMapByValue(Map<String, Integer> map){
         Comparator<String> comparator = new MapValueComparator(map);
         TreeMap<String, Integer> result = new TreeMap<String, Integer>(comparator);
         result.putAll(map);
 
         return result;
+    }
+    
+    public Duration castDuration(String format, String value) throws TypeInferringException{
+        return this.castDuration(format, value, null);
     }
     
     /**
@@ -245,12 +253,16 @@ public class TypeInferrer {
      * @return 
      * @throws TypeInferringException 
      */
-    public Duration castDuration(String format, String value) throws TypeInferringException{
+    public Duration castDuration(String format, String value, Map<String, Object> options) throws TypeInferringException{
         try{
             return Duration.parse(value); 
         }catch(Exception e){
             throw new TypeInferringException();
         }
+    }
+    
+    public JSONObject castGeojson(String format, String value) throws TypeInferringException{
+        return this.castGeojson(format, value, null);
     }
     
     /**
@@ -261,7 +273,7 @@ public class TypeInferrer {
      * @return
      * @throws TypeInferringException 
      */
-    public JSONObject castGeojson(String format, String value) throws TypeInferringException{
+    public JSONObject castGeojson(String format, String value, Map<String, Object> options) throws TypeInferringException{
         JSONObject jsonObj = null;
         
         try {
@@ -328,6 +340,10 @@ public class TypeInferrer {
         this.getTopoJsonSchema().validate(topoJson);
     }
     
+    public int[] castGeopoint(String format, String value) throws TypeInferringException{
+        return this.castGeopoint(format, value, null);
+    }
+    
     /**
      * Only validates against pattern.
      * Does not validate against min/max brackets -180:180 for lon and -90:90 for lat.
@@ -336,7 +352,7 @@ public class TypeInferrer {
      * @return 
      * @throws TypeInferringException
      */
-    public int[] castGeopoint(String format, String value) throws TypeInferringException{
+    public int[] castGeopoint(String format, String value, Map<String, Object> options) throws TypeInferringException{
         try{
             if(format.equalsIgnoreCase("default")){
                 String[] geopoint = value.split(",");
@@ -393,8 +409,11 @@ public class TypeInferrer {
         }
     }
     
-    
     public JSONObject castObject(String format, String value) throws TypeInferringException{
+        return this.castObject(format, value, null);
+    }
+ 
+    public JSONObject castObject(String format, String value, Map<String, Object> options) throws TypeInferringException{
         try {
             return new JSONObject(value);
         }catch(JSONException je){
@@ -403,6 +422,10 @@ public class TypeInferrer {
     }
     
     public JSONArray castArray(String format, String value) throws TypeInferringException{
+        return this.castArray(format, value, null);
+    }
+    
+    public JSONArray castArray(String format, String value, Map<String, Object> options) throws TypeInferringException{
         try {
             return new JSONArray(value);
         }catch(JSONException je){
@@ -411,6 +434,10 @@ public class TypeInferrer {
     }
     
     public DateTime castDatetime(String format, String value) throws TypeInferringException{
+        return this.castDatetime(format, value, null);
+    }
+    
+    public DateTime castDatetime(String format, String value, Map<String, Object> options) throws TypeInferringException{
    
         Pattern pattern = Pattern.compile(REGEX_DATETIME);
         Matcher matcher = pattern.matcher(value);
@@ -427,6 +454,10 @@ public class TypeInferrer {
     }
     
     public DateTime castTime(String format, String value) throws TypeInferringException{
+        return this.castTime(format, value, null);
+    }
+    
+    public DateTime castTime(String format, String value, Map<String, Object> options) throws TypeInferringException{
         Pattern pattern = Pattern.compile(REGEX_TIME);
         Matcher matcher = pattern.matcher(value);
         
@@ -442,6 +473,10 @@ public class TypeInferrer {
     }
     
     public DateTime castDate(String format, String value) throws TypeInferringException{
+        return this.castDate(format, value, null);
+    }
+    
+    public DateTime castDate(String format, String value, Map<String, Object> options) throws TypeInferringException{
         
         Pattern pattern = Pattern.compile(REGEX_DATE);
         Matcher matcher = pattern.matcher(value);
@@ -458,6 +493,10 @@ public class TypeInferrer {
     }
     
     public int castYear(String format, String value) throws TypeInferringException{
+        return this.castYear(format, value, null);
+    }
+    
+    public int castYear(String format, String value, Map<String, Object> options) throws TypeInferringException{
         Pattern pattern = Pattern.compile(REGEX_YEAR);
         Matcher matcher = pattern.matcher(value);
         
@@ -471,6 +510,10 @@ public class TypeInferrer {
     }
     
     public DateTime castYearmonth(String format, String value) throws TypeInferringException{
+        return this.castYearmonth(format, value, null);
+    }
+    
+    public DateTime castYearmonth(String format, String value, Map<String, Object> options) throws TypeInferringException{
         Pattern pattern = Pattern.compile(REGEX_YEARMONTH);
         Matcher matcher = pattern.matcher(value);
         
@@ -486,6 +529,10 @@ public class TypeInferrer {
     }
     
     public int castInteger(String format, String value) throws TypeInferringException{
+        return this.castInteger(format, value, null);
+    }
+    
+    public int castInteger(String format, String value, Map<String, Object> options) throws TypeInferringException{
         try{
             return Integer.parseInt(value);
         }catch(NumberFormatException nfe){
@@ -493,11 +540,57 @@ public class TypeInferrer {
         }
     }
     
-    public boolean castNumber(String format, String value) throws TypeInferringException{
-        throw new TypeInferringException();
+    public Object castNumber(String format, String value) throws TypeInferringException{   
+        return castNumber(format, value, null);
+    }
+    
+    public Object castNumber(String format, String value, Map<String, Object> options) throws TypeInferringException{ 
+        try{
+            
+            if(options != null){
+                if(options.containsKey("decimalChar")){
+                    value = value.replace((String)options.get("decimalChar"), NUMBER_DEFAULT_DECIMAL_CHAR);
+                }
+            
+                if(options.containsKey("groupChar")){
+                    value = value.replace((String)options.get("groupChar"), NUMBER_DEFAULT_GROUP_CHAR);
+                }
+
+                if(options.containsKey("bareNumber") && !(boolean)options.get("bareNumber")){
+                    value = value.replaceAll(REGEX_BARE_NUMBER, "");
+                }             
+            }
+            
+            // Try to match integer pattern
+            Pattern intergerPattern = Pattern.compile(REGEX_INTEGER);
+            Matcher integerMatcher = intergerPattern.matcher(value);
+            
+            if(integerMatcher.matches()){
+                return Integer.parseInt(value);
+            }
+            
+            // Try to match float pattern
+            Pattern floatPattern = Pattern.compile(REGEX_FLOAT);
+            Matcher floatMatcher = floatPattern.matcher(value);
+        
+            if(floatMatcher.matches()){
+                return Float.parseFloat(value);
+            }
+                        
+            // The value failed to match neither the Float or the Integer value.
+            // Throw exception.
+            throw new TypeInferringException();
+            
+        }catch(Exception e){
+            throw new TypeInferringException();
+        } 
     }
     
     public boolean castBoolean(String format, String value) throws TypeInferringException{
+        return this.castBoolean(format, value, null);
+    }
+    
+    public boolean castBoolean(String format, String value, Map<String, Object> options) throws TypeInferringException{
         if(Arrays.asList(new String[]{"yes", "y", "true", "t", "1"}).contains(value.toLowerCase())){
             return true;
             
@@ -509,6 +602,10 @@ public class TypeInferrer {
         }
     }
     
+    public String castString(String format, String value) throws TypeInferringException{
+        return this.castAny(format, value, null);
+    }
+    
     /**
      * 
      * @param format can be either default, e-mail, uri, binary, or uuid.
@@ -516,11 +613,15 @@ public class TypeInferrer {
      * @return
      * @throws TypeInferringException 
      */
-    public String castString(String format, String value) throws TypeInferringException{
+    public String castString(String format, String value, Map<String, Object> options) throws TypeInferringException{
         return value;
     }
     
-    public String isAny(String format, String value) throws TypeInferringException{
+    public String castAny(String format, String value) throws TypeInferringException{
+        return this.castAny(format, value, null);
+    }
+    
+    public String castAny(String format, String value, Map<String, Object> options) throws TypeInferringException{
         return value;
     }
     
