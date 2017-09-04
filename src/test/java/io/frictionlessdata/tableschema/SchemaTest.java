@@ -66,12 +66,12 @@ public class SchemaTest {
     
     @Test
     public void testAddInvalidField(){
-        Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
         Field invalidField = new Field("title", "invalid");
         Field geopointField = new Field("coordinates", Field.FIELD_TYPE_GEOPOINT); 
         
         Schema validSchema = new Schema();
-        validSchema.addField(nameField);
+        validSchema.addField(idField);
         validSchema.addField(invalidField); // will be ignored
         validSchema.addField(geopointField);
         
@@ -79,6 +79,16 @@ public class SchemaTest {
         Assert.assertNull(validSchema.getField("title"));
         Assert.assertNotNull(validSchema.getField("id"));
         Assert.assertNotNull(validSchema.getField("coordinates"));
+    }
+    
+    @Test
+    public void hasField(){
+        Schema schema = new Schema();
+        Assert.assertFalse(schema.hasFields());
+        
+        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        schema.addField(idField);
+        Assert.assertTrue(schema.hasFields());
     }
     
     
