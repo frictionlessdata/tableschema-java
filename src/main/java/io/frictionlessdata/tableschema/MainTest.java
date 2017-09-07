@@ -57,6 +57,22 @@ public class MainTest {
             sourceFileAbsPath = MainTest.class.getResource("/fixtures/employee_data.csv").getPath();
             Table table = new Table(sourceFileAbsPath, schema);
             
+            TableIterator<Object[]> iter = table.iterator();
+            while(iter.hasNext()){
+
+                // The fetched array will contain row values that have been cast into their
+                // appropriate types as per field definitions in the schema.
+                Object[] row = iter.next();
+
+                int id = (int)row[0];
+                String name = (String)row[1];
+                DateTime dob = (DateTime)row[2];
+                boolean isAdmin = (boolean)row[3];
+                int[] addressCoordinates = (int[])row[4];
+                Duration contractLength = (Duration)row[5];
+                JSONObject info = (JSONObject)row[6];
+            }
+            
              /**Iterator<Object[]> iter = table.iterator();
             while(iter.hasNext()){
                 Object[] row = iter.next();

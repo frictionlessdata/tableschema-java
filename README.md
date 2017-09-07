@@ -17,7 +17,7 @@ URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschem
 Table table = new Table(url);
 
 // Iterate through rows          
-Iterator<Object[]> iter = table.iterator();
+TableIterator<Object[]> iter = table.iterator();
 while(iter.hasNext()){
     Object[] row = iter.next();
     System.out.println(Arrays.toString(row));
@@ -169,7 +169,7 @@ schema.addField(infoField);
 URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/employee_data.csv");
 Table table = new Table(url, schema);
 
-Iterator<Object[]> iter = table.iterator();
+TableIterator<Object[]> iter = table.iterator();
 while(iter.hasNext()){
 
     // The fetched array will contain row values that have been cast into their
@@ -211,7 +211,8 @@ System.out.println(isValid);
 // false
 ```
 
-### Row Casting
+### Casting
+## Row Casting
 To check if a given set of values complies with the schema, you can use `castRow`:
 
 ```java
@@ -238,7 +239,7 @@ Object[] castRow = schema.castRow(row);
 
 If a value in the given set of values cannot be cast to its expected type as defined by the schema, then an `InvalidCastException` is thrown.
 
-### Field Casting
+## Field Casting
 Data values can be cast to native Java objects with a Field instance. This allows formats and constraints to be defined for the field in the [field descriptor](https://specs.frictionlessdata.io/table-schema/#field-descriptors):
 
 ```java
@@ -298,4 +299,16 @@ Map<String, Object> violatedConstraints = field.checkConstraintViolations(constr
 System.out.println(violatedConstraints);
 
 // {maximum=15}
+```
+
+## Infer Type
+The `Field` class' `castValue` used the `TypeInferrer` singleton to cast the given value into the desired type.
+For instance, you can use the `TypeInferrer` singleton to cast a String representation of a number into a float like so:
+
+```java
+Map<String, Object> options = new HashMap();
+options.put("bareNumber", false);
+options.put("groupChar", " ");
+options.put("decimalChar", ",");
+float num = (float)TypeInferrer.getInstance().castNumber(Field.FIELD_FORMAT_DEFAULT, "1 564,123 EUR", options);    
 ```
