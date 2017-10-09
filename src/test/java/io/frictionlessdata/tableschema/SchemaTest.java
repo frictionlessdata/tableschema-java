@@ -59,8 +59,8 @@ public class SchemaTest {
     public void testCreateSchemaFromValidSchemaUrl() throws Exception{
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_schema.json");
         
-        Schema invalidSchema = new Schema(url);
-        Assert.assertFalse(invalidSchema.validate());
+        Schema valideSchema = new Schema(url);
+        Assert.assertTrue(valideSchema.validate());
     }
     
     @Test
@@ -68,7 +68,7 @@ public class SchemaTest {
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/BAD/URL/simple_schema.json");
         
         exception.expect(Exception.class);
-        Schema invalidSchema = new Schema(url);
+        Schema schema = new Schema(url);
     }
      
     @Test
