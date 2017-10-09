@@ -1,0 +1,53 @@
+{
+  "fields": [
+    {
+      "name": "id",
+      "format": "default",
+      "description": "The id.",
+      "type": "integer",
+      "title": "id"
+    },
+    {
+      "name": "name",
+      "format": "default",
+      "description": "The name.",
+      "type": "string",
+      "title": "name"
+    },
+    {
+      "name": "dateOfBirth",
+      "format": "default",
+      "description": "The date of birth.",
+      "type": "date",
+      "title": "dateOfBirth"
+    },
+    {
+      "name": "isAdmin",
+      "format": "default",
+      "description": "The admin status flag.",
+      "type": "boolean",
+      "title": "isAdmin"
+    },
+    {
+      "name": "addressCoordinates",
+      "format": "object",
+      "description": "The address coordinates",
+      "type": "geopoint",
+      "title": "addressCoordinates"
+    },
+    {
+      "name": "contractLength",
+      "format": "default",
+      "description": "The length of the contract in months.",
+      "type": "duration",
+      "title": "contractLength"
+    },
+    {
+      "name": "info",
+      "format": "default",
+      "description": "Additional information and comments.",
+      "type": "object",
+      "title": "info"
+    }
+  ]
+}

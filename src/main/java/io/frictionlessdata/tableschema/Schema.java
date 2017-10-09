@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,19 +31,58 @@ public class Schema {
         initValidator();
     }
     
+    /**
+     * Read and validate a table schema  with JSON Object descriptor.
+     * @param schema 
+     */
     public Schema(JSONObject schema){
         initValidator(); 
         setFieldsFromSchemaJson(schema);
     }
     
+    /**
+     * Read and validate a table schema with remote descriptor.
+     * @param schemaUrl
+     * @throws Exception 
+     */
+    public Schema(URL schemaUrl) throws Exception{
+        InputStreamReader inputStreamReader = new InputStreamReader(schemaUrl.openStream(), "UTF-8");
+        initSchemaFromStream(inputStreamReader);
+    }
+    
+    /**
+     * Read and validate a table schema with local descriptor.
+     * @param schemaFilePath
+     * @throws Exception 
+     */
     public Schema(String schemaFilePath) throws Exception{
         InputStream is = new FileInputStream(schemaFilePath);
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        InputStreamReader inputStreamReader = new InputStreamReader(is);
+        initSchemaFromStream(inputStreamReader);
+    }
+    
+    /**
+     * Create schema use list of fields. 
+     * @param fields 
+     */
+    public Schema(List<Field> fields){
+        initValidator(); 
+        this.fields = fields;
+    }
+    
+    /**
+     * Initializes the schema from given stream.
+     * Used for Schema class instanciation with remote or local schema file.
+     * @param schemaStreamReader
+     * @throws Exception 
+     */
+    private void initSchemaFromStream(InputStreamReader schemaStreamReader) throws Exception{
+        BufferedReader br = new BufferedReader(schemaStreamReader);
         String line = br.readLine();
 
         StringBuilder sb = new StringBuilder();
         while(line != null){
-            sb.append(line).append("\n");
+            sb.append(line);
             line = br.readLine();
         }
 
@@ -50,11 +90,6 @@ public class Schema {
         JSONObject schemaJson = new JSONObject(schemaString);
         
         setFieldsFromSchemaJson(schemaJson);
-    }
-    
-    public Schema(List<Field> fields){
-        initValidator(); 
-        this.fields = fields;
     }
     
     private void setFieldsFromSchemaJson(JSONObject schema){

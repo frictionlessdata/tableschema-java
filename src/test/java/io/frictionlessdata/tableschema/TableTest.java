@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.joda.time.DateTime;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;

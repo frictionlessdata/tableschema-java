@@ -53,6 +53,8 @@ public class MainTest {
 
             Field infoField = new Field("info", Field.FIELD_TYPE_OBJECT);
             schema.addField(infoField);
+            
+            schema.write("/Users/pechorin/Dev/simple_schema.json");
            
             sourceFileAbsPath = MainTest.class.getResource("/fixtures/employee_data.csv").getPath();
             Table table = new Table(sourceFileAbsPath, schema);

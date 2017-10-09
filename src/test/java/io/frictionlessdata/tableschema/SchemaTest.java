@@ -2,7 +2,7 @@ package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import java.io.File;
-import java.io.IOException;
+import java.net.URL;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,6 +53,22 @@ public class SchemaTest {
         
         Schema invalidSchema = new Schema(schemaJsonObj);
         Assert.assertFalse(invalidSchema.validate());
+    }
+    
+    @Test
+    public void testCreateSchemaFromValidSchemaUrl() throws Exception{
+        URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_schema.json");
+        
+        Schema invalidSchema = new Schema(url);
+        Assert.assertFalse(invalidSchema.validate());
+    }
+    
+    @Test
+    public void testCreateSchemaFromBadUrl()  throws Exception{ 
+        URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/BAD/URL/simple_schema.json");
+        
+        exception.expect(Exception.class);
+        Schema invalidSchema = new Schema(url);
     }
      
     @Test
