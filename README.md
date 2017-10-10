@@ -353,7 +353,7 @@ Found a problem and would like to fix it? Have that great idea and would love to
 
 It could save a lot of time for everyone and we are super happy to answer questions and help you along the way. Furthermore, feel free to join [frictionlessdata Gitter chat room](https://gitter.im/frictionlessdata/chat) and ask questions.
 
-This project follows the [Open Knowledge International coding standards](https://github.com/okfn/coding-standards)
+This project follows the [Open Knowledge International coding standards](https://github.com/okfn/coding-standards).
 
 Get started:
 ```sh
