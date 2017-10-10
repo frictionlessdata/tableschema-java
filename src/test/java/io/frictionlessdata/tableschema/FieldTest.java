@@ -267,6 +267,7 @@ public class FieldTest {
         Assert.assertFalse(field.castValue("f"));
         Assert.assertFalse(field.castValue("F"));
         Assert.assertFalse(field.castValue("False"));
+        Assert.assertFalse(field.castValue("false"));
         Assert.assertFalse(field.castValue("FALSE"));
         Assert.assertFalse(field.castValue("0"));
         Assert.assertFalse(field.castValue("no"));
@@ -277,6 +278,7 @@ public class FieldTest {
         Assert.assertTrue(field.castValue("t"));
         Assert.assertTrue(field.castValue("T"));
         Assert.assertTrue(field.castValue("True"));
+        Assert.assertTrue(field.castValue("true"));
         Assert.assertTrue(field.castValue("TRUE"));
         Assert.assertTrue(field.castValue("1"));
         Assert.assertTrue(field.castValue("yes"));
