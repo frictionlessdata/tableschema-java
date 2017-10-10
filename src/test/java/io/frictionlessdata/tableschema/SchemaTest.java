@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
-import io.frictionlessdata.tableschema.exceptions.InvalidPrimaryKeyException;
+import io.frictionlessdata.tableschema.exceptions.PrimaryKeyException;
 import java.io.File;
 import java.net.URL;
 import java.time.Duration;
@@ -33,7 +33,7 @@ public class SchemaTest {
     public final ExpectedException exception = ExpectedException.none();
      
     @Test
-    public void testCreateSchemaFromValidSchemaJson(){ 
+    public void testCreateSchemaFromValidSchemaJson() throws PrimaryKeyException{ 
         JSONObject schemaJsonObj = new JSONObject();
        
         schemaJsonObj.put("fields", new JSONArray());
@@ -45,7 +45,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testCreateSchemaFromInvalidSchemaJson(){  
+    public void testCreateSchemaFromInvalidSchemaJson() throws PrimaryKeyException{  
         JSONObject schemaJsonObj = new JSONObject();
        
         schemaJsonObj.put("fields", new JSONArray());
@@ -73,8 +73,8 @@ public class SchemaTest {
     public void testCreateSchemaFromValidSchemaUrl() throws Exception{
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_schema.json");
         
-        Schema valideSchema = new Schema(url);
-        Assert.assertTrue(valideSchema.isValid());
+        Schema validSchema = new Schema(url);
+        Assert.assertTrue(validSchema.isValid());
     }
     
     @Test
@@ -83,6 +83,38 @@ public class SchemaTest {
         
         exception.expect(Exception.class);
         Schema schema = new Schema(url);
+    }
+    
+    @Test
+    public void testCreateSchemaFromFileWithValidPrimaryKey() throws Exception{
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_schema_with_valid_pk.json").getPath();
+        Schema schemaWithValidPK = new Schema(sourceFileAbsPath);
+        
+        Assert.assertEquals("id", schemaWithValidPK.getPrimaryKey());
+    }
+    
+    @Test
+    public void testCreateSchemaFromFileWithInvalidPrimaryKey() throws Exception{
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_schema_with_invalid_pk.json").getPath();
+        
+        exception.expect(PrimaryKeyException.class);
+        Schema schemaWithInvalidPK = new Schema(sourceFileAbsPath);
+    }
+    
+    @Test
+    public void testCreateSchemaFromFileWithValidCompositeKey() throws Exception{
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_schema_with_valid_ck.json").getPath();
+        Schema schemaWithValidCK = new Schema(sourceFileAbsPath);
+        
+        Assert.assertArrayEquals(new String[]{"name", "surname"}, schemaWithValidCK.getPrimaryKey());
+    }
+    
+    @Test
+    public void testCreateSchemaFromFileWithInvalidCompositeKey() throws Exception{
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_schema_with_invalid_ck.json").getPath();
+        
+        exception.expect(PrimaryKeyException.class);
+        Schema schemaWithInvalidCK = new Schema(sourceFileAbsPath);
     }
      
     @Test
@@ -282,7 +314,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testSinglePrimaryKey() throws InvalidPrimaryKeyException{
+    public void testSinglePrimaryKey() throws PrimaryKeyException{
         Schema schema = new Schema();
         
         Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
@@ -295,18 +327,18 @@ public class SchemaTest {
     }
     
     @Test
-    public void testInvalidSinglePrimaryKey() throws InvalidPrimaryKeyException{
+    public void testInvalidSinglePrimaryKey() throws PrimaryKeyException{
         Schema schema = new Schema();
         
         Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
         schema.addField(idField);
         
-        exception.expect(InvalidPrimaryKeyException.class);
+        exception.expect(PrimaryKeyException.class);
         schema.setPrimaryKey("invalid");
     }
     
     @Test
-    public void testCompositePrimaryKey() throws InvalidPrimaryKeyException{
+    public void testCompositePrimaryKey() throws PrimaryKeyException{
         Schema schema = new Schema();
         
         Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
@@ -326,7 +358,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testInvalidCompositePrimaryKey() throws InvalidPrimaryKeyException{
+    public void testInvalidCompositePrimaryKey() throws PrimaryKeyException{
         Schema schema = new Schema();
         
         Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
@@ -338,7 +370,7 @@ public class SchemaTest {
         Field surnameField = new Field("surname", Field.FIELD_TYPE_STRING);
         schema.addField(surnameField);
 
-        exception.expect(InvalidPrimaryKeyException.class);
+        exception.expect(PrimaryKeyException.class);
         schema.setPrimaryKey(new String[]{"name", "invalid"}); 
     }
 }

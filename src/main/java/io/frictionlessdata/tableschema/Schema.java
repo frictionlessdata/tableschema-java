@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
-import io.frictionlessdata.tableschema.exceptions.InvalidPrimaryKeyException;
+import io.frictionlessdata.tableschema.exceptions.PrimaryKeyException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -37,10 +37,11 @@ public class Schema {
     /**
      * Read and validate a table schema  with JSON Object descriptor.
      * @param schema 
+     * @throws io.frictionlessdata.tableschema.exceptions.PrimaryKeyException 
      */
-    public Schema(JSONObject schema) throws ValidationException{
+    public Schema(JSONObject schema) throws ValidationException, PrimaryKeyException{
         initValidator(); 
-        setFieldsFromSchemaJson(schema);
+        initFromSchemaJson(schema);
         validate();
     }
     
@@ -48,8 +49,9 @@ public class Schema {
      * Read and validate a table schema with remote descriptor.
      * @param schemaUrl
      * @throws Exception 
+     * @throws io.frictionlessdata.tableschema.exceptions.PrimaryKeyException 
      */
-    public Schema(URL schemaUrl) throws Exception, ValidationException{
+    public Schema(URL schemaUrl) throws ValidationException, PrimaryKeyException, Exception{
         initValidator();
         InputStreamReader inputStreamReader = new InputStreamReader(schemaUrl.openStream(), "UTF-8");
         initSchemaFromStream(inputStreamReader);
@@ -60,8 +62,9 @@ public class Schema {
      * Read and validate a table schema with local descriptor.
      * @param schemaFilePath
      * @throws Exception 
+     * @throws io.frictionlessdata.tableschema.exceptions.PrimaryKeyException 
      */
-    public Schema(String schemaFilePath) throws Exception, ValidationException{
+    public Schema(String schemaFilePath) throws ValidationException, PrimaryKeyException, Exception{
         initValidator(); 
         InputStream is = new FileInputStream(schemaFilePath);
         InputStreamReader inputStreamReader = new InputStreamReader(is);
@@ -98,10 +101,11 @@ public class Schema {
         String schemaString = sb.toString();
         JSONObject schemaJson = new JSONObject(schemaString);
         
-        setFieldsFromSchemaJson(schemaJson);
+        initFromSchemaJson(schemaJson);
     }
     
-    private void setFieldsFromSchemaJson(JSONObject schema){
+    private void initFromSchemaJson(JSONObject schema) throws PrimaryKeyException{
+        // Set Fields
         if(schema.has("fields")){
             Iterator iter = schema.getJSONArray("fields").iterator();
             while(iter.hasNext()){
@@ -110,6 +114,28 @@ public class Schema {
                 this.fields.add(field);
             }  
         }
+        
+        // Set Primary Key
+        if(schema.has("primaryKey")){
+            
+            // If primary key is a composite key.
+            if(schema.get("primaryKey") instanceof JSONArray){
+                
+                JSONArray keyJSONArray = schema.getJSONArray("primaryKey");
+                String[] composityKey = new String[keyJSONArray.length()];
+                for(int i=0; i<keyJSONArray.length(); i++){
+                    composityKey[i] = keyJSONArray.getString(i);
+                }
+                
+                this.setPrimaryKey(composityKey);
+                
+            }else{
+                // Else if primary key is a single String key.
+                this.setPrimaryKey(schema.getString("primaryKey"));
+            }
+        }
+        
+        // TODO: Set Foreign Keys
     }
     
     private void initValidator(){
@@ -249,13 +275,13 @@ public class Schema {
     /**
      * Set single primary key.
      * @param key
-     * @throws InvalidPrimaryKeyException 
+     * @throws PrimaryKeyException 
      */
-    public void setPrimaryKey(String key) throws InvalidPrimaryKeyException{
+    public void setPrimaryKey(String key) throws PrimaryKeyException{
         if(this.hasField(key)){
           this.key = key;  
         }else{
-            throw new InvalidPrimaryKeyException("No such field as: " + key + ".");
+            throw new PrimaryKeyException("No such field as: " + key + ".");
         }
         
     }
@@ -263,12 +289,12 @@ public class Schema {
     /**
      * Set composite primary key.
      * @param compositeKey
-     * @throws InvalidPrimaryKeyException 
+     * @throws PrimaryKeyException 
      */
-    public void setPrimaryKey(String[] compositeKey) throws InvalidPrimaryKeyException{
+    public void setPrimaryKey(String[] compositeKey) throws PrimaryKeyException{
         for (String aKey : compositeKey) {
             if (!this.hasField(aKey)) {
-                throw new InvalidPrimaryKeyException("No such field as: " + aKey + ".");
+                throw new PrimaryKeyException("No such field as: " + aKey + ".");
             }
         }
         
@@ -280,6 +306,7 @@ public class Schema {
     }
     
     public Map<String, String> getForeignKeys(){
+        //TODO: Implement.
         throw new UnsupportedOperationException();
     }
    

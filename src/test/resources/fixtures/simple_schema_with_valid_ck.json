@@ -1,0 +1,26 @@
+{
+  "fields": [
+    {
+      "name": "id",
+      "format": "default",
+      "description": "The id.",
+      "type": "integer",
+      "title": "id"
+    },
+    {
+      "name": "name",
+      "format": "default",
+      "description": "The name.",
+      "type": "string",
+      "title": "name"
+    },
+    {
+      "name": "surname",
+      "format": "default",
+      "description": "The surname.",
+      "type": "string",
+      "title": "surname"
+    }
+  ],
+  "primaryKey": ["name", "surname"]
+}
