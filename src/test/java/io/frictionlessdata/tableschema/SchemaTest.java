@@ -1,6 +1,7 @@
 package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import io.frictionlessdata.tableschema.exceptions.InvalidPrimaryKeyException;
 import java.io.File;
 import java.net.URL;
 import java.time.Duration;
@@ -59,15 +60,12 @@ public class SchemaTest {
     }
     
     public void testIsValid(){  
-        Schema invalidSchema = new Schema();
+        Schema schema = new Schema();
         
-        Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
-        invalidSchema.addField(nameField);
+        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        schema.addField(idField);
         
-        Field invalidField = new Field("coordinates", "invalid");
-        invalidSchema.addField(invalidField);
-        
-        Assert.assertFalse(invalidSchema.isValid());
+        Assert.assertTrue(schema.isValid());
     }
     
     
@@ -282,5 +280,65 @@ public class SchemaTest {
         Assert.assertEquals(36, readSchema.getField("name").getConstraints().get(Field.CONSTRAINT_KEY_MIN_LENGTH));
         Assert.assertEquals(45, readSchema.getField("name").getConstraints().get(Field.CONSTRAINT_KEY_MAX_LENGTH));
     }
+    
+    @Test
+    public void testSinglePrimaryKey() throws InvalidPrimaryKeyException{
+        Schema schema = new Schema();
+        
+        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        schema.addField(idField);
+        
+        schema.setPrimaryKey("id");
+        String key = schema.getPrimaryKey();
+        
+        Assert.assertEquals("id", key);
+    }
+    
+    @Test
+    public void testInvalidSinglePrimaryKey() throws InvalidPrimaryKeyException{
+        Schema schema = new Schema();
+        
+        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        schema.addField(idField);
+        
+        exception.expect(InvalidPrimaryKeyException.class);
+        schema.setPrimaryKey("invalid");
+    }
+    
+    @Test
+    public void testCompositePrimaryKey() throws InvalidPrimaryKeyException{
+        Schema schema = new Schema();
+        
+        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        schema.addField(idField);
+        
+        Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+        schema.addField(nameField);
+        
+        Field surnameField = new Field("surname", Field.FIELD_TYPE_STRING);
+        schema.addField(surnameField);
 
+        schema.setPrimaryKey(new String[]{"name", "surname"});
+        String[] compositeKey = schema.getPrimaryKey();
+        
+        Assert.assertEquals("name", compositeKey[0]);
+        Assert.assertEquals("surname", compositeKey[1]);  
+    }
+    
+    @Test
+    public void testInvalidCompositePrimaryKey() throws InvalidPrimaryKeyException{
+        Schema schema = new Schema();
+        
+        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        schema.addField(idField);
+        
+        Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+        schema.addField(nameField);
+        
+        Field surnameField = new Field("surname", Field.FIELD_TYPE_STRING);
+        schema.addField(surnameField);
+
+        exception.expect(InvalidPrimaryKeyException.class);
+        schema.setPrimaryKey(new String[]{"name", "invalid"}); 
+    }
 }

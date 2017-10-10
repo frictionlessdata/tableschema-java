@@ -1,6 +1,7 @@
 package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import io.frictionlessdata.tableschema.exceptions.InvalidPrimaryKeyException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -12,6 +13,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
@@ -26,6 +28,7 @@ public class Schema {
    
     private org.everit.json.schema.Schema tableJsonSchema = null;
     private List<Field> fields = new ArrayList();
+    private Object key = null;
     
     public Schema(){
         initValidator();
@@ -115,54 +118,6 @@ public class Schema {
         JSONObject rawTableJsonSchema = new JSONObject(new JSONTokener(tableSchemaInputStream));
         this.tableJsonSchema = SchemaLoader.load(rawTableJsonSchema);
     }
-           
-    
-    public void addField(Field field){
-        this.fields.add(field);
-        
-        try{
-            this.tableJsonSchema.validate(this.getJson());         
-            // No exception thrown? This means that the schema is valid.
-        }catch(ValidationException ve){
-            // If an Exception is thrown it means that the field that was justed added invalidates the schema.
-            // We want to ignore this update on the scheme because now the updated version of the schema fails validation.
-            // Simply remove last item that was added
-            this.fields.remove(this.fields.size()-1);
-        }
-    }
-    
-    
-    public void addField(JSONObject fieldJson){
-        Field field = new Field(fieldJson);
-        this.addField(field);
-    }
-    
-    public List<Field> getFields(){
-        return this.fields;
-    }
-    
-    public Field getField(String name){
-        Iterator<Field> iter = this.fields.iterator();
-        while(iter.hasNext()){
-            Field field = iter.next();
-            if(field.getName().equalsIgnoreCase(name)){
-                return field;
-            }
-        }
-        return null;
-    }
-    
-    public boolean hasField(String name){
-        Iterator<Field> iter = this.fields.iterator();
-        while(iter.hasNext()){
-            Field field = iter.next();
-            if(field.getName().equalsIgnoreCase(name)){
-                return true;
-            }
-        }
-        
-        return false;
-    }
     
     /**
      * Check if schema is valid or not.
@@ -170,8 +125,9 @@ public class Schema {
      */
     public boolean isValid(){
         try{
-            this.tableJsonSchema.validate(this.getJson());
+            validate();
             return true;
+            
         }catch(ValidationException ve){
             return false;
         }
@@ -230,8 +186,91 @@ public class Schema {
         }
     }
     
+    public void addField(Field field){
+        boolean isSchemaValidPreInsert = this.isValid();
+        this.fields.add(field);
+        
+        // Is not longer valid after insert?
+        if(isSchemaValidPreInsert && !this.isValid()){
+            // Remove field if schema was valid prior
+            this.fields.remove(this.fields.size()-1);
+        }
+    }
+    
+    public void addField(JSONObject fieldJson){
+        Field field = new Field(fieldJson);
+        this.addField(field);
+    }
+    
+    public List<Field> getFields(){
+        return this.fields;
+    }
+    
+    public Field getField(String name){
+        Iterator<Field> iter = this.fields.iterator();
+        while(iter.hasNext()){
+            Field field = iter.next();
+            if(field.getName().equalsIgnoreCase(name)){
+                return field;
+            }
+        }
+        return null;
+    }
+    
+    public List<String> getFieldNames(){
+        // Would be more elegant with Java 8 .map and .collect but it is certainly
+        // best to keep logic backward compatible to Java 7.
+        List<String> fieldNames = new ArrayList();
+        Iterator<Field> iter = this.fields.iterator();
+        while(iter.hasNext()){
+            Field field = iter.next();
+            fieldNames.add(field.getName());
+        }
+        
+        return fieldNames;
+    }
+    
+    public boolean hasField(String name){
+        Iterator<Field> iter = this.fields.iterator();
+        while(iter.hasNext()){
+            Field field = iter.next();
+            if(field.getName().equalsIgnoreCase(name)){
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     public boolean hasFields(){
         return !this.getFields().isEmpty();
+    }
+    
+    public void setPrimaryKey(String key) throws InvalidPrimaryKeyException{
+        if(this.hasField(key)){
+          this.key = key;  
+        }else{
+            throw new InvalidPrimaryKeyException("No such field as: " + key + ".");
+        }
+        
+    }
+    
+    public void setPrimaryKey(String[] compositeKey) throws InvalidPrimaryKeyException{
+        for (String aKey : compositeKey) {
+            if (!this.hasField(aKey)) {
+                throw new InvalidPrimaryKeyException("No such field as: " + aKey + ".");
+            }
+        }
+        
+        this.key = compositeKey;
+    }
+    
+    public <Any> Any getPrimaryKey(){
+        return (Any)this.key;
+    }
+    
+    public Map<String, String> getForeignKeys(){
+        throw new UnsupportedOperationException();
     }
    
 }
