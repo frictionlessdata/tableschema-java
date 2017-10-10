@@ -312,3 +312,15 @@ options.put("groupChar", " ");
 options.put("decimalChar", ",");
 float num = (float)TypeInferrer.getInstance().castNumber(Field.FIELD_FORMAT_DEFAULT, "1 564,123 EUR", options);    
 ```
+
+## Contributing
+
+Found a problem and would like to fix it? Have that great idea and would love to see it in the repository?
+
+> Please open an issue before you start working.
+
+It could save a lot of time for everyone and we are super happy to answer questions and help you along the way. Furthermore, feel free to join [frictionlessdata Gitter chat room](https://gitter.im/frictionlessdata/chat) and ask questions.
+
+This project follows the [Open Knowledge International coding standards](https://github.com/okfn/coding-standards)
+
+Make sure your all tests pass.
