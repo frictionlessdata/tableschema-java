@@ -211,8 +211,40 @@ System.out.println(isValid);
 // false
 ```
 
-### Casting
-## Row Casting
+## Setting Primary Key
+### Single Key
+```java
+Schema schema = new Schema();
+        
+Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+schema.addField(idField);
+
+Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+schema.addField(nameField);
+
+schema.setPrimaryKey("id");
+```
+
+### Composite Key
+```java
+Schema schema = new Schema();
+        
+        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        schema.addField(idField);
+        
+        Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+        schema.addField(nameField);
+        
+        Field surnameField = new Field("surname", Field.FIELD_TYPE_STRING);
+        schema.addField(surnameField);
+
+        schema.setPrimaryKey(new String[]{"name", "surname"});
+        String[] compositeKey = schema.getPrimaryKey();
+```
+
+
+## Casting
+### Row Casting
 To check if a given set of values complies with the schema, you can use `castRow`:
 
 ```java
@@ -239,7 +271,7 @@ Object[] castRow = schema.castRow(row);
 
 If a value in the given set of values cannot be cast to its expected type as defined by the schema, then an `InvalidCastException` is thrown.
 
-## Field Casting
+### Field Casting
 Data values can be cast to native Java objects with a Field instance. This allows formats and constraints to be defined for the field in the [field descriptor](https://specs.frictionlessdata.io/table-schema/#field-descriptors):
 
 ```java

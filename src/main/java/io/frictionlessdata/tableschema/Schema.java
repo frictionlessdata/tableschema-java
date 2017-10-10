@@ -246,6 +246,11 @@ public class Schema {
         return !this.getFields().isEmpty();
     }
     
+    /**
+     * Set single primary key.
+     * @param key
+     * @throws InvalidPrimaryKeyException 
+     */
     public void setPrimaryKey(String key) throws InvalidPrimaryKeyException{
         if(this.hasField(key)){
           this.key = key;  
@@ -255,6 +260,11 @@ public class Schema {
         
     }
     
+    /**
+     * Set composite primary key.
+     * @param compositeKey
+     * @throws InvalidPrimaryKeyException 
+     */
     public void setPrimaryKey(String[] compositeKey) throws InvalidPrimaryKeyException{
         for (String aKey : compositeKey) {
             if (!this.hasField(aKey)) {
