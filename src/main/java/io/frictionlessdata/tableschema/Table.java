@@ -16,47 +16,38 @@ import java.util.List;
 public class Table{
     private DataSource dataSource = null;
     private Schema schema = null;
-    //private TypeInferrer typeInferrer = null;
     
     public Table(String dataSourceFilename) throws Exception{
-        // FIXME: Don't assume it is always CSV.
         this.dataSource = new CsvDataSource(dataSourceFilename);
-        //this.typeInferrer = new TypeInferrer();
-        // Infer schema?
     }
     
     public Table(String dataSourceFilename, JSONObject schemaJson) throws Exception{
-        // FIXME: Don't assume it is always CSV.
         this.dataSource = new CsvDataSource(dataSourceFilename);
-        //this.typeInferrer = new TypeInferrer();
         this.schema = new Schema(schemaJson);
     }
     
     public Table(String dataSourceFilename, Schema schema) throws Exception{
-        // FIXME: Don't assume it is always CSV.
         this.dataSource = new CsvDataSource(dataSourceFilename);
-        //this.typeInferrer = new TypeInferrer();
         this.schema = schema;
     }
     
     public Table(URL url) throws Exception{
         this.dataSource = new CsvDataSource(url);
-        //this.typeInferrer = new TypeInferrer();
-        // Infer schema?
     }
     
     public Table(URL url, JSONObject schemaJson) throws Exception{
         this.dataSource = new CsvDataSource(url);
-        //this.typeInferrer = new TypeInferrer();
-        // Infer schema?
         this.schema = new Schema(schemaJson);
     }
     
     public Table(URL url, Schema schema) throws Exception{
         this.dataSource = new CsvDataSource(url);
-        //this.typeInferrer = new TypeInferrer();
-        // Infer schema?
         this.schema = schema;
+    }
+    
+    public Table(URL dataSourceUrl, URL schemaUrl) throws Exception{
+        this.dataSource = new CsvDataSource(dataSourceUrl);
+        this.schema = new Schema(schemaUrl);
     }
     
     public TableIterator iterator(){
