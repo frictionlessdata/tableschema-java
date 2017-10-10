@@ -46,6 +46,7 @@ public class Schema {
      * @throws Exception 
      */
     public Schema(URL schemaUrl) throws Exception{
+        initValidator();
         InputStreamReader inputStreamReader = new InputStreamReader(schemaUrl.openStream(), "UTF-8");
         initSchemaFromStream(inputStreamReader);
     }
@@ -56,6 +57,7 @@ public class Schema {
      * @throws Exception 
      */
     public Schema(String schemaFilePath) throws Exception{
+        initValidator(); 
         InputStream is = new FileInputStream(schemaFilePath);
         InputStreamReader inputStreamReader = new InputStreamReader(is);
         initSchemaFromStream(inputStreamReader);

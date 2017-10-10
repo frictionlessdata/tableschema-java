@@ -31,7 +31,7 @@
     {
       "name": "addressCoordinates",
       "format": "object",
-      "description": "The address coordinates",
+      "description": "The address coordinates.",
       "type": "geopoint",
       "title": "addressCoordinates"
     },

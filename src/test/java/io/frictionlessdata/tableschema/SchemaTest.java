@@ -64,7 +64,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testCreateSchemaFromBadUrl()  throws Exception{ 
+    public void testCreateSchemaFromBadUrl() throws Exception{ 
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/BAD/URL/simple_schema.json");
         
         exception.expect(Exception.class);
