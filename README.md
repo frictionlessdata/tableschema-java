@@ -323,4 +323,4 @@ It could save a lot of time for everyone and we are super happy to answer questi
 
 This project follows the [Open Knowledge International coding standards](https://github.com/okfn/coding-standards)
 
-Make sure your all tests pass.
+Make sure all tests pass.
