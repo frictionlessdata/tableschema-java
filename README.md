@@ -8,7 +8,7 @@ A Java library for working with Table Schema.
 
 ## Usage
 
-### Parse a CSV Without a Schema
+### Parse a CSV without a Schema
 
 Cast [data](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv) from a CSV without a schema:
 
@@ -136,7 +136,7 @@ schema.addField(coordinatesField);
 schema.write("/path/to/write/schema.json");
 ```
 
-### Parse a CSV With a Schema
+### Parse a CSV with a Schema
 
 If you have a schema, you can input it as parameter when creating the `Table` instance so that the [data](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/employee_data.csv) from the CSV will be cast into the field types defined in the schema:
 
@@ -229,17 +229,17 @@ schema.setPrimaryKey("id");
 ```java
 Schema schema = new Schema();
         
-        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
-        schema.addField(idField);
-        
-        Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
-        schema.addField(nameField);
-        
-        Field surnameField = new Field("surname", Field.FIELD_TYPE_STRING);
-        schema.addField(surnameField);
+Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+schema.addField(idField);
 
-        schema.setPrimaryKey(new String[]{"name", "surname"});
-        String[] compositeKey = schema.getPrimaryKey();
+Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+schema.addField(nameField);
+
+Field surnameField = new Field("surname", Field.FIELD_TYPE_STRING);
+schema.addField(surnameField);
+
+schema.setPrimaryKey(new String[]{"name", "surname"});
+String[] compositeKey = schema.getPrimaryKey();
 ```
 
 
