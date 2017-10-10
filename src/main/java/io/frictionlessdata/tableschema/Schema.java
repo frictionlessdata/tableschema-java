@@ -35,9 +35,10 @@ public class Schema {
      * Read and validate a table schema  with JSON Object descriptor.
      * @param schema 
      */
-    public Schema(JSONObject schema){
+    public Schema(JSONObject schema) throws ValidationException{
         initValidator(); 
         setFieldsFromSchemaJson(schema);
+        validate();
     }
     
     /**
@@ -45,10 +46,11 @@ public class Schema {
      * @param schemaUrl
      * @throws Exception 
      */
-    public Schema(URL schemaUrl) throws Exception{
+    public Schema(URL schemaUrl) throws Exception, ValidationException{
         initValidator();
         InputStreamReader inputStreamReader = new InputStreamReader(schemaUrl.openStream(), "UTF-8");
         initSchemaFromStream(inputStreamReader);
+        validate();
     }
     
     /**
@@ -56,20 +58,22 @@ public class Schema {
      * @param schemaFilePath
      * @throws Exception 
      */
-    public Schema(String schemaFilePath) throws Exception{
+    public Schema(String schemaFilePath) throws Exception, ValidationException{
         initValidator(); 
         InputStream is = new FileInputStream(schemaFilePath);
         InputStreamReader inputStreamReader = new InputStreamReader(is);
         initSchemaFromStream(inputStreamReader);
+        validate();
     }
     
     /**
      * Create schema use list of fields. 
      * @param fields 
      */
-    public Schema(List<Field> fields){
+    public Schema(List<Field> fields) throws ValidationException{
         initValidator(); 
         this.fields = fields;
+        validate();
     }
     
     /**
@@ -160,13 +164,26 @@ public class Schema {
         return false;
     }
     
-    public boolean validate(){
+    /**
+     * Check if schema is valid or not.
+     * @return 
+     */
+    public boolean isValid(){
         try{
             this.tableJsonSchema.validate(this.getJson());
             return true;
         }catch(ValidationException ve){
             return false;
         }
+    }
+    
+    /**
+     * Method that throws a ValidationException if invoked while the loaded
+     * Schema is invalid.
+     * @throws ValidationException 
+     */
+    public final void validate() throws ValidationException{
+        this.tableJsonSchema.validate(this.getJson());
     }
     
     public JSONObject getJson(){

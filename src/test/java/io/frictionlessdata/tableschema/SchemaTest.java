@@ -12,10 +12,12 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import static org.hamcrest.CoreMatchers.instanceOf;
+import org.junit.rules.TemporaryFolder;
+import org.everit.json.schema.ValidationException;
 import org.joda.time.DateTime;
 import static org.junit.Assert.assertThat;
-import org.junit.rules.TemporaryFolder;
+import static org.hamcrest.CoreMatchers.instanceOf;
+
 
 /**
  *
@@ -38,7 +40,7 @@ public class SchemaTest {
         schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
         
         Schema validSchema = new Schema(schemaJsonObj);
-        Assert.assertTrue(validSchema.validate());
+        Assert.assertTrue(validSchema.isValid());
     }
     
     @Test
@@ -51,16 +53,30 @@ public class SchemaTest {
         schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
         schemaJsonObj.getJSONArray("fields").put(invalidField.getJson());
         
+        exception.expect(ValidationException.class);
         Schema invalidSchema = new Schema(schemaJsonObj);
-        Assert.assertFalse(invalidSchema.validate());
+        
     }
+    
+    public void testIsValid(){  
+        Schema invalidSchema = new Schema();
+        
+        Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        invalidSchema.addField(nameField);
+        
+        Field invalidField = new Field("coordinates", "invalid");
+        invalidSchema.addField(invalidField);
+        
+        Assert.assertFalse(invalidSchema.isValid());
+    }
+    
     
     @Test
     public void testCreateSchemaFromValidSchemaUrl() throws Exception{
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_schema.json");
         
         Schema valideSchema = new Schema(url);
-        Assert.assertTrue(valideSchema.validate());
+        Assert.assertTrue(valideSchema.isValid());
     }
     
     @Test
