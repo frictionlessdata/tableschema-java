@@ -355,4 +355,14 @@ It could save a lot of time for everyone and we are super happy to answer questi
 
 This project follows the [Open Knowledge International coding standards](https://github.com/okfn/coding-standards)
 
+Get started:
+```sh
+# install jabba and maven2
+$ cd tableschema-java
+$ jabba install 1.8
+$ jabba use 1.8
+$ mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+$ mvn test -B
+```
+
 Make sure all tests pass.
