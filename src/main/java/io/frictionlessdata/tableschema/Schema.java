@@ -36,60 +36,115 @@ public class Schema {
     }
     
     /**
-     * Read and validate a table schema  with JSON Object descriptor.
+     * Read and create a table schema with JSON Object descriptor.
+     * @param schema
+     * @throws PrimaryKeyException 
+     */
+    public Schema(JSONObject schema) throws Exception{
+        this(schema, false);   
+    }
+    
+    /**
+     * Read, create, and validate a table schema with JSON Object descriptor.
      * @param schema 
      * @throws io.frictionlessdata.tableschema.exceptions.PrimaryKeyException 
      */
-    public Schema(JSONObject schema) throws ValidationException, PrimaryKeyException{
-        initValidator(); 
-        initFromSchemaJson(schema);
-        validate();
+    public Schema(JSONObject schema, boolean strict) throws ValidationException, PrimaryKeyException{
+        initValidator();
+        initFromSchemaJson(schema, strict);
+ 
+        if(strict){
+            validate();
+        }  
     }
     
     /**
-     * Read and validate a table schema with remote descriptor.
+     * Read and create a table schema with remote descriptor.
      * @param schemaUrl
      * @throws Exception 
-     * @throws io.frictionlessdata.tableschema.exceptions.PrimaryKeyException 
      */
-    public Schema(URL schemaUrl) throws ValidationException, PrimaryKeyException, Exception{
-        initValidator();
-        InputStreamReader inputStreamReader = new InputStreamReader(schemaUrl.openStream(), "UTF-8");
-        initSchemaFromStream(inputStreamReader);
-        validate();
+    public Schema(URL schemaUrl) throws Exception{
+        this(schemaUrl, false);
     }
     
     /**
-     * Read and validate a table schema with local descriptor.
+     * Read, create, and validate a table schema with remote descriptor.
+     * @param schemaUrl
+     * @param strict
+     * @throws ValidationException
+     * @throws PrimaryKeyException
+     * @throws Exception 
+     */
+    public Schema(URL schemaUrl, boolean strict) throws ValidationException, PrimaryKeyException, Exception{
+        initValidator();
+        InputStreamReader inputStreamReader = new InputStreamReader(schemaUrl.openStream(), "UTF-8");
+        initSchemaFromStream(inputStreamReader, strict);
+        
+        if(strict){
+            validate();
+        }
+    }
+    
+    /**
+     * Read and create a table schema with local descriptor.
      * @param schemaFilePath
      * @throws Exception 
-     * @throws io.frictionlessdata.tableschema.exceptions.PrimaryKeyException 
      */
-    public Schema(String schemaFilePath) throws ValidationException, PrimaryKeyException, Exception{
+    public Schema(String schemaFilePath) throws Exception{
+        this(schemaFilePath, false);
+    }
+    
+    /**
+     * Read, create, and validate a table schema with local descriptor.
+     * @param schemaFilePath
+     * @param strict
+     * @throws ValidationException
+     * @throws PrimaryKeyException
+     * @throws Exception 
+     */
+    public Schema(String schemaFilePath, boolean strict) throws ValidationException, PrimaryKeyException, Exception{
         initValidator(); 
         InputStream is = new FileInputStream(schemaFilePath);
         InputStreamReader inputStreamReader = new InputStreamReader(is);
-        initSchemaFromStream(inputStreamReader);
-        validate();
+        initSchemaFromStream(inputStreamReader, strict);
+        
+        if(strict){
+            validate();
+        }
     }
     
     /**
-     * Create schema use list of fields. 
+     * Reade and create a table schema using list of fields. 
      * @param fields 
      */
-    public Schema(List<Field> fields) throws ValidationException{
+    public Schema(List<Field> fields){
+        this(fields, false);
+        
+    }
+    
+    /**
+     * Read, create, and validate a table schema using list of fields. 
+     * @param fields
+     * @param strict
+     * @throws ValidationException 
+     */
+    public Schema(List<Field> fields, boolean strict) throws ValidationException{
         initValidator(); 
         this.fields = fields;
-        validate();
+        
+        if(strict){
+            validate();
+        }
     }
     
     /**
      * Initializes the schema from given stream.
      * Used for Schema class instanciation with remote or local schema file.
      * @param schemaStreamReader
+     * @param strict
      * @throws Exception 
      */
-    private void initSchemaFromStream(InputStreamReader schemaStreamReader) throws Exception{
+    private void initSchemaFromStream(InputStreamReader schemaStreamReader, boolean strict) throws Exception{
         BufferedReader br = new BufferedReader(schemaStreamReader);
         String line = br.readLine();
 
@@ -102,10 +157,10 @@ public class Schema {
         String schemaString = sb.toString();
         JSONObject schemaJson = new JSONObject(schemaString);
         
-        initFromSchemaJson(schemaJson);
+        initFromSchemaJson(schemaJson, strict);
     }
     
-    private void initFromSchemaJson(JSONObject schema) throws PrimaryKeyException{
+    private void initFromSchemaJson(JSONObject schema, boolean strict) throws PrimaryKeyException{
         // Set Fields
         if(schema.has("fields")){
             Iterator iter = schema.getJSONArray("fields").iterator();
@@ -128,11 +183,11 @@ public class Schema {
                     composityKey[i] = keyJSONArray.getString(i);
                 }
                 
-                this.setPrimaryKey(composityKey);
+                this.setPrimaryKey(composityKey, strict);
                 
             }else{
                 // Else if primary key is a single String key.
-                this.setPrimaryKey(schema.getString("primaryKey"));
+                this.setPrimaryKey(schema.getString("primaryKey"), strict);
             }
         }
         
@@ -274,32 +329,59 @@ public class Schema {
     }
     
     /**
-     * Set single primary key.
-     * @param key
-     * @throws PrimaryKeyException 
+     * Set primary key without validation.
+     * @param key 
      */
-    public void setPrimaryKey(String key) throws PrimaryKeyException{
-        if(this.hasField(key)){
-          this.key = key;  
-        }else{
-            throw new PrimaryKeyException("No such field as: " + key + ".");
-        }
-        
+    public void setPrimaryKey(String key){
+        // Could call this.setPrimaryKey(key, false) instead...
+        this.key = key;
     }
     
     /**
-     * Set composite primary key.
-     * @param compositeKey
+     * Set single primary key with the option of validation.
+     * @param key
+     * @param strict
      * @throws PrimaryKeyException 
      */
-    public void setPrimaryKey(String[] compositeKey) throws PrimaryKeyException{
-        for (String aKey : compositeKey) {
-            if (!this.hasField(aKey)) {
-                throw new PrimaryKeyException("No such field as: " + aKey + ".");
+    public void setPrimaryKey(String key, boolean strict) throws PrimaryKeyException{
+        if(!strict){
+            this.key = key;
+        }else{
+            if(this.hasField(key)){
+                this.key = key;  
+            }else{
+                throw new PrimaryKeyException("No such field as: " + key + ".");
             }
         }
-        
+    }
+    
+    /**
+     * Set composite primary key without validation.
+     * @param compositeKey 
+     */
+    public void setPrimaryKey(String[] compositeKey){
         this.key = compositeKey;
+    }
+    
+    
+    /**
+     * Set composite primary key with the option of validation.
+     * @param compositeKey
+     * @param strict
+     * @throws PrimaryKeyException 
+     */
+    public void setPrimaryKey(String[] compositeKey, boolean strict) throws PrimaryKeyException{
+        if(!strict){
+            this.key = compositeKey;
+        }else{
+            for (String aKey : compositeKey) {
+                if (!this.hasField(aKey)) {
+                    throw new PrimaryKeyException("No such field as: " + aKey + ".");
+                }
+            }
+        
+            this.key = compositeKey;
+        } 
     }
     
     public <Any> Any getPrimaryKey(){
