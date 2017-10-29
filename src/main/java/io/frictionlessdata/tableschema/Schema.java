@@ -25,7 +25,8 @@ import org.json.JSONTokener;
  * 
  */
 public class Schema {
-   
+    public static final int JSON_INDENT_FACTOR = 4;
+    
     private org.everit.json.schema.Schema tableJsonSchema = null;
     private List<Field> fields = new ArrayList();
     private Object key = null;
@@ -208,7 +209,7 @@ public class Schema {
     
     public void save(String outputFilePath) throws IOException{
         try (FileWriter file = new FileWriter(outputFilePath)) {
-            file.write(this.getJson().toString());
+            file.write(this.getJson().toString(JSON_INDENT_FACTOR));
         }
     }
     
