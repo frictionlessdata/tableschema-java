@@ -74,7 +74,7 @@ public class Table{
         return this.dataSource.getHeaders();
     }
     
-    public void write(String outputFilePath) throws Exception{
+    public void save(String outputFilePath) throws Exception{
        this.dataSource.write(outputFilePath);
     }
     public List<Object[]> read(boolean cast) throws Exception{

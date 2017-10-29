@@ -298,12 +298,12 @@ public class TableTest {
     }
     
     @Test
-    public void writeTable() throws Exception{
+    public void saveTable() throws Exception{
         File createdFile = folder.newFile("test_data_table.csv");
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
         Table loadedTable = new Table(sourceFileAbsPath);
         
-        loadedTable.write(createdFile.getAbsolutePath());
+        loadedTable.save(createdFile.getAbsolutePath());
         
         Table readTable = new Table(createdFile.getAbsolutePath());
         Assert.assertEquals(loadedTable.getHeaders()[0], "id");
