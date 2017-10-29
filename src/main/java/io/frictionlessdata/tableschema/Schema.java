@@ -206,7 +206,7 @@ public class Schema {
         
     }
     
-    public void write(String outputFilePath) throws IOException{
+    public void save(String outputFilePath) throws IOException{
         try (FileWriter file = new FileWriter(outputFilePath)) {
             file.write(this.getJson().toString());
         }

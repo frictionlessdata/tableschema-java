@@ -277,7 +277,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testWrite() throws Exception{
+    public void testSave() throws Exception{
         File createdFile = folder.newFile("test_schema.json");
         
         Schema createdSchema = new Schema(); 
@@ -295,7 +295,7 @@ public class SchemaTest {
         Field stringField = new Field("name", Field.FIELD_TYPE_STRING, Field.FIELD_FORMAT_DEFAULT, "the title", "the description", stringFieldConstraints);
         createdSchema.addField(stringField);
         
-        createdSchema.write(createdFile.getAbsolutePath());
+        createdSchema.save(createdFile.getAbsolutePath());
         
         Schema readSchema = new Schema(createdFile.getAbsolutePath());
         
