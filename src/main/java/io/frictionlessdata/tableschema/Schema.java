@@ -2,6 +2,7 @@ package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import io.frictionlessdata.tableschema.exceptions.PrimaryKeyException;
+import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -135,6 +136,29 @@ public class Schema {
         if(strict){
             validate();
         }
+    }
+    
+    /**
+     * Infer the data types and return the generated schema.
+     * @param data
+     * @param headers
+     * @return
+     * @throws TypeInferringException 
+     */
+    public JSONObject infer(List<Object[]> data, String[] headers) throws TypeInferringException{
+        return TypeInferrer.getInstance().infer(data, headers);
+    }
+    
+    /**
+     * Infer the data types and return the generated schema.
+     * @param data
+     * @param headers
+     * @param rowLimit
+     * @return
+     * @throws TypeInferringException 
+     */
+    public JSONObject infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
+        return TypeInferrer.getInstance().infer(data, headers, rowLimit);
     }
     
     /**
