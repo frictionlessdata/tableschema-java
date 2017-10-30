@@ -120,6 +120,21 @@ The inferral algorithm traverses all of the table's rows and attempts to cast ev
 Schema schema = table.inferSchema(25);
 ```
 
+If `List<Object[]> data` and `String[] headers` are available, the schema can also be inferred from the a Schema object:
+```java
+JSONObject inferredSchema = schema.infer(data, headers);
+```
+
+Row limit can also be set:
+```java
+JSONObject inferredSchema = schema.infer(data, headers, 25);
+```
+
+Using an instance of Table or Scheme to infer a schema invokes the same method from the TypeInferred Singleton:
+```java
+TypeInferrer.getInstance().infer(data, headers, 25);
+```
+
 ### Write a Schema Into a File:
 
 You can write a `Schema` into a JSON file:
