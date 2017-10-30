@@ -94,7 +94,7 @@ Alternatively, you might want to build your `Schema` by loading the schema defin
 
 ```java
 String schemaFilePath = "/path/to/schema/file/shema.json";
-Schema schema = new Schema(schemaFilePath);
+Schema schema = new Schema(schemaFilePath, true); // enforce validation with strict=true.
 ```
 
 ### Infer a Schema
