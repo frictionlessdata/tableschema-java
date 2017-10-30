@@ -59,6 +59,23 @@ public class SchemaTest {
         
     }
     
+    @Test
+    public void testCreateSchemaFromInvalidSchemaJsonWithoutStrictValidation() throws Exception{  
+        JSONObject schemaJsonObj = new JSONObject();
+       
+        schemaJsonObj.put("fields", new JSONArray());
+        Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        Field invalidField = new Field("coordinates", "invalid");
+        schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
+        schemaJsonObj.getJSONArray("fields").put(invalidField.getJson());
+        
+        Schema invalidSchema = new Schema(schemaJsonObj); // strict=false
+        
+        Assert.assertEquals(Field.FIELD_TYPE_INTEGER, invalidSchema.getField("id").getType()); 
+        Assert.assertEquals("invalid", invalidSchema.getField("coordinates").getType());
+        
+    }
+    
     public void testIsValid(){  
         Schema schema = new Schema();
         
@@ -372,5 +389,26 @@ public class SchemaTest {
 
         exception.expect(PrimaryKeyException.class);
         schema.setPrimaryKey(new String[]{"name", "invalid"}, true); 
+    }
+    
+    @Test
+    public void testInvalidCompositePrimaryKeyWithoutStrictValidation(){
+        Schema schema = new Schema();
+        
+        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        schema.addField(idField);
+        
+        Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+        schema.addField(nameField);
+        
+        Field surnameField = new Field("surname", Field.FIELD_TYPE_STRING);
+        schema.addField(surnameField);
+
+        String[] compositeKey = new String[]{"name", "invalid"};
+        schema.setPrimaryKey(compositeKey); // strict=false
+        
+        String[] fetchedCompositeKey = schema.getPrimaryKey();
+        Assert.assertEquals("name", fetchedCompositeKey[0]);
+        Assert.assertEquals("invalid", fetchedCompositeKey[1]);
     }
 }
