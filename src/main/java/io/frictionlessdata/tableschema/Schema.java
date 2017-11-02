@@ -1,8 +1,10 @@
 package io.frictionlessdata.tableschema;
 
+import io.frictionlessdata.tableschema.exceptions.ForeignKeyException;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import io.frictionlessdata.tableschema.exceptions.PrimaryKeyException;
 import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
+import io.frictionlessdata.tableschema.fk.ForeignKey;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -14,7 +16,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
@@ -26,11 +27,15 @@ import org.json.JSONTokener;
  * 
  */
 public class Schema {
-    public static final int JSON_INDENT_FACTOR = 4;
+    private static final int JSON_INDENT_FACTOR = 4;
+    private static final String JSON_KEY_FIELDS = "fields";
+    private static final String JSON_KEY_PRIMARY_KEY = "primaryKey";
+    private static final String JSON_KEY_FOREIGN_KEY = "foreignKey";
     
     private org.everit.json.schema.Schema tableJsonSchema = null;
     private List<Field> fields = new ArrayList();
-    private Object key = null;
+    private Object primaryKey = null;
+    private List<ForeignKey> foreignKeys = null;
     
     public Schema(){
         initValidator();
@@ -47,10 +52,13 @@ public class Schema {
     
     /**
      * Read, create, and validate a table schema with JSON Object descriptor.
-     * @param schema 
-     * @throws io.frictionlessdata.tableschema.exceptions.PrimaryKeyException 
+     * @param schema
+     * @param strict
+     * @throws ValidationException
+     * @throws PrimaryKeyException
+     * @throws ForeignKeyException 
      */
-    public Schema(JSONObject schema, boolean strict) throws ValidationException, PrimaryKeyException{
+    public Schema(JSONObject schema, boolean strict) throws ValidationException, PrimaryKeyException, ForeignKeyException{
         initValidator();
         initFromSchemaJson(schema, strict);
  
@@ -74,9 +82,10 @@ public class Schema {
      * @param strict
      * @throws ValidationException
      * @throws PrimaryKeyException
+     * @throws ForeignKeyException
      * @throws Exception 
      */
-    public Schema(URL schemaUrl, boolean strict) throws ValidationException, PrimaryKeyException, Exception{
+    public Schema(URL schemaUrl, boolean strict) throws ValidationException, PrimaryKeyException, ForeignKeyException, Exception{
         initValidator();
         InputStreamReader inputStreamReader = new InputStreamReader(schemaUrl.openStream(), "UTF-8");
         initSchemaFromStream(inputStreamReader, strict);
@@ -101,9 +110,10 @@ public class Schema {
      * @param strict
      * @throws ValidationException
      * @throws PrimaryKeyException
+     * @throws ForeignKeyException
      * @throws Exception 
      */
-    public Schema(String schemaFilePath, boolean strict) throws ValidationException, PrimaryKeyException, Exception{
+    public Schema(String schemaFilePath, boolean strict) throws ValidationException, PrimaryKeyException, ForeignKeyException, Exception{
         initValidator(); 
         InputStream is = new FileInputStream(schemaFilePath);
         InputStreamReader inputStreamReader = new InputStreamReader(is);
@@ -184,10 +194,10 @@ public class Schema {
         initFromSchemaJson(schemaJson, strict);
     }
     
-    private void initFromSchemaJson(JSONObject schema, boolean strict) throws PrimaryKeyException{
+    private void initFromSchemaJson(JSONObject schema, boolean strict) throws PrimaryKeyException, ForeignKeyException{
         // Set Fields
-        if(schema.has("fields")){
-            Iterator iter = schema.getJSONArray("fields").iterator();
+        if(schema.has(JSON_KEY_FIELDS)){
+            Iterator iter = schema.getJSONArray(JSON_KEY_FIELDS).iterator();
             while(iter.hasNext()){
                 JSONObject fieldJsonObj = (JSONObject)iter.next();
                 Field field = new Field(fieldJsonObj);
@@ -196,12 +206,12 @@ public class Schema {
         }
         
         // Set Primary Key
-        if(schema.has("primaryKey")){
+        if(schema.has(JSON_KEY_PRIMARY_KEY)){
             
             // If primary key is a composite key.
-            if(schema.get("primaryKey") instanceof JSONArray){
+            if(schema.get(JSON_KEY_PRIMARY_KEY) instanceof JSONArray){
                 
-                JSONArray keyJSONArray = schema.getJSONArray("primaryKey");
+                JSONArray keyJSONArray = schema.getJSONArray(JSON_KEY_PRIMARY_KEY);
                 String[] composityKey = new String[keyJSONArray.length()];
                 for(int i=0; i<keyJSONArray.length(); i++){
                     composityKey[i] = keyJSONArray.getString(i);
@@ -211,11 +221,21 @@ public class Schema {
                 
             }else{
                 // Else if primary key is a single String key.
-                this.setPrimaryKey(schema.getString("primaryKey"), strict);
+                this.setPrimaryKey(schema.getString(JSON_KEY_PRIMARY_KEY), strict);
             }
         }
         
-        // TODO: Set Foreign Keys
+        // Set Foreign Keys
+        if(schema.has(JSON_KEY_FOREIGN_KEY)){
+
+            JSONArray fkJsonArray = schema.getJSONArray(JSON_KEY_FOREIGN_KEY);
+            for(int i=0; i<fkJsonArray.length(); i++){
+                
+                JSONObject fkJsonObj = fkJsonArray.getJSONObject(i);
+                ForeignKey fk = new ForeignKey(fkJsonObj, strict);
+                this.addForeignKey(fk);   
+            } 
+        }
     }
     
     private void initValidator(){
@@ -251,10 +271,10 @@ public class Schema {
     public JSONObject getJson(){
         //FIXME: Maybe we should use JSON serializer like Gson?
         JSONObject schemaJson = new JSONObject();
-        schemaJson.put("fields", new JSONArray());
+        schemaJson.put(JSON_KEY_FIELDS, new JSONArray());
         
         for(Field field : fields) {
-            schemaJson.getJSONArray("fields").put(field.getJson());   
+            schemaJson.getJSONArray(JSON_KEY_FIELDS).put(field.getJson());   
         }
         
         return schemaJson;
@@ -358,7 +378,7 @@ public class Schema {
      */
     public void setPrimaryKey(String key){
         // Could call this.setPrimaryKey(key, false) instead...
-        this.key = key;
+        this.primaryKey = key;
     }
     
     /**
@@ -369,10 +389,10 @@ public class Schema {
      */
     public void setPrimaryKey(String key, boolean strict) throws PrimaryKeyException{
         if(!strict){
-            this.key = key;
+            this.primaryKey = key;
         }else{
             if(this.hasField(key)){
-                this.key = key;  
+                this.primaryKey = key;  
             }else{
                 throw new PrimaryKeyException("No such field as: " + key + ".");
             }
@@ -384,7 +404,7 @@ public class Schema {
      * @param compositeKey 
      */
     public void setPrimaryKey(String[] compositeKey){
-        this.key = compositeKey;
+        this.primaryKey = compositeKey;
     }
     
     
@@ -396,7 +416,7 @@ public class Schema {
      */
     public void setPrimaryKey(String[] compositeKey, boolean strict) throws PrimaryKeyException{
         if(!strict){
-            this.key = compositeKey;
+            this.primaryKey = compositeKey;
         }else{
             for (String aKey : compositeKey) {
                 if (!this.hasField(aKey)) {
@@ -404,17 +424,20 @@ public class Schema {
                 }
             }
         
-            this.key = compositeKey;
+            this.primaryKey = compositeKey;
         } 
     }
     
     public <Any> Any getPrimaryKey(){
-        return (Any)this.key;
+        return (Any)this.primaryKey;
     }
     
-    public Map<String, String> getForeignKeys(){
-        //TODO: Implement.
-        throw new UnsupportedOperationException();
+    public List<ForeignKey> getForeignKeys(){
+        return this.foreignKeys;
+    }
+    
+    public void addForeignKey(ForeignKey foreignKey){
+        this.foreignKeys.add(foreignKey);
     }
    
 }

@@ -1,0 +1,42 @@
+{
+    "fields": [
+        {
+            "name": "first_name",
+            "title": "First Name",
+            "type": "string",
+            "description": "The first name of the person"
+        },
+        {
+            "name": "last_name",
+            "title": "Last Name",
+            "type": "string",
+            "description": "The last name of the person"
+        },
+        {
+            "name": "home_location",
+            "title": "Home Location",
+            "type": "geopoint",
+            "description": "A geopoint for this person's home address."
+        },
+        {
+            "name": "position_title",
+            "title": "Position Title",
+            "type": "string",
+            "description": "This person's position in the company."
+        }
+    ],
+    "primaryKey": [
+        "first_name",
+        "last_name",
+        "home_location"
+    ],
+    "foreignKeys": [
+        {
+            "fields": "position_title",
+            "reference": {
+                "resource": "positions",
+                "fields": "name"
+            }
+        }
+    ]
+}

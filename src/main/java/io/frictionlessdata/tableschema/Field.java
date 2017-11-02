@@ -106,12 +106,12 @@ public class Field {
         return this.castValue(value, true, null);
     }
     
-        /**
+    /**
      * Use the Field definition to cast a value into the Field type.
      * Enforces constraints by default.
      * @param <Any>
      * @param value
-     * @param value options
+     * @param options
      * @return
      * @throws InvalidCastException
      * @throws ConstraintsException 

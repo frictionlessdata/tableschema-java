@@ -411,4 +411,76 @@ public class SchemaTest {
         Assert.assertEquals("name", fetchedCompositeKey[0]);
         Assert.assertEquals("invalid", fetchedCompositeKey[1]);
     }
+    
+    @Test
+    public void testInvalidForeignKeyArray() throws PrimaryKeyException, Exception{  
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array.json").getPath();
+        Schema schema = new Schema(sourceFileAbsPath, true);
+        
+        Assert.assertTrue(true);
+    }
+    
+    @Test
+    public void testInvalidForeignKeyArrayString() throws PrimaryKeyException, Exception{  
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array_string.json").getPath();
+        Schema schema = new Schema(sourceFileAbsPath, true);
+        
+        Assert.assertTrue(true);
+    }
+    
+    @Test
+    public void testInvalidForeignKeyArrayStringRef() throws PrimaryKeyException, Exception{
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array_string_ref.json").getPath();
+        Schema schema = new Schema(sourceFileAbsPath, true);
+        
+        Assert.assertTrue(true);
+    }
+    
+    @Test
+    public void testInvalidForeignKeyArrayWrongNumber() throws PrimaryKeyException, Exception{
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array_wrong_number.json").getPath();
+        Schema schema = new Schema(sourceFileAbsPath, true);
+        
+        Assert.assertTrue(true);
+    }
+    
+    @Test
+    public void testInvalidForeignKeyNoReference() throws PrimaryKeyException, Exception{
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_no_reference.json").getPath();
+        
+        exception.expect(ValidationException.class);
+        Schema schema = new Schema(sourceFileAbsPath, true);
+    }
+    
+    @Test
+    public void testInvalidForeignKeyString() throws PrimaryKeyException, Exception{
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_string.json").getPath();
+        
+        exception.expect(ValidationException.class);
+        Schema schema = new Schema(sourceFileAbsPath, true);
+    }
+    
+    @Test
+    public void testInvalidForeignKeyStringArrayRef() throws PrimaryKeyException, Exception{
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_string_array_ref.json").getPath();
+        Schema schema = new Schema(sourceFileAbsPath, true);
+        
+        Assert.assertTrue(true);
+    }
+    
+    @Test
+    public void testValidForeignKeyArray() throws PrimaryKeyException, Exception{
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_valid_fk_array.json").getPath();
+        Schema schema = new Schema(sourceFileAbsPath, true);
+        
+        Assert.assertTrue(true);
+    }
+    
+    @Test
+    public void testValidForeignKeyString() throws PrimaryKeyException, Exception{
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_valid_fk_string.json").getPath();
+        Schema schema = new Schema(sourceFileAbsPath, true);
+        
+        Assert.assertTrue(true);
+    }
 }
