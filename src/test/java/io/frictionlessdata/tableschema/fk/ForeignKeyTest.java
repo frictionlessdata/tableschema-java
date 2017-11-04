@@ -116,7 +116,7 @@ public class ForeignKeyTest {
         fkFields.put("field1");
         fkFields.put("field2");
         
-        exception.expectMessage("The reference's fields property must an array of the same length as the outer.");
+        exception.expectMessage("The reference's fields property must an array of the same length as that of the outer fields' array.");
         ForeignKey fk = new ForeignKey(fkFields, ref, true);
     }
 }

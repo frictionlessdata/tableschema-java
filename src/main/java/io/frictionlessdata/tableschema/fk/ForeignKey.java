@@ -54,8 +54,16 @@ public class ForeignKey {
         this.fields = fields;
     }
     
+    public <Any> Any getFields(){
+        return (Any)this.fields;
+    }
+    
     public void setReference(Reference reference){
         this.reference = reference;
+    }
+    
+    public Reference getReference(){
+        return this.reference;
     }
     
     public final void validate() throws ForeignKeyException{
@@ -76,7 +84,7 @@ public class ForeignKey {
             JSONArray refFields = (JSONArray)this.reference.getFields();
             
             if(fkFields.length() != refFields.length()){
-                throw new ForeignKeyException("The reference's fields property must an array of the same length as the outer.");
+                throw new ForeignKeyException("The reference's fields property must an array of the same length as that of the outer fields' array.");
             }
         }
     }

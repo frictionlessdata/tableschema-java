@@ -416,40 +416,40 @@ public class SchemaTest {
     @Test
     public void testInvalidForeignKeyArray() throws PrimaryKeyException, ForeignKeyException, Exception{  
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array.json").getPath();
-        Schema schema = new Schema(sourceFileAbsPath, true);
         
-        Assert.assertTrue(true);
+        exception.expectMessage("The reference's fields property must be an array if the outer fields is an array.");
+        Schema schema = new Schema(sourceFileAbsPath, true);
     }
     
     @Test
     public void testInvalidForeignKeyArrayString() throws PrimaryKeyException, ForeignKeyException, Exception{  
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array_string.json").getPath();
+ 
+        exception.expectMessage("The reference's fields property must be a string if the outer fields is a string.");
         Schema schema = new Schema(sourceFileAbsPath, true);
-        
-        Assert.assertTrue(true);
     }
     
     @Test
     public void testInvalidForeignKeyArrayStringRef() throws PrimaryKeyException, ForeignKeyException, Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array_string_ref.json").getPath();
-        Schema schema = new Schema(sourceFileAbsPath, true);
         
-        Assert.assertTrue(true);
+        exception.expectMessage("The reference's fields property must be an array if the outer fields is an array.");
+        Schema schema = new Schema(sourceFileAbsPath, true);
     }
     
     @Test
     public void testInvalidForeignKeyArrayWrongNumber() throws PrimaryKeyException, ForeignKeyException, Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array_wrong_number.json").getPath();
-        Schema schema = new Schema(sourceFileAbsPath, true);
         
-        Assert.assertTrue(true);
+        exception.expectMessage("The reference's fields property must an array of the same length as that of the outer fields' array.");
+        Schema schema = new Schema(sourceFileAbsPath, true);
     }
     
     @Test
     public void testInvalidForeignKeyNoReference() throws PrimaryKeyException, ForeignKeyException, Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_no_reference.json").getPath();
         
-        exception.expect(ValidationException.class);
+        exception.expectMessage("A foreign key must have the fields and reference properties.");
         Schema schema = new Schema(sourceFileAbsPath, true);
     }
     
@@ -464,17 +464,23 @@ public class SchemaTest {
     @Test
     public void testInvalidForeignKeyStringArrayRef() throws PrimaryKeyException, ForeignKeyException, Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_string_array_ref.json").getPath();
-        Schema schema = new Schema(sourceFileAbsPath, true);
         
-        Assert.assertTrue(true);
+        exception.expectMessage("The reference's fields property must be a string if the outer fields is a string.");
+        Schema schema = new Schema(sourceFileAbsPath, true);
     }
     
     @Test
     public void testValidForeignKeyArray() throws PrimaryKeyException, ForeignKeyException, Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_valid_fk_array.json").getPath();
         Schema schema = new Schema(sourceFileAbsPath, true);
+
+        JSONArray parsedFields = schema.getForeignKeys().get(0).getFields();
+        Assert.assertEquals("id", parsedFields.getString(0));
+        Assert.assertEquals("title", parsedFields.getString(1));
         
-        Assert.assertTrue(true);
+        JSONArray refFields = schema.getForeignKeys().get(0).getReference().getFields();  
+        Assert.assertEquals("fk_id", refFields.getString(0));
+        Assert.assertEquals("title_id", refFields.getString(1));
     }
     
     @Test
@@ -482,6 +488,8 @@ public class SchemaTest {
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_valid_fk_string.json").getPath();
         Schema schema = new Schema(sourceFileAbsPath, true);
         
-        Assert.assertTrue(true);
+        Assert.assertEquals("position_title", schema.getForeignKeys().get(0).getFields());
+        Assert.assertEquals("positions", schema.getForeignKeys().get(0).getReference().getResource());
+        Assert.assertEquals("name", schema.getForeignKeys().get(0).getReference().getFields());
     }
 }

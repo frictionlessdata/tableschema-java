@@ -89,8 +89,8 @@ public class Reference {
         this.resource = resource;
     }
     
-    public Object getFields(){
-        return this.fields;
+    public <Any> Any getFields(){
+        return (Any)this.fields;
     }
     
     public void setFields(Object fields){

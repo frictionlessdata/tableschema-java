@@ -30,12 +30,12 @@ public class Schema {
     private static final int JSON_INDENT_FACTOR = 4;
     private static final String JSON_KEY_FIELDS = "fields";
     private static final String JSON_KEY_PRIMARY_KEY = "primaryKey";
-    private static final String JSON_KEY_FOREIGN_KEY = "foreignKey";
+    private static final String JSON_KEY_FOREIGN_KEYS = "foreignKeys";
     
     private org.everit.json.schema.Schema tableJsonSchema = null;
     private List<Field> fields = new ArrayList();
     private Object primaryKey = null;
-    private List<ForeignKey> foreignKeys = null;
+    private List<ForeignKey> foreignKeys = new ArrayList();
     
     public Schema(){
         initValidator();
@@ -226,9 +226,9 @@ public class Schema {
         }
         
         // Set Foreign Keys
-        if(schema.has(JSON_KEY_FOREIGN_KEY)){
+        if(schema.has(JSON_KEY_FOREIGN_KEYS)){
 
-            JSONArray fkJsonArray = schema.getJSONArray(JSON_KEY_FOREIGN_KEY);
+            JSONArray fkJsonArray = schema.getJSONArray(JSON_KEY_FOREIGN_KEYS);
             for(int i=0; i<fkJsonArray.length(); i++){
                 
                 JSONObject fkJsonObj = fkJsonArray.getJSONObject(i);
