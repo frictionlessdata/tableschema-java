@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema;
 
+import io.frictionlessdata.tableschema.exceptions.ForeignKeyException;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import io.frictionlessdata.tableschema.exceptions.PrimaryKeyException;
 import java.io.File;
@@ -33,7 +34,7 @@ public class SchemaTest {
     public final ExpectedException exception = ExpectedException.none();
      
     @Test
-    public void testCreateSchemaFromValidSchemaJson() throws PrimaryKeyException{ 
+    public void testCreateSchemaFromValidSchemaJson() throws PrimaryKeyException, ForeignKeyException{ 
         JSONObject schemaJsonObj = new JSONObject();
        
         schemaJsonObj.put("fields", new JSONArray());
@@ -45,7 +46,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testCreateSchemaFromInvalidSchemaJson() throws PrimaryKeyException{  
+    public void testCreateSchemaFromInvalidSchemaJson() throws PrimaryKeyException, ForeignKeyException{  
         JSONObject schemaJsonObj = new JSONObject();
        
         schemaJsonObj.put("fields", new JSONArray());
@@ -413,7 +414,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testInvalidForeignKeyArray() throws PrimaryKeyException, Exception{  
+    public void testInvalidForeignKeyArray() throws PrimaryKeyException, ForeignKeyException, Exception{  
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array.json").getPath();
         Schema schema = new Schema(sourceFileAbsPath, true);
         
@@ -421,7 +422,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testInvalidForeignKeyArrayString() throws PrimaryKeyException, Exception{  
+    public void testInvalidForeignKeyArrayString() throws PrimaryKeyException, ForeignKeyException, Exception{  
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array_string.json").getPath();
         Schema schema = new Schema(sourceFileAbsPath, true);
         
@@ -429,7 +430,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testInvalidForeignKeyArrayStringRef() throws PrimaryKeyException, Exception{
+    public void testInvalidForeignKeyArrayStringRef() throws PrimaryKeyException, ForeignKeyException, Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array_string_ref.json").getPath();
         Schema schema = new Schema(sourceFileAbsPath, true);
         
@@ -437,7 +438,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testInvalidForeignKeyArrayWrongNumber() throws PrimaryKeyException, Exception{
+    public void testInvalidForeignKeyArrayWrongNumber() throws PrimaryKeyException, ForeignKeyException, Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array_wrong_number.json").getPath();
         Schema schema = new Schema(sourceFileAbsPath, true);
         
@@ -445,7 +446,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testInvalidForeignKeyNoReference() throws PrimaryKeyException, Exception{
+    public void testInvalidForeignKeyNoReference() throws PrimaryKeyException, ForeignKeyException, Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_no_reference.json").getPath();
         
         exception.expect(ValidationException.class);
@@ -453,7 +454,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testInvalidForeignKeyString() throws PrimaryKeyException, Exception{
+    public void testInvalidForeignKeyString() throws PrimaryKeyException, ForeignKeyException, Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_string.json").getPath();
         
         exception.expect(ValidationException.class);
@@ -461,7 +462,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testInvalidForeignKeyStringArrayRef() throws PrimaryKeyException, Exception{
+    public void testInvalidForeignKeyStringArrayRef() throws PrimaryKeyException, ForeignKeyException, Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_string_array_ref.json").getPath();
         Schema schema = new Schema(sourceFileAbsPath, true);
         
@@ -469,7 +470,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testValidForeignKeyArray() throws PrimaryKeyException, Exception{
+    public void testValidForeignKeyArray() throws PrimaryKeyException, ForeignKeyException, Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_valid_fk_array.json").getPath();
         Schema schema = new Schema(sourceFileAbsPath, true);
         
@@ -477,7 +478,7 @@ public class SchemaTest {
     }
     
     @Test
-    public void testValidForeignKeyString() throws PrimaryKeyException, Exception{
+    public void testValidForeignKeyString() throws PrimaryKeyException, ForeignKeyException, Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/foreignkeys/schema_valid_fk_string.json").getPath();
         Schema schema = new Schema(sourceFileAbsPath, true);
         

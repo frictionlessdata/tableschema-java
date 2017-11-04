@@ -99,13 +99,10 @@ public class Reference {
     
     public final void validate() throws ForeignKeyException{
         if(this.resource == null || this.fields == null){
-            throw new ForeignKeyException();
+            throw new ForeignKeyException("A foreign key's reference must have the fields and resource properties.");
             
-        }else if(!(this.resource instanceof String)){
-            throw new ForeignKeyException();
-            
-        }else if(!(this.fields instanceof String) || !(this.fields instanceof JSONArray)){
-            throw new ForeignKeyException();
+        }else if(!(this.fields instanceof String) && !(this.fields instanceof JSONArray)){
+            throw new ForeignKeyException("The foreign key's reference fields property must be a string or an array.");
         }
     }
 }
