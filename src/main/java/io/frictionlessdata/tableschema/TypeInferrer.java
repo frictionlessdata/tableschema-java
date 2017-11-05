@@ -67,6 +67,9 @@ public class TypeInferrer {
         new String[]{Field.FIELD_TYPE_STRING, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
         new String[]{Field.FIELD_TYPE_ANY, Field.FIELD_FORMAT_DEFAULT})); // No different formats, just use default.
     
+    private static final String NUMBER_OPTION_DECIMAL_CHAR = "decimalChar";
+    private static final String NUMBER_OPTION_GROUP_CHAR = "groupChar";
+    private static final String NUMBER_OPTION_BARE_NUMBER = "bareNumber";
     private static final String NUMBER_DEFAULT_DECIMAL_CHAR = ".";
     private static final String NUMBER_DEFAULT_GROUP_CHAR = "";
     
@@ -137,12 +140,12 @@ public class TypeInferrer {
             
             // Init the schema objects
             JSONObject fieldObj = new JSONObject();
-            fieldObj.put("name", header);
-            fieldObj.put("title", ""); // This will stay blank.
-            fieldObj.put("description", ""); // This will stay blank.
-            fieldObj.put("constraints", new JSONObject()); // This will stay blank.
-            fieldObj.put("format", ""); // This will bet set post inferral.
-            fieldObj.put("type", ""); // This will bet set post inferral.
+            fieldObj.put(Field.JSON_KEY_NAME, header);
+            fieldObj.put(Field.JSON_KEY_TITLE, ""); // This will stay blank.
+            fieldObj.put(Field.JSON_KEY_DESCRIPTION, ""); // This will stay blank.
+            fieldObj.put(Field.JSON_KEY_CONSTRAINTS, new JSONObject()); // This will stay blank.
+            fieldObj.put(Field.JSON_KEY_FORMAT, ""); // This will bet set post inferral.
+            fieldObj.put(Field.JSON_KEY_TYPE, ""); // This will bet set post inferral.
             
             // Wrap it all in an array.
             tableFieldJsonArray.put(fieldObj);
@@ -163,13 +166,13 @@ public class TypeInferrer {
         // Now for each field we figure out which type was the most inferred and settle for that type
         // as the final type for the field.
         for(int j=0; j < tableFieldJsonArray.length(); j++){
-            String fieldName = tableFieldJsonArray.getJSONObject(j).getString("name");
+            String fieldName = tableFieldJsonArray.getJSONObject(j).getString(Field.JSON_KEY_NAME);
             HashMap<String, Integer> typeInferralCountMap = (HashMap<String, Integer>)this.getTypeInferralMap().get(fieldName);
             TreeMap<String, Integer> typeInferralCountMapSortedByCount = sortMapByValue(typeInferralCountMap); 
            
             if(!typeInferralCountMapSortedByCount.isEmpty()){
                 String inferredType = typeInferralCountMapSortedByCount.firstEntry().getKey();
-                tableFieldJsonArray.getJSONObject(j).put("type", inferredType);
+                tableFieldJsonArray.getJSONObject(j).put(Field.JSON_KEY_TYPE, inferredType);
             }
             
         }
@@ -179,7 +182,7 @@ public class TypeInferrer {
         
         // Now that the types have been inferred and set, we build and return the schema object.
         JSONObject schemaJsonObject = new JSONObject();
-        schemaJsonObject.put("fields", tableFieldJsonArray);
+        schemaJsonObject.put(io.frictionlessdata.tableschema.Schema.JSON_KEY_FIELDS, tableFieldJsonArray);
         
         return schemaJsonObject;
     }
@@ -236,7 +239,7 @@ public class TypeInferrer {
      */
     private TreeMap<String, Integer> sortMapByValue(Map<String, Integer> map){
         Comparator<String> comparator = new MapValueComparator(map);
-        TreeMap<String, Integer> result = new TreeMap<String, Integer>(comparator);
+        TreeMap<String, Integer> result = new TreeMap<>(comparator);
         result.putAll(map);
 
         return result;
@@ -249,8 +252,10 @@ public class TypeInferrer {
     /**
      * Using regex only tests the pattern.
      * Unfortunately, this approach does not test the validity of the date value itself.
+     * @param format
      * @param value
-     * @return 
+     * @param options
+     * @return
      * @throws TypeInferringException 
      */
     public Duration castDuration(String format, String value, Map<String, Object> options) throws TypeInferringException{
@@ -266,10 +271,10 @@ public class TypeInferrer {
     }
     
     /**
-     * /**
      * Validate against GeoJSON or TopoJSON schema.
-     * @param format can be either default or topojson. Default is geojson.
+     * @param format
      * @param value
+     * @param options
      * @return
      * @throws TypeInferringException 
      */
@@ -281,10 +286,10 @@ public class TypeInferrer {
             jsonObj = new JSONObject(value);
 
             try{
-                if(format.equalsIgnoreCase("default")){
+                if(format.equalsIgnoreCase(Field.FIELD_FORMAT_DEFAULT)){
                     validateGeoJsonSchema(jsonObj);
 
-                }else if(format.equalsIgnoreCase("topojson")){
+                }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_TOPOJSON)){
                     validateTopoJsonSchema(jsonObj);
 
                 }else{
@@ -344,17 +349,19 @@ public class TypeInferrer {
         return this.castGeopoint(format, value, null);
     }
     
+  
     /**
      * Only validates against pattern.
      * Does not validate against min/max brackets -180:180 for lon and -90:90 for lat.
      * @param format can be either default, array, or object.
      * @param value
-     * @return 
-     * @throws TypeInferringException
+     * @param options
+     * @return
+     * @throws TypeInferringException 
      */
     public int[] castGeopoint(String format, String value, Map<String, Object> options) throws TypeInferringException{
         try{
-            if(format.equalsIgnoreCase("default")){
+            if(format.equalsIgnoreCase(Field.FIELD_FORMAT_DEFAULT)){
                 String[] geopoint = value.split(",");
 
                 if(geopoint.length == 2){
@@ -548,15 +555,15 @@ public class TypeInferrer {
         try{
             
             if(options != null){
-                if(options.containsKey("decimalChar")){
-                    value = value.replace((String)options.get("decimalChar"), NUMBER_DEFAULT_DECIMAL_CHAR);
+                if(options.containsKey(NUMBER_OPTION_DECIMAL_CHAR)){
+                    value = value.replace((String)options.get(NUMBER_OPTION_DECIMAL_CHAR), NUMBER_DEFAULT_DECIMAL_CHAR);
                 }
             
-                if(options.containsKey("groupChar")){
-                    value = value.replace((String)options.get("groupChar"), NUMBER_DEFAULT_GROUP_CHAR);
+                if(options.containsKey(NUMBER_OPTION_GROUP_CHAR)){
+                    value = value.replace((String)options.get(NUMBER_OPTION_GROUP_CHAR), NUMBER_DEFAULT_GROUP_CHAR);
                 }
 
-                if(options.containsKey("bareNumber") && !(boolean)options.get("bareNumber")){
+                if(options.containsKey(NUMBER_OPTION_BARE_NUMBER) && !(boolean)options.get(NUMBER_OPTION_BARE_NUMBER)){
                     value = value.replaceAll(REGEX_BARE_NUMBER, "");
                 }             
             }
@@ -607,9 +614,10 @@ public class TypeInferrer {
     }
     
     /**
-     * 
-     * @param format can be either default, e-mail, uri, binary, or uuid.
+     * Can be either default, e-mail, uri, binary, or uuid.
+     * @param format
      * @param value
+     * @param options
      * @return
      * @throws TypeInferringException 
      */

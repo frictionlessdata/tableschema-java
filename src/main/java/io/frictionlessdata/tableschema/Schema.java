@@ -28,9 +28,9 @@ import org.json.JSONTokener;
  */
 public class Schema {
     private static final int JSON_INDENT_FACTOR = 4;
-    private static final String JSON_KEY_FIELDS = "fields";
-    private static final String JSON_KEY_PRIMARY_KEY = "primaryKey";
-    private static final String JSON_KEY_FOREIGN_KEYS = "foreignKeys";
+    public static final String JSON_KEY_FIELDS = "fields";
+    public static final String JSON_KEY_PRIMARY_KEY = "primaryKey";
+    public static final String JSON_KEY_FOREIGN_KEYS = "foreignKeys";
     
     private org.everit.json.schema.Schema tableJsonSchema = null;
     private List<Field> fields = new ArrayList();
