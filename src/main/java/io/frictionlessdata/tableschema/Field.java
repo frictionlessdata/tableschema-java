@@ -48,6 +48,13 @@ public class Field {
     public static final String CONSTRAINT_KEY_MAXIMUM = "maximum";
     public static final String CONSTRAINT_KEY_PATTERN = "pattern";
     public static final String CONSTRAINT_KEY_ENUM = "enum";
+    
+    public static final String JSON_KEY_NAME = "name";
+    public static final String JSON_KEY_TYPE = "type";
+    public static final String JSON_KEY_FORMAT = "format";
+    public static final String JSON_KEY_TITLE = "title";
+    public static final String JSON_KEY_DESCRIPTION = "description";
+    public static final String JSON_KEY_CONSTRAINTS = "constraints";
   
     private String name = "";
     private String type = "";
@@ -86,12 +93,12 @@ public class Field {
     
     public Field(JSONObject field){
         //TODO: Maybe use Gson serializer for this instead? Is it worth importing library just for this?      
-        this.name = field.has("name") ? field.getString("name") : "";
-        this.type = field.has("type") ? field.getString("type") : "";
-        this.format = field.has("format") ? field.getString("format") : FIELD_FORMAT_DEFAULT;
-        this.title = field.has("title") ? field.getString("title") : "";
-        this.description = field.has("description") ? field.getString("description") : "";
-        this.constraints = field.has("constraints") ? field.getJSONObject("constraints").toMap() : null;
+        this.name = field.has(JSON_KEY_NAME) ? field.getString(JSON_KEY_NAME) : "";
+        this.type = field.has(JSON_KEY_TYPE) ? field.getString(JSON_KEY_TYPE) : "";
+        this.format = field.has(JSON_KEY_FORMAT) ? field.getString(JSON_KEY_FORMAT) : FIELD_FORMAT_DEFAULT;
+        this.title = field.has(JSON_KEY_TITLE) ? field.getString(JSON_KEY_TITLE) : "";
+        this.description = field.has(JSON_KEY_DESCRIPTION) ? field.getString(JSON_KEY_DESCRIPTION) : "";
+        this.constraints = field.has(JSON_KEY_CONSTRAINTS) ? field.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
     }
     
     /**
@@ -138,6 +145,7 @@ public class Field {
      * @param <Any>
      * @param value
      * @param enforceConstraints
+     * @param options
      * @return
      * @throws InvalidCastException
      * @throws ConstraintsException 
@@ -397,12 +405,12 @@ public class Field {
     public JSONObject getJson(){
         //FIXME: Maybe we should use JSON serializer like Gson?
         JSONObject json = new JSONObject();
-        json.put("name", this.name);
-        json.put("type", this.type);
-        json.put("format", this.format);
-        json.put("title", this.title);
-        json.put("description", this.description);
-        json.put("constraints", this.constraints);
+        json.put(JSON_KEY_NAME, this.name);
+        json.put(JSON_KEY_TYPE, this.type);
+        json.put(JSON_KEY_FORMAT, this.format);
+        json.put(JSON_KEY_TITLE, this.title);
+        json.put(JSON_KEY_DESCRIPTION, this.description);
+        json.put(JSON_KEY_CONSTRAINTS, this.constraints);
         
         return json;
     }
