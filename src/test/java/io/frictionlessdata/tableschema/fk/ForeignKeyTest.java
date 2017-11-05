@@ -17,7 +17,7 @@ public class ForeignKeyTest {
     public final ExpectedException exception = ExpectedException.none();
     
     @Test
-    public void validStringFieldsTest() throws ForeignKeyException{
+    public void testValidStringFields() throws ForeignKeyException{
         Reference ref = new Reference("aResource", "refField", true);
         ForeignKey fk = new ForeignKey("fkField", ref, true);
         
@@ -27,7 +27,7 @@ public class ForeignKeyTest {
     }
     
     @Test
-    public void validArrayFieldsTest() throws ForeignKeyException{
+    public void testValidArrayFields() throws ForeignKeyException{
         JSONArray refFields = new JSONArray();
         refFields.put("refField1");
         refFields.put("refField2");
@@ -46,7 +46,7 @@ public class ForeignKeyTest {
     }
     
     @Test
-    public void nullFieldsTest() throws ForeignKeyException{
+    public void testNullFields() throws ForeignKeyException{
         Reference ref = new Reference("aResource", "aField", true);
         
         exception.expectMessage("A foreign key must have the fields and reference properties.");
@@ -54,7 +54,7 @@ public class ForeignKeyTest {
     }
     
     @Test
-    public void nullReferenceTest() throws ForeignKeyException{
+    public void testNullReference() throws ForeignKeyException{
         ForeignKey fk = new ForeignKey();
         fk.setFields("aField");
         
@@ -63,14 +63,14 @@ public class ForeignKeyTest {
     }
     
     @Test
-    public void nullFieldsAndReferenceTest() throws ForeignKeyException{
+    public void testNullFieldsAndReference() throws ForeignKeyException{
         ForeignKey fk = new ForeignKey();
         exception.expectMessage("A foreign key must have the fields and reference properties.");
         fk.validate();
     }
     
     @Test
-    public void fieldsNotStringOrArrayTest() throws ForeignKeyException{
+    public void testFieldsNotStringOrArray() throws ForeignKeyException{
         Reference ref = new Reference("aResource", "aField", true);
         
         exception.expectMessage("The foreign key's fields property must be a string or an array.");
@@ -78,7 +78,7 @@ public class ForeignKeyTest {
     }
     
     @Test
-    public void fkFieldsIsStringAndRefFieldsIsArrayTest() throws ForeignKeyException{
+    public void testFkFieldsIsStringAndRefFieldsIsArray() throws ForeignKeyException{
         JSONArray refFields = new JSONArray();
         refFields.put("field1");
         refFields.put("field2");
@@ -91,7 +91,7 @@ public class ForeignKeyTest {
     }
     
     @Test
-    public void fkFieldsIsArrayAndRefFieldsIsStringTest() throws ForeignKeyException{
+    public void testFkFieldsIsArrayAndRefFieldsIsString() throws ForeignKeyException{
         Reference ref = new Reference("aResource", "aStringField", true);
         
         JSONArray fkFields = new JSONArray();
@@ -104,7 +104,7 @@ public class ForeignKeyTest {
     }
     
     @Test
-    public void fkAndRefFieldsDifferentSizeArrayTest() throws ForeignKeyException{
+    public void testFkAndRefFieldsDifferentSizeArray() throws ForeignKeyException{
         JSONArray refFields = new JSONArray();
         refFields.put("refField1");
         refFields.put("refField2");
