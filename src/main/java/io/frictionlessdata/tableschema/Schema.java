@@ -271,10 +271,27 @@ public class Schema {
     public JSONObject getJson(){
         //FIXME: Maybe we should use JSON serializer like Gson?
         JSONObject schemaJson = new JSONObject();
-        schemaJson.put(JSON_KEY_FIELDS, new JSONArray());
         
-        for(Field field : fields) {
-            schemaJson.getJSONArray(JSON_KEY_FIELDS).put(field.getJson());   
+        // Fields
+        if(this.fields != null && this.fields.size() > 0){
+            schemaJson.put(JSON_KEY_FIELDS, new JSONArray());
+            this.fields.forEach((field) -> {
+                schemaJson.getJSONArray(JSON_KEY_FIELDS).put(field.getJson());
+            });
+        }
+        
+        // Primary Key
+        if(this.primaryKey != null){
+            schemaJson.put(JSON_KEY_PRIMARY_KEY, this.primaryKey);
+        }
+        
+        //Foreign Keys
+        if(this.foreignKeys != null && this.foreignKeys.size() > 0){
+            schemaJson.put(JSON_KEY_FOREIGN_KEYS, new JSONArray());
+
+            this.foreignKeys.forEach((fk) -> {
+                schemaJson.getJSONArray(JSON_KEY_FOREIGN_KEYS).put(fk.getJson());
+            });            
         }
         
         return schemaJson;
@@ -313,19 +330,33 @@ public class Schema {
     }
     
     public void addField(Field field){
-        boolean isSchemaValidPreInsert = this.isValid();
-        this.fields.add(field);
+        this.addField(field, true);
+    }
+    
+    public void addField(Field field, boolean strict){
         
-        // Is not longer valid after insert?
-        if(isSchemaValidPreInsert && !this.isValid()){
-            // Remove field if schema was valid prior
-            this.fields.remove(this.fields.size()-1);
+        if(!strict){
+            this.fields.add(field);
+        }else{
+            boolean isSchemaValidPreInsert = this.isValid();
+            this.fields.add(field);
+
+            // Is not longer valid after insert?
+            if(isSchemaValidPreInsert && !this.isValid()){
+                // Remove field if schema was valid prior
+                this.fields.remove(this.fields.size()-1);
+            }
         }
     }
     
     public void addField(JSONObject fieldJson){
         Field field = new Field(fieldJson);
         this.addField(field);
+    }
+    
+    public void addField(JSONObject fieldJson, boolean strict){
+        Field field = new Field(fieldJson);
+        this.addField(field, strict);
     }
     
     public List<Field> getFields(){

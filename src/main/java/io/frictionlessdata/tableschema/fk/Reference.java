@@ -105,4 +105,23 @@ public class Reference {
             throw new ForeignKeyException("The foreign key's reference fields property must be a string or an array.");
         }
     }
+    
+    public JSONObject getJson(){
+        //FIXME: Maybe we should use JSON serializer like Gson?
+
+        JSONObject json = new JSONObject();
+        if(this.datapackage != null){
+            json.put(JSON_KEY_DATAPACKAGE, this.datapackage.toString());
+        }
+        
+        if(this.resource != null){
+            json.put(JSON_KEY_RESOURCE, this.resource);
+        }
+        
+        if(this.fields != null){
+            json.put(JSON_KEY_FIELDS, this.fields);
+        }
+
+        return json;
+    }
 }

@@ -5,6 +5,8 @@
  */
 package io.frictionlessdata.tableschema;
 
+import io.frictionlessdata.tableschema.fk.ForeignKey;
+import io.frictionlessdata.tableschema.fk.Reference;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -30,7 +32,29 @@ public class MainTest {
         String sourceFileAbsPath = MainTest.class.getResource("/fixtures/dates_data.csv").getPath();
         
         try{
+            /**
+            String sourceFileAbsPath2 = MainTest.class.getResource("/fixtures/foreignkeys/schema_valid_fk_string.json").getPath();
+            Schema schema = new Schema(sourceFileAbsPath2, true);
+
+            System.out.println(schema.getJson());
+            **/
             
+            Schema createdSchema = new Schema(); 
+        
+            Field intField = new Field("id", Field.FIELD_TYPE_INTEGER, Field.FIELD_FORMAT_DEFAULT);
+            createdSchema.addField(intField);
+
+            Field stringField = new Field("name", Field.FIELD_TYPE_STRING, Field.FIELD_FORMAT_DEFAULT);
+            createdSchema.addField(stringField);
+
+            // Foreign Keys
+            Reference ref = new Reference(new URL("http://data.okfn.org/data/mydatapackage/"), "resource", "name");
+            ForeignKey fk = new ForeignKey("fkName", ref, true);
+            createdSchema.addForeignKey(fk);
+            
+            System.out.println(createdSchema.getJson());
+
+            /**
             Schema schema = new Schema();
         
             Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
@@ -74,7 +98,7 @@ public class MainTest {
                 Duration contractLength = (Duration)row[5];
                 JSONObject info = (JSONObject)row[6];
             }
-            
+            **/
              /**Iterator<Object[]> iter = table.iterator();
             while(iter.hasNext()){
                 Object[] row = iter.next();
@@ -377,11 +401,13 @@ public class MainTest {
             System.out.println(floatValPositive1);
             **/
             
+            /**
             Map<String, Object> options = new HashMap();
             options.put("decimalChar", ",");
             float num = (float)TypeInferrer.getInstance().castNumber(Field.FIELD_FORMAT_DEFAULT, "1020,123", options);
 
             System.out.println(num);
+            **/
         
         }catch(Exception e){
             e.printStackTrace();

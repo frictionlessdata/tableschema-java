@@ -89,4 +89,19 @@ public class ForeignKey {
         }
     }
     
+    public JSONObject getJson(){
+        //FIXME: Maybe we should use JSON serializer like Gson?
+        JSONObject json = new JSONObject();
+        
+        if(this.fields != null){
+            json.put(JSON_KEY_FIELDS, this.fields);
+        }
+        
+        if(this.reference != null){
+            json.put(JSON_KEY_REFERENCE, this.reference.getJson());
+        }
+  
+        return json;
+    }
+    
 }
