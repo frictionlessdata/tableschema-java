@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.joda.time.DateTime;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -41,8 +42,6 @@ public class TableTest {
         Assert.assertEquals(3, table.read().size());
     }
     
-    //FIXME: Too slow.
-    /**
     @Test
     public void testInferTypesIntAndDates() throws Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/dates_data.csv").getPath();
@@ -56,10 +55,7 @@ public class TableTest {
             Assert.assertEquals(schemaFiles.getJSONObject(i).get("name"), schemaFiles.getJSONObject(i).get("type"));
         }
     }
-    **/
     
-    //FIXME: Too slow.
-    /**
     @Test
     public void testInferTypesIntBoolAndGeopoints() throws Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/int_bool_geopoint_data.csv").getPath();
@@ -67,15 +63,16 @@ public class TableTest {
         
         // Infer
         Schema schema = table.inferSchema();
-        
+      
         Iterator<Field> iter = schema.getFields().iterator();
         
         // The field names are the same as the name of the type we are expecting to be inferred.
         // So if type is set then in means that inferral worked.
         while(iter.hasNext()){
-            Assert.assertEquals(iter.next().getName(), iter.next().getType());
+            Field field = iter.next();
+            Assert.assertEquals(field.getName(), field.getType());
         }
-    }**/
+    }
     
     @Test
     public void testIterateUncastData() throws Exception{
@@ -306,8 +303,8 @@ public class TableTest {
         loadedTable.save(createdFile.getAbsolutePath());
         
         Table readTable = new Table(createdFile.getAbsolutePath());
-        Assert.assertEquals(loadedTable.getHeaders()[0], "id");
-        Assert.assertEquals(loadedTable.getHeaders()[1], "title");
+        Assert.assertEquals("id", loadedTable.getHeaders()[0]);
+        Assert.assertEquals("title", loadedTable.getHeaders()[1]);
         Assert.assertEquals(loadedTable.read().size(), readTable.read().size());   
     }
     
