@@ -225,7 +225,6 @@ public class Table{
         return this.parser.getRecords();
     }
     
-    /**
     public Schema inferSchema() throws TypeInferringException{
         try{
             JSONObject schemaJson = TypeInferrer.getInstance().infer(this.read(), this.getHeaders());
@@ -235,7 +234,7 @@ public class Table{
         }catch(Exception e){
             throw new TypeInferringException();
         }
-    }**/
+    }
     
     /**
     public Schema inferSchema(int rowLimit) throws TypeInferringException{

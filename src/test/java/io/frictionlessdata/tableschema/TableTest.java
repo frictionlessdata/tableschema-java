@@ -43,7 +43,6 @@ public class TableTest {
         Assert.assertEquals(3, table.read().size());
     }
     
-    /**
     @Test
     public void testInferTypesIntAndDates() throws Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/dates_data.csv").getPath();
@@ -56,9 +55,8 @@ public class TableTest {
         for(int i=0; i<schemaFiles.length(); i++){
             Assert.assertEquals(schemaFiles.getJSONObject(i).get("name"), schemaFiles.getJSONObject(i).get("type"));
         }
-    }**/
+    }
     
-    /**
     @Test
     public void testInferTypesIntBoolAndGeopoints() throws Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/int_bool_geopoint_data.csv").getPath();
@@ -75,7 +73,7 @@ public class TableTest {
             Field field = iter.next();
             Assert.assertEquals(field.getName(), field.getType());
         }
-    }**/
+    }
     
     @Test
     public void testIterateUncastData() throws Exception{

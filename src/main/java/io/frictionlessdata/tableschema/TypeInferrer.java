@@ -21,6 +21,7 @@ import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeMap;
+import org.apache.commons.csv.CSVRecord;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -110,7 +111,7 @@ public class TypeInferrer {
      * @return
      * @throws TypeInferringException 
      */
-    public synchronized JSONObject infer(List<Object[]> data, String[] headers) throws TypeInferringException{
+    public synchronized JSONObject infer(List<CSVRecord> data, String[] headers) throws TypeInferringException{
         return this.infer(data, headers, data.size()-1);
     }
     
@@ -122,7 +123,7 @@ public class TypeInferrer {
      * @return
      * @throws TypeInferringException 
      */
-    public synchronized JSONObject infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
+    public synchronized JSONObject infer(List<CSVRecord> data, String[] headers, int rowLimit) throws TypeInferringException{
         
         // If the given row limit is bigger than the length of the data
         // then just use the length of the data.
@@ -153,12 +154,12 @@ public class TypeInferrer {
 
         // Find the type for each column data for each row.
         // This uses method invokation via reflection in a foor loop that iterates
-        // for each possible type/format combo. Insprect the findType method for implementation.
-        for(int i = 1; i <= rowLimit; i++){
-            Object[] row = data.get(i);
+        // for each possible type/format combo. Inspect the findType method for implementation.
+        for(int i = 0; i <= rowLimit; i++){
+            CSVRecord record = data.get(i);
             
-            for(int j = 0; j < row.length; j++){
-                this.findType(headers[j], row[j].toString());
+            for(int j = 0; j < record.size(); j++){
+                this.findType(headers[j], record.get(j));
             }
         }
         
