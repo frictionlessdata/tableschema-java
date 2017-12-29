@@ -20,7 +20,7 @@ public class TableIterator<T> {
     private boolean cast = true;
     private boolean relations = false;
     private int index = 0;
-    
+    /**
     public TableIterator(Table table){
         this.init(table);
         this.headers = table.getHeaders();
@@ -134,5 +134,5 @@ public class TableIterator<T> {
                 return (T)row;
             }
         }  
-    }
+    }**/
 }
