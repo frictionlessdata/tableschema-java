@@ -25,7 +25,6 @@ public class TableTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
     
-    /**
     @Test
     public void testReadFromValidFilePath() throws Exception{
         // get path of test CSV file
@@ -33,9 +32,8 @@ public class TableTest {
         Table table = new Table(sourceFileAbsPath);
         
         Assert.assertEquals(3, table.read().size()); 
-    }**/
+    }
     
-    /**
     @Test
     public void testReadFromValidUrl() throws Exception{
         // get path of test CSV file
@@ -43,7 +41,7 @@ public class TableTest {
         Table table = new Table(url);
         
         Assert.assertEquals(3, table.read().size());
-    }**/
+    }
     
     /**
     @Test
