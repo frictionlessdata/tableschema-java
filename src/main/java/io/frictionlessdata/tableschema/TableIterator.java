@@ -20,15 +20,15 @@ public class TableIterator<T> {
     private boolean cast = true;
     private boolean relations = false;
     private int index = 0;
-    /**
-    public TableIterator(Table table){
+
+    public TableIterator(Table table) throws Exception{
         this.init(table);
         this.headers = table.getHeaders();
         this.schema = table.getSchema();
         this.iter = table.getDataSource().iterator();
     }
     
-    public TableIterator(Table table, boolean keyed){
+    public TableIterator(Table table, boolean keyed) throws Exception{
         this.init(table);
         this.headers = table.getHeaders();
         this.schema = table.getSchema();
@@ -36,7 +36,7 @@ public class TableIterator<T> {
         this.keyed = keyed;
     }
     
-    public TableIterator(Table table, boolean keyed, boolean extended){
+    public TableIterator(Table table, boolean keyed, boolean extended) throws Exception{
         this.init(table);
         this.headers = table.getHeaders();
         this.schema = table.getSchema();
@@ -45,7 +45,7 @@ public class TableIterator<T> {
         this.extended = extended;
     }
     
-    public TableIterator(Table table, boolean keyed, boolean extended, boolean cast){
+    public TableIterator(Table table, boolean keyed, boolean extended, boolean cast) throws Exception{
         this.init(table);
         this.headers = table.getHeaders();
         this.schema = table.getSchema();
@@ -55,7 +55,7 @@ public class TableIterator<T> {
         this.cast = cast;
     }
     
-    public TableIterator(Table table, boolean keyed, boolean extended, boolean cast, boolean relations){
+    public TableIterator(Table table, boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
         this.init(table);
         this.keyed = keyed;
         this.extended = extended;
@@ -63,7 +63,7 @@ public class TableIterator<T> {
         this.relations = relations;
     }
     
-    private void init(Table table){
+    private void init(Table table) throws Exception{
         this.headers = table.getHeaders();
         this.schema = table.getSchema();
         this.iter = table.getDataSource().iterator();
@@ -134,5 +134,5 @@ public class TableIterator<T> {
                 return (T)row;
             }
         }  
-    }**/
+    }
 }

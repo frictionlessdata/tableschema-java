@@ -1,64 +1,189 @@
 package io.frictionlessdata.tableschema.datasources;
 
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
+import com.google.common.collect.Iterators;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
+
 /**
  *
- * 
  */
 public class CsvDataSource extends AbstractDataSource {
-    private CSVReader reader = null;
-    private List<String[]> data = null;
-    private String[] headers = null;
+    //private CSVParser parser = null;
+    private Object dataSource = null;
     
+    public CsvDataSource(Object dataSource) throws Exception{
+        this.dataSource = dataSource;
+    }
+    
+    /** 
+     * Constructor.
+     * @param dataSource
+     * @throws Exception 
+     */
+    /**
     public CsvDataSource(String dataSource) throws Exception{
-        FileReader fileReader = new FileReader(dataSource);
-        this.reader = new CSVReader(fileReader);
-        this.data = this.reader.readAll();
-        this.headers = this.data.remove(0); // remove header
-    }
+        // The path value can either be a relative path or a full path.
+        // If it's a relative path then build the full path by using the working directory.
+        File f = new File(dataSource);
+        if(!f.exists()) { 
+            dataSource = System.getProperty("user.dir") + "/" + dataSource;
+        }
+
+        // Read the file.
+        Reader fr = new FileReader(dataSource);
+
+        // Get the parser.
+        this.parser = CSVFormat.RFC4180.withHeader().parse(fr);
+    }**/
     
+    /**
+     * Constructor.
+     * @param url
+     * @throws Exception 
+     */
+    /**
     public CsvDataSource(URL url) throws Exception{
-        InputStreamReader inputStreamReader = new InputStreamReader(url.openStream(), "UTF-8");
-        this.reader = new CSVReader(inputStreamReader);
-        this.data = this.reader.readAll();
-        this.headers = this.data.remove(0); // remove header
+        this.parser = CSVParser.parse(url, Charset.forName("UTF-8"), CSVFormat.RFC4180.withHeader()); 
+    }**/
+    
+    @Override
+    public Iterator<String[]> iterator() throws Exception{
+        Iterator<CSVRecord> iterCSVRecords = this.getCSVParser().iterator();
+        
+        Iterator<String[]> iterStringArrays = Iterators.transform(iterCSVRecords, (CSVRecord input) -> {
+            Iterator<String> iterCols = input.iterator();
+            
+            List<String> cols = new ArrayList();
+            while(iterCols.hasNext()){
+                cols.add(iterCols.next());
+            }
+            
+            String[] output = cols.toArray(new String[0]);
+            
+            return output;
+        });
+        
+        return iterStringArrays;
     }
     
     @Override
-    public Iterator<String[]> iterator(){
-        return this.data.iterator();
-    }
-    
-    @Override
-    public List<String[]> data(){
-       return this.data;
+    public List<String[]> data() throws Exception{
+        // This is pretty much what happens when we call this.parser.getRecords()...
+        Iterator<CSVRecord> iter = this.getCSVParser().iterator();
+        List<String[]> data = new ArrayList();
+        
+        while(iter.hasNext()){
+            CSVRecord record = iter.next();
+            Iterator<String> colIter = record.iterator();
+            
+            //...except that we want list of String[] rather than list of CSVRecord.
+            List<String> cols = new ArrayList();
+            while(colIter.hasNext()){
+                cols.add(colIter.next());
+            }
+            
+            data.add(cols.toArray(new String[0]));
+        }
+        
+        return data;
     }
 
     @Override
-    public void write(String outputFilePath) throws IOException {
-        CSVWriter writer = new CSVWriter(new FileWriter(outputFilePath));
-        
-        // Write header
-        writer.writeNext(this.headers);
-        
-        //Write all the rows to file
-        writer.writeAll(this.data());
-        
-        //close the writer
-        writer.close();
+    public void write(String outputFilePath) throws Exception{            
+       try(Writer out = new BufferedWriter(new FileWriter(outputFilePath));
+               CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.RFC4180)) {
+            
+            if(this.getHeaders() != null){
+                csvPrinter.printRecord(this.getHeaders());
+            }
+            
+            Iterator<CSVRecord> recordIter = this.getCSVParser().iterator();
+            while(recordIter.hasNext()){
+                CSVRecord record = recordIter.next();
+                csvPrinter.printRecord(record);
+            }
+            
+            csvPrinter.flush();
+                
+       }catch(Exception e){
+            throw e;
+       }
     }
     
     @Override
-    public String[] getHeaders(){
-        return this.headers;
-    }
+    public String[] getHeaders() throws Exception{
+        try{
+            // Get a copy of the header map that iterates in column order.
+            // The map keys are column names. The map values are 0-based indices.
+            Map<String, Integer> headerMap = this.getCSVParser().getHeaderMap();
 
+            // Generate list of keys
+            List<String> headerVals = new ArrayList();
+
+            headerMap.entrySet().forEach((pair) -> {
+                headerVals.add((String)pair.getKey());
+            });
+
+            // Return string array of keys.
+            return headerVals.toArray(new String[0]);
+            
+        }catch(Exception e){
+            throw e;
+        }
+
+    }
+    
+    /**
+     * Retrieve the CSV Parser.
+     * The parser works record wise. It is not possible to go back, once a
+     * record has been parsed from the input stream. Because of this, CSVParser
+     * needs to be recreated every time:
+     * https://commons.apache.org/proper/commons-csv/apidocs/index.html?org/apache/commons/csv/CSVParser.html
+     * 
+     * @return
+     * @throws Exception 
+     */
+    private CSVParser getCSVParser() throws Exception{
+        if(this.dataSource instanceof String){
+            return getCSVParserFromFilePath();
+        }else if(this.dataSource instanceof URL){
+            return CSVParser.parse((URL)this.dataSource, Charset.forName("UTF-8"), CSVFormat.RFC4180.withHeader());
+        }else{
+            throw new Exception("Data source is of invalid type. Must be either String path or URL.");
+        }
+    }
+    
+    /**
+     * Get CSVPareser instance from file path.
+     * @return
+     * @throws Exception 
+     */
+    private CSVParser getCSVParserFromFilePath() throws Exception{
+        // The path value can either be a relative path or a full path.
+        // If it's a relative path then build the full path by using the working directory.
+        File f = new File((String)this.dataSource);
+        if(!f.exists()) { 
+            this.dataSource = System.getProperty("user.dir") + "/" + (String)this.dataSource;
+        }
+
+        // Read the file.
+        Reader fr = new FileReader((String)this.dataSource);
+
+        // Get the parser.
+        return CSVFormat.RFC4180.withHeader().parse(fr);
+    }
 }

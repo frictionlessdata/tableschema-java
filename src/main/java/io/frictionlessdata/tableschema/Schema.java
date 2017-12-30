@@ -16,7 +16,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.apache.commons.csv.CSVRecord;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
@@ -156,7 +155,7 @@ public class Schema {
      * @return
      * @throws TypeInferringException 
      */
-    public JSONObject infer(List<CSVRecord> data, String[] headers) throws TypeInferringException{
+    public JSONObject infer(List<Object[]> data, String[] headers) throws TypeInferringException{
         return TypeInferrer.getInstance().infer(data, headers);
     }
     
@@ -168,7 +167,7 @@ public class Schema {
      * @return
      * @throws TypeInferringException 
      */
-    public JSONObject infer(List<CSVRecord> data, String[] headers, int rowLimit) throws TypeInferringException{
+    public JSONObject infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
         return TypeInferrer.getInstance().infer(data, headers, rowLimit);
     }
     

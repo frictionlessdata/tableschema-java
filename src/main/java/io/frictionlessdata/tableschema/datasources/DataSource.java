@@ -5,7 +5,6 @@
  */
 package io.frictionlessdata.tableschema.datasources;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,8 +12,8 @@ import java.util.List;
  *
  */
 public interface DataSource {  
-    public Iterator<String[]> iterator();
-    public String[] getHeaders();
-    public List<String[]> data();
-    public void write(String outputFilePath) throws IOException;
+    public Iterator<String[]> iterator() throws Exception;
+    public String[] getHeaders() throws Exception;
+    public List<String[]> data() throws Exception;
+    public void write(String outputFilePath) throws Exception;
 }
