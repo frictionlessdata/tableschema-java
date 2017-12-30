@@ -22,43 +22,11 @@ import org.apache.commons.csv.CSVRecord;
  *
  */
 public class CsvDataSource extends AbstractDataSource {
-    //private CSVParser parser = null;
     private Object dataSource = null;
     
     public CsvDataSource(Object dataSource) throws Exception{
         this.dataSource = dataSource;
     }
-    
-    /** 
-     * Constructor.
-     * @param dataSource
-     * @throws Exception 
-     */
-    /**
-    public CsvDataSource(String dataSource) throws Exception{
-        // The path value can either be a relative path or a full path.
-        // If it's a relative path then build the full path by using the working directory.
-        File f = new File(dataSource);
-        if(!f.exists()) { 
-            dataSource = System.getProperty("user.dir") + "/" + dataSource;
-        }
-
-        // Read the file.
-        Reader fr = new FileReader(dataSource);
-
-        // Get the parser.
-        this.parser = CSVFormat.RFC4180.withHeader().parse(fr);
-    }**/
-    
-    /**
-     * Constructor.
-     * @param url
-     * @throws Exception 
-     */
-    /**
-    public CsvDataSource(URL url) throws Exception{
-        this.parser = CSVParser.parse(url, Charset.forName("UTF-8"), CSVFormat.RFC4180.withHeader()); 
-    }**/
     
     @Override
     public Iterator<String[]> iterator() throws Exception{
