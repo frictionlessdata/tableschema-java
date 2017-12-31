@@ -89,14 +89,14 @@
             <version>2.9.9</version>
         </dependency>
         
-        <!-- Commons CSV: https://commons.apache.org/proper/commons-csv/ -->
+        <!-- https://commons.apache.org/proper/commons-csv/ -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
             <version>1.5</version>
         </dependency>
         
-         <!-- Commons CSV: https://commons.apache.org/proper/commons-csv/ -->
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
