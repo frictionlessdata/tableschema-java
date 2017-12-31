@@ -1,6 +1,8 @@
 package io.frictionlessdata.tableschema;
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.joda.time.DateTime;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -27,8 +30,45 @@ public class TableTest {
     public void testReadFromValidFilePath() throws Exception{
         // get path of test CSV file
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
-        Table table = new Table(sourceFileAbsPath);
+        File file = new File(sourceFileAbsPath);
+        Table table = new Table(file);
         
+        Assert.assertEquals(3, table.read().size()); 
+    }
+    
+    @Test
+    public void testReadFromValidCSVContentString() throws Exception{
+        // get path of test CSV file
+        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
+        String csvContent = new String(Files.readAllBytes(Paths.get(sourceFileAbsPath)));
+        
+        Table table = new Table(csvContent);
+        
+        Assert.assertEquals(3, table.read().size()); 
+    }
+    
+    @Test
+    public void testReadFromValidJSONArray() throws Exception{
+
+        JSONArray jsonData = new JSONArray("[" +
+            "{" +
+              "\"city\": \"london\"," +
+              "\"year\": 2017," +
+              "\"population\": 8780000" +
+            "}," +
+            "{" +
+              "\"city\": \"paris\"," +
+              "\"year\": 2017," +
+              "\"population\": 2240000" +
+            "}," +
+            "{" +
+              "\"city\": \"rome\"," +
+              "\"year\": 2017," +
+              "\"population\": 2860000" +
+            "}" +
+        "]");
+        
+        Table table = new Table(jsonData);
         Assert.assertEquals(3, table.read().size()); 
     }
     
@@ -81,7 +121,8 @@ public class TableTest {
     public void testIterateUncastData() throws Exception{
         // get path of test CSV file
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
-        Table table = new Table(sourceFileAbsPath);
+        File file = new File(sourceFileAbsPath);
+        Table table = new Table(file);
         
         List<String[]> expectedResults = new ArrayList();
         expectedResults.add(new String[]{"1", "foo"});
@@ -102,7 +143,8 @@ public class TableTest {
     public void testIterateUncastKeyedData() throws Exception{
         // Fetch the data
         String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
-        Table employeeTable = new Table(employeeDataSourceFile);
+        File file = new File(employeeDataSourceFile);
+        Table employeeTable = new Table(file);
         
         TableIterator<Map> iter = employeeTable.iterator(true);
 
@@ -123,7 +165,8 @@ public class TableTest {
     public void testIterateUncastExtendedData() throws Exception{
         // Fetch the data.
         String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
-        Table employeeTable = new Table(employeeDataSourceFile);
+        File file = new File(employeeDataSourceFile);
+        Table employeeTable = new Table(file);
    
         TableIterator<Object[]> iter = employeeTable.iterator(false, true);
         
@@ -155,7 +198,8 @@ public class TableTest {
         
         // Fetch the data and apply the schema
         String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
-        Table employeeTable = new Table(employeeDataSourceFile, employeeTableSchema);
+        File file = new File(employeeDataSourceFile);
+        Table employeeTable = new Table(file, employeeTableSchema);
         
         // We will iterate the rows and these are the values classes we expect:
         Class[] expectedTypes = new Class[]{
@@ -187,7 +231,8 @@ public class TableTest {
         
         // Fetch the data and apply the schema
         String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
-        Table employeeTable = new Table(employeeDataSourceFile, employeeTableSchema);
+        File file = new File(employeeDataSourceFile);
+        Table employeeTable = new Table(file, employeeTableSchema);
         
         TableIterator<Map> iter = employeeTable.iterator(true, false, false, false);
 
@@ -211,7 +256,8 @@ public class TableTest {
         
         // Fetch the data and apply the schema
         String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
-        Table employeeTable = new Table(employeeDataSourceFile, employeeTableSchema);
+        File file = new File(employeeDataSourceFile);
+        Table employeeTable = new Table(file, employeeTableSchema);
         
         TableIterator<Object[]> iter = employeeTable.iterator(false, true, false, false);
         
@@ -239,7 +285,8 @@ public class TableTest {
     public void testFetchHeaders() throws Exception{
         // get path of test CSV file
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
-        Table table = new Table(sourceFileAbsPath);
+        File file = new File(sourceFileAbsPath);
+        Table table = new Table(file);
         
         Assert.assertEquals("[id, title]", Arrays.toString(table.getHeaders()));
     }
@@ -247,7 +294,8 @@ public class TableTest {
     @Test
     public void testReadUncastData() throws Exception{
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
-        Table table = new Table(sourceFileAbsPath);
+        File file = new File(sourceFileAbsPath);
+        Table table = new Table(file);
         
         Assert.assertEquals(3, table.read().size());
         Assert.assertEquals("1", table.read().get(0)[0]);
@@ -262,7 +310,8 @@ public class TableTest {
         
         // Fetch the data and apply the schema
         String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
-        Table employeeTable = new Table(employeeDataSourceFile, employeeTableSchema);
+        File file = new File(employeeDataSourceFile);
+        Table employeeTable = new Table(file, employeeTableSchema);
         
         // We will iterate the rows and these are the values classes we expect:
         Class[] expectedTypes = new Class[]{
@@ -291,11 +340,12 @@ public class TableTest {
     public void saveTable() throws Exception{
         File createdFile = folder.newFile("test_data_table.csv");
         String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
-        Table loadedTable = new Table(sourceFileAbsPath);
+        File file = new File(sourceFileAbsPath);
+        Table loadedTable = new Table(file);
         
         loadedTable.save(createdFile.getAbsolutePath());
         
-        Table readTable = new Table(createdFile.getAbsolutePath());
+        Table readTable = new Table(createdFile);
         Assert.assertEquals("id", readTable.getHeaders()[0]);
         Assert.assertEquals("title", readTable.getHeaders()[1]);
         Assert.assertEquals(3, readTable.read().size());   
