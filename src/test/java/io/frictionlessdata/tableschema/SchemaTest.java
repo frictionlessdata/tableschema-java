@@ -155,15 +155,24 @@ public class SchemaTest {
         Field invalidField = new Field("title", "invalid");
         Field geopointField = new Field("coordinates", Field.FIELD_TYPE_GEOPOINT); 
         
-        Schema validSchema = new Schema();
-        validSchema.addField(idField);
-        validSchema.addField(invalidField); // will be ignored
-        validSchema.addField(geopointField);
+        Schema schema = new Schema(); // strict=false by default
         
-        Assert.assertEquals(2, validSchema.getFields().size());
-        Assert.assertNull(validSchema.getField("title"));
-        Assert.assertNotNull(validSchema.getField("id"));
-        Assert.assertNotNull(validSchema.getField("coordinates"));
+        // Add a valid field.
+        schema.addField(idField);
+        
+        // Add an invalid field.
+        // Won't be ignored because strict=false by default but error will be saved in error list.
+        schema.addField(invalidField);
+        
+        // Add an invalid field.
+        // Won't be ignored because strict=false by default but error will be saved in error list.
+        schema.addField(geopointField);
+        
+        Assert.assertEquals(3, schema.getFields().size());
+        Assert.assertEquals(2, schema.getErrors().size());
+        Assert.assertNotNull(schema.getField("title"));
+        Assert.assertNotNull(schema.getField("id"));
+        Assert.assertNotNull(schema.getField("coordinates"));
     }
     
     @Test
@@ -344,7 +353,7 @@ public class SchemaTest {
     public void testSaveWithPrimaryKey() throws Exception{
         File createdFile = folder.newFile("test_schema.json");
         
-        Schema createdSchema = new Schema(); 
+        Schema createdSchema = new Schema(true); 
         
         Field intField = new Field("id", Field.FIELD_TYPE_INTEGER, Field.FIELD_FORMAT_DEFAULT);
         createdSchema.addField(intField);
@@ -353,7 +362,7 @@ public class SchemaTest {
         createdSchema.addField(stringField);
         
         // Primary Key
-        createdSchema.setPrimaryKey("id", true);
+        createdSchema.setPrimaryKey("id");
         
         // Save schema
         createdSchema.save(createdFile.getAbsolutePath());
@@ -394,12 +403,12 @@ public class SchemaTest {
     
     @Test
     public void testSinglePrimaryKey() throws PrimaryKeyException{
-        Schema schema = new Schema();
+        Schema schema = new Schema(true);
         
         Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
         schema.addField(idField);
         
-        schema.setPrimaryKey("id", true);
+        schema.setPrimaryKey("id");
         String key = schema.getPrimaryKey();
         
         Assert.assertEquals("id", key);
@@ -407,18 +416,18 @@ public class SchemaTest {
     
     @Test
     public void testInvalidSinglePrimaryKey() throws PrimaryKeyException{
-        Schema schema = new Schema();
+        Schema schema = new Schema(true);
         
         Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
         schema.addField(idField);
         
         exception.expect(PrimaryKeyException.class);
-        schema.setPrimaryKey("invalid", true);
+        schema.setPrimaryKey("invalid");
     }
     
     @Test
     public void testCompositePrimaryKey() throws PrimaryKeyException{
-        Schema schema = new Schema();
+        Schema schema = new Schema(true);
         
         Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
         schema.addField(idField);
@@ -429,7 +438,7 @@ public class SchemaTest {
         Field surnameField = new Field("surname", Field.FIELD_TYPE_STRING);
         schema.addField(surnameField);
 
-        schema.setPrimaryKey(new String[]{"name", "surname"}, true);
+        schema.setPrimaryKey(new String[]{"name", "surname"});
         String[] compositeKey = schema.getPrimaryKey();
         
         Assert.assertEquals("name", compositeKey[0]);
@@ -438,7 +447,7 @@ public class SchemaTest {
     
     @Test
     public void testInvalidCompositePrimaryKey() throws PrimaryKeyException{
-        Schema schema = new Schema();
+        Schema schema = new Schema(true);
         
         Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
         schema.addField(idField);
@@ -450,11 +459,11 @@ public class SchemaTest {
         schema.addField(surnameField);
 
         exception.expect(PrimaryKeyException.class);
-        schema.setPrimaryKey(new String[]{"name", "invalid"}, true); 
+        schema.setPrimaryKey(new String[]{"name", "invalid"}); 
     }
     
     @Test
-    public void testInvalidCompositePrimaryKeyWithoutStrictValidation(){
+    public void testInvalidCompositePrimaryKeyWithoutStrictValidation() throws PrimaryKeyException{
         Schema schema = new Schema();
         
         Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
@@ -502,7 +511,7 @@ public class SchemaTest {
     public void testInvalidForeignKeyArrayWrongNumber() throws PrimaryKeyException, ForeignKeyException, Exception{
         String sourceFileAbsPath = SchemaTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array_wrong_number.json").getPath();
         
-        exception.expectMessage("The reference's fields property must an array of the same length as that of the outer fields' array.");
+        exception.expectMessage("The reference's fields property must be an array of the same length as that of the outer fields' array.");
         Schema schema = new Schema(sourceFileAbsPath, true);
     }
     

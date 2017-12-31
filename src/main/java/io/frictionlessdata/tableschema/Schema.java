@@ -37,8 +37,16 @@ public class Schema {
     private Object primaryKey = null;
     private List<ForeignKey> foreignKeys = new ArrayList();
     
+    private boolean strictValidation = false;
+    private List<Exception> errors = new ArrayList();
+    
     public Schema(){
-        initValidator();
+        this.initValidator();
+    }
+    
+    public Schema(boolean strict){
+        this.strictValidation = strict;
+        this.initValidator();
     }
     
     /**
@@ -59,12 +67,11 @@ public class Schema {
      * @throws ForeignKeyException 
      */
     public Schema(JSONObject schema, boolean strict) throws ValidationException, PrimaryKeyException, ForeignKeyException{
-        initValidator();
-        initFromSchemaJson(schema, strict);
+        this.strictValidation = strict;
+        this.initValidator();
+        this.initFromSchemaJson(schema);
  
-        if(strict){
-            validate();
-        }  
+        this.validate();         
     }
     
     /**
@@ -86,13 +93,12 @@ public class Schema {
      * @throws Exception 
      */
     public Schema(URL schemaUrl, boolean strict) throws ValidationException, PrimaryKeyException, ForeignKeyException, Exception{
-        initValidator();
+        this.strictValidation = strict;
+        this.initValidator();
         InputStreamReader inputStreamReader = new InputStreamReader(schemaUrl.openStream(), "UTF-8");
-        initSchemaFromStream(inputStreamReader, strict);
-        
-        if(strict){
-            validate();
-        }
+        this.initSchemaFromStream(inputStreamReader);
+
+        this.validate();
     }
     
     /**
@@ -114,14 +120,13 @@ public class Schema {
      * @throws Exception 
      */
     public Schema(String schemaFilePath, boolean strict) throws ValidationException, PrimaryKeyException, ForeignKeyException, Exception{
-        initValidator(); 
+        this.strictValidation = strict;
+        this.initValidator(); 
         InputStream is = new FileInputStream(schemaFilePath);
         InputStreamReader inputStreamReader = new InputStreamReader(is);
-        initSchemaFromStream(inputStreamReader, strict);
+        this.initSchemaFromStream(inputStreamReader);
         
-        if(strict){
-            validate();
-        }
+        this.validate();
     }
     
     /**
@@ -129,8 +134,7 @@ public class Schema {
      * @param fields 
      */
     public Schema(List<Field> fields){
-        this(fields, false);
-        
+        this(fields, false); 
     }
     
     /**
@@ -140,12 +144,11 @@ public class Schema {
      * @throws ValidationException 
      */
     public Schema(List<Field> fields, boolean strict) throws ValidationException{
-        initValidator(); 
+        this.strictValidation = strict;
         this.fields = fields;
         
-        if(strict){
-            validate();
-        }
+        initValidator(); 
+        validate();
     }
     
     /**
@@ -175,10 +178,9 @@ public class Schema {
      * Initializes the schema from given stream.
      * Used for Schema class instanciation with remote or local schema file.
      * @param schemaStreamReader
-     * @param strict
      * @throws Exception 
      */
-    private void initSchemaFromStream(InputStreamReader schemaStreamReader, boolean strict) throws Exception{
+    private void initSchemaFromStream(InputStreamReader schemaStreamReader) throws Exception{
         BufferedReader br = new BufferedReader(schemaStreamReader);
         String line = br.readLine();
 
@@ -191,10 +193,10 @@ public class Schema {
         String schemaString = sb.toString();
         JSONObject schemaJson = new JSONObject(schemaString);
         
-        initFromSchemaJson(schemaJson, strict);
+        this.initFromSchemaJson(schemaJson);
     }
     
-    private void initFromSchemaJson(JSONObject schema, boolean strict) throws PrimaryKeyException, ForeignKeyException{
+    private void initFromSchemaJson(JSONObject schema) throws PrimaryKeyException, ForeignKeyException{
         // Set Fields
         if(schema.has(JSON_KEY_FIELDS)){
             Iterator iter = schema.getJSONArray(JSON_KEY_FIELDS).iterator();
@@ -217,11 +219,11 @@ public class Schema {
                     composityKey[i] = keyJSONArray.getString(i);
                 }
                 
-                this.setPrimaryKey(composityKey, strict);
+                this.setPrimaryKey(composityKey);
                 
             }else{
                 // Else if primary key is a single String key.
-                this.setPrimaryKey(schema.getString(JSON_KEY_PRIMARY_KEY), strict);
+                this.setPrimaryKey(schema.getString(JSON_KEY_PRIMARY_KEY));
             }
         }
         
@@ -232,9 +234,13 @@ public class Schema {
             for(int i=0; i<fkJsonArray.length(); i++){
                 
                 JSONObject fkJsonObj = fkJsonArray.getJSONObject(i);
-                ForeignKey fk = new ForeignKey(fkJsonObj, strict);
-                this.addForeignKey(fk);   
-            } 
+                ForeignKey fk = new ForeignKey(fkJsonObj, this.strictValidation);
+                this.addForeignKey(fk);
+                
+                if(!this.strictValidation){
+                    this.getErrors().addAll(fk.getErrors());
+                }     
+            }
         }
     }
     
@@ -260,12 +266,26 @@ public class Schema {
     }
     
     /**
-     * Method that throws a ValidationException if invoked while the loaded
-     * Schema is invalid.
+     * Validate the loaded Schema.
+     * Validation is strict or unstrict depending on how the package was
+     * instanciated with the strict flag.
      * @throws ValidationException 
      */
     public final void validate() throws ValidationException{
-        this.tableJsonSchema.validate(this.getJson());
+        try{
+             this.tableJsonSchema.validate(this.getJson());
+            
+        }catch(ValidationException ve){
+            if(this.strictValidation){
+                throw ve;
+            }else{
+                this.getErrors().add(ve);
+            }
+        }
+    }
+    
+    public List<Exception> getErrors(){
+        return this.errors;
     }
     
     public JSONObject getJson(){
@@ -330,33 +350,13 @@ public class Schema {
     }
     
     public void addField(Field field){
-        this.addField(field, true);
-    }
-    
-    public void addField(Field field, boolean strict){
-        
-        if(!strict){
-            this.fields.add(field);
-        }else{
-            boolean isSchemaValidPreInsert = this.isValid();
-            this.fields.add(field);
-
-            // Is not longer valid after insert?
-            if(isSchemaValidPreInsert && !this.isValid()){
-                // Remove field if schema was valid prior
-                this.fields.remove(this.fields.size()-1);
-            }
-        }
+        this.fields.add(field);
+        this.validate();
     }
     
     public void addField(JSONObject fieldJson){
         Field field = new Field(fieldJson);
         this.addField(field);
-    }
-    
-    public void addField(JSONObject fieldJson, boolean strict){
-        Field field = new Field(fieldJson);
-        this.addField(field, strict);
     }
     
     public List<Field> getFields(){
@@ -403,60 +403,45 @@ public class Schema {
         return !this.getFields().isEmpty();
     }
     
-    /**
-     * Set primary key without validation.
-     * @param key 
-     */
-    public void setPrimaryKey(String key){
-        // Could call this.setPrimaryKey(key, false) instead...
-        this.primaryKey = key;
-    }
+
     
     /**
      * Set single primary key with the option of validation.
      * @param key
-     * @param strict
      * @throws PrimaryKeyException 
      */
-    public void setPrimaryKey(String key, boolean strict) throws PrimaryKeyException{
-        if(!strict){
-            this.primaryKey = key;
-        }else{
-            if(this.hasField(key)){
-                this.primaryKey = key;  
+    public void setPrimaryKey(String key) throws PrimaryKeyException{        
+        if(!this.hasField(key)){
+            PrimaryKeyException pke = new PrimaryKeyException("No such field as: " + key + ".");
+            if(this.strictValidation){
+                throw pke;
             }else{
-                throw new PrimaryKeyException("No such field as: " + key + ".");
+                this.getErrors().add(pke);
             }
         }
+        
+        this.primaryKey = key; 
     }
-    
-    /**
-     * Set composite primary key without validation.
-     * @param compositeKey 
-     */
-    public void setPrimaryKey(String[] compositeKey){
-        this.primaryKey = compositeKey;
-    }
-    
     
     /**
      * Set composite primary key with the option of validation.
      * @param compositeKey
-     * @param strict
      * @throws PrimaryKeyException 
      */
-    public void setPrimaryKey(String[] compositeKey, boolean strict) throws PrimaryKeyException{
-        if(!strict){
-            this.primaryKey = compositeKey;
-        }else{
-            for (String aKey : compositeKey) {
-                if (!this.hasField(aKey)) {
-                    throw new PrimaryKeyException("No such field as: " + aKey + ".");
+    public void setPrimaryKey(String[] compositeKey) throws PrimaryKeyException{        
+        for (String aKey : compositeKey) {
+            if (!this.hasField(aKey)) {
+                PrimaryKeyException pke = new PrimaryKeyException("No such field as: " + aKey + ".");
+                
+                if(this.strictValidation){
+                    throw pke;
+                }else{
+                    this.getErrors().add(pke);
                 }
             }
+        }
         
-            this.primaryKey = compositeKey;
-        } 
+        this.primaryKey = compositeKey;
     }
     
     public <Any> Any getPrimaryKey(){

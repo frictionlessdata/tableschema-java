@@ -62,14 +62,15 @@ System.out.println(schema.getJson());
 You can also build a `Schema` instance with `JSONObject` instances instead of `Field` instances:
 
 ```java
-Schema schema = new Schema();
+Schema schema = new Schema(); // By default strict=false validation
 
 JSONObject nameFieldJsonObject = new JSONObject();
 nameFieldJsonObject.put("name", "name");
 nameFieldJsonObject.put("type", Field.FIELD_TYPE_STRING);
 schema.addField(nameFieldJsonObject);
 
-// An invalid Field definition, will be ignored.
+// Because strict=false, an invalid Field definition will be included.
+// The error will be logged/tracked in the error list schema.getErrors().
 JSONObject invalidFieldJsonObject = new JSONObject();
 invalidFieldJsonObject.put("name", "id");
 invalidFieldJsonObject.put("type", Field.FIELD_TYPE_INTEGER);
@@ -84,7 +85,7 @@ schema.addField(coordinatesFieldJsonObject);
 
 System.out.println(schema.getJson());
 
-// {"fields":[{"name":"name","type":"string"},{"name":"coordinates","format":"array","type":"geopoint"}]}
+// {"fields":[{"name":"name","format":"default","description":"","type":"string","title":"","constraints":{}},{"name":"id","format":"invalid","description":"","type":"integer","title":"","constraints":{}},{"name":"coordinates","format":"array","description":"","type":"geopoint","title":"","constraints":{}}]}
 ```
 
 When using the `addField` method, the schema undergoes validation after every field addition.

@@ -1,6 +1,8 @@
 package io.frictionlessdata.tableschema.fk;
 
 import io.frictionlessdata.tableschema.exceptions.ForeignKeyException;
+import java.util.ArrayList;
+import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -14,20 +16,22 @@ public class ForeignKey {
     private Object fields = null;
     private Reference reference = null;
     
+    private boolean strictValidation = false;
+    private List<Exception> errors = new ArrayList();
+    
     public ForeignKey(){   
     }
     
-    public ForeignKey(Object fields, Reference reference) throws ForeignKeyException{
-        this(fields, reference, false);
+    public ForeignKey(boolean strict){  
+        this.strictValidation = strict;
     }
+    
     
     public ForeignKey(Object fields, Reference reference, boolean strict) throws ForeignKeyException{
         this.fields = fields;
         this.reference = reference;
-        
-        if(strict){
-            this.validate();
-        } 
+        this.strictValidation = strict;
+        this.validate();
     }
     
     public ForeignKey(JSONObject fkJsonObject) throws ForeignKeyException{
@@ -35,6 +39,7 @@ public class ForeignKey {
     }
     
     public ForeignKey(JSONObject fkJsonObject, boolean strict) throws ForeignKeyException{
+        this.strictValidation = strict;
         
         if(fkJsonObject.has(JSON_KEY_FIELDS)){
             this.fields = fkJsonObject.get(JSON_KEY_FIELDS);
@@ -45,9 +50,7 @@ public class ForeignKey {
             this.reference = new Reference(refJsonObject, strict);
         }
         
-        if(strict){
-            this.validate();
-        } 
+        this.validate();
     }
     
     public void setFields(Object fields){
@@ -67,26 +70,37 @@ public class ForeignKey {
     }
     
     public final void validate() throws ForeignKeyException{
+        ForeignKeyException fke = null;
+        
         if(this.fields == null || this.reference == null){
-            throw new ForeignKeyException("A foreign key must have the fields and reference properties.");
+            fke = new ForeignKeyException("A foreign key must have the fields and reference properties.");
             
         }else if(!(this.fields instanceof String) && !(this.fields instanceof JSONArray)){
-            throw new ForeignKeyException("The foreign key's fields property must be a string or an array.");
+            fke = new ForeignKeyException("The foreign key's fields property must be a string or an array.");
             
         }else if(this.fields instanceof JSONArray && !(this.reference.getFields() instanceof JSONArray)){
-            throw new ForeignKeyException("The reference's fields property must be an array if the outer fields is an array.");
+            fke = new ForeignKeyException("The reference's fields property must be an array if the outer fields is an array.");
             
         }else if(this.fields instanceof String && !(this.reference.getFields() instanceof String)){
-            throw new ForeignKeyException("The reference's fields property must be a string if the outer fields is a string.");
+            fke = new ForeignKeyException("The reference's fields property must be a string if the outer fields is a string.");
             
         }else if(this.fields instanceof JSONArray && this.reference.getFields() instanceof JSONArray){
             JSONArray fkFields = (JSONArray)this.fields;
             JSONArray refFields = (JSONArray)this.reference.getFields();
             
             if(fkFields.length() != refFields.length()){
-                throw new ForeignKeyException("The reference's fields property must an array of the same length as that of the outer fields' array.");
+                fke = new ForeignKeyException("The reference's fields property must be an array of the same length as that of the outer fields' array.");
             }
         }
+        
+        if(fke != null){
+            if(this.strictValidation){
+                throw fke;  
+            }else{
+                this.getErrors().add(fke);
+            }           
+        }
+
     }
     
     public JSONObject getJson(){
@@ -102,6 +116,10 @@ public class ForeignKey {
         }
   
         return json;
+    }
+    
+    public List<Exception> getErrors(){
+        return this.errors;
     }
     
 }

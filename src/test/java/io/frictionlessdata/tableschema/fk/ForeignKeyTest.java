@@ -55,7 +55,7 @@ public class ForeignKeyTest {
     
     @Test
     public void testNullReference() throws ForeignKeyException{
-        ForeignKey fk = new ForeignKey();
+        ForeignKey fk = new ForeignKey(true);
         fk.setFields("aField");
         
         exception.expectMessage("A foreign key must have the fields and reference properties.");
@@ -64,7 +64,7 @@ public class ForeignKeyTest {
     
     @Test
     public void testNullFieldsAndReference() throws ForeignKeyException{
-        ForeignKey fk = new ForeignKey();
+        ForeignKey fk = new ForeignKey(true);
         exception.expectMessage("A foreign key must have the fields and reference properties.");
         fk.validate();
     }
@@ -116,7 +116,7 @@ public class ForeignKeyTest {
         fkFields.put("field1");
         fkFields.put("field2");
         
-        exception.expectMessage("The reference's fields property must an array of the same length as that of the outer fields' array.");
+        exception.expectMessage("The reference's fields property must be an array of the same length as that of the outer fields' array.");
         ForeignKey fk = new ForeignKey(fkFields, ref, true);
     }
 }
