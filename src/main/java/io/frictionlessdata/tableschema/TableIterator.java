@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * 
  */
-public class TableIterator<T> {
+public class TableIterator<T> implements Iterator<T> {
     
     private String[] headers = null;
     private Schema schema = null;
@@ -69,11 +69,18 @@ public class TableIterator<T> {
         this.iter = table.getDataSource().iterator();
     }
     
+    @Override
     public boolean hasNext() {
         return this.iter.hasNext();
     }
+    
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
 
-    public <T> T next(){
+    @Override
+    public T next() {
         String[] row = this.iter.next();
         
         Map<String, Object> keyedRow = new HashMap();
