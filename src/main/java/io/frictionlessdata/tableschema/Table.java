@@ -4,6 +4,7 @@ import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
 import io.frictionlessdata.tableschema.datasources.CsvDataSource;
 import io.frictionlessdata.tableschema.datasources.DataSource;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import java.io.File;
 import org.json.*;
 import java.net.URL;
 import java.util.ArrayList;
@@ -17,37 +18,65 @@ public class Table{
     private DataSource dataSource = null;
     private Schema schema = null;
     
-    public Table(String dataSourceFilename) throws Exception{
-        this.dataSource = new CsvDataSource(dataSourceFilename);
+    public Table(File dataSource) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
     }
     
-    public Table(String dataSourceFilename, JSONObject schemaJson) throws Exception{
-        this.dataSource = new CsvDataSource(dataSourceFilename);
-        this.schema = new Schema(schemaJson);
+    public Table(File dataSource, JSONObject schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
+        this.schema = new Schema(schema);
     }
     
-    public Table(String dataSourceFilename, Schema schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSourceFilename);
+    public Table(File dataSource, Schema schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
         this.schema = schema;
     }
     
-    public Table(URL url) throws Exception{
-        this.dataSource = new CsvDataSource(url);
+    public Table(String dataSource) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
     }
     
-    public Table(URL url, JSONObject schemaJson) throws Exception{
-        this.dataSource = new CsvDataSource(url);
-        this.schema = new Schema(schemaJson);
+    public Table(String dataSource, JSONObject schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
+        this.schema = new Schema(schema);
     }
     
-    public Table(URL url, Schema schema) throws Exception{
-        this.dataSource = new CsvDataSource(url);
+    public Table(String dataSource, Schema schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
         this.schema = schema;
     }
     
-    public Table(URL dataSourceUrl, URL schemaUrl) throws Exception{
-        this.dataSource = new CsvDataSource(dataSourceUrl);
-        this.schema = new Schema(schemaUrl);
+    public Table(URL dataSource) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
+    }
+    
+    public Table(URL dataSource, JSONObject schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
+        this.schema = new Schema(schema);
+    }
+    
+    public Table(URL dataSource, Schema schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
+        this.schema = schema;
+    }
+    
+    public Table(URL dataSource, URL schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
+        this.schema = new Schema(schema);
+    }
+    
+    public Table(JSONArray dataSource) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
+    }
+    
+    public Table(JSONArray dataSource, JSONObject schemaJson) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
+        this.schema = new Schema(schemaJson);
+    }
+    
+    public Table(JSONArray dataSource, Schema schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
+        this.schema = schema;
     }
     
     public TableIterator iterator() throws Exception{

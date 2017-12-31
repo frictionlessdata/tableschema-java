@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -17,14 +18,28 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
+import org.json.CDL;
+import org.json.JSONArray;
 
 /**
  *
  */
 public class CsvDataSource extends AbstractDataSource {
     private Object dataSource = null;
+     
+    public CsvDataSource(URL dataSource){
+        this.dataSource = dataSource;
+    }
     
-    public CsvDataSource(Object dataSource) throws Exception{
+    public CsvDataSource(File dataSource){
+        this.dataSource = dataSource;
+    }
+    
+    public CsvDataSource(String dataSource){
+        this.dataSource = dataSource;
+    }
+    
+    public CsvDataSource(JSONArray dataSource){
         this.dataSource = dataSource;
     }
     
@@ -127,31 +142,33 @@ public class CsvDataSource extends AbstractDataSource {
      */
     private CSVParser getCSVParser() throws Exception{
         if(this.dataSource instanceof String){
-            return getCSVParserFromFilePath();
+            Reader sr = new StringReader((String)this.dataSource);
+            return CSVParser.parse(sr, CSVFormat.RFC4180.withHeader());
+
+        }else if(this.dataSource instanceof File){
+            // The path value can either be a relative path or a full path.
+            // If it's a relative path then build the full path by using the working directory.
+            File f = (File)this.dataSource;
+            if(!f.exists()) { 
+                f = new File(System.getProperty("user.dir") + "/" + f.getAbsolutePath());
+            }
+
+            // Read the file.
+            Reader fr = new FileReader(f);
+
+            // Get the parser.
+            return CSVFormat.RFC4180.withHeader().parse(fr);
+            
         }else if(this.dataSource instanceof URL){
             return CSVParser.parse((URL)this.dataSource, Charset.forName("UTF-8"), CSVFormat.RFC4180.withHeader());
+            
+        }else if(this.dataSource instanceof JSONArray){
+            String dataCsv = CDL.toString((JSONArray)this.dataSource);                
+            Reader sr = new StringReader(dataCsv);
+            return CSVParser.parse(sr, CSVFormat.RFC4180.withHeader());
+            
         }else{
-            throw new Exception("Data source is of invalid type. Must be either String path or URL.");
+            throw new Exception("Data source is of invalid type.");
         }
-    }
-    
-    /**
-     * Get CSVPareser instance from file path.
-     * @return
-     * @throws Exception 
-     */
-    private CSVParser getCSVParserFromFilePath() throws Exception{
-        // The path value can either be a relative path or a full path.
-        // If it's a relative path then build the full path by using the working directory.
-        File f = new File((String)this.dataSource);
-        if(!f.exists()) { 
-            this.dataSource = System.getProperty("user.dir") + "/" + (String)this.dataSource;
-        }
-
-        // Read the file.
-        Reader fr = new FileReader((String)this.dataSource);
-
-        // Get the parser.
-        return CSVFormat.RFC4180.withHeader().parse(fr);
     }
 }
