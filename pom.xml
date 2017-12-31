@@ -5,6 +5,15 @@
     <artifactId>tableschema-java</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <issueManagement>
+        <url>https://github.com/frictionlessdata/tableschema-java/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+    <scm>
+        <url>https://github.com/kevinsawicki/github-maven-example</url>
+        <connection>scm:git:git://github.com/frictionlessdata/tableschema-java.git</connection>
+        <developerConnection>scm:git:git@github.com:frictionlessdata/tableschema-java.git</developerConnection>
+    </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
