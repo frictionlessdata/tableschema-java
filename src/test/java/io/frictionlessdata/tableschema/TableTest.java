@@ -129,7 +129,7 @@ public class TableTest {
         expectedResults.add(new String[]{"2", "bar"});
         expectedResults.add(new String[]{"3", "baz"});
 
-        TableIterator<Object[]> iter = table.iterator();
+        Iterator<Object[]> iter = table.iterator();
         int loopCounter = 0;
         while (iter.hasNext()) {
             Object[] row = iter.next();
@@ -146,7 +146,7 @@ public class TableTest {
         File file = new File(employeeDataSourceFile);
         Table employeeTable = new Table(file);
         
-        TableIterator<Map> iter = employeeTable.iterator(true);
+        Iterator<Map> iter = employeeTable.iterator(true);
 
         while(iter.hasNext()){
             Map row = iter.next();
@@ -168,7 +168,7 @@ public class TableTest {
         File file = new File(employeeDataSourceFile);
         Table employeeTable = new Table(file);
    
-        TableIterator<Object[]> iter = employeeTable.iterator(false, true);
+        Iterator<Object[]> iter = employeeTable.iterator(false, true);
         
         int rowIndex = 0;
         while(iter.hasNext()){
@@ -213,7 +213,7 @@ public class TableTest {
         };
         
         // Let's iterate and assert row value classes against the expected classes
-        TableIterator<Object[]> iter = employeeTable.iterator();
+        Iterator<Object[]> iter = employeeTable.iterator();
         
         while (iter.hasNext()) {
             Object[] row = iter.next();
@@ -234,7 +234,7 @@ public class TableTest {
         File file = new File(employeeDataSourceFile);
         Table employeeTable = new Table(file, employeeTableSchema);
         
-        TableIterator<Map> iter = employeeTable.iterator(true, false, false, false);
+        Iterator<Map> iter = employeeTable.iterator(true, false, false, false);
 
         while(iter.hasNext()){
             Map row = iter.next();
@@ -259,7 +259,7 @@ public class TableTest {
         File file = new File(employeeDataSourceFile);
         Table employeeTable = new Table(file, employeeTableSchema);
         
-        TableIterator<Object[]> iter = employeeTable.iterator(false, true, false, false);
+        Iterator<Object[]> iter = employeeTable.iterator(false, true, false, false);
         
         int rowIndex = 0;
         while(iter.hasNext()){

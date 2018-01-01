@@ -8,6 +8,7 @@ import java.io.File;
 import org.json.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -79,23 +80,23 @@ public class Table{
         this.schema = schema;
     }
     
-    public TableIterator iterator() throws Exception{
+    public Iterator iterator() throws Exception{
        return new TableIterator(this);
     }
     
-    public TableIterator iterator(boolean keyed) throws Exception{
+    public Iterator iterator(boolean keyed) throws Exception{
        return new TableIterator(this, keyed);
     }
     
-    public TableIterator iterator(boolean keyed, boolean extended) throws Exception{
+    public Iterator iterator(boolean keyed, boolean extended) throws Exception{
        return new TableIterator(this, keyed, extended);
     }
     
-    public TableIterator iterator(boolean keyed, boolean extended, boolean cast) throws Exception{
+    public Iterator iterator(boolean keyed, boolean extended, boolean cast) throws Exception{
        return new TableIterator(this, keyed, extended, cast);
     }
     
-    public TableIterator iterator(boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
+    public Iterator iterator(boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
        return new TableIterator(this, keyed, extended, cast, relations);
     }
     
@@ -113,7 +114,7 @@ public class Table{
         
         List<Object[]> rows = new ArrayList();
         
-        TableIterator<Object[]> iter = this.iterator(false, false, cast, false);
+        Iterator<Object[]> iter = this.iterator(false, false, cast, false);
         while(iter.hasNext()){
             Object[] row = iter.next();
             rows.add(row);
