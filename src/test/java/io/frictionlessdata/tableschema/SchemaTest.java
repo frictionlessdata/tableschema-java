@@ -345,8 +345,8 @@ public class SchemaTest {
         Assert.assertEquals(Field.FIELD_FORMAT_DEFAULT, readSchema.getField("name").getFormat());
         Assert.assertEquals("the title", readSchema.getField("name").getTitle());
         Assert.assertEquals("the description", readSchema.getField("name").getDescription());
-        Assert.assertEquals(readSchema.getField("name").getConstraints().get(Field.CONSTRAINT_KEY_MIN_LENGTH), 36);
-        Assert.assertEquals(readSchema.getField("name").getConstraints().get(Field.CONSTRAINT_KEY_MAX_LENGTH), 45);
+        Assert.assertEquals(36, readSchema.getField("name").getConstraints().get(Field.CONSTRAINT_KEY_MIN_LENGTH));
+        Assert.assertEquals(45, readSchema.getField("name").getConstraints().get(Field.CONSTRAINT_KEY_MAX_LENGTH));
     }
     
     @Test
