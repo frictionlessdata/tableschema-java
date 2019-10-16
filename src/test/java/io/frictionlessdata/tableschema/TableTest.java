@@ -2,6 +2,7 @@ package io.frictionlessdata.tableschema;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -39,8 +40,9 @@ public class TableTest {
     @Test
     public void testReadFromValidCSVContentString() throws Exception{
         // get path of test CSV file
-        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
-        String csvContent = new String(Files.readAllBytes(Paths.get(sourceFileAbsPath)));
+        URL sourceFileUrl = TableTest.class.getResource("/fixtures/simple_data.csv");
+        Path path = Paths.get(sourceFileUrl.toURI());
+        String csvContent = new String(Files.readAllBytes(path));
         
         Table table = new Table(csvContent);
         
