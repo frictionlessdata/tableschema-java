@@ -1,25 +1,18 @@
 package io.frictionlessdata.tableschema.datasources;
 
 import com.google.common.collect.Iterators;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
+import org.apache.commons.csv.*;
+import org.json.CDL;
+import org.json.JSONArray;
+
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
-import org.json.CDL;
-import org.json.JSONArray;
 
 /**
  *
@@ -148,13 +141,16 @@ public class CsvDataSource extends AbstractDataSource {
         }else if(this.dataSource instanceof File){
             // The path value can either be a relative path or a full path.
             // If it's a relative path then build the full path by using the working directory.
-            File f = (File)this.dataSource;
-            if(!f.exists()) { 
-                f = new File(System.getProperty("user.dir") + "/" + f.getAbsolutePath());
-            }
+            // Caution: here, we cannot simply use provided paths, we have to check
+            // they are neither absolute path or relative parent paths (../)
+            // see:
+            //    - https://github.com/frictionlessdata/tableschema-java/issues/29
+            //    - https://frictionlessdata.io/specs/data-resource/#url-or-path
+            Path inPath = ((File)this.dataSource).toPath();
+            Path resolvedPath = DataSource.toSecure(inPath, new File(System.getProperty("user.dir")).toPath());
 
             // Read the file.
-            Reader fr = new FileReader(f);
+            Reader fr = new FileReader(resolvedPath.toFile());
 
             // Get the parser.
             return CSVFormat.RFC4180.withHeader().parse(fr);
