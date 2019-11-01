@@ -19,17 +19,17 @@ public class Table{
     private DataSource dataSource = null;
     private Schema schema = null;
     
-    public Table(File dataSource) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource);
+    public Table(File dataSource, File workDir) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource, workDir);
     }
     
-    public Table(File dataSource, JSONObject schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource);
+    public Table(File dataSource, File workDir, JSONObject schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource, workDir);
         this.schema = new Schema(schema);
     }
     
-    public Table(File dataSource, Schema schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource);
+    public Table(File dataSource, File workDir, Schema schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource, workDir);
         this.schema = schema;
     }
     
@@ -102,6 +102,10 @@ public class Table{
     
     public String[] getHeaders() throws Exception{
         return this.dataSource.getHeaders();
+    }
+
+    public void save(File outputFile) throws Exception{
+        this.dataSource.write(outputFile);
     }
     
     public void save(String outputFilePath) throws Exception{

@@ -2,6 +2,7 @@ package io.frictionlessdata.tableschema;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -28,10 +29,10 @@ public class TableTest {
     
     @Test
     public void testReadFromValidFilePath() throws Exception{
+        File testDataDir = getTestDataDirectory();
         // get path of test CSV file
-        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
-        File file = new File(sourceFileAbsPath);
-        Table table = new Table(file);
+        File file = new File("simple_data.csv");
+        Table table = new Table(file, testDataDir);
         
         Assert.assertEquals(3, table.read().size()); 
     }
@@ -39,8 +40,9 @@ public class TableTest {
     @Test
     public void testReadFromValidCSVContentString() throws Exception{
         // get path of test CSV file
-        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
-        String csvContent = new String(Files.readAllBytes(Paths.get(sourceFileAbsPath)));
+        URL sourceFileUrl = TableTest.class.getResource("/fixtures/simple_data.csv");
+        Path path = Paths.get(sourceFileUrl.toURI());
+        String csvContent = new String(Files.readAllBytes(path));
         
         Table table = new Table(csvContent);
         
@@ -119,10 +121,10 @@ public class TableTest {
     
     @Test
     public void testIterateUncastData() throws Exception{
+        File testDataDir = getTestDataDirectory();
         // get path of test CSV file
-        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
-        File file = new File(sourceFileAbsPath);
-        Table table = new Table(file);
+        File file = new File("simple_data.csv");
+        Table table = new Table(file, testDataDir);
         
         List<String[]> expectedResults = new ArrayList();
         expectedResults.add(new String[]{"1", "foo"});
@@ -138,13 +140,14 @@ public class TableTest {
             loopCounter++;
         }
     }
+
     
     @Test
     public void testIterateUncastKeyedData() throws Exception{
+        File testDataDir = getTestDataDirectory();
         // Fetch the data
-        String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
-        File file = new File(employeeDataSourceFile);
-        Table employeeTable = new Table(file);
+        File file = new File("employee_data.csv");
+        Table employeeTable = new Table(file, testDataDir);
         
         Iterator<Map> iter = employeeTable.iterator(true);
 
@@ -163,10 +166,11 @@ public class TableTest {
     
     @Test
     public void testIterateUncastExtendedData() throws Exception{
+        File testDataDir = getTestDataDirectory();
         // Fetch the data.
-        String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
-        File file = new File(employeeDataSourceFile);
-        Table employeeTable = new Table(file);
+
+        File file = new File("employee_data.csv");
+        Table employeeTable = new Table(file, testDataDir);
    
         Iterator<Object[]> iter = employeeTable.iterator(false, true);
         
@@ -192,14 +196,15 @@ public class TableTest {
     
     @Test
     public void testIterateCastData() throws Exception{
+        File testDataDir = getTestDataDirectory();
         
         // Let's start by defining and building the schema:
         Schema employeeTableSchema = getEmployeeTableSchema();
         
         // Fetch the data and apply the schema
-        String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
-        File file = new File(employeeDataSourceFile);
-        Table employeeTable = new Table(file, employeeTableSchema);
+
+        File file = new File("employee_data.csv");
+        Table employeeTable = new Table(file, testDataDir, employeeTableSchema);
         
         // We will iterate the rows and these are the values classes we expect:
         Class[] expectedTypes = new Class[]{
@@ -226,13 +231,13 @@ public class TableTest {
     
     @Test
     public void testIterateCastKeyedData() throws Exception{
+        File testDataDir = getTestDataDirectory();
         // Let's start by defining and building the schema:
         Schema employeeTableSchema = getEmployeeTableSchema();
         
         // Fetch the data and apply the schema
-        String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
-        File file = new File(employeeDataSourceFile);
-        Table employeeTable = new Table(file, employeeTableSchema);
+        File file = new File("employee_data.csv");
+        Table employeeTable = new Table(file, testDataDir, employeeTableSchema);
         
         Iterator<Map> iter = employeeTable.iterator(true, false, false, false);
 
@@ -251,13 +256,13 @@ public class TableTest {
     
     @Test
     public void testIterateCastExtendedData() throws Exception{
+        File testDataDir = getTestDataDirectory();
         // Let's start by defining and building the schema:
         Schema employeeTableSchema = getEmployeeTableSchema();
         
         // Fetch the data and apply the schema
-        String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
-        File file = new File(employeeDataSourceFile);
-        Table employeeTable = new Table(file, employeeTableSchema);
+        File file = new File("employee_data.csv");
+        Table employeeTable = new Table(file, testDataDir, employeeTableSchema);
         
         Iterator<Object[]> iter = employeeTable.iterator(false, true, false, false);
         
@@ -283,19 +288,19 @@ public class TableTest {
     
     @Test
     public void testFetchHeaders() throws Exception{
+        File testDataDir = getTestDataDirectory();
         // get path of test CSV file
-        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
-        File file = new File(sourceFileAbsPath);
-        Table table = new Table(file);
+        File file = new File("simple_data.csv");
+        Table table = new Table(file, testDataDir);
         
         Assert.assertEquals("[id, title]", Arrays.toString(table.getHeaders()));
     }
     
     @Test
     public void testReadUncastData() throws Exception{
-        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
-        File file = new File(sourceFileAbsPath);
-        Table table = new Table(file);
+        File testDataDir = getTestDataDirectory();
+        File file = new File("simple_data.csv");
+        Table table = new Table(file, testDataDir);
         
         Assert.assertEquals(3, table.read().size());
         Assert.assertEquals("1", table.read().get(0)[0]);
@@ -304,14 +309,14 @@ public class TableTest {
 
     @Test
     public void testReadCastData() throws Exception{
+        File testDataDir = getTestDataDirectory();
 
         // Let's start by defining and building the schema:
         Schema employeeTableSchema = getEmployeeTableSchema();
         
         // Fetch the data and apply the schema
-        String employeeDataSourceFile = TableTest.class.getResource("/fixtures/employee_data.csv").getPath();
-        File file = new File(employeeDataSourceFile);
-        Table employeeTable = new Table(file, employeeTableSchema);
+        File file = new File("employee_data.csv");
+        Table employeeTable = new Table(file, testDataDir, employeeTableSchema);
         
         // We will iterate the rows and these are the values classes we expect:
         Class[] expectedTypes = new Class[]{
@@ -338,17 +343,24 @@ public class TableTest {
     
     @Test
     public void saveTable() throws Exception{
-        File createdFile = folder.newFile("test_data_table.csv");
-        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/simple_data.csv").getPath();
-        File file = new File(sourceFileAbsPath);
-        Table loadedTable = new Table(file);
+        String createdFileName = "test_data_table.csv";
+        File createdFileDir = folder.newFile(createdFileName).getParentFile();
+        File testDataDir = getTestDataDirectory();
+        File file = new File("simple_data.csv");
+        Table loadedTable = new Table(file, testDataDir);
         
-        loadedTable.save(createdFile.getAbsolutePath());
+        loadedTable.save(new File (createdFileDir, createdFileName));
         
-        Table readTable = new Table(createdFile);
+        Table readTable = new Table(new File(createdFileName), createdFileDir);
         Assert.assertEquals("id", readTable.getHeaders()[0]);
         Assert.assertEquals("title", readTable.getHeaders()[1]);
         Assert.assertEquals(3, readTable.read().size());   
+    }
+
+    private File getTestDataDirectory()throws Exception {
+        URL u = TableTest.class.getResource("/fixtures/simple_data.csv");
+        Path path = Paths.get(u.toURI());
+        return path.getParent().toFile();
     }
     
     private Schema getEmployeeTableSchema(){
