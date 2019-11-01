@@ -253,7 +253,7 @@ public class Schema {
     
     /**
      * Check if schema is valid or not.
-     * @return 
+     * @return
      */
     public boolean isValid(){
         try{

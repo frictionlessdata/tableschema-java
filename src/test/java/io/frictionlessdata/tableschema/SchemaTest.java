@@ -34,7 +34,7 @@ public class SchemaTest {
     
     @Rule
     public final ExpectedException exception = ExpectedException.none();
-     
+
     @Test
     public void testCreateSchemaFromValidSchemaJson() throws PrimaryKeyException, ForeignKeyException{ 
         JSONObject schemaJsonObj = new JSONObject();
