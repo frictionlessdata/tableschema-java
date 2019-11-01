@@ -19,13 +19,15 @@ import java.util.Map;
  */
 public class CsvDataSource extends AbstractDataSource {
     private Object dataSource = null;
+    private File workDir;
      
     public CsvDataSource(URL dataSource){
         this.dataSource = dataSource;
     }
     
-    public CsvDataSource(File dataSource){
+    public CsvDataSource(File dataSource, File workDir){
         this.dataSource = dataSource;
+        this.workDir = workDir;
     }
     
     public CsvDataSource(String dataSource){
@@ -79,25 +81,30 @@ public class CsvDataSource extends AbstractDataSource {
     }
 
     @Override
-    public void write(String outputFilePath) throws Exception{            
-       try(Writer out = new BufferedWriter(new FileWriter(outputFilePath));
-               CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.RFC4180)) {
-            
+    public void write(File outputFile) throws Exception{
+        try(Writer out = new BufferedWriter(new FileWriter(outputFile));
+            CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.RFC4180)) {
+
             if(this.getHeaders() != null){
                 csvPrinter.printRecord(this.getHeaders());
             }
-            
+
             Iterator<CSVRecord> recordIter = this.getCSVParser().iterator();
             while(recordIter.hasNext()){
                 CSVRecord record = recordIter.next();
                 csvPrinter.printRecord(record);
             }
-            
+
             csvPrinter.flush();
-                
-       }catch(Exception e){
+
+        }catch(Exception e){
             throw e;
-       }
+        }
+    }
+
+    @Override
+    public void write(String outputFilePath) throws Exception{
+        write(new File(outputFilePath));
     }
     
     @Override
@@ -147,7 +154,7 @@ public class CsvDataSource extends AbstractDataSource {
             //    - https://github.com/frictionlessdata/tableschema-java/issues/29
             //    - https://frictionlessdata.io/specs/data-resource/#url-or-path
             Path inPath = ((File)this.dataSource).toPath();
-            Path resolvedPath = DataSource.toSecure(inPath, new File(System.getProperty("user.dir")).toPath());
+            Path resolvedPath = DataSource.toSecure(inPath, workDir.toPath());
 
             // Read the file.
             Reader fr = new FileReader(resolvedPath.toFile());

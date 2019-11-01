@@ -3,6 +3,7 @@
  */
 package io.frictionlessdata.tableschema.datasources;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Iterator;
@@ -15,7 +16,8 @@ public interface DataSource {
     public Iterator<String[]> iterator() throws Exception;
     public String[] getHeaders() throws Exception;
     public List<String[]> data() throws Exception;
-    public void write(String outputFilePath) throws Exception;
+    public void write(String outputFile) throws Exception;
+    public void write(File outputFile) throws Exception;
 
     public static Path toSecure(Path testPath, Path referencePath) throws IOException {
         if (!referencePath.isAbsolute()) {
