@@ -1,8 +1,6 @@
 package io.frictionlessdata.tableschema;
 
-import com.sun.javafx.PlatformUtil;
 import io.frictionlessdata.tableschema.datasources.DataSource;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -22,7 +20,7 @@ public class DataSourceTest {
        Path path = Paths.get(u.toURI());
        Path testPath = path.getParent();
        String maliciousPathName = "/etc/passwd";
-       if (PlatformUtil.isWindows()){
+       if (runningOnWindowsOperatingSystem()){
            maliciousPathName = "C:/Windows/system.ini";
        }
        Path maliciousPath = new File(maliciousPathName).toPath();
@@ -36,7 +34,7 @@ public class DataSourceTest {
         Path path = Paths.get(u.toURI());
         Path testPath = path.getParent();
         String maliciousPathName = "/etc/";
-        if (PlatformUtil.isWindows()){
+        if (runningOnWindowsOperatingSystem()){
             maliciousPathName = "C:/Windows/";
         }
         Path maliciousPath = new File(maliciousPathName).toPath();
@@ -50,11 +48,16 @@ public class DataSourceTest {
         Path path = Paths.get(u.toURI());
         Path testPath = path.getParent().getParent();
         String maliciousPathName = "fixtures/dates_data.csv";
-        if (PlatformUtil.isWindows()){
+        if (runningOnWindowsOperatingSystem()){
             maliciousPathName = "fixtures/dates_data.csv";
         }
         Path maliciousPath = new File(maliciousPathName).toPath();
         DataSource.toSecure(maliciousPath, testPath);
+    }
+
+    private static boolean runningOnWindowsOperatingSystem() {
+        String os = System.getProperty("os.name");
+        return (os.toLowerCase().contains("windows"));
     }
 }
 
