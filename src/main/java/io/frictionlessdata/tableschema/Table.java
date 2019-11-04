@@ -107,10 +107,7 @@ public class Table{
     public void save(File outputFile) throws Exception{
         this.dataSource.write(outputFile);
     }
-    
-    public void save(String outputFilePath) throws Exception{
-       this.dataSource.write(outputFilePath);
-    }
+
     public List<Object[]> read(boolean cast) throws Exception{
         if(cast && !this.schema.hasFields()){
             throw new InvalidCastException();
