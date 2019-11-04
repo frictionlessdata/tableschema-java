@@ -12,6 +12,7 @@ import org.json.JSONException;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -23,8 +24,10 @@ import java.util.stream.Collectors;
  */
 public class JsonArrayDataSource extends AbstractDataSource {
     private Object dataSource = null;
+    private File workDir;
 
-    JsonArrayDataSource(InputStream inStream) throws IOException{
+    public JsonArrayDataSource(InputStream inStream, File workDir) throws IOException{
+        this.workDir = workDir;
         try (InputStreamReader ir = new InputStreamReader(inStream)) {
             try (BufferedReader rdr = new BufferedReader(ir)) {
                 String dSource = rdr.lines().collect(Collectors.joining("\n"));
@@ -33,16 +36,19 @@ public class JsonArrayDataSource extends AbstractDataSource {
         }
     }
 
-    public JsonArrayDataSource(URL dataSource){
+    public JsonArrayDataSource(URL dataSource, File workDir){
         this.dataSource = dataSource;
+        this.workDir = workDir;
     }
 
-    public JsonArrayDataSource(File dataSource){
+    public JsonArrayDataSource(File dataSource, File workDir){
         this.dataSource = dataSource;
+        this.workDir = workDir;
     }
 
-    JsonArrayDataSource(JSONArray dataSource){
+    JsonArrayDataSource(JSONArray dataSource, File workDir){
         this.dataSource = dataSource;
+        this.workDir = workDir;
     }
 
 
@@ -149,13 +155,16 @@ public class JsonArrayDataSource extends AbstractDataSource {
         }else if(this.dataSource instanceof File){
             // The path value can either be a relative path or a full path.
             // If it's a relative path then build the full path by using the working directory.
-            File f = (File)this.dataSource;
-            if(!f.exists()) {
-                f = new File(System.getProperty("user.dir") + "/" + f.getAbsolutePath());
-            }
+            // Caution: here, we cannot simply use provided paths, we have to check
+            // they are neither absolute path or relative parent paths (../)
+            // see:
+            //    - https://github.com/frictionlessdata/tableschema-java/issues/29
+            //    - https://frictionlessdata.io/specs/data-resource/#url-or-path
+            Path inPath = ((File)this.dataSource).toPath();
+            Path resolvedPath = DataSource.toSecure(inPath, workDir.toPath());
 
             // Read the file.
-            Reader fr = new FileReader(f);
+            Reader fr = new FileReader(resolvedPath.toFile());
 
             // Get the parser.
             return CSVFormat.RFC4180.withHeader().parse(fr);

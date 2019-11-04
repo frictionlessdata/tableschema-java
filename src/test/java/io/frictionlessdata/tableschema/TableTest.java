@@ -44,7 +44,7 @@ public class TableTest {
         Path path = Paths.get(sourceFileUrl.toURI());
         String csvContent = new String(Files.readAllBytes(path));
         
-        Table table = new Table(csvContent);
+        Table table = new Table(csvContent, null);
         
         Assert.assertEquals(3, table.read().size()); 
     }
@@ -70,15 +70,16 @@ public class TableTest {
             "}" +
         "]");
         
-        Table table = new Table(jsonData);
+        Table table = new Table(jsonData.toString(), null);
         Assert.assertEquals(3, table.read().size()); 
     }
     
     @Test
     public void testReadFromValidUrl() throws Exception{
+        File testDataDir = getTestDataDirectory();
         // get path of test CSV file
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
-        Table table = new Table(url);
+        Table table = new Table(url, testDataDir);
         
         Assert.assertEquals(3, table.read().size());
     }

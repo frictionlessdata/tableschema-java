@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -20,9 +21,20 @@ import java.util.Map;
 public class CsvDataSource extends AbstractDataSource {
     private Object dataSource = null;
     private File workDir;
-     
-    public CsvDataSource(URL dataSource){
+
+    public CsvDataSource(InputStream inStream, File workDir) throws IOException{
+        this.workDir = workDir;
+        try (InputStreamReader ir = new InputStreamReader(inStream)) {
+            try (BufferedReader rdr = new BufferedReader(ir)) {
+                String dSource = rdr.lines().collect(Collectors.joining("\n"));
+                this.dataSource = new JSONArray(dSource);
+            }
+        }
+    }
+
+    public CsvDataSource(URL dataSource, File workDir){
         this.dataSource = dataSource;
+        this.workDir = workDir;
     }
     
     public CsvDataSource(File dataSource, File workDir){
@@ -30,13 +42,11 @@ public class CsvDataSource extends AbstractDataSource {
         this.workDir = workDir;
     }
     
-    public CsvDataSource(String dataSource){
+    public CsvDataSource(String dataSource, File workDir){
         this.dataSource = dataSource;
+        this.workDir = workDir;
     }
-    
-    public CsvDataSource(JSONArray dataSource){
-        this.dataSource = dataSource;
-    }
+
     
     @Override
     public Iterator<String[]> iterator() throws Exception{

@@ -6,19 +6,33 @@ import io.frictionlessdata.tableschema.datasources.DataSource;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import java.io.File;
 import org.json.*;
+
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 /**
- *
+ * This class represents a CSV table
  * 
  */
 public class Table{
     private DataSource dataSource = null;
     private Schema schema = null;
-    
+
+    /**
+     * Constructor using an {@link java.io.InputStream} for reading both the CSV
+     * data and the table schema.
+     * @param dataSource InputStream for reading the CSV from
+     * @param schema InputStream for reading table schema from
+     * @throws Exception if either reading or parsing throws an Exception
+     */
+    public Table(InputStream dataSource, InputStream schema, File workDir) throws Exception{
+        this.dataSource = DataSource.createDataSource(dataSource, workDir);
+        this.schema = new Schema(schema, true);
+    }
+
     public Table(File dataSource, File workDir) throws Exception{
         this.dataSource = new CsvDataSource(dataSource, workDir);
     }
@@ -33,53 +47,31 @@ public class Table{
         this.schema = schema;
     }
     
-    public Table(String dataSource) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource);
+    public Table(String dataSource, File workDir) throws Exception{
+        this.dataSource = DataSource.createDataSource(dataSource, workDir);
     }
-    
-    public Table(String dataSource, JSONObject schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource);
-        this.schema = new Schema(schema.toString(), false);
-    }
-    
-    public Table(String dataSource, Schema schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource);
+
+    public Table(String dataSource, Schema schema, File workDir) throws Exception{
+        this.dataSource = DataSource.createDataSource(dataSource, workDir);
         this.schema = schema;
     }
     
-    public Table(URL dataSource) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource);
+    public Table(URL dataSource, File workDir) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource, workDir);
     }
-    
-    public Table(URL dataSource, JSONObject schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource);
-        this.schema = new Schema(schema.toString(), false);
-    }
-    
-    public Table(URL dataSource, Schema schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource);
+
+    public Table(URL dataSource, Schema schema, File workDir) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource, workDir);
         this.schema = schema;
     }
     
-    public Table(URL dataSource, URL schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource);
+    public Table(URL dataSource, URL schema, File workDir) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource, workDir);
         this.schema = new Schema(schema, false);
     }
-    
-    public Table(JSONArray dataSource) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource);
-    }
-    
-    public Table(JSONArray dataSource, JSONObject schemaJson) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource);
-        this.schema = new Schema(schemaJson.toString(), false);
-    }
-    
-    public Table(JSONArray dataSource, Schema schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource);
-        this.schema = schema;
-    }
-    
+
+
+
     public Iterator iterator() throws Exception{
        return new TableIterator(this);
     }
@@ -105,9 +97,8 @@ public class Table{
     }
 
     public void save(File outputFile) throws Exception{
-        this.dataSource.write(outputFile);
+       this.dataSource.writeCsv(outputFile);
     }
-
     public List<Object[]> read(boolean cast) throws Exception{
         if(cast && !this.schema.hasFields()){
             throw new InvalidCastException();

@@ -39,30 +39,24 @@ public interface DataSource {
      * CsvDataSource based on input format
      * @return DataSource created from input String
      */
-    public static DataSource createDataSource(String input) {
+    public static DataSource createDataSource(String input, File workDir) {
         try {
             JSONArray arr = new JSONArray(input);
-            return new JsonArrayDataSource(arr);
+            return new JsonArrayDataSource(arr, workDir);
         } catch (JSONException ex) {
             // JSON parsing failed, treat it as a CSV
-            return new CsvDataSource(input);
+            return new CsvDataSource(input, workDir);
         }
     }
 
     /**
      * Factory method to instantiate either a JsonArrayDataSource or a
      * CsvDataSource based on input format
-     * @return DataSource created from input String
+     * @return DataSource created from input File
      */
-    public static DataSource createDataSource(File input) throws IOException {
-        // The path value can either be a relative path or a full path.
-        // If it's a relative path then build the full path by using the working directory.
-        if(!input.exists()) {
-            input = new File(System.getProperty("user.dir") + "/" + input.getAbsolutePath());
-        }
-
+    public static DataSource createDataSource(File input, File workDir) throws IOException {
         try (InputStream is = new FileInputStream(input)) { // Read the file.
-            return createDataSource(is);
+            return createDataSource(is, workDir);
         }
     }
 
@@ -71,7 +65,7 @@ public interface DataSource {
      * CsvDataSource based on input format
      * @return DataSource created from input String
      */
-    public static DataSource createDataSource(InputStream input) throws IOException {
+    public static DataSource createDataSource(InputStream input, File workDir) throws IOException {
         String content = null;
 
         // Read the file.
@@ -83,7 +77,7 @@ public interface DataSource {
             throw ex;
         }
 
-        return createDataSource(content);
+        return createDataSource(content, workDir);
     }
 
     public static Path toSecure(Path testPath, Path referencePath) throws IOException {
