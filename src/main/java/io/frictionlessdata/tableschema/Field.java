@@ -414,7 +414,11 @@ public class Field {
         
         return json;
     }
-    
+
+    public String getCastMethodName() {
+        return "cast" + (this.type.substring(0, 1).toUpperCase() + this.type.substring(1));
+    }
+
     public String getName(){
         return this.name;
     }

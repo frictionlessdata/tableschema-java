@@ -5,17 +5,16 @@ import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import io.frictionlessdata.tableschema.exceptions.PrimaryKeyException;
 import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
@@ -39,104 +38,66 @@ public class Schema {
     
     private boolean strictValidation = false;
     private List<Exception> errors = new ArrayList();
-    
+
+    /**
+     * Create an empty table schema without strict validation
+     */
     public Schema(){
         this.initValidator();
     }
-    
+
+    /**
+     * Create an empty table schema
+     * @param strict whether to enforce strict validation
+     */
     public Schema(boolean strict){
         this.strictValidation = strict;
         this.initValidator();
     }
-    
+
     /**
-     * Read and create a table schema with JSON Object descriptor.
-     * @param schema
-     * @throws PrimaryKeyException 
+     * Read, create, and validate a table schema from an {@link java.io.InputStream}.
+     * @param inStream the InputStream to read the schema JSON data from
+     * @param strict whether to enforce strict validation
+     * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
-    public Schema(JSONObject schema) throws Exception{
-        this(schema, false);   
-    }
-    
-    /**
-     * Read, create, and validate a table schema with JSON Object descriptor.
-     * @param schema
-     * @param strict
-     * @throws ValidationException
-     * @throws PrimaryKeyException
-     * @throws ForeignKeyException 
-     */
-    public Schema(JSONObject schema, boolean strict) throws ValidationException, PrimaryKeyException, ForeignKeyException{
+    public Schema (InputStream inStream, boolean strict) throws Exception {
         this.strictValidation = strict;
         this.initValidator();
-        this.initFromSchemaJson(schema);
- 
-        this.validate();         
-    }
-    
-    /**
-     * Read and create a table schema with remote descriptor.
-     * @param schemaUrl
-     * @throws Exception 
-     */
-    public Schema(URL schemaUrl) throws Exception{
-        this(schemaUrl, false);
-    }
-    
-    /**
-     * Read, create, and validate a table schema with remote descriptor.
-     * @param schemaUrl
-     * @param strict
-     * @throws ValidationException
-     * @throws PrimaryKeyException
-     * @throws ForeignKeyException
-     * @throws Exception 
-     */
-    public Schema(URL schemaUrl, boolean strict) throws ValidationException, PrimaryKeyException, ForeignKeyException, Exception{
-        this.strictValidation = strict;
-        this.initValidator();
-        InputStreamReader inputStreamReader = new InputStreamReader(schemaUrl.openStream(), "UTF-8");
-        this.initSchemaFromStream(inputStreamReader);
+        initSchemaFromStream(inStream);
 
         this.validate();
     }
-    
+
     /**
-     * Read and create a table schema with local descriptor.
-     * @param schemaFilePath
-     * @throws Exception 
+     * Read, create, and validate a table schema from a remote location.
+     * @param schemaUrl the URL to read the schema JSON data from
+     * @param strict whether to enforce strict validation
+     * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
-    public Schema(String schemaFilePath) throws Exception{
-        this(schemaFilePath, false);
+    public Schema(URL schemaUrl, boolean strict) throws Exception{
+        this(schemaUrl.openStream(), strict);
     }
-    
+
     /**
-     * Read, create, and validate a table schema with local descriptor.
-     * @param schemaFilePath
-     * @param strict
-     * @throws ValidationException
-     * @throws PrimaryKeyException
-     * @throws ForeignKeyException
-     * @throws Exception 
+     * Read, create, and validate a table schema from a local {@link java.io.File}.
+     * @param schemaFile the File to read schema JSON data from
+     * @param strict whether to enforce strict validation
+     * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
-    public Schema(String schemaFilePath, boolean strict) throws ValidationException, PrimaryKeyException, ForeignKeyException, Exception{
-        this.strictValidation = strict;
-        this.initValidator(); 
-        InputStream is = new FileInputStream(schemaFilePath);
-        InputStreamReader inputStreamReader = new InputStreamReader(is);
-        this.initSchemaFromStream(inputStreamReader);
-        
-        this.validate();
+    public Schema(File schemaFile, boolean strict) throws Exception {
+        this(new FileInputStream(schemaFile), strict);
     }
-    
     /**
-     * Reade and create a table schema using list of fields. 
-     * @param fields 
+     * Read, create, and validate a table schema from a JSON string.
+     * @param schemaJson the File to read schema JSON data from
+     * @param strict whether to enforce strict validation
+     * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
-    public Schema(List<Field> fields){
-        this(fields, false); 
+    public Schema(String schemaJson, boolean strict) throws Exception {
+        this(new ByteArrayInputStream(schemaJson.getBytes()), strict);
     }
-    
+
     /**
      * Read, create, and validate a table schema using list of fields. 
      * @param fields
@@ -176,21 +137,15 @@ public class Schema {
     
     /**
      * Initializes the schema from given stream.
-     * Used for Schema class instanciation with remote or local schema file.
-     * @param schemaStreamReader
-     * @throws Exception 
+     * Used for Schema class instantiation with remote or local schema file.
+     * @param inStream the `InputStream` to read and parse the Schema from
+     * @throws Exception when reading fails
      */
-    private void initSchemaFromStream(InputStreamReader schemaStreamReader) throws Exception{
-        BufferedReader br = new BufferedReader(schemaStreamReader);
-        String line = br.readLine();
+    private void initSchemaFromStream(InputStream inStream) throws Exception{
+        InputStreamReader inputStreamReader = new InputStreamReader(inStream, Charset.forName("UTF-8"));
+        BufferedReader br = new BufferedReader(inputStreamReader);
 
-        StringBuilder sb = new StringBuilder();
-        while(line != null){
-            sb.append(line);
-            line = br.readLine();
-        }
-
-        String schemaString = sb.toString();
+        String schemaString = br.lines().collect(Collectors.joining("\n"));
         JSONObject schemaJson = new JSONObject(schemaString);
         
         this.initFromSchemaJson(schemaJson);
@@ -329,7 +284,7 @@ public class Schema {
             for(int i=0; i<row.length; i++){
                 Field field = this.fields.get(i);
 
-                String castMethodName = "cast" + (field.getType().substring(0, 1).toUpperCase() + field.getType().substring(1));;
+                String castMethodName = field.getCastMethodName();
                 Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class);
 
                 castRow[i] = method.invoke(TypeInferrer.getInstance(), field.getFormat(), row[i]);
