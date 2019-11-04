@@ -174,7 +174,7 @@ public class Field {
                 throw ce;
                 
             }catch(Exception e){
-                throw new InvalidCastException();
+                throw new InvalidCastException(e);
             }
         } 
     }
@@ -190,7 +190,7 @@ public class Field {
         
         // Indicates whether this field is allowed to be null. If required is true, then null is disallowed. 
         if(this.constraints.containsKey(CONSTRAINT_KEY_REQUIRED)){
-            if((boolean)this.constraints.get(CONSTRAINT_KEY_REQUIRED) == true && value == null){
+            if((boolean) this.constraints.get(CONSTRAINT_KEY_REQUIRED) && value == null){
                 violatedConstraints.put(CONSTRAINT_KEY_REQUIRED, true);
             }
         }
