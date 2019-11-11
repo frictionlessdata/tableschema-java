@@ -182,7 +182,7 @@ public class Field {
     /**
      * Returns a Map with all the constraints that have been violated.
      * @param value
-     * @return 
+     * @return Map containing all the contraints violations
      */
     public Map<String, Object> checkConstraintViolations(Object value){
        
@@ -400,7 +400,7 @@ public class Field {
     
     /**
      * Get the JSON representation of the Field.
-     * @return 
+     * @return JSONObject containing the properties of this field as JSON
      */
     public JSONObject getJson(){
         //FIXME: Maybe we should use JSON serializer like Gson?
