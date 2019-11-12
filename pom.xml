@@ -37,21 +37,12 @@
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
     </properties>
 
-    <build>
-	<resources>
-		<resource>
-			<directory>${project.basedir}</directory>
-			<includes>
-				<include>NOTICE*</include>
-				<include>LICENSE*</include>
-			</includes>
-		</resource>
-	</resources>    
+    <build>  
         <plugins>
             <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-resources-plugin</artifactId>
-		<version>3.1.0</version>
+		<version>${maven-resources-plugin.version}</version>
 		<configuration>
 			<encoding>UTF-8</encoding>
 		</configuration>
