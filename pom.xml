@@ -35,7 +35,7 @@
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
-        <jacoco-maven-plugin>0.8.5</jacoco-maven-plugin>
+        <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
     </properties>
 
     <build>  
@@ -48,6 +48,7 @@
 					<encoding>utf-8</encoding>
 					<source>${maven.compiler.source}</source>
 					<target>${maven.compiler.target}</target>
+					<verbose>true</verbose>
 				</configuration>
 			</plugin>
             <plugin>
@@ -109,7 +110,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco-maven-plugin}</version>
+                <version>${jacoco-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
