@@ -28,7 +28,7 @@
         <apache-commons-csv.version>1.5</apache-commons-csv.version>
         <everit-json-schema.version>1.5.1</everit-json-schema.version>
         <joda-time.version>2.9.9</joda-time.version>
-        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
@@ -43,16 +43,17 @@
 
     <build>  
         <plugins>
-		<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
-				<configuration>
-					<encoding>utf-8</encoding>
-					<source>${maven.compiler.source}</source>
-					<target>${maven.compiler.target}</target>
-				</configuration>
-			</plugin>
+	    <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-compiler-plugin</artifactId>
+		<version>${maven-compiler-plugin.version}</version>
+		<configuration>
+			<encoding>utf-8</encoding>
+			<source>${maven.compiler.source}</source>
+			<target>${maven.compiler.target}</target>
+		</configuration>
+	    </plugin>
+		
             <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-resources-plugin</artifactId>
