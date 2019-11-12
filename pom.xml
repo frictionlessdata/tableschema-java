@@ -28,7 +28,7 @@
         <apache-commons-lang3.version>3.6</apache-commons-lang3.version>
         <apache-commons-csv.version>1.5</apache-commons-csv.version>
         <everit-json-schema.version>1.5.1</everit-json-schema.version>
-        <jacoco-maven-plugin>0.8.5</jacoco-maven-plugin>
+        <jacoco-maven-plugin>0.7.6.201602180812</jacoco-maven-plugin>
         <joda-time.version>2.9.9</joda-time.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
