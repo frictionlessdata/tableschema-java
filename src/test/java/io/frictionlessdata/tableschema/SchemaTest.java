@@ -6,7 +6,10 @@ import io.frictionlessdata.tableschema.exceptions.PrimaryKeyException;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 import io.frictionlessdata.tableschema.fk.Reference;
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,19 +39,19 @@ public class SchemaTest {
     public final ExpectedException exception = ExpectedException.none();
 
     @Test
-    public void testCreateSchemaFromValidSchemaJson() throws PrimaryKeyException, ForeignKeyException{ 
+    public void testCreateSchemaFromValidSchemaJson() throws Exception {
         JSONObject schemaJsonObj = new JSONObject();
        
         schemaJsonObj.put("fields", new JSONArray());
         Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
         schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
         
-        Schema validSchema = new Schema(schemaJsonObj, true);
+        Schema validSchema = new Schema(schemaJsonObj.toString(), true);
         Assert.assertTrue(validSchema.isValid());
     }
     
     @Test
-    public void testCreateSchemaFromInvalidSchemaJson() throws PrimaryKeyException, ForeignKeyException{  
+    public void testCreateSchemaFromInvalidSchemaJson() throws Exception {
         JSONObject schemaJsonObj = new JSONObject();
        
         schemaJsonObj.put("fields", new JSONArray());
@@ -58,7 +61,7 @@ public class SchemaTest {
         schemaJsonObj.getJSONArray("fields").put(invalidField.getJson());
         
         exception.expect(ValidationException.class);
-        Schema invalidSchema = new Schema(schemaJsonObj, true);
+        Schema invalidSchema = new Schema(schemaJsonObj.toString(), true);
         
     }
     
@@ -72,7 +75,7 @@ public class SchemaTest {
         schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
         schemaJsonObj.getJSONArray("fields").put(invalidField.getJson());
         
-        Schema invalidSchema = new Schema(schemaJsonObj); // strict=false
+        Schema invalidSchema = new Schema(schemaJsonObj.toString(), false); // strict=false
         
         Assert.assertEquals(Field.FIELD_TYPE_INTEGER, invalidSchema.getField("id").getType()); 
         Assert.assertEquals("invalid", invalidSchema.getField("coordinates").getType());
@@ -107,24 +110,24 @@ public class SchemaTest {
     
     @Test
     public void testCreateSchemaFromFileWithValidPrimaryKey() throws Exception{
-        String sourceFileAbsPath = SchemaTest.class.getResource("/fixtures/primarykey/simple_schema_with_valid_pk.json").getPath();
-        Schema schemaWithValidPK = new Schema(sourceFileAbsPath, true);
+        File source = getResourceFile("/fixtures/primarykey/simple_schema_with_valid_pk.json");
+        Schema schemaWithValidPK = new Schema(source, true);
         
         Assert.assertEquals("id", schemaWithValidPK.getPrimaryKey());
     }
     
     @Test
     public void testCreateSchemaFromFileWithInvalidPrimaryKey() throws Exception{
-        String sourceFileAbsPath = SchemaTest.class.getResource("/fixtures/primarykey/simple_schema_with_invalid_pk.json").getPath();
+        File source = getResourceFile("/fixtures/primarykey/simple_schema_with_invalid_pk.json");
         
         exception.expect(PrimaryKeyException.class);
-        Schema schemaWithInvalidPK = new Schema(sourceFileAbsPath, true);
+        new Schema(source, true);
     }
     
     @Test
     public void testCreateSchemaFromFileWithValidCompositeKey() throws Exception{
-        String sourceFileAbsPath = SchemaTest.class.getResource("/fixtures/primarykey/simple_schema_with_valid_ck.json").getPath();
-        Schema schemaWithValidCK = new Schema(sourceFileAbsPath, false); //FIXME: Why does this primary key fail validation when strict=true
+        File source = getResourceFile("/fixtures/primarykey/simple_schema_with_valid_ck.json");
+        Schema schemaWithValidCK = new Schema(source, false); //FIXME: Why does this primary key fail validation when strict=true
         
         String[] compositePrimaryKey = schemaWithValidCK.getPrimaryKey();
         Assert.assertEquals("name", compositePrimaryKey[0]);
@@ -134,10 +137,10 @@ public class SchemaTest {
     
     @Test
     public void testCreateSchemaFromFileWithInvalidCompositeKey() throws Exception{
-        String sourceFileAbsPath = SchemaTest.class.getResource("/fixtures/primarykey/simple_schema_with_invalid_ck.json").getPath();
+        File source = getResourceFile("/fixtures/primarykey/simple_schema_with_invalid_ck.json");
         
         exception.expect(PrimaryKeyException.class);
-        Schema schemaWithInvalidCK = new Schema(sourceFileAbsPath, true);
+        new Schema(source, true);
     }
      
     @Test
@@ -331,7 +334,7 @@ public class SchemaTest {
         // Save schema
         createdSchema.save(createdFile.getAbsolutePath());
         
-        Schema readSchema = new Schema(createdFile.getAbsolutePath(), true);
+        Schema readSchema = new Schema(createdFile, true);
         
         // Assert id field
         Assert.assertEquals(Field.FIELD_TYPE_INTEGER, readSchema.getField("id").getType());
@@ -367,7 +370,7 @@ public class SchemaTest {
         // Save schema
         createdSchema.save(createdFile.getAbsolutePath());
         
-        Schema readSchema = new Schema(createdFile.getAbsolutePath(), true);
+        Schema readSchema = new Schema(createdFile, true);
         
         // Assert Primary Key
         Assert.assertEquals("id", readSchema.getPrimaryKey());
@@ -393,7 +396,7 @@ public class SchemaTest {
         // Save schema
         createdSchema.save(createdFile.getAbsolutePath());
         
-        Schema readSchema = new Schema(createdFile.getAbsolutePath(), true);
+        Schema readSchema = new Schema(createdFile, true);
         
         // Assert Foreign Keys
         Assert.assertEquals("fkName", readSchema.getForeignKeys().get(0).getFields());
@@ -485,64 +488,64 @@ public class SchemaTest {
     
     @Test
     public void testInvalidForeignKeyArray() throws PrimaryKeyException, ForeignKeyException, Exception{  
-        String sourceFileAbsPath = SchemaTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array.json").getPath();
+        File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_array.json");
         
         exception.expectMessage("The reference's fields property must be an array if the outer fields is an array.");
-        Schema schema = new Schema(sourceFileAbsPath, true);
+        new Schema(source, true);
     }
     
     @Test
     public void testInvalidForeignKeyArrayString() throws PrimaryKeyException, ForeignKeyException, Exception{  
-        String sourceFileAbsPath = SchemaTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array_string.json").getPath();
+        File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_array_string.json");
  
         exception.expectMessage("The reference's fields property must be a string if the outer fields is a string.");
-        Schema schema = new Schema(sourceFileAbsPath, true);
+        new Schema(source, true);
     }
     
     @Test
     public void testInvalidForeignKeyArrayStringRef() throws PrimaryKeyException, ForeignKeyException, Exception{
-        String sourceFileAbsPath = SchemaTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array_string_ref.json").getPath();
+        File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_array_string_ref.json");
         
         exception.expectMessage("The reference's fields property must be an array if the outer fields is an array.");
-        Schema schema = new Schema(sourceFileAbsPath, true);
+        new Schema(source, true);
     }
     
     @Test
     public void testInvalidForeignKeyArrayWrongNumber() throws PrimaryKeyException, ForeignKeyException, Exception{
-        String sourceFileAbsPath = SchemaTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_array_wrong_number.json").getPath();
+        File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_array_wrong_number.json");
         
         exception.expectMessage("The reference's fields property must be an array of the same length as that of the outer fields' array.");
-        Schema schema = new Schema(sourceFileAbsPath, true);
+        new Schema(source, true);
     }
     
     @Test
     public void testInvalidForeignKeyNoReference() throws PrimaryKeyException, ForeignKeyException, Exception{
-        String sourceFileAbsPath = SchemaTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_no_reference.json").getPath();
+        File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_no_reference.json");
         
         exception.expectMessage("A foreign key must have the fields and reference properties.");
-        Schema schema = new Schema(sourceFileAbsPath, true);
+        Schema schema = new Schema(source, true);
     }
     
     @Test
     public void testInvalidForeignKeyString() throws PrimaryKeyException, ForeignKeyException, Exception{
-        String sourceFileAbsPath = SchemaTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_string.json").getPath();
+        File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_string.json");
         
         exception.expect(ValidationException.class);
-        Schema schema = new Schema(sourceFileAbsPath, true);
+        new Schema(source, true);
     }
     
     @Test
     public void testInvalidForeignKeyStringArrayRef() throws PrimaryKeyException, ForeignKeyException, Exception{
-        String sourceFileAbsPath = SchemaTest.class.getResource("/fixtures/foreignkeys/schema_invalid_fk_string_array_ref.json").getPath();
+        File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_string_array_ref.json");
         
         exception.expectMessage("The reference's fields property must be a string if the outer fields is a string.");
-        Schema schema = new Schema(sourceFileAbsPath, true);
+        new Schema(source, true);
     }
     
     @Test
     public void testValidForeignKeyArray() throws PrimaryKeyException, ForeignKeyException, Exception{
-        String sourceFileAbsPath = SchemaTest.class.getResource("/fixtures/foreignkeys/schema_valid_fk_array.json").getPath();
-        Schema schema = new Schema(sourceFileAbsPath, true);
+        File source = getResourceFile("/fixtures/foreignkeys/schema_valid_fk_array.json");
+        Schema schema = new Schema(source, true);
 
         JSONArray parsedFields = schema.getForeignKeys().get(0).getFields();
         Assert.assertEquals("id", parsedFields.getString(0));
@@ -555,11 +558,24 @@ public class SchemaTest {
     
     @Test
     public void testValidForeignKeyString() throws PrimaryKeyException, ForeignKeyException, Exception{
-        String sourceFileAbsPath = SchemaTest.class.getResource("/fixtures/foreignkeys/schema_valid_fk_string.json").getPath();
-        Schema schema = new Schema(sourceFileAbsPath, true);
+        File source = getResourceFile("/fixtures/foreignkeys/schema_valid_fk_string.json");
+        Schema schema = new Schema(source, true);
         
         Assert.assertEquals("position_title", schema.getForeignKeys().get(0).getFields());
         Assert.assertEquals("positions", schema.getForeignKeys().get(0).getReference().getResource());
         Assert.assertEquals("name", schema.getForeignKeys().get(0).getReference().getFields());
+    }
+
+    private static File getResourceFile(String fileName) throws URISyntaxException {
+        try {
+            // Create file-URL of source file:
+            URL sourceFileUrl = SchemaTest.class.getResource(fileName);
+            // normal case: resolve against resources path
+            Path path = Paths.get(sourceFileUrl.toURI());
+            return path.toFile();
+        } catch (NullPointerException ex) {
+            // special case for invalid path test
+            return new File (fileName);
+        }
     }
 }

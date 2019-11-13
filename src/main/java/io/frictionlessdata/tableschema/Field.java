@@ -105,7 +105,7 @@ public class Field {
      * 
      * @param <Any>
      * @param value
-     * @return
+     * @return result of the cast operation
      * @throws InvalidCastException
      * @throws ConstraintsException 
      */
@@ -119,7 +119,7 @@ public class Field {
      * @param <Any>
      * @param value
      * @param options
-     * @return
+     * @return result of the cast operation
      * @throws InvalidCastException
      * @throws ConstraintsException 
      */
@@ -132,7 +132,7 @@ public class Field {
      * @param <Any>
      * @param value
      * @param enforceConstraints
-     * @return
+     * @return result of the cast operation
      * @throws InvalidCastException
      * @throws ConstraintsException 
      */
@@ -146,7 +146,7 @@ public class Field {
      * @param value
      * @param enforceConstraints
      * @param options
-     * @return
+     * @return result of the cast operation
      * @throws InvalidCastException
      * @throws ConstraintsException 
      */
@@ -174,14 +174,14 @@ public class Field {
                 throw ce;
                 
             }catch(Exception e){
-                throw new InvalidCastException();
+                throw new InvalidCastException(e);
             }
         } 
     }
     
     /**
      * Returns a Map with all the constraints that have been violated.
-     * @param value
+     * @param value either a JSONArray/JSONObject or a string containing JSON
      * @return Map containing all the contraints violations
      */
     public Map<String, Object> checkConstraintViolations(Object value){
@@ -190,7 +190,7 @@ public class Field {
         
         // Indicates whether this field is allowed to be null. If required is true, then null is disallowed. 
         if(this.constraints.containsKey(CONSTRAINT_KEY_REQUIRED)){
-            if((boolean)this.constraints.get(CONSTRAINT_KEY_REQUIRED) == true && value == null){
+            if((boolean) this.constraints.get(CONSTRAINT_KEY_REQUIRED) && value == null){
                 violatedConstraints.put(CONSTRAINT_KEY_REQUIRED, true);
             }
         }
@@ -414,7 +414,11 @@ public class Field {
         
         return json;
     }
-    
+
+    public String getCastMethodName() {
+        return "cast" + (this.type.substring(0, 1).toUpperCase() + this.type.substring(1));
+    }
+
     public String getName(){
         return this.name;
     }

@@ -27,4 +27,14 @@ public class InvalidCastException extends Exception {
     public InvalidCastException(String msg) {
         super(msg);
     }
+
+    /**
+     * Constructs an instance of <code>InvalidCastException</code> wrapping a
+     * Throwable.
+     *
+     * @param throwable the wrapped Throwable.
+     */
+    public InvalidCastException(Throwable throwable) {
+        super(throwable);
+    }
 }
