@@ -23,32 +23,21 @@ import java.util.stream.Collectors;
  *
  */
 public class JsonArrayDataSource extends AbstractDataSource {
-    private Object dataSource = null;
-    private File workDir;
 
-    public JsonArrayDataSource(InputStream inStream, File workDir) throws IOException{
-        this.workDir = workDir;
-        try (InputStreamReader ir = new InputStreamReader(inStream)) {
-            try (BufferedReader rdr = new BufferedReader(ir)) {
-                String dSource = rdr.lines().collect(Collectors.joining("\n"));
-                this.dataSource = new JSONArray(dSource);
-            }
-        }
+    public JsonArrayDataSource(InputStream inStream) throws IOException{
+        super(inStream);
     }
 
-    public JsonArrayDataSource(URL dataSource, File workDir){
-        this.dataSource = dataSource;
-        this.workDir = workDir;
+    public JsonArrayDataSource(URL dataSource){
+        super(dataSource);
     }
 
     public JsonArrayDataSource(File dataSource, File workDir){
-        this.dataSource = dataSource;
-        this.workDir = workDir;
+        super(dataSource, workDir);
     }
 
-    JsonArrayDataSource(JSONArray dataSource, File workDir){
-        this.dataSource = dataSource;
-        this.workDir = workDir;
+    JsonArrayDataSource(JSONArray dataSource){
+        super(dataSource.toString());
     }
 
 
@@ -148,11 +137,11 @@ public class JsonArrayDataSource extends AbstractDataSource {
      * @throws Exception
      */
     private CSVParser getCSVParser() throws Exception{
-        if(this.dataSource instanceof String){
-            Reader sr = new StringReader((String)this.dataSource);
-            return CSVParser.parse(sr, CSVFormat.RFC4180.withHeader());
+        String dataSourceString;
+        if (dataSource instanceof String){
+            dataSourceString = (String)dataSource;
 
-        }else if(this.dataSource instanceof File){
+        } else if(dataSource instanceof File){
             // The path value can either be a relative path or a full path.
             // If it's a relative path then build the full path by using the working directory.
             // Caution: here, we cannot simply use provided paths, we have to check
@@ -160,25 +149,25 @@ public class JsonArrayDataSource extends AbstractDataSource {
             // see:
             //    - https://github.com/frictionlessdata/tableschema-java/issues/29
             //    - https://frictionlessdata.io/specs/data-resource/#url-or-path
-            Path inPath = ((File)this.dataSource).toPath();
+            Path inPath = ((File)dataSource).toPath();
             Path resolvedPath = DataSource.toSecure(inPath, workDir.toPath());
 
-            // Read the file.
-            Reader fr = new FileReader(resolvedPath.toFile());
+           try (BufferedReader fr = new BufferedReader(new FileReader(resolvedPath.toFile()))) {
+               dataSourceString = fr.lines().collect(Collectors.joining("\n"));
+           }
 
-            // Get the parser.
-            return CSVFormat.RFC4180.withHeader().parse(fr);
+        } else if(dataSource instanceof URL){
+            return CSVParser.parse((URL)dataSource, Charset.forName("UTF-8"), CSVFormat.RFC4180.withHeader());
 
-        }else if(this.dataSource instanceof URL){
-            return CSVParser.parse((URL)this.dataSource, Charset.forName("UTF-8"), CSVFormat.RFC4180.withHeader());
+        } else if(dataSource instanceof JSONArray){
+            dataSourceString = dataSource.toString();
 
-        }else if(this.dataSource instanceof JSONArray){
-            String dataCsv = CDL.toString((JSONArray)this.dataSource);
-            Reader sr = new StringReader(dataCsv);
-            return CSVParser.parse(sr, CSVFormat.RFC4180.withHeader());
-
-        }else{
+        } else{
             throw new Exception("Data source is of invalid type.");
         }
+        String dataCsv = CDL.toString(new JSONArray(dataSourceString));
+        Reader sr = new StringReader(dataCsv);
+        // Get the parser.
+        return CSVParser.parse(sr, CSVFormat.RFC4180.withHeader());
     }
 }
