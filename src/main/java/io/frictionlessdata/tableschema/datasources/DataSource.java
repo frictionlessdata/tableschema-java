@@ -55,7 +55,8 @@ public interface DataSource {
      * @return DataSource created from input File
      */
     public static DataSource createDataSource(File input, File workDir) throws IOException {
-        try (InputStream is = new FileInputStream(input)) { // Read the file.
+        Path resolvedPath = DataSource.toSecure(input.toPath(), workDir.toPath());
+        try (InputStream is = new FileInputStream(resolvedPath.toFile())) { // Read the file.
             return createDataSource(is, workDir);
         }
     }

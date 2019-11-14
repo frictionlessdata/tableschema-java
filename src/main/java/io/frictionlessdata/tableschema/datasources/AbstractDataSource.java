@@ -3,19 +3,46 @@ package io.frictionlessdata.tableschema.datasources;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
+import org.json.JSONArray;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
+import java.io.*;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
  * 
  */
 public abstract class AbstractDataSource implements DataSource {
+    Object dataSource = null;
+    File workDir;
+
+    public AbstractDataSource(InputStream inStream, File workDir) throws IOException{
+        this.workDir = workDir;
+        try (InputStreamReader ir = new InputStreamReader(inStream)) {
+            try (BufferedReader rdr = new BufferedReader(ir)) {
+                String dSource = rdr.lines().collect(Collectors.joining("\n"));
+                this.dataSource = new JSONArray(dSource);
+            }
+        }
+    }
+
+    public AbstractDataSource(URL dataSource, File workDir){
+        this.dataSource = dataSource;
+        this.workDir = workDir;
+    }
+
+    public AbstractDataSource(File dataSource, File workDir){
+        this.dataSource = dataSource;
+        this.workDir = workDir;
+    }
+
+    public AbstractDataSource(String dataSource, File workDir){
+        this.dataSource = dataSource;
+        this.workDir = workDir;
+    }
 
     @Override
     abstract public Iterator<String[]> iterator() throws Exception;
