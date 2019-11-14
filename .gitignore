@@ -25,5 +25,6 @@ nbproject
 hs_err_pid*
 /target/
 
-
+# IntelliJ files
+.idea/
 *.iml

@@ -56,7 +56,7 @@ public class Table{
         this.dataSource = DataSource.createDataSource(dataSource, null);
         this.schema = schema;
     }
-    
+
     public Table(URL dataSource) {
         this.dataSource = new CsvDataSource(dataSource);
     }
@@ -70,8 +70,6 @@ public class Table{
         this.dataSource = new CsvDataSource(dataSource);
         this.schema = new Schema(schema, false);
     }
-
-
 
     public Iterator iterator() throws Exception{
        return new TableIterator(this);

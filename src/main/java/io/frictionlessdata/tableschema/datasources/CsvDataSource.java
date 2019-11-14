@@ -35,7 +35,7 @@ public class CsvDataSource extends AbstractDataSource {
     public CsvDataSource(String dataSource){
         super(dataSource);
     }
-    
+
     @Override
     public Iterator<String[]> iterator() throws Exception{
         Iterator<CSVRecord> iterCSVRecords = this.getCSVParser().iterator();

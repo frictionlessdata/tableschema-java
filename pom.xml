@@ -28,20 +28,21 @@
         <apache-commons-csv.version>1.5</apache-commons-csv.version>
         <everit-json-schema.version>1.5.1</everit-json-schema.version>
         <joda-time.version>2.9.9</joda-time.version>
+		<junit.version>4.12</junit.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
-	<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>    
-	<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>  
-	<maven-release-plugin.version>2.5.3</maven-release-plugin.version>  
-	<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>    
+	    <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+	    <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+	    <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+	    <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
     </properties>
 
-    <build>  
+    <build>
         <plugins>
 	    <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
@@ -53,7 +54,7 @@
 			<target>${maven.compiler.target}</target>
 		</configuration>
 	    </plugin>
-		
+
             <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-resources-plugin</artifactId>
@@ -70,7 +71,7 @@
 		<configuration>
 		</configuration>
 	    </plugin>
-		    
+
 	    <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-source-plugin</artifactId>
@@ -83,7 +84,7 @@
 				</goals>
 			</execution>
 		</executions>
-	    </plugin>	
+	    </plugin>
 
 	    <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
@@ -102,7 +103,7 @@
 				</goals>
 			</execution>
 		</executions>
-	    </plugin>	
+	    </plugin>
 
 	    <plugin>
 		<artifactId>maven-deploy-plugin</artifactId>
@@ -132,7 +133,7 @@
 			</execution>
 		</executions>
 	    </plugin>
-	   
+
 	    <plugin>
 		<groupId>org.sonatype.plugins</groupId>
 		<artifactId>nexus-staging-maven-plugin</artifactId>
@@ -163,14 +164,14 @@
 			</dependency>
 		</dependencies>
 	    </plugin>
-		
+
             <!-- Test Coverage: https://github.com/trautonen/coveralls-maven-plugin -->
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>${coveralls-maven-plugin.version}</version>
             </plugin>
-		
+
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -195,7 +196,7 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
-        
+
         <!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest-all -->
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -237,6 +238,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${google-guava.version}</version>
-        </dependency>
+		</dependency>
     </dependencies>
 </project>

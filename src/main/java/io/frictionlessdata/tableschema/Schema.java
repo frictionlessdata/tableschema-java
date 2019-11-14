@@ -116,7 +116,7 @@ public class Schema {
      * Infer the data types and return the generated schema.
      * @param data
      * @param headers
-     * @return
+     * @return Schema generated from the inferred input
      * @throws TypeInferringException 
      */
     public JSONObject infer(List<Object[]> data, String[] headers) throws TypeInferringException{
@@ -128,7 +128,7 @@ public class Schema {
      * @param data
      * @param headers
      * @param rowLimit
-     * @return
+     * @return Schema generated from the inferred input
      * @throws TypeInferringException 
      */
     public JSONObject infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
