@@ -28,12 +28,12 @@ public class Table{
      * @param schema InputStream for reading table schema from
      * @throws Exception if either reading or parsing throws an Exception
      */
-    public Table(InputStream dataSource, InputStream schema, File workDir) throws Exception{
-        this.dataSource = DataSource.createDataSource(dataSource, workDir);
+    public Table(InputStream dataSource, InputStream schema) throws Exception{
+        this.dataSource = DataSource.createDataSource(dataSource, null);
         this.schema = new Schema(schema, true);
     }
 
-    public Table(File dataSource, File workDir) throws Exception{
+    public Table(File dataSource, File workDir) {
         this.dataSource = new CsvDataSource(dataSource, workDir);
     }
     
@@ -42,31 +42,31 @@ public class Table{
         this.schema = new Schema(schema.toString(), false);
     }
     
-    public Table(File dataSource, File workDir, Schema schema) throws Exception{
+    public Table(File dataSource, File workDir, Schema schema) {
         this.dataSource = new CsvDataSource(dataSource, workDir);
         this.schema = schema;
     }
     
-    public Table(String dataSource, File workDir) throws Exception{
-        this.dataSource = DataSource.createDataSource(dataSource, workDir);
+    public Table(String dataSource) {
+        this.dataSource = DataSource.createDataSource(dataSource, null);
     }
 
-    public Table(String dataSource, Schema schema, File workDir) throws Exception{
-        this.dataSource = DataSource.createDataSource(dataSource, workDir);
+    public Table(String dataSource, Schema schema) {
+        this.dataSource = DataSource.createDataSource(dataSource, null);
         this.schema = schema;
     }
     
-    public Table(URL dataSource, File workDir) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource, workDir);
+    public Table(URL dataSource) {
+        this.dataSource = new CsvDataSource(dataSource);
     }
 
-    public Table(URL dataSource, Schema schema, File workDir) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource, workDir);
+    public Table(URL dataSource, Schema schema) {
+        this.dataSource = new CsvDataSource(dataSource);
         this.schema = schema;
     }
     
-    public Table(URL dataSource, URL schema, File workDir) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource, workDir);
+    public Table(URL dataSource, URL schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
         this.schema = new Schema(schema, false);
     }
 

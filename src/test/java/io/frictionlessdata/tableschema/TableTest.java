@@ -76,10 +76,9 @@ public class TableTest {
     
     @Test
     public void testReadFromValidUrl() throws Exception{
-        File testDataDir = getTestDataDirectory();
         // get path of test CSV file
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
-        Table table = new Table(url, testDataDir);
+        Table table = new Table(url);
         
         Assert.assertEquals(3, table.read().size());
     }

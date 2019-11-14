@@ -42,10 +42,10 @@ public interface DataSource {
     public static DataSource createDataSource(String input, File workDir) {
         try {
             JSONArray arr = new JSONArray(input);
-            return new JsonArrayDataSource(arr, workDir);
+            return new JsonArrayDataSource(arr);
         } catch (JSONException ex) {
             // JSON parsing failed, treat it as a CSV
-            return new CsvDataSource(input, workDir);
+            return new CsvDataSource(input);
         }
     }
 
@@ -55,7 +55,8 @@ public interface DataSource {
      * @return DataSource created from input File
      */
     public static DataSource createDataSource(File input, File workDir) throws IOException {
-        try (InputStream is = new FileInputStream(input)) { // Read the file.
+        Path resolvedPath = DataSource.toSecure(input.toPath(), workDir.toPath());
+        try (InputStream is = new FileInputStream(resolvedPath.toFile())) { // Read the file.
             return createDataSource(is, workDir);
         }
     }
