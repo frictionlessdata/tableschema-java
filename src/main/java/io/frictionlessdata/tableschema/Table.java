@@ -33,17 +33,18 @@ public class Table{
         this.schema = new Schema(schema, true);
     }
 
-    public Table(File dataSource, File workDir) {
-        this.dataSource = new CsvDataSource(dataSource, workDir);
+    public Table(File dataSource, File basePath) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource, basePath);
     }
     
-    public Table(File dataSource, File workDir, JSONObject schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource, workDir);
-        this.schema = new Schema(schema.toString(), false);
+    public Table(File dataSource, File basePath, JSONObject schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource, basePath);
+        if (null != schema)
+            this.schema = new Schema(schema.toString(), false);
     }
     
-    public Table(File dataSource, File workDir, Schema schema) {
-        this.dataSource = new CsvDataSource(dataSource, workDir);
+    public Table(File dataSource, File basePath, Schema schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource, basePath);
         this.schema = schema;
     }
     
