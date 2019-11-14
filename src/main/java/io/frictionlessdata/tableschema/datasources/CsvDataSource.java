@@ -20,20 +20,20 @@ import java.util.stream.Collectors;
  */
 public class CsvDataSource extends AbstractDataSource {
 
-    public CsvDataSource(InputStream inStream, File workDir) throws IOException{
-        super(inStream, workDir);
+    public CsvDataSource(InputStream inStream) throws IOException{
+        super(inStream);
     }
 
-    public CsvDataSource(URL dataSource, File workDir){
-        super(dataSource, workDir);
+    public CsvDataSource(URL dataSource){
+        super(dataSource);
     }
     
     public CsvDataSource(File dataSource, File workDir){
         super(dataSource, workDir);
     }
     
-    public CsvDataSource(String dataSource, File workDir){
-        super(dataSource, workDir);
+    public CsvDataSource(String dataSource){
+        super(dataSource);
     }
     
     @Override

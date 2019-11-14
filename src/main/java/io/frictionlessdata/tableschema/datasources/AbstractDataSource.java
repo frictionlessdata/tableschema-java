@@ -19,8 +19,7 @@ public abstract class AbstractDataSource implements DataSource {
     Object dataSource = null;
     File workDir;
 
-    public AbstractDataSource(InputStream inStream, File workDir) throws IOException{
-        this.workDir = workDir;
+    public AbstractDataSource(InputStream inStream) throws IOException{
         try (InputStreamReader ir = new InputStreamReader(inStream)) {
             try (BufferedReader rdr = new BufferedReader(ir)) {
                 String dSource = rdr.lines().collect(Collectors.joining("\n"));
@@ -29,9 +28,8 @@ public abstract class AbstractDataSource implements DataSource {
         }
     }
 
-    public AbstractDataSource(URL dataSource, File workDir){
+    public AbstractDataSource(URL dataSource){
         this.dataSource = dataSource;
-        this.workDir = workDir;
     }
 
     public AbstractDataSource(File dataSource, File workDir){
@@ -39,9 +37,8 @@ public abstract class AbstractDataSource implements DataSource {
         this.workDir = workDir;
     }
 
-    public AbstractDataSource(String dataSource, File workDir){
+    public AbstractDataSource(String dataSource){
         this.dataSource = dataSource;
-        this.workDir = workDir;
     }
 
     @Override

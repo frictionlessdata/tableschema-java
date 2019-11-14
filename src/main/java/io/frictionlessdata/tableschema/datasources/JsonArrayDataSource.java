@@ -24,20 +24,20 @@ import java.util.stream.Collectors;
  */
 public class JsonArrayDataSource extends AbstractDataSource {
 
-    public JsonArrayDataSource(InputStream inStream, File workDir) throws IOException{
-        super(inStream, workDir);
+    public JsonArrayDataSource(InputStream inStream) throws IOException{
+        super(inStream);
     }
 
-    public JsonArrayDataSource(URL dataSource, File workDir){
-        super(dataSource, workDir);
+    public JsonArrayDataSource(URL dataSource){
+        super(dataSource);
     }
 
     public JsonArrayDataSource(File dataSource, File workDir){
         super(dataSource, workDir);
     }
 
-    JsonArrayDataSource(JSONArray dataSource, File workDir){
-        super(dataSource.toString(), workDir);
+    JsonArrayDataSource(JSONArray dataSource){
+        super(dataSource.toString());
     }
 
 

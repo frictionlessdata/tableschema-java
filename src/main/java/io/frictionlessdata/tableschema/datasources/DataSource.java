@@ -42,10 +42,10 @@ public interface DataSource {
     public static DataSource createDataSource(String input, File workDir) {
         try {
             JSONArray arr = new JSONArray(input);
-            return new JsonArrayDataSource(arr, workDir);
+            return new JsonArrayDataSource(arr);
         } catch (JSONException ex) {
             // JSON parsing failed, treat it as a CSV
-            return new CsvDataSource(input, workDir);
+            return new CsvDataSource(input);
         }
     }
 
