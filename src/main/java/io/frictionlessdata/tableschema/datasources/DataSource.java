@@ -81,12 +81,17 @@ public interface DataSource {
         return createDataSource(content, workDir);
     }
 
+    //https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html
     public static Path toSecure(Path testPath, Path referencePath) throws IOException {
-        if (!referencePath.isAbsolute()) {
-            throw new IllegalArgumentException("Reference path must be absolute");
-        }
+        // catch paths starting with "/" but on Windows where they get rewritten
+        // to start with "\"
+        if (testPath.startsWith(File.separator))
+            throw new IllegalArgumentException("Input path must be relative");
         if (testPath.isAbsolute()){
             throw new IllegalArgumentException("Input path must be relative");
+        }
+        if (!referencePath.isAbsolute()) {
+            throw new IllegalArgumentException("Reference path must be absolute");
         }
         if (testPath.toFile().isDirectory()){
             throw new IllegalArgumentException("Input path cannot be a directory");
