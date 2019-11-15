@@ -98,6 +98,8 @@ public interface DataSource {
         }
         //Path canonicalPath = testPath.toRealPath(null);
         final Path resolvedPath = referencePath.resolve(testPath).normalize();
+        if (!resolvedPath.toFile().exists())
+            throw new FileNotFoundException("File "+resolvedPath.toString()+" does not exist");
         if (!resolvedPath.toFile().isFile()){
             throw new IllegalArgumentException("Input must be a file");
         }
