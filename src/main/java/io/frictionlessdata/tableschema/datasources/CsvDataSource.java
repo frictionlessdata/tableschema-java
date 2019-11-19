@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
  */
 public class CsvDataSource extends AbstractDataSource {
 
+    private CSVFormat format;
+
     public CsvDataSource(InputStream inStream) throws IOException{
         super(inStream);
     }
@@ -121,9 +123,17 @@ public class CsvDataSource extends AbstractDataSource {
         }catch(Exception e){
             throw e;
         }
-
     }
-    
+
+    public CsvDataSource format(CSVFormat format) {
+        this.format = format;
+        return this;
+    }
+
+    public CSVFormat format() {
+        return format;
+    }
+
     /**
      * Retrieve the CSV Parser.
      * The parser works record wise. It is not possible to go back, once a
@@ -137,7 +147,10 @@ public class CsvDataSource extends AbstractDataSource {
     private CSVParser getCSVParser() throws Exception{
         if(dataSource instanceof String){
             Reader sr = new StringReader((String)dataSource);
-            return CSVParser.parse(sr, CSVFormat.RFC4180.withHeader());
+            if (null == format)
+                return CSVParser.parse(sr, CSVFormat.RFC4180);
+            else
+                return CSVParser.parse(sr, format);
 
         }else if(dataSource instanceof File){
             // The path value can either be a relative path or a full path.

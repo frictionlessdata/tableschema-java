@@ -5,6 +5,8 @@ import io.frictionlessdata.tableschema.datasources.CsvDataSource;
 import io.frictionlessdata.tableschema.datasources.DataSource;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import java.io.File;
+
+import org.apache.commons.csv.CSVFormat;
 import org.json.*;
 
 import java.io.InputStream;
@@ -20,6 +22,7 @@ import java.util.List;
 public class Table{
     private DataSource dataSource = null;
     private Schema schema = null;
+    private CSVFormat format;
 
     /**
      * Constructor using an {@link java.io.InputStream} for reading both the CSV
@@ -139,12 +142,21 @@ public class Table{
             throw new TypeInferringException();
         }
     }
-    
-    public Schema getSchema(){
+
+    public Table csvFormat(CSVFormat format) {
+        this.format = format;
+        return this;
+    }
+
+    public CSVFormat format() {
+        return format;
+    }
+
+    public Schema schema(){
         return this.schema;
     }
     
-    public DataSource getDataSource(){
+    public DataSource dataSource(){
         return this.dataSource;
     }
 }
