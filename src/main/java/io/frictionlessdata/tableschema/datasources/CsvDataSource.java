@@ -20,7 +20,9 @@ import java.util.stream.Collectors;
  */
 public class CsvDataSource extends AbstractDataSource {
 
-    private CSVFormat format;
+    private CSVFormat format = CSVFormat
+            .RFC4180
+            .withHeader();;
 
     public CsvDataSource(InputStream inStream) throws IOException{
         super(inStream);
@@ -145,12 +147,15 @@ public class CsvDataSource extends AbstractDataSource {
      * @throws Exception 
      */
     private CSVParser getCSVParser() throws Exception{
+        CSVFormat format = this.format;
+        if (null == format) {
+            format = CSVFormat
+                    .RFC4180
+                    .withHeader();
+        }
         if(dataSource instanceof String){
             Reader sr = new StringReader((String)dataSource);
-            if (null == format)
-                return CSVParser.parse(sr, CSVFormat.RFC4180);
-            else
-                return CSVParser.parse(sr, format);
+            return CSVParser.parse(sr, format);
 
         }else if(dataSource instanceof File){
             // The path value can either be a relative path or a full path.
@@ -160,22 +165,22 @@ public class CsvDataSource extends AbstractDataSource {
             // see:
             //    - https://github.com/frictionlessdata/tableschema-java/issues/29
             //    - https://frictionlessdata.io/specs/data-resource/#url-or-path
-            Path inPath = ((File)dataSource).toPath();
-            Path resolvedPath = DataSource.toSecure(inPath, workDir.toPath());
 
-            // Read the file.
-            Reader fr = new FileReader(resolvedPath.toFile());
+            String lines = getFileContents(((File)dataSource).getPath());
 
             // Get the parser.
-            return CSVFormat.RFC4180.withHeader().parse(fr);
+            //return CSVFormat.RFC4180.withHeader().parse(fr);
+            return CSVParser.parse(lines, format);
             
         }else if(dataSource instanceof URL){
-            return CSVParser.parse((URL)dataSource, Charset.forName("UTF-8"), CSVFormat.RFC4180.withHeader());
+            return CSVParser.parse((URL)dataSource, Charset.forName("UTF-8"), format);
+            //return CSVParser.parse((URL)dataSource, Charset.forName("UTF-8"), CSVFormat.RFC4180.withHeader());
             
         }else if(dataSource instanceof JSONArray){
             String dataCsv = CDL.toString((JSONArray)dataSource);
             Reader sr = new StringReader(dataCsv);
-            return CSVParser.parse(sr, CSVFormat.RFC4180.withHeader());
+            return CSVParser.parse(sr, format);
+            //return CSVParser.parse(sr, CSVFormat.RFC4180.withHeader());
             
         }else{
             throw new Exception("Data source is of invalid type.");

@@ -98,8 +98,8 @@ public class Table{
         return this.dataSource.getHeaders();
     }
 
-    public void save(File outputFile) throws Exception{
-       this.dataSource.writeCsv(outputFile);
+    public void writeCsv(File outputFile, CSVFormat format) throws Exception{
+       this.dataSource.writeCsv(outputFile, format);
     }
     public List<Object[]> read(boolean cast) throws Exception{
         if(cast && !this.schema.hasFields()){
@@ -145,6 +145,9 @@ public class Table{
 
     public Table csvFormat(CSVFormat format) {
         this.format = format;
+        if ((null != dataSource) && (dataSource instanceof CsvDataSource)) {
+            ((CsvDataSource)dataSource).format(format);
+        }
         return this;
     }
 

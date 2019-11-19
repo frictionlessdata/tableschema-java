@@ -3,6 +3,7 @@ package io.frictionlessdata.tableschema;
 import io.frictionlessdata.tableschema.datasources.CsvDataSource;
 import io.frictionlessdata.tableschema.datasources.DataSource;
 import io.frictionlessdata.tableschema.datasources.JsonArrayDataSource;
+import org.apache.commons.csv.CSVFormat;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -70,7 +71,7 @@ public class DataSourceTest {
 
         DataSource ds = DataSource.createDataSource(dates, null);
         File tempFile = Files.createTempFile("tableschema-", ".csv").toFile();
-        ds.writeCsv(tempFile);
+        ds.writeCsv(tempFile, CSVFormat.RFC4180);
         try (FileReader fr = new FileReader(tempFile)) {
             try (BufferedReader rdr = new BufferedReader(fr)) {
                 content = rdr.lines().collect(Collectors.joining("\n"));

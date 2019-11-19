@@ -1,6 +1,6 @@
 package io.frictionlessdata.tableschema.exceptions;
 
-public class PrimaryKeyException extends Exception {
+public class PrimaryKeyException extends TableSchemaException {
 
     public PrimaryKeyException() {
     }

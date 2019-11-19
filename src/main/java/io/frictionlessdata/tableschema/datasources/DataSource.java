@@ -3,6 +3,7 @@
  */
 package io.frictionlessdata.tableschema.datasources;
 
+import org.apache.commons.csv.CSVFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -28,11 +29,11 @@ public interface DataSource {
     public void write(File outputFile) throws Exception;
 
     /**
-     * Write as RFC 4180 CSV file
+     * Write as CSV file, the `format` parameter decides on the CSV options
      * @param outputFile the File to write to
      * @throws Exception thrown if write operation fails
      */
-    void writeCsv(File outputFile) throws Exception;
+    void writeCsv(File outputFile, CSVFormat format) throws Exception;
 
     /**
      * Factory method to instantiate either a JsonArrayDataSource or a

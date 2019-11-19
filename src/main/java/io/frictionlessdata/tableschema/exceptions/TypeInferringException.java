@@ -9,7 +9,7 @@ package io.frictionlessdata.tableschema.exceptions;
  *
  * @author pechorin
  */
-public class TypeInferringException extends Exception {
+public class TypeInferringException extends TableSchemaException {
 
     /**
      * Creates a new instance of <code>TypeInferringException</code> without
