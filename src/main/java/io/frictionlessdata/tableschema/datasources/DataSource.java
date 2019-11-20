@@ -29,6 +29,13 @@ public interface DataSource {
     public void write(File outputFile) throws Exception;
 
     /**
+     * Write as CSV, the `format` parameter decides on the CSV options
+     * @param out the Writer to write to
+     * @throws Exception thrown if write operation fails
+     */
+    public void writeCsv(Writer out, CSVFormat format);
+
+    /**
      * Write as CSV file, the `format` parameter decides on the CSV options
      * @param outputFile the File to write to
      * @throws Exception thrown if write operation fails

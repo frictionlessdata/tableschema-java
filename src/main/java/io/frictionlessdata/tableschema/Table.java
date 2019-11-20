@@ -10,6 +10,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.json.*;
 
 import java.io.InputStream;
+import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -98,9 +99,6 @@ public class Table{
         return this.dataSource.getHeaders();
     }
 
-    public void writeCsv(File outputFile, CSVFormat format) throws Exception{
-       this.dataSource.writeCsv(outputFile, format);
-    }
     public List<Object[]> read(boolean cast) throws Exception{
         if(cast && !this.schema.hasFields()){
             throw new InvalidCastException();
@@ -119,6 +117,14 @@ public class Table{
     
     public List<Object[]> read() throws Exception{
         return this.read(false);
+    }
+
+    public void writeCsv(Writer out, CSVFormat format) {
+        this.dataSource.writeCsv(out, format);
+    }
+
+    public void writeCsv(File outputFile, CSVFormat format) throws Exception{
+        this.dataSource.writeCsv(outputFile, format);
     }
     
     public Schema inferSchema() throws TypeInferringException{

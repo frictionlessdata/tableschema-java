@@ -105,17 +105,17 @@ public abstract class AbstractDataSource implements DataSource {
     /**
      * Write as CSV file, the `format` parameter decides on the CSV options. If it is
      * null, then the file will be written as RFC 4180 compliant CSV
-     * @param outputFile the File to write to
+     * @param out the Writer to write to
      * @throws Exception thrown if write operation fails
      */
     @Override
-    public void writeCsv(File outputFile, CSVFormat format) throws Exception {
-        CSVFormat locFormat = (null != format)
-                ? format
-                : CSVFormat.RFC4180
-                .withHeader();
-        try (Writer out = new BufferedWriter(new FileWriter(outputFile));
-             CSVPrinter csvPrinter = new CSVPrinter(out, locFormat)) {
+    public void writeCsv(Writer out, CSVFormat format) {
+        try {
+            CSVFormat locFormat = (null != format)
+                    ? format
+                    : CSVFormat.RFC4180
+                    .withHeader();
+            CSVPrinter csvPrinter = new CSVPrinter(out, locFormat);
 
             String[] headers = getHeaders();
             if (headers != null) {
@@ -125,11 +125,25 @@ public abstract class AbstractDataSource implements DataSource {
             for (String[] record : data()) {
                 csvPrinter.printRecord(record);
             }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
-            csvPrinter.flush();
-
-        } catch (Exception e) {
-            throw e;
+    /**
+     * Write as CSV file, the `format` parameter decides on the CSV options. If it is
+     * null, then the file will be written as RFC 4180 compliant CSV
+     * @param outputFile the File to write to
+     * @throws Exception thrown if write operation fails
+     */
+    @Override
+    public void writeCsv(File outputFile, CSVFormat format) throws Exception {
+        CSVFormat locFormat = (null != format)
+                ? format
+                : CSVFormat.RFC4180
+                .withHeader();
+        try (Writer out = new BufferedWriter(new FileWriter(outputFile))) {
+            writeCsv(out, locFormat);
         }
     }
 }
