@@ -26,6 +26,14 @@ public class Table{
     private CSVFormat format;
 
     /**
+     * Constructor using either a CSV or JSON array-containing string.
+     * @param dataSource the CSV or JSON content for the Table
+     */
+    public Table(String dataSource) {
+        this.dataSource = DataSource.createDataSource(dataSource);
+    }
+
+    /**
      * Constructor using an {@link java.io.InputStream} for reading both the CSV
      * data and the table schema.
      * @param dataSource InputStream for reading the CSV from
@@ -51,13 +59,9 @@ public class Table{
         this.dataSource = new CsvDataSource(dataSource, basePath);
         this.schema = schema;
     }
-    
-    public Table(String dataSource) {
-        this.dataSource = DataSource.createDataSource(dataSource, null);
-    }
 
     public Table(String dataSource, Schema schema) {
-        this.dataSource = DataSource.createDataSource(dataSource, null);
+        this.dataSource = DataSource.createDataSource(dataSource);
         this.schema = schema;
     }
 
@@ -149,7 +153,7 @@ public class Table{
         }
     }
 
-    public Table csvFormat(CSVFormat format) {
+    public Table setCsvFormat(CSVFormat format) {
         this.format = format;
         if ((null != dataSource) && (dataSource instanceof CsvDataSource)) {
             ((CsvDataSource)dataSource).format(format);
@@ -157,7 +161,7 @@ public class Table{
         return this;
     }
 
-    public CSVFormat format() {
+    public CSVFormat getCsvFormat() {
         return format;
     }
 

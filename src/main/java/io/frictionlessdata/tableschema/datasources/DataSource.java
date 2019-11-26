@@ -47,7 +47,7 @@ public interface DataSource {
      * CsvDataSource based on input format
      * @return DataSource created from input String
      */
-    public static DataSource createDataSource(String input, File workDir) {
+    public static DataSource createDataSource(String input) {
         try {
             JSONArray arr = new JSONArray(input);
             return new JsonArrayDataSource(arr);
@@ -86,7 +86,7 @@ public interface DataSource {
             throw ex;
         }
 
-        return createDataSource(content, workDir);
+        return createDataSource(content);
     }
 
     //https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html
