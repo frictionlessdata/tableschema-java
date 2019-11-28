@@ -9,7 +9,7 @@ package io.frictionlessdata.tableschema.exceptions;
  *
  * @author pechorin
  */
-public class InvalidCastException extends Exception {
+public class InvalidCastException extends TableSchemaException {
 
     /**
      * Creates a new instance of <code>InvalidCastException</code> without

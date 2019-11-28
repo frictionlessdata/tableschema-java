@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,6 +58,7 @@ public class Schema {
 
     /**
      * Read, create, and validate a table schema from an {@link java.io.InputStream}.
+     *
      * @param inStream the InputStream to read the schema JSON data from
      * @param strict whether to enforce strict validation
      * @throws Exception thrown if reading from the stream or parsing throws an exception
@@ -71,6 +73,7 @@ public class Schema {
 
     /**
      * Read, create, and validate a table schema from a remote location.
+     *
      * @param schemaUrl the URL to read the schema JSON data from
      * @param strict whether to enforce strict validation
      * @throws Exception thrown if reading from the stream or parsing throws an exception
@@ -81,6 +84,7 @@ public class Schema {
 
     /**
      * Read, create, and validate a table schema from a local {@link java.io.File}.
+     *
      * @param schemaFile the File to read schema JSON data from
      * @param strict whether to enforce strict validation
      * @throws Exception thrown if reading from the stream or parsing throws an exception
@@ -90,6 +94,7 @@ public class Schema {
     }
     /**
      * Read, create, and validate a table schema from a JSON string.
+     *
      * @param schemaJson the File to read schema JSON data from
      * @param strict whether to enforce strict validation
      * @throws Exception thrown if reading from the stream or parsing throws an exception
@@ -99,14 +104,14 @@ public class Schema {
     }
 
     /**
-     * Read, create, and validate a table schema using list of fields. 
-     * @param fields
-     * @param strict
-     * @throws ValidationException 
+     * Read, create, and validate a table schema using a collection of fields.
+     * @param fields the fields to use for the Table
+     * @param strict whether to enforce strict validation
+     * @throws ValidationException thrown if parsing throws an exception
      */
-    public Schema(List<Field> fields, boolean strict) throws ValidationException{
+    public Schema(Collection<Field> fields, boolean strict) throws ValidationException{
         this.strictValidation = strict;
-        this.fields = fields;
+        this.fields = new ArrayList<>(fields);
         
         initValidator(); 
         validate();
@@ -116,7 +121,7 @@ public class Schema {
      * Infer the data types and return the generated schema.
      * @param data
      * @param headers
-     * @return
+     * @return Schema generated from the inferred input
      * @throws TypeInferringException 
      */
     public JSONObject infer(List<Object[]> data, String[] headers) throws TypeInferringException{
@@ -128,7 +133,7 @@ public class Schema {
      * @param data
      * @param headers
      * @param rowLimit
-     * @return
+     * @return Schema generated from the inferred input
      * @throws TypeInferringException 
      */
     public JSONObject infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
@@ -324,8 +329,14 @@ public class Schema {
         
     }
     
-    public void save(String outputFilePath) throws IOException{
-        try (FileWriter file = new FileWriter(outputFilePath)) {
+    public void writeJson (File outputFile) throws IOException{
+        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            writeJson(fos);
+        }
+    }
+
+    public void writeJson (OutputStream output) throws IOException{
+        try (BufferedWriter file = new BufferedWriter(new OutputStreamWriter(output))) {
             file.write(this.getJson().toString(JSON_INDENT_FACTOR));
         }
     }

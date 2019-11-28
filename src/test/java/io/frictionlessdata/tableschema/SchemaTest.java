@@ -121,7 +121,7 @@ public class SchemaTest {
         File source = getResourceFile("/fixtures/primarykey/simple_schema_with_invalid_pk.json");
         
         exception.expect(PrimaryKeyException.class);
-        Schema schemaWithInvalidPK = new Schema(source, true);
+        new Schema(source, true);
     }
     
     @Test
@@ -140,7 +140,7 @@ public class SchemaTest {
         File source = getResourceFile("/fixtures/primarykey/simple_schema_with_invalid_ck.json");
         
         exception.expect(PrimaryKeyException.class);
-        Schema schemaWithInvalidCK = new Schema(source, true);
+        new Schema(source, true);
     }
      
     @Test
@@ -332,7 +332,7 @@ public class SchemaTest {
         createdSchema.addField(stringField);
 
         // Save schema
-        createdSchema.save(createdFile.getAbsolutePath());
+        createdSchema.writeJson(createdFile);
         
         Schema readSchema = new Schema(createdFile, true);
         
@@ -368,7 +368,7 @@ public class SchemaTest {
         createdSchema.setPrimaryKey("id");
         
         // Save schema
-        createdSchema.save(createdFile.getAbsolutePath());
+        createdSchema.writeJson(createdFile);
         
         Schema readSchema = new Schema(createdFile, true);
         
@@ -394,7 +394,7 @@ public class SchemaTest {
         createdSchema.addForeignKey(fk);
         
         // Save schema
-        createdSchema.save(createdFile.getAbsolutePath());
+        createdSchema.writeJson(createdFile);
         
         Schema readSchema = new Schema(createdFile, true);
         
@@ -539,7 +539,7 @@ public class SchemaTest {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_string_array_ref.json");
         
         exception.expectMessage("The reference's fields property must be a string if the outer fields is a string.");
-       new Schema(source, true);
+        new Schema(source, true);
     }
     
     @Test

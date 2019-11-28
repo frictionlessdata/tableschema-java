@@ -19,35 +19,27 @@ import java.util.stream.Collectors;
  *
  */
 public class CsvDataSource extends AbstractDataSource {
-    private Object dataSource = null;
-    private File workDir;
 
-    public CsvDataSource(InputStream inStream, File workDir) throws IOException{
-        this.workDir = workDir;
-        try (InputStreamReader ir = new InputStreamReader(inStream)) {
-            try (BufferedReader rdr = new BufferedReader(ir)) {
-                String dSource = rdr.lines().collect(Collectors.joining("\n"));
-                this.dataSource = new JSONArray(dSource);
-            }
-        }
+    private CSVFormat format = CSVFormat
+            .RFC4180
+            .withHeader();;
+
+    public CsvDataSource(InputStream inStream) throws IOException{
+        super(inStream);
     }
 
-    public CsvDataSource(URL dataSource, File workDir){
-        this.dataSource = dataSource;
-        this.workDir = workDir;
+    public CsvDataSource(URL dataSource){
+        super(dataSource);
     }
     
     public CsvDataSource(File dataSource, File workDir){
-        this.dataSource = dataSource;
-        this.workDir = workDir;
+        super(dataSource, workDir);
     }
     
-    public CsvDataSource(String dataSource, File workDir){
-        this.dataSource = dataSource;
-        this.workDir = workDir;
+    public CsvDataSource(String dataSource){
+        super(dataSource);
     }
 
-    
     @Override
     public Iterator<String[]> iterator() throws Exception{
         Iterator<CSVRecord> iterCSVRecords = this.getCSVParser().iterator();
@@ -133,9 +125,17 @@ public class CsvDataSource extends AbstractDataSource {
         }catch(Exception e){
             throw e;
         }
-
     }
-    
+
+    public CsvDataSource format(CSVFormat format) {
+        this.format = format;
+        return this;
+    }
+
+    public CSVFormat format() {
+        return format;
+    }
+
     /**
      * Retrieve the CSV Parser.
      * The parser works record wise. It is not possible to go back, once a
@@ -147,11 +147,17 @@ public class CsvDataSource extends AbstractDataSource {
      * @throws Exception 
      */
     private CSVParser getCSVParser() throws Exception{
-        if(this.dataSource instanceof String){
-            Reader sr = new StringReader((String)this.dataSource);
-            return CSVParser.parse(sr, CSVFormat.RFC4180.withHeader());
+        CSVFormat format = this.format;
+        if (null == format) {
+            format = CSVFormat
+                    .RFC4180
+                    .withHeader();
+        }
+        if(dataSource instanceof String){
+            Reader sr = new StringReader((String)dataSource);
+            return CSVParser.parse(sr, format);
 
-        }else if(this.dataSource instanceof File){
+        }else if(dataSource instanceof File){
             // The path value can either be a relative path or a full path.
             // If it's a relative path then build the full path by using the working directory.
             // Caution: here, we cannot simply use provided paths, we have to check
@@ -159,22 +165,22 @@ public class CsvDataSource extends AbstractDataSource {
             // see:
             //    - https://github.com/frictionlessdata/tableschema-java/issues/29
             //    - https://frictionlessdata.io/specs/data-resource/#url-or-path
-            Path inPath = ((File)this.dataSource).toPath();
-            Path resolvedPath = DataSource.toSecure(inPath, workDir.toPath());
 
-            // Read the file.
-            Reader fr = new FileReader(resolvedPath.toFile());
+            String lines = getFileContents(((File)dataSource).getPath());
 
             // Get the parser.
-            return CSVFormat.RFC4180.withHeader().parse(fr);
+            //return CSVFormat.RFC4180.withHeader().parse(fr);
+            return CSVParser.parse(lines, format);
             
-        }else if(this.dataSource instanceof URL){
-            return CSVParser.parse((URL)this.dataSource, Charset.forName("UTF-8"), CSVFormat.RFC4180.withHeader());
+        }else if(dataSource instanceof URL){
+            return CSVParser.parse((URL)dataSource, Charset.forName("UTF-8"), format);
+            //return CSVParser.parse((URL)dataSource, Charset.forName("UTF-8"), CSVFormat.RFC4180.withHeader());
             
-        }else if(this.dataSource instanceof JSONArray){
-            String dataCsv = CDL.toString((JSONArray)this.dataSource);                
+        }else if(dataSource instanceof JSONArray){
+            String dataCsv = CDL.toString((JSONArray)dataSource);
             Reader sr = new StringReader(dataCsv);
-            return CSVParser.parse(sr, CSVFormat.RFC4180.withHeader());
+            return CSVParser.parse(sr, format);
+            //return CSVParser.parse(sr, CSVFormat.RFC4180.withHeader());
             
         }else{
             throw new Exception("Data source is of invalid type.");

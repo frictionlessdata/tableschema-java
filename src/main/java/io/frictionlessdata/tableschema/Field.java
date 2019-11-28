@@ -113,7 +113,7 @@ public class Field {
      * 
      * @param <Any>
      * @param value
-     * @return
+     * @return result of the cast operation
      * @throws InvalidCastException
      * @throws ConstraintsException 
      */
@@ -127,7 +127,7 @@ public class Field {
      * @param <Any>
      * @param value
      * @param options
-     * @return
+     * @return result of the cast operation
      * @throws InvalidCastException
      * @throws ConstraintsException 
      */
@@ -140,7 +140,7 @@ public class Field {
      * @param <Any>
      * @param value
      * @param enforceConstraints
-     * @return
+     * @return result of the cast operation
      * @throws InvalidCastException
      * @throws ConstraintsException 
      */
@@ -154,7 +154,7 @@ public class Field {
      * @param value
      * @param enforceConstraints
      * @param options
-     * @return
+     * @return result of the cast operation
      * @throws InvalidCastException
      * @throws ConstraintsException 
      */
@@ -189,7 +189,7 @@ public class Field {
     
     /**
      * Returns a Map with all the constraints that have been violated.
-     * @param value
+     * @param value either a JSONArray/JSONObject or a string containing JSON
      * @return Map containing all the contraints violations
      */
     public Map<String, Object> checkConstraintViolations(Object value){

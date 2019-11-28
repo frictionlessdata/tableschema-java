@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.csv.CSVFormat;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -76,10 +78,9 @@ public class TableTest {
     
     @Test
     public void testReadFromValidUrl() throws Exception{
-        File testDataDir = getTestDataDirectory();
         // get path of test CSV file
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
-        Table table = new Table(url, testDataDir);
+        Table table = new Table(url);
         
         Assert.assertEquals(3, table.read().size());
     }
@@ -350,7 +351,7 @@ public class TableTest {
         File file = new File("simple_data.csv");
         Table loadedTable = new Table(file, testDataDir);
         
-        loadedTable.save(new File (createdFileDir, createdFileName));
+        loadedTable.writeCsv(new File (createdFileDir, createdFileName), CSVFormat.RFC4180);
         
         Table readTable = new Table(new File(createdFileName), createdFileDir);
         Assert.assertEquals("id", readTable.getHeaders()[0]);

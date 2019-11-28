@@ -24,23 +24,23 @@ public class TableIterator<T> implements Iterator<T> {
     public TableIterator(Table table) throws Exception{
         this.init(table);
         this.headers = table.getHeaders();
-        this.schema = table.getSchema();
-        this.iter = table.getDataSource().iterator();
+        this.schema = table.schema();
+        this.iter = table.dataSource().iterator();
     }
     
     public TableIterator(Table table, boolean keyed) throws Exception{
         this.init(table);
         this.headers = table.getHeaders();
-        this.schema = table.getSchema();
-        this.iter = table.getDataSource().iterator();
+        this.schema = table.schema();
+        this.iter = table.dataSource().iterator();
         this.keyed = keyed;
     }
     
     public TableIterator(Table table, boolean keyed, boolean extended) throws Exception{
         this.init(table);
         this.headers = table.getHeaders();
-        this.schema = table.getSchema();
-        this.iter = table.getDataSource().iterator();
+        this.schema = table.schema();
+        this.iter = table.dataSource().iterator();
         this.keyed = keyed;
         this.extended = extended;
     }
@@ -48,8 +48,8 @@ public class TableIterator<T> implements Iterator<T> {
     public TableIterator(Table table, boolean keyed, boolean extended, boolean cast) throws Exception{
         this.init(table);
         this.headers = table.getHeaders();
-        this.schema = table.getSchema();
-        this.iter = table.getDataSource().iterator();
+        this.schema = table.schema();
+        this.iter = table.dataSource().iterator();
         this.keyed = keyed;
         this.extended = extended;
         this.cast = cast;
@@ -65,8 +65,8 @@ public class TableIterator<T> implements Iterator<T> {
     
     private void init(Table table) throws Exception{
         this.headers = table.getHeaders();
-        this.schema = table.getSchema();
-        this.iter = table.getDataSource().iterator();
+        this.schema = table.schema();
+        this.iter = table.dataSource().iterator();
     }
     
     @Override

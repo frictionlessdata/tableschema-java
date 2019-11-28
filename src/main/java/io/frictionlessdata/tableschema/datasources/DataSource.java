@@ -3,6 +3,7 @@
  */
 package io.frictionlessdata.tableschema.datasources;
 
+import org.apache.commons.csv.CSVFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -28,24 +29,31 @@ public interface DataSource {
     public void write(File outputFile) throws Exception;
 
     /**
-     * Write as RFC 4180 CSV file
+     * Write as CSV, the `format` parameter decides on the CSV options
+     * @param out the Writer to write to
+     * @throws Exception thrown if write operation fails
+     */
+    public void writeCsv(Writer out, CSVFormat format);
+
+    /**
+     * Write as CSV file, the `format` parameter decides on the CSV options
      * @param outputFile the File to write to
      * @throws Exception thrown if write operation fails
      */
-    void writeCsv(File outputFile) throws Exception;
+    void writeCsv(File outputFile, CSVFormat format) throws Exception;
 
     /**
      * Factory method to instantiate either a JsonArrayDataSource or a
      * CsvDataSource based on input format
      * @return DataSource created from input String
      */
-    public static DataSource createDataSource(String input, File workDir) {
+    public static DataSource createDataSource(String input) {
         try {
             JSONArray arr = new JSONArray(input);
-            return new JsonArrayDataSource(arr, workDir);
+            return new JsonArrayDataSource(arr);
         } catch (JSONException ex) {
             // JSON parsing failed, treat it as a CSV
-            return new CsvDataSource(input, workDir);
+            return new CsvDataSource(input);
         }
     }
 
@@ -55,7 +63,8 @@ public interface DataSource {
      * @return DataSource created from input File
      */
     public static DataSource createDataSource(File input, File workDir) throws IOException {
-        try (InputStream is = new FileInputStream(input)) { // Read the file.
+        Path resolvedPath = DataSource.toSecure(input.toPath(), workDir.toPath());
+        try (InputStream is = new FileInputStream(resolvedPath.toFile())) { // Read the file.
             return createDataSource(is, workDir);
         }
     }
@@ -77,21 +86,28 @@ public interface DataSource {
             throw ex;
         }
 
-        return createDataSource(content, workDir);
+        return createDataSource(content);
     }
 
+    //https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html
     public static Path toSecure(Path testPath, Path referencePath) throws IOException {
-        if (!referencePath.isAbsolute()) {
-            throw new IllegalArgumentException("Reference path must be absolute");
-        }
+        // catch paths starting with "/" but on Windows where they get rewritten
+        // to start with "\"
+        if (testPath.startsWith(File.separator))
+            throw new IllegalArgumentException("Input path must be relative");
         if (testPath.isAbsolute()){
             throw new IllegalArgumentException("Input path must be relative");
+        }
+        if (!referencePath.isAbsolute()) {
+            throw new IllegalArgumentException("Reference path must be absolute");
         }
         if (testPath.toFile().isDirectory()){
             throw new IllegalArgumentException("Input path cannot be a directory");
         }
         //Path canonicalPath = testPath.toRealPath(null);
         final Path resolvedPath = referencePath.resolve(testPath).normalize();
+        if (!resolvedPath.toFile().exists())
+            throw new FileNotFoundException("File "+resolvedPath.toString()+" does not exist");
         if (!resolvedPath.toFile().isFile()){
             throw new IllegalArgumentException("Input must be a file");
         }

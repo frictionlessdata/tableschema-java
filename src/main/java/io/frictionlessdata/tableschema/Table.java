@@ -5,9 +5,12 @@ import io.frictionlessdata.tableschema.datasources.CsvDataSource;
 import io.frictionlessdata.tableschema.datasources.DataSource;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import java.io.File;
+
+import org.apache.commons.csv.CSVFormat;
 import org.json.*;
 
 import java.io.InputStream;
+import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,6 +23,15 @@ import java.util.List;
 public class Table{
     private DataSource dataSource = null;
     private Schema schema = null;
+    private CSVFormat format;
+
+    /**
+     * Constructor using either a CSV or JSON array-containing string.
+     * @param dataSource the CSV or JSON content for the Table
+     */
+    public Table(String dataSource) {
+        this.dataSource = DataSource.createDataSource(dataSource);
+    }
 
     /**
      * Constructor using an {@link java.io.InputStream} for reading both the CSV
@@ -28,49 +40,44 @@ public class Table{
      * @param schema InputStream for reading table schema from
      * @throws Exception if either reading or parsing throws an Exception
      */
-    public Table(InputStream dataSource, InputStream schema, File workDir) throws Exception{
-        this.dataSource = DataSource.createDataSource(dataSource, workDir);
+    public Table(InputStream dataSource, InputStream schema) throws Exception{
+        this.dataSource = DataSource.createDataSource(dataSource, null);
         this.schema = new Schema(schema, true);
     }
 
-    public Table(File dataSource, File workDir) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource, workDir);
+    public Table(File dataSource, File basePath) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource, basePath);
     }
     
-    public Table(File dataSource, File workDir, JSONObject schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource, workDir);
-        this.schema = new Schema(schema.toString(), false);
+    public Table(File dataSource, File basePath, JSONObject schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource, basePath);
+        if (null != schema)
+            this.schema = new Schema(schema.toString(), false);
     }
     
-    public Table(File dataSource, File workDir, Schema schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource, workDir);
+    public Table(File dataSource, File basePath, Schema schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource, basePath);
         this.schema = schema;
-    }
-    
-    public Table(String dataSource, File workDir) throws Exception{
-        this.dataSource = DataSource.createDataSource(dataSource, workDir);
     }
 
-    public Table(String dataSource, Schema schema, File workDir) throws Exception{
-        this.dataSource = DataSource.createDataSource(dataSource, workDir);
+    public Table(String dataSource, Schema schema) {
+        this.dataSource = DataSource.createDataSource(dataSource);
         this.schema = schema;
-    }
-    
-    public Table(URL dataSource, File workDir) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource, workDir);
     }
 
-    public Table(URL dataSource, Schema schema, File workDir) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource, workDir);
+    public Table(URL dataSource) {
+        this.dataSource = new CsvDataSource(dataSource);
+    }
+
+    public Table(URL dataSource, Schema schema) {
+        this.dataSource = new CsvDataSource(dataSource);
         this.schema = schema;
     }
     
-    public Table(URL dataSource, URL schema, File workDir) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource, workDir);
+    public Table(URL dataSource, URL schema) throws Exception{
+        this.dataSource = new CsvDataSource(dataSource);
         this.schema = new Schema(schema, false);
     }
-
-
 
     public Iterator iterator() throws Exception{
        return new TableIterator(this);
@@ -96,9 +103,6 @@ public class Table{
         return this.dataSource.getHeaders();
     }
 
-    public void save(File outputFile) throws Exception{
-       this.dataSource.writeCsv(outputFile);
-    }
     public List<Object[]> read(boolean cast) throws Exception{
         if(cast && !this.schema.hasFields()){
             throw new InvalidCastException();
@@ -117,6 +121,14 @@ public class Table{
     
     public List<Object[]> read() throws Exception{
         return this.read(false);
+    }
+
+    public void writeCsv(Writer out, CSVFormat format) {
+        this.dataSource.writeCsv(out, format);
+    }
+
+    public void writeCsv(File outputFile, CSVFormat format) throws Exception{
+        this.dataSource.writeCsv(outputFile, format);
     }
     
     public Schema inferSchema() throws TypeInferringException{
@@ -140,12 +152,24 @@ public class Table{
             throw new TypeInferringException();
         }
     }
-    
-    public Schema getSchema(){
+
+    public Table setCsvFormat(CSVFormat format) {
+        this.format = format;
+        if ((null != dataSource) && (dataSource instanceof CsvDataSource)) {
+            ((CsvDataSource)dataSource).format(format);
+        }
+        return this;
+    }
+
+    public CSVFormat getCsvFormat() {
+        return format;
+    }
+
+    public Schema schema(){
         return this.schema;
     }
     
-    public DataSource getDataSource(){
+    public DataSource dataSource(){
         return this.dataSource;
     }
 }
