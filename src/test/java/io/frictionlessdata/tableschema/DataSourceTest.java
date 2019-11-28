@@ -46,13 +46,13 @@ public class DataSourceTest {
 
     @Test
     public void testCreateJsonArrayDataSource() throws Exception{
-        DataSource ds = DataSource.createDataSource(jsonString1, null);
+        DataSource ds = DataSource.createDataSource(jsonString1);
         Assert.assertTrue(ds instanceof JsonArrayDataSource);
     }
 
     @Test
     public void testJsonArrayDataSourceHeaders() throws Exception{
-        DataSource ds = DataSource.createDataSource(jsonString1, null);
+        DataSource ds = DataSource.createDataSource(jsonString1);
         String[] headers = ds.getHeaders();
         Assert.assertArrayEquals(jsonHeaders, headers);
     }
@@ -60,7 +60,7 @@ public class DataSourceTest {
     @Test
     public void createCsvDataSource() throws Exception{
         String dates = this.getDatesCsvData();
-        DataSource ds = DataSource.createDataSource(dates, null);
+        DataSource ds = DataSource.createDataSource(dates);
         Assert.assertTrue(ds instanceof CsvDataSource);
     }
 
@@ -69,7 +69,7 @@ public class DataSourceTest {
         String dates = this.getDatesCsvData();
         String content = null;
 
-        DataSource ds = DataSource.createDataSource(dates, null);
+        DataSource ds = DataSource.createDataSource(dates);
         File tempFile = Files.createTempFile("tableschema-", ".csv").toFile();
         ds.writeCsv(tempFile, CSVFormat.RFC4180);
         try (FileReader fr = new FileReader(tempFile)) {

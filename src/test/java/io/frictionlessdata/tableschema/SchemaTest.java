@@ -332,7 +332,7 @@ public class SchemaTest {
         createdSchema.addField(stringField);
 
         // Save schema
-        createdSchema.save(createdFile.getAbsolutePath());
+        createdSchema.writeJson(createdFile);
         
         Schema readSchema = new Schema(createdFile, true);
         
@@ -368,7 +368,7 @@ public class SchemaTest {
         createdSchema.setPrimaryKey("id");
         
         // Save schema
-        createdSchema.save(createdFile.getAbsolutePath());
+        createdSchema.writeJson(createdFile);
         
         Schema readSchema = new Schema(createdFile, true);
         
@@ -394,7 +394,7 @@ public class SchemaTest {
         createdSchema.addForeignKey(fk);
         
         // Save schema
-        createdSchema.save(createdFile.getAbsolutePath());
+        createdSchema.writeJson(createdFile);
         
         Schema readSchema = new Schema(createdFile, true);
         

@@ -10,6 +10,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.json.*;
 
 import java.io.InputStream;
+import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,6 +24,14 @@ public class Table{
     private DataSource dataSource = null;
     private Schema schema = null;
     private CSVFormat format;
+
+    /**
+     * Constructor using either a CSV or JSON array-containing string.
+     * @param dataSource the CSV or JSON content for the Table
+     */
+    public Table(String dataSource) {
+        this.dataSource = DataSource.createDataSource(dataSource);
+    }
 
     /**
      * Constructor using an {@link java.io.InputStream} for reading both the CSV
@@ -50,13 +59,9 @@ public class Table{
         this.dataSource = new CsvDataSource(dataSource, basePath);
         this.schema = schema;
     }
-    
-    public Table(String dataSource) {
-        this.dataSource = DataSource.createDataSource(dataSource, null);
-    }
 
     public Table(String dataSource, Schema schema) {
-        this.dataSource = DataSource.createDataSource(dataSource, null);
+        this.dataSource = DataSource.createDataSource(dataSource);
         this.schema = schema;
     }
 
@@ -98,9 +103,6 @@ public class Table{
         return this.dataSource.getHeaders();
     }
 
-    public void writeCsv(File outputFile, CSVFormat format) throws Exception{
-       this.dataSource.writeCsv(outputFile, format);
-    }
     public List<Object[]> read(boolean cast) throws Exception{
         if(cast && !this.schema.hasFields()){
             throw new InvalidCastException();
@@ -119,6 +121,14 @@ public class Table{
     
     public List<Object[]> read() throws Exception{
         return this.read(false);
+    }
+
+    public void writeCsv(Writer out, CSVFormat format) {
+        this.dataSource.writeCsv(out, format);
+    }
+
+    public void writeCsv(File outputFile, CSVFormat format) throws Exception{
+        this.dataSource.writeCsv(outputFile, format);
     }
     
     public Schema inferSchema() throws TypeInferringException{
@@ -143,7 +153,7 @@ public class Table{
         }
     }
 
-    public Table csvFormat(CSVFormat format) {
+    public Table setCsvFormat(CSVFormat format) {
         this.format = format;
         if ((null != dataSource) && (dataSource instanceof CsvDataSource)) {
             ((CsvDataSource)dataSource).format(format);
@@ -151,7 +161,7 @@ public class Table{
         return this;
     }
 
-    public CSVFormat format() {
+    public CSVFormat getCsvFormat() {
         return format;
     }
 

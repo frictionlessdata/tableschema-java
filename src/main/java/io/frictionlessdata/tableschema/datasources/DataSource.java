@@ -29,6 +29,13 @@ public interface DataSource {
     public void write(File outputFile) throws Exception;
 
     /**
+     * Write as CSV, the `format` parameter decides on the CSV options
+     * @param out the Writer to write to
+     * @throws Exception thrown if write operation fails
+     */
+    public void writeCsv(Writer out, CSVFormat format);
+
+    /**
      * Write as CSV file, the `format` parameter decides on the CSV options
      * @param outputFile the File to write to
      * @throws Exception thrown if write operation fails
@@ -40,7 +47,7 @@ public interface DataSource {
      * CsvDataSource based on input format
      * @return DataSource created from input String
      */
-    public static DataSource createDataSource(String input, File workDir) {
+    public static DataSource createDataSource(String input) {
         try {
             JSONArray arr = new JSONArray(input);
             return new JsonArrayDataSource(arr);
@@ -79,7 +86,7 @@ public interface DataSource {
             throw ex;
         }
 
-        return createDataSource(content, workDir);
+        return createDataSource(content);
     }
 
     //https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html
