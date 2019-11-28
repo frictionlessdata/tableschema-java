@@ -10,7 +10,10 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.everit.json.schema.ValidationException;
@@ -232,7 +235,7 @@ public class Schema {
             throw new ValidationException (tableJsonSchema, "Primary key field " + foundFieldName+" not found");
         }
     }
-    
+
     /**
      * Validate the loaded Schema. First do a formal validation via JSON schema,
      * then check foreign keys match to existing fields.
@@ -257,7 +260,7 @@ public class Schema {
                      }
                  }
              }
-            
+
         }catch(ValidationException ve){
             if(this.strictValidation){
                 throw ve;
