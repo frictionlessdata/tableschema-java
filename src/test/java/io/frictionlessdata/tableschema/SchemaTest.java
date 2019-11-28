@@ -6,12 +6,15 @@ import io.frictionlessdata.tableschema.exceptions.PrimaryKeyException;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 import io.frictionlessdata.tableschema.fk.Reference;
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -61,10 +64,17 @@ public class SchemaTest {
         schemaJsonObj.getJSONArray("fields").put(invalidField.getJson());
         
         exception.expect(ValidationException.class);
-        Schema invalidSchema = new Schema(schemaJsonObj.toString(), true);
-        
+        new Schema(schemaJsonObj.toString(), true);
     }
-    
+
+
+    @Test
+    public void testReadFromInValidSchemaFileWithStrictValidation() throws Exception{
+        File f = new File(getTestDataDirectory(), "schema/invalid_population_schema.json");
+        exception.expect(ValidationException.class);
+        new Schema(f, true);
+    }
+
     @Test
     public void testCreateSchemaFromInvalidSchemaJsonWithoutStrictValidation() throws Exception{  
         JSONObject schemaJsonObj = new JSONObject();
@@ -564,6 +574,13 @@ public class SchemaTest {
         Assert.assertEquals("position_title", schema.getForeignKeys().get(0).getFields());
         Assert.assertEquals("positions", schema.getForeignKeys().get(0).getReference().getResource());
         Assert.assertEquals("name", schema.getForeignKeys().get(0).getReference().getFields());
+    }
+
+
+    private File getTestDataDirectory()throws Exception {
+        URL u = TableTest.class.getResource("/fixtures/simple_data.csv");
+        Path path = Paths.get(u.toURI());
+        return path.getParent().toFile();
     }
 
     private static File getResourceFile(String fileName) throws URISyntaxException {

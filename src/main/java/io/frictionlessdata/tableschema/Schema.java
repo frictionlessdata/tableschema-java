@@ -10,10 +10,7 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.everit.json.schema.ValidationException;
@@ -447,5 +444,19 @@ public class Schema {
     public void addForeignKey(ForeignKey foreignKey){
         this.foreignKeys.add(foreignKey);
     }
-   
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Schema schema = (Schema) o;
+        return Objects.equals(fields, schema.fields) &&
+                Objects.equals(primaryKey, schema.primaryKey) &&
+                Objects.equals(foreignKeys, schema.foreignKeys);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fields, primaryKey, foreignKeys);
+    }
 }

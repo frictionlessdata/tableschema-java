@@ -106,7 +106,12 @@ public class Field {
         String description = field.has(JSON_KEY_DESCRIPTION) ? field.getString(JSON_KEY_DESCRIPTION) : null;
         this.description = (!StringUtils.isEmpty(description)) ? description.trim() : null;
 
-        this.constraints = field.has(JSON_KEY_CONSTRAINTS) ? field.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
+        Map cstraints = null;
+        if (field.has(JSON_KEY_CONSTRAINTS))
+            cstraints = field.getJSONObject(JSON_KEY_CONSTRAINTS).toMap();
+        if ((null != cstraints) && (!cstraints.isEmpty())) {
+            this.constraints = field.has(JSON_KEY_CONSTRAINTS) ? field.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
+        }
     }
     
     /**
@@ -418,7 +423,8 @@ public class Field {
         json.put(JSON_KEY_FORMAT, this.format);
         json.put(JSON_KEY_TITLE, this.title);
         json.put(JSON_KEY_DESCRIPTION, this.description);
-        json.put(JSON_KEY_CONSTRAINTS, this.constraints);
+        if ((null != constraints) && (!constraints.isEmpty()))
+            json.put(JSON_KEY_CONSTRAINTS, this.constraints);
         
         return json;
     }
