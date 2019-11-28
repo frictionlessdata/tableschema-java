@@ -66,7 +66,7 @@ public class Schema {
         this.initValidator();
         initSchemaFromStream(inStream);
 
-        this.validate();
+        validate();
     }
 
     /**
@@ -219,16 +219,42 @@ public class Schema {
             return false;
         }
     }
+
+    private void validate(String foundFieldName) throws ValidationException{
+        Field foundField = fields
+                .stream()
+                .filter((f) -> f.getName().equals(foundFieldName))
+                .findFirst()
+                .orElse(null);
+        if (null == foundField) {
+            throw new ValidationException (tableJsonSchema, "Primary key field " + foundFieldName+" not found");
+        }
+    }
     
     /**
-     * Validate the loaded Schema.
+     * Validate the loaded Schema. First do a formal validation via JSON schema,
+     * then check foreign keys match to existing fields.
+     *
      * Validation is strict or unstrict depending on how the package was
-     * instanciated with the strict flag.
+     * instantiated with the strict flag.
      * @throws ValidationException 
      */
-    public final void validate() throws ValidationException{
+    private void validate() throws ValidationException{
         try{
              this.tableJsonSchema.validate(this.getJson());
+             if (null != foreignKeys) {
+                 for (ForeignKey fk : foreignKeys) {
+                     Object fields = fk.getFields();
+                     if (fields instanceof JSONArray) {
+                         List<Object> subFields = ((JSONArray) fields).toList();
+                         for (Object subField : subFields) {
+                             validate((String) subField);
+                         }
+                     } else if (fields instanceof String) {
+                         validate((String) fields);
+                     }
+                 }
+             }
             
         }catch(ValidationException ve){
             if(this.strictValidation){

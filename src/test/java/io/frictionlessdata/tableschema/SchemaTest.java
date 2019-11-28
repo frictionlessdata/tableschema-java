@@ -339,8 +339,8 @@ public class SchemaTest {
         // Assert id field
         Assert.assertEquals(Field.FIELD_TYPE_INTEGER, readSchema.getField("id").getType());
         Assert.assertEquals(Field.FIELD_FORMAT_DEFAULT, readSchema.getField("id").getFormat());
-        Assert.assertEquals("", readSchema.getField("id").getTitle());
-        Assert.assertEquals("", readSchema.getField("id").getDescription());
+        Assert.assertNull(readSchema.getField("id").getTitle());
+        Assert.assertNull(readSchema.getField("id").getDescription());
         Assert.assertTrue((boolean)readSchema.getField("id").getConstraints().get(Field.CONSTRAINT_KEY_REQUIRED));
         
         // Assert name field
@@ -390,7 +390,7 @@ public class SchemaTest {
         
         // Foreign Keys
         Reference ref = new Reference(new URL("http://data.okfn.org/data/mydatapackage/"), "resource", "name");
-        ForeignKey fk = new ForeignKey("fkName", ref, true);
+        ForeignKey fk = new ForeignKey("name", ref, true);
         createdSchema.addForeignKey(fk);
         
         // Save schema
@@ -399,7 +399,7 @@ public class SchemaTest {
         Schema readSchema = new Schema(createdFile, true);
         
         // Assert Foreign Keys
-        Assert.assertEquals("fkName", readSchema.getForeignKeys().get(0).getFields());
+        Assert.assertEquals("name", readSchema.getForeignKeys().get(0).getFields());
         Assert.assertEquals("http://data.okfn.org/data/mydatapackage/", readSchema.getForeignKeys().get(0).getReference().getDatapackage().toString());
         Assert.assertEquals("resource", readSchema.getForeignKeys().get(0).getReference().getResource());
     }
@@ -531,7 +531,7 @@ public class SchemaTest {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_string.json");
         
         exception.expect(ValidationException.class);
-        Schema schema = new Schema(source, true);
+        new Schema(source, true);
     }
     
     @Test
@@ -539,7 +539,7 @@ public class SchemaTest {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_string_array_ref.json");
         
         exception.expectMessage("The reference's fields property must be a string if the outer fields is a string.");
-        Schema schema = new Schema(source, true);
+       new Schema(source, true);
     }
     
     @Test
