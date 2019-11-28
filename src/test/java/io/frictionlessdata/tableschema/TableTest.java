@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema;
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,7 +26,14 @@ import org.junit.rules.TemporaryFolder;
  * 
  */
 public class TableTest {
-    
+
+    private static Object[][] populationTestData = new Object[][]
+            {
+                new Object[]{"london",2017,8780000},
+                new Object[]{"paris",2017,2240000},
+                new Object[]{"rome",2017,2860000}
+            };
+
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
     
@@ -73,18 +81,59 @@ public class TableTest {
         "]");
         
         Table table = new Table(jsonData.toString(), null);
-        Assert.assertEquals(3, table.read().size()); 
+        Assert.assertEquals(3, table.read().size());
+        Schema schema = table.inferSchema();
+        File f = new File(getTestDataDirectory(), "schema/population_schema.json");
+        Schema expectedSchema = null;
+        try (FileInputStream fis = new FileInputStream(f)) {
+            expectedSchema = new Schema(fis, false);
+        }
+
+        if (!expectedSchema.equals(schema)) {
+            for (int i = 0; i < expectedSchema.getFields().size(); i++) {
+                Field expectedField = expectedSchema.getFields().get(i);
+                Field actualField = schema.getFields().get(i);
+                Assert.assertEquals(expectedField,actualField);
+            }
+        }
+        Assert.assertEquals(expectedSchema, schema);
     }
     
     @Test
     public void testReadFromValidUrl() throws Exception{
+        File testDataDir = getTestDataDirectory();
         // get path of test CSV file
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
         Table table = new Table(url);
         
         Assert.assertEquals(3, table.read().size());
     }
-    
+
+
+    @Test
+    public void testReadFromValidFileWithValidSchema() throws Exception{
+        // get path of test CSV file
+        URL sourceFileUrl = TableTest.class.getResource("/fixtures/data/population.csv");
+        Path path = Paths.get(sourceFileUrl.toURI());
+        String csvContent = new String(Files.readAllBytes(path));
+
+        File f = new File(getTestDataDirectory(), "schema/population_schema.json");
+        Schema schema = null;
+        try (FileInputStream fis = new FileInputStream(f)) {
+            schema = new Schema(fis, false);
+        }
+
+        Table table = new Table(csvContent, schema);
+
+        Assert.assertEquals(3, table.read().size());
+        List<Object[]> actualData = table.read();
+        for (int i = 0; i < actualData.size(); i++) {
+            Object[] actualRow = actualData.get(i);
+            Object[] testRow = populationTestData[i];
+            Assert.assertArrayEquals(testRow, actualRow);
+        }
+    }
+
     //FIXME: Too slow.
     /**
     @Test

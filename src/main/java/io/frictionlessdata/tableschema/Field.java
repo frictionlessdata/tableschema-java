@@ -4,12 +4,11 @@ import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -90,15 +89,29 @@ public class Field {
         this.description = description;
         this.constraints = constraints;
     }
-    
+
     public Field(JSONObject field){
-        //TODO: Maybe use Gson serializer for this instead? Is it worth importing library just for this?      
-        this.name = field.has(JSON_KEY_NAME) ? field.getString(JSON_KEY_NAME) : "";
-        this.type = field.has(JSON_KEY_TYPE) ? field.getString(JSON_KEY_TYPE) : "";
-        this.format = field.has(JSON_KEY_FORMAT) ? field.getString(JSON_KEY_FORMAT) : FIELD_FORMAT_DEFAULT;
-        this.title = field.has(JSON_KEY_TITLE) ? field.getString(JSON_KEY_TITLE) : "";
-        this.description = field.has(JSON_KEY_DESCRIPTION) ? field.getString(JSON_KEY_DESCRIPTION) : "";
-        this.constraints = field.has(JSON_KEY_CONSTRAINTS) ? field.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
+        //TODO: Maybe use Gson serializer for this instead? Is it worth importing library just for this?
+        String name = field.has(JSON_KEY_NAME) ? field.getString(JSON_KEY_NAME) : null;
+        this.name = (!StringUtils.isEmpty(name)) ? name.trim() : null;
+
+        this.type = field.has(JSON_KEY_TYPE) ? field.getString(JSON_KEY_TYPE) : "string";
+
+        String format = field.has(JSON_KEY_FORMAT) ? field.getString(JSON_KEY_FORMAT) : null;
+        this.format = (!StringUtils.isEmpty(format)) ? format.trim() : FIELD_FORMAT_DEFAULT;
+
+        String title = field.has(JSON_KEY_TITLE) ? field.getString(JSON_KEY_TITLE) : null;
+        this.title = (!StringUtils.isEmpty(title)) ? title.trim() : null;
+
+        String description = field.has(JSON_KEY_DESCRIPTION) ? field.getString(JSON_KEY_DESCRIPTION) : null;
+        this.description = (!StringUtils.isEmpty(description)) ? description.trim() : null;
+
+        Map cstraints = null;
+        if (field.has(JSON_KEY_CONSTRAINTS))
+            cstraints = field.getJSONObject(JSON_KEY_CONSTRAINTS).toMap();
+        if ((null != cstraints) && (!cstraints.isEmpty())) {
+            this.constraints = field.has(JSON_KEY_CONSTRAINTS) ? field.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
+        }
     }
     
     /**
@@ -410,7 +423,8 @@ public class Field {
         json.put(JSON_KEY_FORMAT, this.format);
         json.put(JSON_KEY_TITLE, this.title);
         json.put(JSON_KEY_DESCRIPTION, this.description);
-        json.put(JSON_KEY_CONSTRAINTS, this.constraints);
+        if ((null != constraints) && (!constraints.isEmpty()))
+            json.put(JSON_KEY_CONSTRAINTS, this.constraints);
         
         return json;
     }
@@ -441,5 +455,22 @@ public class Field {
     
     public Map<String, Object> getConstraints(){
         return this.constraints;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Field field = (Field) o;
+        return name.equals(field.name) &&
+                type.equals(field.type) &&
+                Objects.equals(format, field.format) &&
+                Objects.equals(constraints, field.constraints);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type, format, constraints);
     }
 }

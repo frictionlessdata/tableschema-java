@@ -6,12 +6,15 @@ import io.frictionlessdata.tableschema.exceptions.PrimaryKeyException;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 import io.frictionlessdata.tableschema.fk.Reference;
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -61,10 +64,17 @@ public class SchemaTest {
         schemaJsonObj.getJSONArray("fields").put(invalidField.getJson());
         
         exception.expect(ValidationException.class);
-        Schema invalidSchema = new Schema(schemaJsonObj.toString(), true);
-        
+        new Schema(schemaJsonObj.toString(), true);
     }
-    
+
+
+    @Test
+    public void testReadFromInValidSchemaFileWithStrictValidation() throws Exception{
+        File f = new File(getTestDataDirectory(), "schema/invalid_population_schema.json");
+        exception.expect(ValidationException.class);
+        new Schema(f, true);
+    }
+
     @Test
     public void testCreateSchemaFromInvalidSchemaJsonWithoutStrictValidation() throws Exception{  
         JSONObject schemaJsonObj = new JSONObject();
@@ -339,8 +349,8 @@ public class SchemaTest {
         // Assert id field
         Assert.assertEquals(Field.FIELD_TYPE_INTEGER, readSchema.getField("id").getType());
         Assert.assertEquals(Field.FIELD_FORMAT_DEFAULT, readSchema.getField("id").getFormat());
-        Assert.assertEquals("", readSchema.getField("id").getTitle());
-        Assert.assertEquals("", readSchema.getField("id").getDescription());
+        Assert.assertNull(readSchema.getField("id").getTitle());
+        Assert.assertNull(readSchema.getField("id").getDescription());
         Assert.assertTrue((boolean)readSchema.getField("id").getConstraints().get(Field.CONSTRAINT_KEY_REQUIRED));
         
         // Assert name field
@@ -390,7 +400,7 @@ public class SchemaTest {
         
         // Foreign Keys
         Reference ref = new Reference(new URL("http://data.okfn.org/data/mydatapackage/"), "resource", "name");
-        ForeignKey fk = new ForeignKey("fkName", ref, true);
+        ForeignKey fk = new ForeignKey("name", ref, true);
         createdSchema.addForeignKey(fk);
         
         // Save schema
@@ -399,7 +409,7 @@ public class SchemaTest {
         Schema readSchema = new Schema(createdFile, true);
         
         // Assert Foreign Keys
-        Assert.assertEquals("fkName", readSchema.getForeignKeys().get(0).getFields());
+        Assert.assertEquals("name", readSchema.getForeignKeys().get(0).getFields());
         Assert.assertEquals("http://data.okfn.org/data/mydatapackage/", readSchema.getForeignKeys().get(0).getReference().getDatapackage().toString());
         Assert.assertEquals("resource", readSchema.getForeignKeys().get(0).getReference().getResource());
     }
@@ -564,6 +574,13 @@ public class SchemaTest {
         Assert.assertEquals("position_title", schema.getForeignKeys().get(0).getFields());
         Assert.assertEquals("positions", schema.getForeignKeys().get(0).getReference().getResource());
         Assert.assertEquals("name", schema.getForeignKeys().get(0).getReference().getFields());
+    }
+
+
+    private File getTestDataDirectory()throws Exception {
+        URL u = TableTest.class.getResource("/fixtures/simple_data.csv");
+        Path path = Paths.get(u.toURI());
+        return path.getParent().toFile();
     }
 
     private static File getResourceFile(String fileName) throws URISyntaxException {

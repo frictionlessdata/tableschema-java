@@ -10,10 +10,7 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.everit.json.schema.ValidationException;
@@ -68,7 +65,7 @@ public class Schema {
         this.initValidator();
         initSchemaFromStream(inStream);
 
-        this.validate();
+        validate();
     }
 
     /**
@@ -224,17 +221,43 @@ public class Schema {
             return false;
         }
     }
-    
+
+    private void validate(String foundFieldName) throws ValidationException{
+        Field foundField = fields
+                .stream()
+                .filter((f) -> f.getName().equals(foundFieldName))
+                .findFirst()
+                .orElse(null);
+        if (null == foundField) {
+            throw new ValidationException (tableJsonSchema, "Primary key field " + foundFieldName+" not found");
+        }
+    }
+
     /**
-     * Validate the loaded Schema.
+     * Validate the loaded Schema. First do a formal validation via JSON schema,
+     * then check foreign keys match to existing fields.
+     *
      * Validation is strict or unstrict depending on how the package was
-     * instanciated with the strict flag.
+     * instantiated with the strict flag.
      * @throws ValidationException 
      */
-    public final void validate() throws ValidationException{
+    private void validate() throws ValidationException{
         try{
              this.tableJsonSchema.validate(this.getJson());
-            
+             if (null != foreignKeys) {
+                 for (ForeignKey fk : foreignKeys) {
+                     Object fields = fk.getFields();
+                     if (fields instanceof JSONArray) {
+                         List<Object> subFields = ((JSONArray) fields).toList();
+                         for (Object subField : subFields) {
+                             validate((String) subField);
+                         }
+                     } else if (fields instanceof String) {
+                         validate((String) fields);
+                     }
+                 }
+             }
+
         }catch(ValidationException ve){
             if(this.strictValidation){
                 throw ve;
@@ -421,5 +444,19 @@ public class Schema {
     public void addForeignKey(ForeignKey foreignKey){
         this.foreignKeys.add(foreignKey);
     }
-   
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Schema schema = (Schema) o;
+        return Objects.equals(fields, schema.fields) &&
+                Objects.equals(primaryKey, schema.primaryKey) &&
+                Objects.equals(foreignKeys, schema.foreignKeys);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fields, primaryKey, foreignKeys);
+    }
 }

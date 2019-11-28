@@ -18,8 +18,17 @@ import org.junit.rules.ExpectedException;
 public class FieldTest {
     @Rule
     public final ExpectedException exception = ExpectedException.none();
-    
+
+    private static String testJson = "{\"name\":\"city\",\"format\":\"\",\"description\":\"\",\"title\":\"\",\"type\":\"string\",\"constraints\":{}}";
+
+
     @Test
+    public void testFieldCreationFromString() throws Exception{
+        Field testField = new Field (new JSONObject(testJson));
+        Assert.assertEquals(testField.getName(), "city");
+    }
+
+        @Test
     public void testFieldCastGeopointDefault() throws Exception{   
         Field field = new Field("test", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_DEFAULT, "title", "description");
         int[] val = field.castValue("12,21");
