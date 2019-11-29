@@ -6,16 +6,16 @@ import io.frictionlessdata.tableschema.exceptions.PrimaryKeyException;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 import io.frictionlessdata.tableschema.fk.Reference;
 import java.io.File;
-import java.io.FileInputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.frictionlessdata.tableschema.table_tests.TableOtherTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -578,7 +578,7 @@ public class SchemaTest {
 
 
     private File getTestDataDirectory()throws Exception {
-        URL u = TableTest.class.getResource("/fixtures/simple_data.csv");
+        URL u = TableOtherTest.class.getResource("/fixtures/simple_data.csv");
         Path path = Paths.get(u.toURI());
         return path.getParent().toFile();
     }
