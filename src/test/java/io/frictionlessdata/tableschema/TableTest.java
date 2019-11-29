@@ -51,6 +51,14 @@ public class TableTest {
                 new Object[]{"rome",2017,2860000}
             };
 
+
+    private static Object[][] populationTestData = new Object[][]
+            {
+                new Object[]{"london",2017,8780000},
+                new Object[]{"paris",2017,2240000},
+                new Object[]{"rome",2017,2860000}
+            };
+
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
     
@@ -78,7 +86,7 @@ public class TableTest {
     
     @Test
     public void testReadFromValidJSONArray() throws Exception{
-        
+
         Table table = new Table(populationTestJson.toString());
         Assert.assertEquals(3, table.read().size());
         Schema schema = table.inferSchema();
