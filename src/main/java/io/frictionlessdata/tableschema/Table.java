@@ -12,9 +12,7 @@ import org.json.*;
 import java.io.InputStream;
 import java.io.Writer;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class represents a CSV table
@@ -41,20 +39,14 @@ public class Table{
      * @throws Exception if either reading or parsing throws an Exception
      */
     public Table(InputStream dataSource, InputStream schema) throws Exception{
-        this.dataSource = DataSource.createDataSource(dataSource, null);
+        this.dataSource = DataSource.createDataSource(dataSource);
         this.schema = new Schema(schema, true);
     }
 
     public Table(File dataSource, File basePath) throws Exception{
         this.dataSource = new CsvDataSource(dataSource, basePath);
     }
-    
-    public Table(File dataSource, File basePath, JSONObject schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource, basePath);
-        if (null != schema)
-            this.schema = new Schema(schema.toString(), false);
-    }
-    
+
     public Table(File dataSource, File basePath, Schema schema) throws Exception{
         this.dataSource = new CsvDataSource(dataSource, basePath);
         this.schema = schema;
@@ -75,8 +67,7 @@ public class Table{
     }
     
     public Table(URL dataSource, URL schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource);
-        this.schema = new Schema(schema, false);
+        this(dataSource, new Schema(schema, true));
     }
 
     public Iterator iterator() throws Exception{
@@ -86,15 +77,7 @@ public class Table{
     public Iterator iterator(boolean keyed) throws Exception{
        return new TableIterator(this, keyed);
     }
-    
-    public Iterator iterator(boolean keyed, boolean extended) throws Exception{
-       return new TableIterator(this, keyed, extended);
-    }
-    
-    public Iterator iterator(boolean keyed, boolean extended, boolean cast) throws Exception{
-       return new TableIterator(this, keyed, extended, cast);
-    }
-    
+
     public Iterator iterator(boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
        return new TableIterator(this, keyed, extended, cast, relations);
     }
@@ -132,21 +115,14 @@ public class Table{
     }
     
     public Schema inferSchema() throws TypeInferringException{
-        try{
-            JSONObject schemaJson = TypeInferrer.getInstance().infer(this.read(), this.getHeaders());
-            this.schema = new Schema(schemaJson.toString(), false);
-            return this.schema;
-            
-        }catch(Exception e){
-            throw new TypeInferringException();
-        }
+        return inferSchema(-1);
     }
     
     public Schema inferSchema(int rowLimit) throws TypeInferringException{
         try{
-            JSONObject schemaJson = TypeInferrer.getInstance().infer(this.read(), this.getHeaders(), rowLimit);
-            this.schema = new Schema(schemaJson.toString(), false);
-            return this.schema;
+            JSONObject schemaJson = TypeInferrer.getInstance().infer(read(), getHeaders(), rowLimit);
+            schema = new Schema(schemaJson.toString(), false);
+            return schema;
             
         }catch(Exception e){
             throw new TypeInferringException();
@@ -171,5 +147,33 @@ public class Table{
     
     public DataSource dataSource(){
         return this.dataSource;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Table table = (Table) o;
+        boolean equals = false;
+        try {
+            equals = Arrays.equals(table.getHeaders(), ((Table) o).getHeaders());
+            equals = equals & table.inferSchema(10).equals(((Table) o).inferSchema(10));
+            List<Object[]> data = table.read();
+            List<Object[]> oData = ((Table) o).read();
+            equals = equals & data.size() == oData.size();
+            for (int i = 0; i <data.size(); i++) {
+                equals = equals & Arrays.equals(data.get(i), oData.get(i));
+            }
+            if (equals)
+                return true;
+        } catch (Exception ex) {
+            return false;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dataSource, schema, format);
     }
 }
