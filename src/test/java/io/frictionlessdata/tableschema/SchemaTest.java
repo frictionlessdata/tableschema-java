@@ -137,11 +137,11 @@ public class SchemaTest {
     @Test
     public void testCreateSchemaFromFileWithValidCompositeKey() throws Exception{
         File source = getResourceFile("/fixtures/primarykey/simple_schema_with_valid_ck.json");
-        Schema schemaWithValidCK = new Schema(source, false); //FIXME: Why does this primary key fail validation when strict=true
+        Schema schemaWithValidCK = new Schema(source, true);
         
-        String[] compositePrimaryKey = schemaWithValidCK.getPrimaryKey();
-        Assert.assertEquals("name", compositePrimaryKey[0]);
-        Assert.assertEquals("surname", compositePrimaryKey[1]);
+        JSONArray compositePrimaryKey = schemaWithValidCK.getPrimaryKey();
+        Assert.assertEquals("name", compositePrimaryKey.getString(0));
+        Assert.assertEquals("surname", compositePrimaryKey.getString(1));
         
     }
     
@@ -452,10 +452,10 @@ public class SchemaTest {
         schema.addField(surnameField);
 
         schema.setPrimaryKey(new String[]{"name", "surname"});
-        String[] compositeKey = schema.getPrimaryKey();
+        JSONArray compositeKey = schema.getPrimaryKey();
         
-        Assert.assertEquals("name", compositeKey[0]);
-        Assert.assertEquals("surname", compositeKey[1]);  
+        Assert.assertEquals("name", compositeKey.getString(0));
+        Assert.assertEquals("surname", compositeKey.getString(1));
     }
     
     @Test
@@ -491,9 +491,9 @@ public class SchemaTest {
         String[] compositeKey = new String[]{"name", "invalid"};
         schema.setPrimaryKey(compositeKey); // strict=false
         
-        String[] fetchedCompositeKey = schema.getPrimaryKey();
-        Assert.assertEquals("name", fetchedCompositeKey[0]);
-        Assert.assertEquals("invalid", fetchedCompositeKey[1]);
+        List<String> fetchedCompositeKey = schema.getPrimaryKeyParts();
+        Assert.assertEquals("name", fetchedCompositeKey.get(0));
+        Assert.assertEquals("invalid", fetchedCompositeKey.get(1));
     }
     
     @Test

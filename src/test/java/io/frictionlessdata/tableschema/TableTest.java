@@ -26,6 +26,23 @@ import org.junit.rules.TemporaryFolder;
  * 
  */
 public class TableTest {
+    private static JSONArray populationTestJson =  new JSONArray("[" +
+             "{" +
+             "\"city\": \"london\"," +
+             "\"year\": 2017," +
+             "\"population\": 8780000" +
+             "}," +
+             "{" +
+             "\"city\": \"paris\"," +
+             "\"year\": 2017," +
+             "\"population\": 2240000" +
+             "}," +
+             "{" +
+             "\"city\": \"rome\"," +
+             "\"year\": 2017," +
+             "\"population\": 2860000" +
+             "}" +
+             "]");
 
     private static Object[][] populationTestData = new Object[][]
             {
@@ -61,29 +78,34 @@ public class TableTest {
     
     @Test
     public void testReadFromValidJSONArray() throws Exception{
-
-        JSONArray jsonData = new JSONArray("[" +
-            "{" +
-              "\"city\": \"london\"," +
-              "\"year\": 2017," +
-              "\"population\": 8780000" +
-            "}," +
-            "{" +
-              "\"city\": \"paris\"," +
-              "\"year\": 2017," +
-              "\"population\": 2240000" +
-            "}," +
-            "{" +
-              "\"city\": \"rome\"," +
-              "\"year\": 2017," +
-              "\"population\": 2860000" +
-            "}" +
-        "]");
         
-        Table table = new Table(jsonData.toString(), null);
+        Table table = new Table(populationTestJson.toString());
         Assert.assertEquals(3, table.read().size());
         Schema schema = table.inferSchema();
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
+        Schema expectedSchema = null;
+        try (FileInputStream fis = new FileInputStream(f)) {
+            expectedSchema = new Schema(fis, false);
+        }
+
+        if (!expectedSchema.equals(schema)) {
+            for (int i = 0; i < expectedSchema.getFields().size(); i++) {
+                Field expectedField = expectedSchema.getFields().get(i);
+                Field actualField = schema.getFields().get(i);
+                Assert.assertEquals(expectedField,actualField);
+            }
+        }
+        Assert.assertEquals(expectedSchema, schema);
+    }
+
+
+    @Test
+    public void testReadFromValidJSONArrayWithSchema() throws Exception{
+        File f = new File(getTestDataDirectory(), "schema/population_schema.json");
+
+        Schema schema = new Schema(f, true);
+        Table table = new Table(populationTestJson.toString(), schema);
+        Assert.assertEquals(3, table.read().size());
         Schema expectedSchema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
             expectedSchema = new Schema(fis, false);
@@ -223,7 +245,7 @@ public class TableTest {
         File file = new File("employee_data.csv");
         Table employeeTable = new Table(file, testDataDir);
    
-        Iterator<Object[]> iter = employeeTable.iterator(false, true);
+        Iterator<Object[]> iter = employeeTable.iterator(false, true, false, false);
         
         int rowIndex = 0;
         while(iter.hasNext()){
