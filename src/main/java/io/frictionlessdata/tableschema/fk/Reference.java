@@ -77,10 +77,6 @@ public class Reference {
         return this.datapackage;
     }
     
-    public void setDatapackage(URL datapackage){
-        this.datapackage = datapackage;
-    }
-    
     public String getResource(){
         return this.resource;
     }

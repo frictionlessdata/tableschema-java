@@ -23,6 +23,7 @@ public class ForeignKey {
     }
     
     public ForeignKey(boolean strict){  
+        this();
         this.strictValidation = strict;
     }
     
@@ -32,10 +33,6 @@ public class ForeignKey {
         this.reference = reference;
         this.strictValidation = strict;
         this.validate();
-    }
-    
-    public ForeignKey(JSONObject fkJsonObject) throws ForeignKeyException{
-        this(fkJsonObject, false);
     }
     
     public ForeignKey(JSONObject fkJsonObject, boolean strict) throws ForeignKeyException{

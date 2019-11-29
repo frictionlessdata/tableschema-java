@@ -27,4 +27,14 @@ public class TypeInferringException extends TableSchemaException {
     public TypeInferringException(String msg) {
         super(msg);
     }
+
+    /**
+     * Constructs an instance of <code>TypeInferringException</code> wrapping an
+     * underlying Exception
+     *
+     * @param ex the causing Throwable.
+     */
+    public TypeInferringException(Throwable ex) {
+        super(ex);
+    }
 }

@@ -27,33 +27,7 @@ public class TableIterator<T> implements Iterator<T> {
         this.schema = table.schema();
         this.iter = table.dataSource().iterator();
     }
-    
-    public TableIterator(Table table, boolean keyed) throws Exception{
-        this.init(table);
-        this.headers = table.getHeaders();
-        this.schema = table.schema();
-        this.iter = table.dataSource().iterator();
-        this.keyed = keyed;
-    }
-    
-    public TableIterator(Table table, boolean keyed, boolean extended) throws Exception{
-        this.init(table);
-        this.headers = table.getHeaders();
-        this.schema = table.schema();
-        this.iter = table.dataSource().iterator();
-        this.keyed = keyed;
-        this.extended = extended;
-    }
-    
-    public TableIterator(Table table, boolean keyed, boolean extended, boolean cast) throws Exception{
-        this.init(table);
-        this.headers = table.getHeaders();
-        this.schema = table.schema();
-        this.iter = table.dataSource().iterator();
-        this.keyed = keyed;
-        this.extended = extended;
-        this.cast = cast;
-    }
+
     
     public TableIterator(Table table, boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
         this.init(table);
@@ -116,7 +90,7 @@ public class TableIterator<T> implements Iterator<T> {
                     return (T)row;
                 }
             
-            }catch(InvalidCastException | ConstraintsException e){
+            } catch(InvalidCastException | ConstraintsException e){
                 // The row data types do not match schema definition.
                 // Or the row values do not respect the Constraint rules.
                 // Do noting and string with String[] typed row.                
@@ -124,7 +98,7 @@ public class TableIterator<T> implements Iterator<T> {
             }
             
         }else{
-            // Enter here of no Schema has been defined.            
+            // Enter here if no Schema has been defined.
             if(extended){
                 extendedRow = new Object[]{index, this.headers, row}; 
                 index++;

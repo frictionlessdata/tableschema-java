@@ -177,7 +177,7 @@ public class Field {
                 if(enforceConstraints && this.constraints != null){
                     Map<String, Object> violatedConstraints = checkConstraintViolations(castValue);
                     if(!violatedConstraints.isEmpty()){
-                        throw new ConstraintsException();
+                        throw new ConstraintsException("Violated "+ violatedConstraints.size()+" contstraints");
                     }
                 }
                 

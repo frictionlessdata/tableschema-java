@@ -75,7 +75,7 @@ public class Table{
     }
     
     public Iterator iterator(boolean keyed) throws Exception{
-       return new TableIterator(this, keyed);
+       return new TableIterator(this, keyed, false, false, false);
     }
 
     public Iterator iterator(boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
@@ -125,7 +125,7 @@ public class Table{
             return schema;
             
         }catch(Exception e){
-            throw new TypeInferringException();
+            throw new TypeInferringException(e);
         }
     }
 
