@@ -111,7 +111,7 @@ public class TypeInferrer {
      * @throws TypeInferringException 
      */
     public synchronized JSONObject infer(List<Object[]> data, String[] headers) throws TypeInferringException{
-        return this.infer(data, headers, data.size()-1);
+        return this.infer(data, headers, -1);
     }
     
     /**
@@ -128,7 +128,11 @@ public class TypeInferrer {
         // then just use the length of the data.
         if(rowLimit > data.size()-1){
             rowLimit = data.size()-1;
+            //If `rowLimit ` is '-1', no row limiting will be enforced
+        } else if(rowLimit == -1){
+            rowLimit = data.size()-1;
         }
+
 
         // The JSON Array that will define the fields in the schema JSON Object.
         JSONArray tableFieldJsonArray = new JSONArray();

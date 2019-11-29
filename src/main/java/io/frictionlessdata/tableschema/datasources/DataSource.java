@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
@@ -65,7 +66,7 @@ public interface DataSource {
     public static DataSource createDataSource(File input, File workDir) throws IOException {
         Path resolvedPath = DataSource.toSecure(input.toPath(), workDir.toPath());
         try (InputStream is = new FileInputStream(resolvedPath.toFile())) { // Read the file.
-            return createDataSource(is, workDir);
+            return createDataSource(is);
         }
     }
 
@@ -74,7 +75,7 @@ public interface DataSource {
      * CsvDataSource based on input format
      * @return DataSource created from input String
      */
-    public static DataSource createDataSource(InputStream input, File workDir) throws IOException {
+    public static DataSource createDataSource(InputStream input) throws IOException {
         String content = null;
 
         // Read the file.
@@ -106,7 +107,7 @@ public interface DataSource {
         }
         //Path canonicalPath = testPath.toRealPath(null);
         final Path resolvedPath = referencePath.resolve(testPath).normalize();
-        if (!resolvedPath.toFile().exists())
+        if (!Files.exists(resolvedPath))
             throw new FileNotFoundException("File "+resolvedPath.toString()+" does not exist");
         if (!resolvedPath.toFile().isFile()){
             throw new IllegalArgumentException("Input must be a file");

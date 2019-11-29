@@ -2,19 +2,10 @@ package io.frictionlessdata.tableschema.datasources;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
 import org.json.JSONArray;
 
 import java.io.*;
 import java.net.URL;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Iterator;
@@ -146,4 +137,5 @@ public abstract class AbstractDataSource implements DataSource {
             writeCsv(out, locFormat);
         }
     }
+
 }

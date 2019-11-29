@@ -1,9 +1,6 @@
 package io.frictionlessdata.tableschema;
 
-import io.frictionlessdata.tableschema.exceptions.ForeignKeyException;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
-import io.frictionlessdata.tableschema.exceptions.PrimaryKeyException;
-import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
+import io.frictionlessdata.tableschema.exceptions.*;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 
 import java.io.*;
@@ -121,7 +118,7 @@ public class Schema {
      * @return Schema generated from the inferred input
      * @throws TypeInferringException 
      */
-    public JSONObject infer(List<Object[]> data, String[] headers) throws TypeInferringException{
+    public static JSONObject infer(List<Object[]> data, String[] headers) throws TypeInferringException{
         return TypeInferrer.getInstance().infer(data, headers);
     }
     
@@ -133,7 +130,7 @@ public class Schema {
      * @return Schema generated from the inferred input
      * @throws TypeInferringException 
      */
-    public JSONObject infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
+    public static JSONObject infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
         return TypeInferrer.getInstance().infer(data, headers, rowLimit);
     }
     
@@ -169,15 +166,7 @@ public class Schema {
             
             // If primary key is a composite key.
             if(schema.get(JSON_KEY_PRIMARY_KEY) instanceof JSONArray){
-                
-                JSONArray keyJSONArray = schema.getJSONArray(JSON_KEY_PRIMARY_KEY);
-                String[] composityKey = new String[keyJSONArray.length()];
-                for(int i=0; i<keyJSONArray.length(); i++){
-                    composityKey[i] = keyJSONArray.getString(i);
-                }
-                
-                this.setPrimaryKey(composityKey);
-                
+                this.setPrimaryKey(schema.getJSONArray(JSON_KEY_PRIMARY_KEY));
             }else{
                 // Else if primary key is a single String key.
                 this.setPrimaryKey(schema.getString(JSON_KEY_PRIMARY_KEY));
@@ -215,8 +204,7 @@ public class Schema {
     public boolean isValid(){
         try{
             validate();
-            return true;
-            
+            return ((null == errors) || (errors.isEmpty()));
         }catch(ValidationException ve){
             return false;
         }
@@ -391,15 +379,18 @@ public class Schema {
     public boolean hasFields(){
         return !this.getFields().isEmpty();
     }
-    
 
-    
     /**
      * Set single primary key with the option of validation.
      * @param key
      * @throws PrimaryKeyException 
      */
-    public void setPrimaryKey(String key) throws PrimaryKeyException{        
+    public void setPrimaryKey(String key) throws PrimaryKeyException{
+        checkKey(key);
+        this.primaryKey = key; 
+    }
+
+    private void checkKey(String key) {
         if(!this.hasField(key)){
             PrimaryKeyException pke = new PrimaryKeyException("No such field as: " + key + ".");
             if(this.strictValidation){
@@ -408,8 +399,14 @@ public class Schema {
                 this.getErrors().add(pke);
             }
         }
-        
-        this.primaryKey = key; 
+    }
+
+    public void setPrimaryKey(String[] keys) throws PrimaryKeyException{
+        JSONArray compositeKey = new JSONArray();
+        for (String key : keys) {
+            compositeKey.put(key);
+        }
+        setPrimaryKey(compositeKey);
     }
     
     /**
@@ -417,24 +414,29 @@ public class Schema {
      * @param compositeKey
      * @throws PrimaryKeyException 
      */
-    public void setPrimaryKey(String[] compositeKey) throws PrimaryKeyException{        
-        for (String aKey : compositeKey) {
-            if (!this.hasField(aKey)) {
-                PrimaryKeyException pke = new PrimaryKeyException("No such field as: " + aKey + ".");
-                
-                if(this.strictValidation){
-                    throw pke;
-                }else{
-                    this.getErrors().add(pke);
-                }
-            }
+    public void setPrimaryKey(JSONArray compositeKey) throws PrimaryKeyException{
+        List<Object> keys = compositeKey.toList();
+        for (Object key : keys) {
+            checkKey((String)key);
         }
-        
         this.primaryKey = compositeKey;
     }
     
     public <Any> Any getPrimaryKey(){
         return (Any)this.primaryKey;
+    }
+
+    public List<String> getPrimaryKeyParts() {
+        if (primaryKey instanceof String)
+            return Arrays.asList((String) primaryKey);
+        if (primaryKey instanceof JSONArray) {
+            final List<String> retVal = new ArrayList<>();
+            for (Object k : ((JSONArray) primaryKey)) {
+                retVal.add((String)k);
+            }
+            return retVal;
+        }
+        throw new TableSchemaException("Unknown PrimaryKey type: "+primaryKey.getClass());
     }
     
     public List<ForeignKey> getForeignKeys(){
