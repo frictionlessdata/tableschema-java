@@ -27,14 +27,8 @@ public abstract class AbstractDataSource implements DataSource {
     Object dataSource = null;
     File workDir;
 
-    public AbstractDataSource(InputStream inStream) throws IOException{
-        try (InputStreamReader ir = new InputStreamReader(inStream)) {
-            try (BufferedReader rdr = new BufferedReader(ir)) {
-                String dSource = rdr.lines().collect(Collectors.joining("\n"));
-                this.dataSource = new JSONArray(dSource);
-            }
-        }
-    }
+    AbstractDataSource(){}
+
 
     public AbstractDataSource(URL dataSource){
         this.dataSource = dataSource;

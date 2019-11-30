@@ -5,8 +5,9 @@ import org.apache.commons.csv.CSVParser;
 import org.json.CDL;
 import org.json.JSONArray;
 
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -17,6 +18,17 @@ public class JsonArrayDataSource extends AbstractDataSource {
         super(dataSource.toString());
     }
 
+    public JsonArrayDataSource(InputStream inStream) throws IOException {
+       //this(new JSONArray(inStream));
+        InputStreamReader inputStreamReader = new InputStreamReader(inStream, Charset.forName("UTF-8"));
+        BufferedReader br = new BufferedReader(inputStreamReader);
+
+        String content = br.lines().collect(Collectors.joining("\n"));
+        br.close();
+        inputStreamReader.close();
+        JSONArray arr = new JSONArray(content);
+        this.dataSource = arr;
+    }
 
 
 
