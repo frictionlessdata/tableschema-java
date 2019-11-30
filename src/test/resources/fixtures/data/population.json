@@ -1,0 +1,15 @@
+[
+  {
+  "city": "london",
+  "year": 2017,
+  "population": 8780000
+  },
+  {"city": "paris",
+  "year": 2017,
+  "population": 2240000
+  },
+  {"city": "rome",
+  "year": 2017,
+  "population": 2860000
+  }
+]

@@ -1,11 +1,17 @@
 package io.frictionlessdata.tableschema.datasources;
 
+import jdk.nashorn.internal.parser.JSONParser;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -16,8 +22,28 @@ public class CsvDataSource extends AbstractDataSource {
             .RFC4180
             .withHeader();;
 
-    public CsvDataSource(InputStream inStream) throws IOException{
-        super(inStream);
+    public CsvDataSource(){};
+
+    public CsvDataSource(InputStream inStream) throws Exception{
+        InputStreamReader inputStreamReader = new InputStreamReader(inStream, Charset.forName("UTF-8"));
+        BufferedReader br = new BufferedReader(inputStreamReader);
+
+        String content = br.lines().collect(Collectors.joining("\n"));
+        this.dataSource = content;
+        br.close();
+        inputStreamReader.close();
+
+        try {
+            new JSONArray(content);
+        } catch (JSONException ex) {
+            try {
+                new JSONObject(content);
+            } catch (JSONException ex2) {
+                return;
+            }
+        }
+
+        throw new IllegalArgumentException("Input seems to be in JSON format");
     }
 
     public CsvDataSource(URL dataSource){

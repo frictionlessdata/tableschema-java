@@ -73,10 +73,6 @@ public class Table{
     public Iterator iterator() throws Exception{
        return new TableIterator(this);
     }
-    
-    public Iterator iterator(boolean keyed) throws Exception{
-       return new TableIterator(this, keyed, false, false, false);
-    }
 
     public Iterator iterator(boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
        return new TableIterator(this, keyed, extended, cast, relations);

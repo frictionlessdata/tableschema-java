@@ -22,6 +22,8 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.*;
 
+import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
+
 /**
  *
  * 
@@ -196,12 +198,6 @@ public class TableCreationTest {
         } finally {
             fis.close();
         }
-    }
-
-    private File getTestDataDirectory()throws Exception {
-        URL u = TableCreationTest.class.getResource("/fixtures/simple_data.csv");
-        Path path = Paths.get(u.toURI());
-        return path.getParent().toFile();
     }
 
 }
