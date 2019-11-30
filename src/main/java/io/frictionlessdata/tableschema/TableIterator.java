@@ -22,10 +22,7 @@ public class TableIterator<T> implements Iterator<T> {
     private int index = 0;
 
     public TableIterator(Table table) throws Exception{
-        this.init(table);
-        this.headers = table.getHeaders();
-        this.schema = table.schema();
-        this.iter = table.dataSource().iterator();
+        this(table, false, false, true, false);
     }
 
     
