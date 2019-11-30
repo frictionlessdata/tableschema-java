@@ -309,7 +309,7 @@ public class Schema {
             return castRow;
             
         }catch(Exception e){
-            throw new InvalidCastException();
+            throw new InvalidCastException(e);
         }
         
     }

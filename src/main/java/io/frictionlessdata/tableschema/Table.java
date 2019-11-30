@@ -84,7 +84,7 @@ public class Table{
 
     public List<Object[]> read(boolean cast) throws Exception{
         if(cast && !this.schema.hasFields()){
-            throw new InvalidCastException();
+            throw new InvalidCastException("Schema has no fields");
         }
         
         List<Object[]> rows = new ArrayList();

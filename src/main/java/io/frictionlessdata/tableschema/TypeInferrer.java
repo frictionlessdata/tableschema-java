@@ -266,7 +266,7 @@ public class TypeInferrer {
         try{
             return Duration.parse(value); 
         }catch(Exception e){
-            throw new TypeInferringException();
+            throw new TypeInferringException(e);
         }
     }
     
@@ -297,16 +297,16 @@ public class TypeInferrer {
                     validateTopoJsonSchema(jsonObj);
 
                 }else{
-                    throw new TypeInferringException();
+                    throw new TypeInferringException("Unknown format type");
                 }
 
             }catch(ValidationException ve){
                 // Not a valid GeoJSON or TopoJSON.
-                throw new TypeInferringException();
+                throw new TypeInferringException(ve);
             }
         }catch(JSONException je){
             // Not a valid JSON.
-            throw new TypeInferringException();
+            throw new TypeInferringException(je);
         }
         
         return jsonObj;
@@ -376,7 +376,7 @@ public class TypeInferrer {
                     return new int[]{lon, lat};
                     
                 }else{
-                    throw new TypeInferringException();
+                    throw new TypeInferringException("Geo points must have two coordinates");
                 }
 
             }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_ARRAY)){
@@ -392,7 +392,7 @@ public class TypeInferrer {
                     return new int[]{lon, lat};
 
                 }else{
-                    throw new TypeInferringException();
+                    throw new TypeInferringException("Geo points must have two coordinates");
                 }     
 
             }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_OBJECT)){
@@ -416,7 +416,7 @@ public class TypeInferrer {
             }
 
         }catch(Exception e){
-            throw new TypeInferringException();
+            throw new TypeInferringException(e);
         }
     }
     
@@ -428,7 +428,7 @@ public class TypeInferrer {
         try {
             return new JSONObject(value);
         }catch(JSONException je){
-            throw new TypeInferringException();
+            throw new TypeInferringException(je);
         }       
     }
     
@@ -440,7 +440,7 @@ public class TypeInferrer {
         try {
             return new JSONArray(value);
         }catch(JSONException je){
-            throw new TypeInferringException();
+            throw new TypeInferringException(je);
         } 
     }
     

@@ -42,6 +42,10 @@ public class DataSourceTest {
             "}" +
             "]";
 
+    private String populationCsv = "city,year,population\n" +
+            "london,2017,8780000\n" +
+            "paris,2017,2240000\n" +
+            "rome,2017,2860000";
     private final String[] populationHeaders = new String[]{
             "city", "year", "population"
     };
@@ -83,6 +87,7 @@ public class DataSourceTest {
         // evade the CRLF mess by nuking all CR chars
         Assert.assertEquals(dates.replaceAll("\\r", ""), content.replaceAll("\\r", ""));
     }
+
     @Test
     public void testUnsafePath1() throws Exception {
        URL u = DataSourceTest.class.getResource("/fixtures/dates_data.csv");
@@ -193,6 +198,51 @@ public class DataSourceTest {
     public void testSafeStreamCreationJson() throws Exception {
         DataSource ds = DataSource.createDataSource(new File ("data/population.json"), TestHelper.getTestDataDirectory());
         Assert.assertNotNull(ds);
+    }
+
+    @Test
+    public void writeCsvToFile() throws Exception{
+        String content = null;
+
+        DataSource ds;
+        File tempFile = Files.createTempFile("tableschema-", ".json").toFile();
+
+        File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.csv");
+        try (FileInputStream is = new FileInputStream(inFile)) {
+            String popCsv = new String(Files.readAllBytes(inFile.toPath()));
+            ds = DataSource.createDataSource(popCsv);
+            Assert.assertArrayEquals(populationHeaders, ds.getHeaders());
+        }
+        System.out.println(tempFile.getAbsolutePath());
+        ds.write(tempFile);
+        try (FileReader fr = new FileReader(tempFile)) {
+            try (BufferedReader rdr = new BufferedReader(fr)) {
+                content = rdr.lines().collect(Collectors.joining("\n"));
+            }
+        }
+        // evade the CRLF mess by nuking all CR chars
+        Assert.assertEquals(populationCsv.replaceAll("\\r", ""), content.replaceAll("\\r", ""));
+    }
+
+
+    @Test
+    public void writeJsonToFile() throws Exception{
+        String content = null;
+        String popCsv;
+
+        File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.json");
+        popCsv = new String(Files.readAllBytes(inFile.toPath()));
+        DataSource ds = DataSource.createDataSource(popCsv);
+
+        File tempFile = Files.createTempFile("tableschema-", ".json").toFile();
+        ds.write(tempFile);
+        try (FileReader fr = new FileReader(tempFile)) {
+            try (BufferedReader rdr = new BufferedReader(fr)) {
+                content = rdr.lines().collect(Collectors.joining("\n"));
+            }
+        }
+        // evade the CRLF mess by nuking all CR chars
+        Assert.assertEquals(content.replaceAll("[\\r\\n ]", ""), popCsv.replaceAll("[\\r\\n ]", ""));
     }
 
     private static boolean runningOnWindowsOperatingSystem() {

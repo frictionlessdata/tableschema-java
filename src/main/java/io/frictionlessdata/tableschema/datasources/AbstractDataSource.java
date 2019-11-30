@@ -87,27 +87,6 @@ public abstract class AbstractDataSource implements DataSource {
         return data;
     }
 
-    @Override
-    public void write(File outputFile) throws Exception {
-        try (Writer out = new BufferedWriter(new FileWriter(outputFile));
-             CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.RFC4180)) {
-
-            if (this.getHeaders() != null) {
-                csvPrinter.printRecord(this.getHeaders());
-            }
-
-            Iterator<CSVRecord> recordIter = this.getCSVParser().iterator();
-            while(recordIter.hasNext()){
-                CSVRecord record = recordIter.next();
-                csvPrinter.printRecord(record);
-            }
-
-            csvPrinter.flush();
-
-        } catch (Exception e) {
-            throw e;
-        }
-    }
 
     @Override
     public String[] getHeaders() throws Exception{

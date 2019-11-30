@@ -6,13 +6,6 @@ package io.frictionlessdata.tableschema.exceptions;
 public class ForeignKeyException extends TableSchemaException {
 
     /**
-     * Creates a new instance of <code>ForeignKeyException</code> without detail
-     * message.
-     */
-    public ForeignKeyException() {
-    }
-
-    /**
      * Constructs an instance of <code>ForeignKeyException</code> with the
      * specified detail message.
      *

@@ -3,6 +3,8 @@ package io.frictionlessdata.tableschema.datasources;
 import jdk.nashorn.internal.parser.JSONParser;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +13,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 import java.util.stream.Collectors;
 
 /**
@@ -111,6 +114,28 @@ public class CsvDataSource extends AbstractDataSource {
             
         } else{
             throw new Exception("Data source is of invalid type.");
+        }
+    }
+
+    @Override
+    public void write(File outputFile) throws Exception {
+        try (Writer out = new BufferedWriter(new FileWriter(outputFile));
+             CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.RFC4180)) {
+
+            if (this.getHeaders() != null) {
+                csvPrinter.printRecord(this.getHeaders());
+            }
+
+            Iterator<CSVRecord> recordIter = this.getCSVParser().iterator();
+            while(recordIter.hasNext()){
+                CSVRecord record = recordIter.next();
+                csvPrinter.printRecord(record);
+            }
+
+            csvPrinter.flush();
+
+        } catch (Exception e) {
+            throw e;
         }
     }
 }

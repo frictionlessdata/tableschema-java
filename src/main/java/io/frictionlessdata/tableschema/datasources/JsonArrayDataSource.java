@@ -2,11 +2,14 @@ package io.frictionlessdata.tableschema.datasources;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.json.CDL;
 import org.json.JSONArray;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.Iterator;
 import java.util.stream.Collectors;
 
 /**
@@ -31,6 +34,14 @@ public class JsonArrayDataSource extends AbstractDataSource {
     }
 
 
+    @Override
+    public void write(File outputFile) throws Exception {
+        try (Writer out = new BufferedWriter(new FileWriter(outputFile))) {
+            out.write((String)dataSource);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 
     /**
      * Retrieve the CSV Parser.

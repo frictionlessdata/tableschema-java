@@ -12,13 +12,6 @@ package io.frictionlessdata.tableschema.exceptions;
 public class ConstraintsException extends TableSchemaException {
 
     /**
-     * Creates a new instance of <code>ConstraintsException</code> without
-     * detail message.
-     */
-    public ConstraintsException() {
-    }
-
-    /**
      * Constructs an instance of <code>ConstraintsException</code> with the
      * specified detail message.
      *

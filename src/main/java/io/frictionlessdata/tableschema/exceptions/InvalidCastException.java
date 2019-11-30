@@ -12,13 +12,6 @@ package io.frictionlessdata.tableschema.exceptions;
 public class InvalidCastException extends TableSchemaException {
 
     /**
-     * Creates a new instance of <code>InvalidCastException</code> without
-     * detail message.
-     */
-    public InvalidCastException() {
-    }
-
-    /**
      * Constructs an instance of <code>InvalidCastException</code> with the
      * specified detail message.
      *
