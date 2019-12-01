@@ -352,16 +352,10 @@ public class Schema {
     }
     
     public List<String> getFieldNames(){
-        // Would be more elegant with Java 8 .map and .collect but it is certainly
-        // best to keep logic backward compatible to Java 7.
-        List<String> fieldNames = new ArrayList();
-        Iterator<Field> iter = this.fields.iterator();
-        while(iter.hasNext()){
-            Field field = iter.next();
-            fieldNames.add(field.getName());
-        }
-        
-        return fieldNames;
+        return fields
+                .stream()
+                .map(Field::getName)
+                .collect(Collectors.toList());
     }
     
     public boolean hasField(String name){
