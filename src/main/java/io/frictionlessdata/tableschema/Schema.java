@@ -359,15 +359,12 @@ public class Schema {
     }
     
     public boolean hasField(String name){
-        Iterator<Field> iter = this.fields.iterator();
-        while(iter.hasNext()){
-            Field field = iter.next();
-            if(field.getName().equalsIgnoreCase(name)){
-                return true;
-            }
-        }
-        
-        return false;
+        Field field = fields
+            .stream()
+            .filter((f) -> f.getName().equals(name))
+            .findFirst()
+            .orElse(null);
+        return (null != field);
     }
     
     public boolean hasFields(){

@@ -237,15 +237,27 @@ public class SchemaTest {
         Assert.assertNotNull(schema.getField("id"));
         Assert.assertNotNull(schema.getField("coordinates"));
     }
-    
+
     @Test
     public void hasField(){
         Schema schema = new Schema();
         Assert.assertFalse(schema.hasFields());
-        
+
         Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
         schema.addField(idField);
         Assert.assertTrue(schema.hasFields());
+    }
+
+    @Test
+    public void hasSetField(){
+        Schema schema = new Schema();
+        Assert.assertFalse(schema.hasFields());
+
+        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        schema.addField(idField);
+        Assert.assertTrue(schema.hasField("id"));
+        Assert.assertFalse(schema.hasField(null));
+        Assert.assertFalse(schema.hasField("sdfsd"));
     }
     
     
