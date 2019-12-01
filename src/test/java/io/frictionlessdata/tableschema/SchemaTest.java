@@ -11,6 +11,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +92,8 @@ public class SchemaTest {
         Assert.assertEquals("invalid", invalidSchema.getField("coordinates").getType());
         
     }
-    
+
+    @Test
     public void testIsValid(){  
         Schema schema = new Schema();
         
@@ -115,7 +117,36 @@ public class SchemaTest {
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/BAD/URL/simple_schema.json");
         
         exception.expect(Exception.class);
-        Schema schema = new Schema(url, true);
+        new Schema(url, true);
+    }
+
+
+    @Test
+    public void testReadSchemaFieldNames() throws Exception{
+        File source = getResourceFile("/fixtures/schema/population_schema.json");
+        Schema schema = new Schema(source, true);
+
+        List<String> fieldNames = schema.getFieldNames();
+        Object[] namesArr = fieldNames.toArray();
+        String[] testArr = new String[]{"city", "year", "population"};
+        Assert.assertArrayEquals(testArr, namesArr);
+    }
+
+
+    @Test
+    public void testCreateFromListOfFields() throws Exception {
+        List<Field> fields = new ArrayList<>();
+
+        Field fieldString = new Field("fieldString", Field.FIELD_TYPE_STRING);
+        fields.add(fieldString);
+        Field fieldInteger = new Field("fieldInteger", Field.FIELD_TYPE_INTEGER);
+        fields.add(fieldInteger);
+        Field fieldBoolean = new Field("fieldBoolean", Field.FIELD_TYPE_BOOLEAN);
+        fields.add(fieldBoolean);
+
+        Schema schema = new Schema(fields, true);
+        Assert.assertEquals(3, schema.getFields().size());
+        Assert.assertEquals(fields, schema.getFields());
     }
     
     @Test
@@ -152,16 +183,35 @@ public class SchemaTest {
         exception.expect(PrimaryKeyException.class);
         new Schema(source, true);
     }
-     
+
     @Test
     public void testAddValidField(){
         Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
         Schema validSchema = new Schema();
         validSchema.addField(nameField);
-        
-        Assert.assertEquals(1, validSchema.getFields().size()); 
+
+        Assert.assertEquals(1, validSchema.getFields().size());
     }
-    
+
+    @Test
+    public void testRetrieveNonexistingField(){
+        Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        Schema validSchema = new Schema();
+        validSchema.addField(nameField);
+
+        Assert.assertNull(validSchema.getField("lksajdf"));
+    }
+
+    @Test
+    public void testAddValidFieldAsJson(){
+        Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        Schema validSchema = new Schema();
+        validSchema.addField(nameField.getJson());
+        Field foundNameField = validSchema.getField("id");
+
+        Assert.assertEquals(nameField, foundNameField);
+    }
+
     @Test
     public void testAddInvalidField(){
         Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
