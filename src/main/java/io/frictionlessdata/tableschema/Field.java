@@ -166,7 +166,9 @@ public class Field {
     public <Any> Any castValue(String value, boolean enforceConstraints, Map<String, Object> options) throws InvalidCastException, ConstraintsException{
         if(this.type.isEmpty()){
             throw new InvalidCastException("Property 'type' must not be empty");
-        }else{
+        } else if (StringUtils.isEmpty(value)) {
+            return null;
+        } else {
             try{
                 // Using reflection to invoke appropriate type casting method from the TypeInferrer class
                 String castMethodName = "cast" + (this.type.substring(0, 1).toUpperCase() + this.type.substring(1));

@@ -61,7 +61,7 @@ public class TableCreationTest {
     public void testReadFromValidFilePath() throws Exception{
         File testDataDir = getTestDataDirectory();
         // get path of test CSV file
-        File file = new File("simple_data.csv");
+        File file = new File("data/simple_data.csv");
         Table table = new Table(file, testDataDir);
         
         Assert.assertEquals(3, table.read().size()); 

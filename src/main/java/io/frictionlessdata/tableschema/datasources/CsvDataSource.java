@@ -1,6 +1,5 @@
 package io.frictionlessdata.tableschema.datasources;
 
-import jdk.nashorn.internal.parser.JSONParser;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
