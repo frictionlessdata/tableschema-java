@@ -2,6 +2,8 @@ package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import java.time.Duration;
+
+import io.frictionlessdata.tableschema.field.Field;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.json.JSONArray;

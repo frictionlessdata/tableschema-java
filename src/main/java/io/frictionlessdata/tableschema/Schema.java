@@ -1,6 +1,7 @@
 package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.exceptions.*;
+import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 
 import java.io.*;
@@ -156,7 +157,7 @@ public class Schema {
             Iterator iter = schema.getJSONArray(JSON_KEY_FIELDS).iterator();
             while(iter.hasNext()){
                 JSONObject fieldJsonObj = (JSONObject)iter.next();
-                Field field = new Field(fieldJsonObj);
+                Field field = Field.fromJson(fieldJsonObj);
                 this.fields.add(field);
             }  
         }
@@ -331,8 +332,8 @@ public class Schema {
         this.validate();
     }
     
-    public void addField(JSONObject fieldJson){
-        Field field = new Field(fieldJson);
+    public void addField(JSONObject fieldJsonObj){
+        Field field = Field.fromJson(fieldJsonObj);
         this.addField(field);
     }
     

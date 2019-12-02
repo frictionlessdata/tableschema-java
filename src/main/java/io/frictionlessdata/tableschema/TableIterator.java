@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema;
 
-import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import io.frictionlessdata.tableschema.field.Field;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;

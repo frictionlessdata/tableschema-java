@@ -1,5 +1,6 @@
-package io.frictionlessdata.tableschema;
+package io.frictionlessdata.tableschema.field;
 
+import io.frictionlessdata.tableschema.TypeInferrer;
 import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import java.lang.reflect.Method;
@@ -17,7 +18,7 @@ import org.json.JSONObject;
  *
  * 
  */
-public class Field {
+public abstract class Field<T> {
     public static final String FIELD_TYPE_STRING = "string";
     public static final String FIELD_TYPE_INTEGER = "integer";
     public static final String FIELD_TYPE_NUMBER = "number";
@@ -56,29 +57,15 @@ public class Field {
     public static final String JSON_KEY_CONSTRAINTS = "constraints";
   
     private String name = "";
-    private String type = "";
-    private String format = FIELD_FORMAT_DEFAULT;
+    String type = "";
+    String format = FIELD_FORMAT_DEFAULT;
     private String title = "";
     private String description = "";
-    private Map<String, Object> constraints = null;
+    Map<String, Object> constraints = null;
     
     public Field(String name, String type){
         this.name = name;
         this.type = type;
-    }
-    
-    public Field(String name, String type, String format){
-        this.name = name;
-        this.type = type;
-        this.format = format;
-    }
-    
-    public Field(String name, String type, String format, String title, String description){
-        this.name = name;
-        this.type = type;
-        this.format = format;
-        this.title = title;
-        this.description = description;
     }
     
     public Field(String name, String type, String format, String title, String description, Map constraints){
@@ -113,49 +100,47 @@ public class Field {
             this.constraints = field.has(JSON_KEY_CONSTRAINTS) ? field.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
         }
     }
-    
+
+    abstract T getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException;
+
     /**
-     * 
-     * @param <Any>
+     *
      * @param value
      * @return result of the cast operation
      * @throws InvalidCastException
      * @throws ConstraintsException 
      */
-    public <Any> Any castValue(String value) throws InvalidCastException, ConstraintsException{
-        return this.castValue(value, true, null);
+    public T castValue(String value) throws InvalidCastException, ConstraintsException{
+        return castValue(value, true, null);
     }
     
     /**
      * Use the Field definition to cast a value into the Field type.
      * Enforces constraints by default.
-     * @param <Any>
      * @param value
      * @param options
      * @return result of the cast operation
      * @throws InvalidCastException
      * @throws ConstraintsException 
      */
-    public <Any> Any castValue(String value, HashMap<String, Object> options) throws InvalidCastException, ConstraintsException{
-        return this.castValue(value, true, options);
+    public T castValue(String value, HashMap<String, Object> options) throws InvalidCastException, ConstraintsException{
+        return castValue(value, true, options);
     }
     
     /**
-     * 
-     * @param <Any>
+     *
      * @param value
      * @param enforceConstraints
      * @return result of the cast operation
      * @throws InvalidCastException
      * @throws ConstraintsException 
      */
-    public <Any> Any castValue(String value, boolean enforceConstraints) throws InvalidCastException, ConstraintsException{
-        return this.castValue(value, enforceConstraints, null);
+    public T castValue(String value, boolean enforceConstraints) throws InvalidCastException, ConstraintsException{
+        return castValue(value, enforceConstraints, null);
     }
     
     /**
-     * 
-     * @param <Any>
+     *
      * @param value
      * @param enforceConstraints
      * @param options
@@ -163,17 +148,14 @@ public class Field {
      * @throws InvalidCastException
      * @throws ConstraintsException 
      */
-    public <Any> Any castValue(String value, boolean enforceConstraints, Map<String, Object> options) throws InvalidCastException, ConstraintsException{
+    public T castValue(String value, boolean enforceConstraints, Map<String, Object> options) throws InvalidCastException, ConstraintsException{
         if(this.type.isEmpty()){
             throw new InvalidCastException("Property 'type' must not be empty");
         } else if (StringUtils.isEmpty(value)) {
             return null;
         } else {
             try{
-                // Using reflection to invoke appropriate type casting method from the TypeInferrer class
-                String castMethodName = "cast" + (this.type.substring(0, 1).toUpperCase() + this.type.substring(1));
-                Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class, Map.class);
-                Object castValue = method.invoke(TypeInferrer.getInstance(), this.format, value, options);
+                Object castValue = getCastValue (this.format, value, options);
             
                 // Check for constraint violations
                 if(enforceConstraints && this.constraints != null){
@@ -183,7 +165,7 @@ public class Field {
                     }
                 }
                 
-                return (Any)castValue;
+                return (T)castValue;
                 
             }catch(ConstraintsException ce){
                 throw ce;
@@ -411,6 +393,78 @@ public class Field {
         }
         
         return violatedConstraints;
+    }
+
+    public static Field fromJson (JSONObject fieldDef){
+        String type = fieldDef.has(JSON_KEY_TYPE) ? fieldDef.getString(JSON_KEY_TYPE) : "string";
+        String name = fieldDef.has(JSON_KEY_NAME) ? fieldDef.getString(JSON_KEY_NAME).trim() : null;
+
+        Field field = null;
+        switch (type) {
+            case FIELD_TYPE_STRING:
+                field = new StringField(name);
+                break;
+            case FIELD_TYPE_INTEGER:
+                field = new IntegerField(name);
+                break;
+            case FIELD_TYPE_NUMBER:
+                field = new NumberField(name);
+                break;
+            case FIELD_TYPE_ARRAY:
+                field = new ArrayField(name);
+                break;
+            case FIELD_TYPE_DATETIME:
+                field = new DateTimeField(name);
+                break;
+            case FIELD_TYPE_DATE:
+                field = new DateField(name);
+                break;
+            case FIELD_TYPE_DURATION:
+                field = new DurationField(name);
+                break;
+            case FIELD_TYPE_GEOJSON:
+                field = new GeoJsonField(name);
+                break;
+            case FIELD_TYPE_GEOPOINT:
+                field = new GeoPointField(name);
+                break;
+            case FIELD_TYPE_ANY:
+                field = new AnyField(name);
+                break;
+            case FIELD_TYPE_OBJECT:
+                field = new ObjectField(name);
+                break;
+            case FIELD_TYPE_YEAR:
+                field = new YearField(name);
+                break;
+            case FIELD_TYPE_YEARMONTH:
+                field = new YearMonthField(name);
+                break;
+            default:
+                field = new AnyField(name);
+        }
+
+        //TODO: Maybe use Gson serializer for this instead? Is it worth importing library just for this?
+        field.name = (!StringUtils.isEmpty(name)) ? name.trim() : null;
+
+
+
+        String format = fieldDef.has(JSON_KEY_FORMAT) ? fieldDef.getString(JSON_KEY_FORMAT) : null;
+        field.format = (!StringUtils.isEmpty(format)) ? format.trim() : FIELD_FORMAT_DEFAULT;
+
+        String title = fieldDef.has(JSON_KEY_TITLE) ? fieldDef.getString(JSON_KEY_TITLE) : null;
+        field.title = (!StringUtils.isEmpty(title)) ? title.trim() : null;
+
+        String description = fieldDef.has(JSON_KEY_DESCRIPTION) ? fieldDef.getString(JSON_KEY_DESCRIPTION) : null;
+        field.description = (!StringUtils.isEmpty(description)) ? description.trim() : null;
+
+        Map cstraints = null;
+        if (fieldDef.has(JSON_KEY_CONSTRAINTS))
+            cstraints = fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap();
+        if ((null != cstraints) && (!cstraints.isEmpty())) {
+            field.constraints = fieldDef.has(JSON_KEY_CONSTRAINTS) ? fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
+        }
+        return field;
     }
     
     /**

@@ -1,18 +1,15 @@
 package io.frictionlessdata.tableschema.table_tests;
 import java.io.File;
-import java.io.FileInputStream;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import io.frictionlessdata.tableschema.Field;
+import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.Schema;
 import io.frictionlessdata.tableschema.Table;
 import org.apache.commons.csv.CSVFormat;
