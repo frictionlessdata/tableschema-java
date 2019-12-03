@@ -3,6 +3,8 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.TypeInferrer;
 import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.*;
@@ -10,9 +12,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.ValidationException;
+import org.everit.json.schema.loader.SchemaLoader;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 /**
  *
@@ -62,6 +68,8 @@ public abstract class Field<T> {
     private String title = "";
     private String description = "";
     Map<String, Object> constraints = null;
+    private Schema geoJsonSchema = null;
+    private Schema topoJsonSchema = null;
     
     public Field(String name, String type){
         this.name = name;
@@ -155,7 +163,7 @@ public abstract class Field<T> {
             return null;
         } else {
             try{
-                Object castValue = getCastValue (this.format, value, options);
+                Object castValue = getCastValue (value, format, options);
             
                 // Check for constraint violations
                 if(enforceConstraints && this.constraints != null){
@@ -488,6 +496,43 @@ public abstract class Field<T> {
         return json;
     }
 
+    /**
+     * We only want to go through this initialization if we have to because it's a
+     * performance issue the first time it is executed.
+     * Because of this, so we don't include this logic in the constructor and only
+     * call it when it is actually required after trying all other type inferral.
+     * @param geoJson
+     * @throws ValidationException
+     */
+    void validateGeoJsonSchema(JSONObject geoJson) throws ValidationException{
+        if(this.geoJsonSchema == null){
+            // FIXME: Maybe this infering against geojson scheme is too much.
+            // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
+            InputStream geoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/geojson.json");
+            JSONObject rawGeoJsonSchema = new JSONObject(new JSONTokener(geoJsonSchemaInputStream));
+            geoJsonSchema = SchemaLoader.load(rawGeoJsonSchema);
+        }
+        geoJsonSchema.validate(geoJson);
+    }
+
+    /**
+     * We only want to go through this initialization if we have to because it's a
+     * performance issue the first time it is executed.
+     * Because of this, so we don't include this logic in the constructor and only
+     * call it when it is actually required after trying all other type inferral.
+     * @param topoJson
+     */
+    void validateTopoJsonSchema(JSONObject topoJson){
+        if(topoJsonSchema == null){
+            // FIXME: Maybe this infering against topojson scheme is too much.
+            // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema
+            InputStream topoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/topojson.json");
+            JSONObject rawTopoJsonSchema = new JSONObject(new JSONTokener(topoJsonSchemaInputStream));
+            topoJsonSchema = SchemaLoader.load(rawTopoJsonSchema);
+        }
+        topoJsonSchema.validate(topoJson);
+    }
+
     public String getCastMethodName() {
         return "cast" + (this.type.substring(0, 1).toUpperCase() + this.type.substring(1));
     }
@@ -516,6 +561,21 @@ public abstract class Field<T> {
         return this.constraints;
     }
 
+    private Schema getGeoJsonSchema(){
+        return this.geoJsonSchema;
+    }
+
+    private void setGeoJsonSchema(Schema geoJsonSchema){
+        this.geoJsonSchema = geoJsonSchema;
+    }
+
+    private Schema getTopoJsonSchema(){
+        return this.topoJsonSchema;
+    }
+
+    private void setTopoJsonSchema(Schema topoJsonSchema){
+        this.topoJsonSchema = topoJsonSchema;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -3,12 +3,17 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.TypeInferrer;
 import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
 import org.joda.time.DateTime;
 import org.json.JSONObject;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class YearField extends Field<Integer> {
+    // yyyy
+    private static final String REGEX_YEAR = "([0-9]{4})";
 
     public YearField(String name) {
         super(name, FIELD_TYPE_YEAR);
@@ -25,6 +30,15 @@ public class YearField extends Field<Integer> {
 
     @Override
     Integer getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return TypeInferrer.getInstance().castYear(value, format, options);
+        Pattern pattern = Pattern.compile(REGEX_YEAR);
+        Matcher matcher = pattern.matcher(value);
+
+        if(matcher.matches()){
+            int year = Integer.parseInt(value);
+            return year;
+
+        }else{
+            throw new TypeInferringException();
+        }
     }
 }

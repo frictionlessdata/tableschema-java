@@ -3,6 +3,7 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.TypeInferrer;
 import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
 import org.json.JSONObject;
 
 import java.time.Duration;
@@ -25,6 +26,10 @@ public class DurationField extends Field<Duration> {
 
     @Override
     Duration getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return TypeInferrer.getInstance().castDuration(value, format, options);
+        try{
+            return Duration.parse(value);
+        }catch(Exception e){
+            throw new TypeInferringException(e);
+        }
     }
 }
