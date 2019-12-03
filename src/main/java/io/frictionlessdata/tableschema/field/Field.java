@@ -5,7 +5,6 @@ import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -109,52 +108,29 @@ public abstract class Field<T> {
         }
     }
 
-    abstract T getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException;
+    abstract T parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException;
 
     /**
-     *
-     * @param value
+     * Use the Field definition to cast a value into the Field type.
+     * Enforces constraints by default.
+     * @param value the value string to cast
      * @return result of the cast operation
-     * @throws InvalidCastException
-     * @throws ConstraintsException 
+     * @throws InvalidCastException if the content of `value` cannot be cast to the destination type
+     * @throws ConstraintsException thrown if `enforceConstraints` was set to `true`and constraints were violated
      */
     public T castValue(String value) throws InvalidCastException, ConstraintsException{
         return castValue(value, true, null);
     }
     
     /**
-     * Use the Field definition to cast a value into the Field type.
-     * Enforces constraints by default.
-     * @param value
-     * @param options
+     * Use the Field definition to cast (=parse) a value into the Field type. Constraints enforcing
+     * can be switched on or off.
+     * @param value the value string to cast
+     * @param enforceConstraints whether to enforce Field constraints
+     * @param options casting options
      * @return result of the cast operation
-     * @throws InvalidCastException
-     * @throws ConstraintsException 
-     */
-    public T castValue(String value, HashMap<String, Object> options) throws InvalidCastException, ConstraintsException{
-        return castValue(value, true, options);
-    }
-    
-    /**
-     *
-     * @param value
-     * @param enforceConstraints
-     * @return result of the cast operation
-     * @throws InvalidCastException
-     * @throws ConstraintsException 
-     */
-    public T castValue(String value, boolean enforceConstraints) throws InvalidCastException, ConstraintsException{
-        return castValue(value, enforceConstraints, null);
-    }
-    
-    /**
-     *
-     * @param value
-     * @param enforceConstraints
-     * @param options
-     * @return result of the cast operation
-     * @throws InvalidCastException
-     * @throws ConstraintsException 
+     * @throws InvalidCastException if the content of `value` cannot be cast to the destination type
+     * @throws ConstraintsException thrown if `enforceConstraints` was set to `true`and constraints were violated
      */
     public T castValue(String value, boolean enforceConstraints, Map<String, Object> options) throws InvalidCastException, ConstraintsException{
         if(this.type.isEmpty()){
@@ -163,7 +139,7 @@ public abstract class Field<T> {
             return null;
         } else {
             try{
-                Object castValue = getCastValue (value, format, options);
+                T castValue = parseValue(value, format, options);
             
                 // Check for constraint violations
                 if(enforceConstraints && this.constraints != null){
@@ -173,7 +149,7 @@ public abstract class Field<T> {
                     }
                 }
                 
-                return (T)castValue;
+                return castValue;
                 
             }catch(ConstraintsException ce){
                 throw ce;

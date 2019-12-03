@@ -41,7 +41,7 @@ public class FieldConstraintsTest {
         violatedConstraints = field.checkConstraintViolations(valueNotNull);
         Assert.assertTrue(violatedConstraints.isEmpty());
         
-        String valueNullConstraintNotEnforce = field.castValue(null, false); 
+        String valueNullConstraintNotEnforce = field.castValue(null, false, null);
         violatedConstraints = field.checkConstraintViolations(valueNullConstraintNotEnforce);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_REQUIRED));
         Assert.assertTrue((boolean)violatedConstraints.get(Field.CONSTRAINT_KEY_REQUIRED));
@@ -94,12 +94,12 @@ public class FieldConstraintsTest {
         Assert.assertTrue(violatedConstraints.isEmpty());
         
         // 35 characters
-        String valueLength35 = field.castValue("This string length is less than 36.", false);
+        String valueLength35 = field.castValue("This string length is less than 36.", false, null);
         violatedConstraints = field.checkConstraintViolations(valueLength35);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MIN_LENGTH));
         
         // 49 characters
-        String valueLength49 = field.castValue("This string length is greater than 45 characters.", false);
+        String valueLength49 = field.castValue("This string length is greater than 45 characters.", false, null);
         violatedConstraints = field.checkConstraintViolations(valueLength49);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAX_LENGTH));
         

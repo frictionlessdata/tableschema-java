@@ -23,7 +23,7 @@ public class ObjectField extends Field<JSONObject> {
     }
 
     @Override
-    JSONObject getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    JSONObject parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return new JSONObject(value);
     }
 }

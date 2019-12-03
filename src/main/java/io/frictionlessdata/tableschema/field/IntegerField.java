@@ -23,7 +23,7 @@ public class IntegerField extends Field<Long> {
     }
 
     @Override
-    Long getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    Long parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return Long.parseLong(value);
     }
 }

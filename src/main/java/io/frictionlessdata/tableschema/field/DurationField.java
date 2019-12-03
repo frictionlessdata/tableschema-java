@@ -25,7 +25,7 @@ public class DurationField extends Field<Duration> {
     }
 
     @Override
-    Duration getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    Duration parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         try{
             return Duration.parse(value);
         }catch(Exception e){

@@ -36,7 +36,7 @@ public class BooleanField extends Field<Boolean> {
     }
 
     @Override
-    Boolean getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    Boolean parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         if (trueValues.contains(value.toLowerCase())){
             return true;
 

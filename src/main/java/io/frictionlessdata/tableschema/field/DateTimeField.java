@@ -31,7 +31,7 @@ public class DateTimeField extends Field<DateTime> {
     }
 
     @Override
-    DateTime getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    DateTime parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
 
         Pattern pattern = Pattern.compile(REGEX_DATETIME);
         Matcher matcher = pattern.matcher(value);

@@ -35,7 +35,7 @@ public class NumberField extends Field<Number> {
     }
 
     @Override
-    Number getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    Number parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         try{
             if(options != null){
                 if(options.containsKey(NUMBER_OPTION_DECIMAL_CHAR)){
