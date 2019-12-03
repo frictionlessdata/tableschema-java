@@ -24,7 +24,7 @@ public class AnyField extends Field<Object> {
     }
 
     @Override
-    Object parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public Object parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return value;
     }
 }

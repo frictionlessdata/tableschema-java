@@ -25,7 +25,7 @@ public class GeoPointField extends Field<int[]> {
     }
 
     @Override
-    int[] parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public int[] parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         try{
             if(format.equalsIgnoreCase(io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT)){
                 String[] geopoint = value.split(",");

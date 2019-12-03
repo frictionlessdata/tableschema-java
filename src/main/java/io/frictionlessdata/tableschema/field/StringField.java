@@ -23,7 +23,7 @@ public class StringField extends Field<String> {
     }
 
     @Override
-    String parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public String parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return value;
     }
 }

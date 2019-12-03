@@ -108,7 +108,7 @@ public abstract class Field<T> {
         }
     }
 
-    abstract T parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException;
+    public abstract T parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException;
 
     /**
      * Use the Field definition to cast a value into the Field type.
@@ -379,10 +379,7 @@ public abstract class Field<T> {
         return violatedConstraints;
     }
 
-    public static Field fromJson (JSONObject fieldDef){
-        String type = fieldDef.has(JSON_KEY_TYPE) ? fieldDef.getString(JSON_KEY_TYPE) : "string";
-        String name = fieldDef.has(JSON_KEY_NAME) ? fieldDef.getString(JSON_KEY_NAME).trim() : null;
-
+    public static Field forType(String type, String name) {
         Field field = null;
         switch (type) {
             case FIELD_TYPE_STRING:
@@ -396,6 +393,9 @@ public abstract class Field<T> {
                 break;
             case FIELD_TYPE_ARRAY:
                 field = new ArrayField(name);
+                break;
+            case FIELD_TYPE_BOOLEAN:
+                field = new BooleanField(name);
                 break;
             case FIELD_TYPE_DATETIME:
                 field = new DateTimeField(name);
@@ -430,6 +430,14 @@ public abstract class Field<T> {
             default:
                 field = new AnyField(name);
         }
+        return field;
+    }
+
+    public static Field fromJson (JSONObject fieldDef){
+        String type = fieldDef.has(JSON_KEY_TYPE) ? fieldDef.getString(JSON_KEY_TYPE) : "string";
+        String name = fieldDef.has(JSON_KEY_NAME) ? fieldDef.getString(JSON_KEY_NAME).trim() : null;
+
+        Field field = forType(type, name);
 
         //TODO: Maybe use Gson serializer for this instead? Is it worth importing library just for this?
         field.name = (!StringUtils.isEmpty(name)) ? name.trim() : null;

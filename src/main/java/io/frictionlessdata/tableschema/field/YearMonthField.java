@@ -32,7 +32,7 @@ public class YearMonthField extends Field<DateTime> {
     }
 
     @Override
-    DateTime parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public DateTime parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         Pattern pattern = Pattern.compile(REGEX_YEARMONTH);
         Matcher matcher = pattern.matcher(value);
 

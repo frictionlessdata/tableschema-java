@@ -29,7 +29,7 @@ public class YearField extends Field<Integer> {
     }
 
     @Override
-    Integer parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public Integer parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         Pattern pattern = Pattern.compile(REGEX_YEAR);
         Matcher matcher = pattern.matcher(value);
 

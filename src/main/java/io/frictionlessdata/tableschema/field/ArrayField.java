@@ -24,7 +24,7 @@ public class ArrayField extends Field<JSONArray> {
     }
 
     @Override
-    JSONArray parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public JSONArray parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return new JSONArray(value);
     }
 }

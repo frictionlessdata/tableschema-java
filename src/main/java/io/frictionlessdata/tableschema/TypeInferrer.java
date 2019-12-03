@@ -173,16 +173,18 @@ public class TypeInferrer {
             try{
                 // Keep invoking the type casting methods until one doesn't throw an exception
                 String dataType = typeInferralDefinition[0];
-                String castMethodName = "cast" + (dataType.substring(0, 1).toUpperCase() + dataType.substring(1));
+                /*String castMethodName = "cast" + (dataType.substring(0, 1).toUpperCase() + dataType.substring(1));*/
                 String format = typeInferralDefinition[1];
                  
-                Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class);
+                /*Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class);
                 // Single pattern is useful here:
-                method.invoke(TypeInferrer.getInstance(), format, datum);
+                method.invoke(TypeInferrer.getInstance(), format, datum);*/
+                Field field = Field.forType(dataType, dataType);
+                field.parseValue(datum, format, null);
                 
                 // If no exception is thrown, in means that a type has been inferred.
                 // Let's keep track of it in the inferral map.
-                this.updateInferralScoreMap(header, dataType);
+                this.updateInferralScoreMap(header, field.getType());
                 
                 // We no longer need to try to infer other types. 
                 // Let's break out of the loop.

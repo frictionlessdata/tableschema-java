@@ -300,11 +300,7 @@ public class Schema {
         
             for(int i=0; i<row.length; i++){
                 Field field = this.fields.get(i);
-
-                String castMethodName = field.getCastMethodName();
-                Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class);
-
-                castRow[i] = method.invoke(TypeInferrer.getInstance(), field.getFormat(), row[i]);
+                castRow[i] = field.parseValue(row[i], field.getFormat(), null);
             }
 
             return castRow;
