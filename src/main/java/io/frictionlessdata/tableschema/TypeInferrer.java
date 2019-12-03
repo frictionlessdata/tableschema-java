@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.frictionlessdata.tableschema.field.Field;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
@@ -39,58 +41,31 @@ public class TypeInferrer {
      * a new class for every cast method call attempt.
      */
     private static TypeInferrer instance = null;
-    
-    private Schema geoJsonSchema = null;
-    private Schema topoJsonSchema = null;
-    
+
     private Map<String, Map<String, Integer>> typeInferralMap = new HashMap();
     
     // The order in which the types will be attempted to be inferred.
     // Once a type is successfully inferred, we do not bother with the remaining types.
     private static final List<String[]> TYPE_INFERRAL_ORDER_LIST = new ArrayList<>(Arrays.asList(
-        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_DEFAULT},
-        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_ARRAY},
-        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT},
-        new String[]{Field.FIELD_TYPE_DURATION, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_YEAR, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_YEARMONTH, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_DATE, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_TIME, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_DATETIME, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_INTEGER, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_NUMBER, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_BOOLEAN, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_DEFAULT},
-        new String[]{Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_TOPOJSON},
-        new String[]{Field.FIELD_TYPE_OBJECT, Field.FIELD_FORMAT_DEFAULT},
-        new String[]{Field.FIELD_TYPE_ARRAY, Field.FIELD_FORMAT_DEFAULT},
-        new String[]{Field.FIELD_TYPE_STRING, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_ANY, Field.FIELD_FORMAT_DEFAULT})); // No different formats, just use default.
-    
-    private static final String NUMBER_OPTION_DECIMAL_CHAR = "decimalChar";
-    private static final String NUMBER_OPTION_GROUP_CHAR = "groupChar";
-    private static final String NUMBER_OPTION_BARE_NUMBER = "bareNumber";
-    private static final String NUMBER_DEFAULT_DECIMAL_CHAR = ".";
-    private static final String NUMBER_DEFAULT_GROUP_CHAR = "";
-    
-    // ISO 8601 format of yyyy-MM-dd'T'HH:mm:ss.SSSZ in UTC time
-    private static final String REGEX_DATETIME = "(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?";
-    
-    // ISO8601 format yyyy-MM-dd
-    private static final String REGEX_DATE = "([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|0[1-9]|[1-2][0-9])";
-    
-    // An ISO8601 time string e.g. HH:mm:ss
-    private static final String REGEX_TIME = "(2[0-3]|[01]?[0-9]):?([0-5]?[0-9]):?([0-5]?[0-9])";
-    
-    // yyyy
-    private static final String REGEX_YEAR = "([0-9]{4})";
-    
-    // yyyy-MM
-    private static final String REGEX_YEARMONTH = "([0-9]{4})-(1[0-2]|0[1-9])";
-    
-    private static final String REGEX_FLOAT = "([+-]?\\d*\\.?\\d*)";
-    private static final String REGEX_INTEGER = "[+-]?\\d+";
-    private static final String REGEX_BARE_NUMBER = "((^\\D*)|(\\D*$))";
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_GEOPOINT, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT},
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_GEOPOINT, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_ARRAY},
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_GEOPOINT, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_OBJECT},
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_DURATION, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_YEAR, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_YEARMONTH, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_DATE, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_TIME, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_DATETIME, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_INTEGER, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_NUMBER, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_BOOLEAN, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_GEOJSON, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT},
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_GEOJSON, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_TOPOJSON},
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_OBJECT, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT},
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_ARRAY, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT},
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_STRING, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_ANY, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT})); // No different formats, just use default.
+
     
     private TypeInferrer(){
         // Private to inforce use of Singleton pattern.
@@ -144,12 +119,12 @@ public class TypeInferrer {
             
             // Init the schema objects
             JSONObject fieldObj = new JSONObject();
-            fieldObj.put(Field.JSON_KEY_NAME, header);
-            fieldObj.put(Field.JSON_KEY_TITLE, ""); // This will stay blank.
-            fieldObj.put(Field.JSON_KEY_DESCRIPTION, ""); // This will stay blank.
-            fieldObj.put(Field.JSON_KEY_CONSTRAINTS, new JSONObject()); // This will stay blank.
-            fieldObj.put(Field.JSON_KEY_FORMAT, ""); // This will bet set post inferral.
-            fieldObj.put(Field.JSON_KEY_TYPE, ""); // This will bet set post inferral.
+            fieldObj.put(io.frictionlessdata.tableschema.field.Field.JSON_KEY_NAME, header);
+            fieldObj.put(io.frictionlessdata.tableschema.field.Field.JSON_KEY_TITLE, ""); // This will stay blank.
+            fieldObj.put(io.frictionlessdata.tableschema.field.Field.JSON_KEY_DESCRIPTION, ""); // This will stay blank.
+            fieldObj.put(io.frictionlessdata.tableschema.field.Field.JSON_KEY_CONSTRAINTS, new JSONObject()); // This will stay blank.
+            fieldObj.put(io.frictionlessdata.tableschema.field.Field.JSON_KEY_FORMAT, ""); // This will bet set post inferral.
+            fieldObj.put(io.frictionlessdata.tableschema.field.Field.JSON_KEY_TYPE, ""); // This will bet set post inferral.
             
             // Wrap it all in an array.
             tableFieldJsonArray.put(fieldObj);
@@ -170,13 +145,13 @@ public class TypeInferrer {
         // Now for each field we figure out which type was the most inferred and settle for that type
         // as the final type for the field.
         for(int j=0; j < tableFieldJsonArray.length(); j++){
-            String fieldName = tableFieldJsonArray.getJSONObject(j).getString(Field.JSON_KEY_NAME);
+            String fieldName = tableFieldJsonArray.getJSONObject(j).getString(io.frictionlessdata.tableschema.field.Field.JSON_KEY_NAME);
             HashMap<String, Integer> typeInferralCountMap = (HashMap<String, Integer>)this.getTypeInferralMap().get(fieldName);
             TreeMap<String, Integer> typeInferralCountMapSortedByCount = sortMapByValue(typeInferralCountMap); 
            
             if(!typeInferralCountMapSortedByCount.isEmpty()){
                 String inferredType = typeInferralCountMapSortedByCount.firstEntry().getKey();
-                tableFieldJsonArray.getJSONObject(j).put(Field.JSON_KEY_TYPE, inferredType);
+                tableFieldJsonArray.getJSONObject(j).put(io.frictionlessdata.tableschema.field.Field.JSON_KEY_TYPE, inferredType);
             }
             
         }
@@ -198,16 +173,18 @@ public class TypeInferrer {
             try{
                 // Keep invoking the type casting methods until one doesn't throw an exception
                 String dataType = typeInferralDefinition[0];
-                String castMethodName = "cast" + (dataType.substring(0, 1).toUpperCase() + dataType.substring(1));
+                /*String castMethodName = "cast" + (dataType.substring(0, 1).toUpperCase() + dataType.substring(1));*/
                 String format = typeInferralDefinition[1];
                  
-                Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class);
+                /*Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class);
                 // Single pattern is useful here:
-                method.invoke(TypeInferrer.getInstance(), format, datum);
+                method.invoke(TypeInferrer.getInstance(), format, datum);*/
+                Field field = Field.forType(dataType, dataType);
+                field.parseValue(datum, format, null);
                 
                 // If no exception is thrown, in means that a type has been inferred.
                 // Let's keep track of it in the inferral map.
-                this.updateInferralScoreMap(header, dataType);
+                this.updateInferralScoreMap(header, field.getType());
                 
                 // We no longer need to try to infer other types. 
                 // Let's break out of the loop.
@@ -248,411 +225,7 @@ public class TypeInferrer {
 
         return result;
     }
-    
-    public Duration castDuration(String format, String value) throws TypeInferringException{
-        return this.castDuration(format, value, null);
-    }
-    
-    /**
-     * Using regex only tests the pattern.
-     * Unfortunately, this approach does not test the validity of the date value itself.
-     * @param format
-     * @param value
-     * @param options
-     * @return
-     * @throws TypeInferringException 
-     */
-    public Duration castDuration(String format, String value, Map<String, Object> options) throws TypeInferringException{
-        try{
-            return Duration.parse(value); 
-        }catch(Exception e){
-            throw new TypeInferringException(e);
-        }
-    }
-    
-    public JSONObject castGeojson(String format, String value) throws TypeInferringException{
-        return this.castGeojson(format, value, null);
-    }
-    
-    /**
-     * Validate against GeoJSON or TopoJSON schema.
-     * @param format
-     * @param value
-     * @param options
-     * @return
-     * @throws TypeInferringException 
-     */
-    public JSONObject castGeojson(String format, String value, Map<String, Object> options) throws TypeInferringException{
-        JSONObject jsonObj = null;
-        
-        try {
 
-            jsonObj = new JSONObject(value);
-
-            try{
-                if(format.equalsIgnoreCase(Field.FIELD_FORMAT_DEFAULT)){
-                    validateGeoJsonSchema(jsonObj);
-
-                }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_TOPOJSON)){
-                    validateTopoJsonSchema(jsonObj);
-
-                }else{
-                    throw new TypeInferringException("Unknown format type");
-                }
-
-            }catch(ValidationException ve){
-                // Not a valid GeoJSON or TopoJSON.
-                throw new TypeInferringException(ve);
-            }
-        }catch(JSONException je){
-            // Not a valid JSON.
-            throw new TypeInferringException(je);
-        }
-        
-        return jsonObj;
-    }
-    
-    /**
-     * We only want to go through this initialization if we have to because it's a
-     * performance issue the first time it is executed.
-     * Because of this, so we don't include this logic in the constructor and only
-     * call it when it is actually required after trying all other type inferral.
-     * @param geoJson
-     * @throws ValidationException 
-     */
-    private void validateGeoJsonSchema(JSONObject geoJson) throws ValidationException{
-        if(this.getGeoJsonSchema() == null){
-            // FIXME: Maybe this infering against geojson scheme is too much.
-            // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
-            InputStream geoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/geojson.json");
-            JSONObject rawGeoJsonSchema = new JSONObject(new JSONTokener(geoJsonSchemaInputStream));
-            this.setGeoJsonSchema(SchemaLoader.load(rawGeoJsonSchema));
-        }
-        this.getGeoJsonSchema().validate(geoJson);
-    }
-    
-    /**
-     * We only want to go through this initialization if we have to because it's a
-     * performance issue the first time it is executed.
-     * Because of this, so we don't include this logic in the constructor and only
-     * call it when it is actually required after trying all other type inferral.
-     * @param topoJson 
-     */
-    private void validateTopoJsonSchema(JSONObject topoJson){
-        if(this.getTopoJsonSchema() == null){
-            // FIXME: Maybe this infering against topojson scheme is too much.
-            // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema
-            InputStream topoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/topojson.json");
-            JSONObject rawTopoJsonSchema = new JSONObject(new JSONTokener(topoJsonSchemaInputStream));
-            this.setTopoJsonSchema(SchemaLoader.load(rawTopoJsonSchema));
-        }
-        this.getTopoJsonSchema().validate(topoJson);
-    }
-    
-    public int[] castGeopoint(String format, String value) throws TypeInferringException{
-        return this.castGeopoint(format, value, null);
-    }
-    
-  
-    /**
-     * Only validates against pattern.
-     * Does not validate against min/max brackets -180:180 for lon and -90:90 for lat.
-     * @param format can be either default, array, or object.
-     * @param value
-     * @param options
-     * @return
-     * @throws TypeInferringException 
-     */
-    public int[] castGeopoint(String format, String value, Map<String, Object> options) throws TypeInferringException{
-        try{
-            if(format.equalsIgnoreCase(Field.FIELD_FORMAT_DEFAULT)){
-                String[] geopoint = value.split(",");
-
-                if(geopoint.length == 2){
-                    int lon = Integer.parseInt(geopoint[0]);
-                    int lat = Integer.parseInt(geopoint[1]);
-                    
-                    // No exceptions? It's a valid geopoint object.
-                    return new int[]{lon, lat};
-                    
-                }else{
-                    throw new TypeInferringException("Geo points must have two coordinates");
-                }
-
-            }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_ARRAY)){
-
-                // This will throw an exception if the value is not an array.
-                JSONArray jsonArray = new JSONArray(value);
-                
-                if (jsonArray.length() == 2){
-                    int lon = jsonArray.getInt(0);
-                    int lat = jsonArray.getInt(1);
-
-                    // No exceptions? It's a valid geopoint object.
-                    return new int[]{lon, lat};
-
-                }else{
-                    throw new TypeInferringException("Geo points must have two coordinates");
-                }     
-
-            }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_OBJECT)){
-
-                // This will throw an exception if the value is not an object.
-                JSONObject jsonObj = new JSONObject(value);
-                
-                if (jsonObj.length() == 2 && jsonObj.has("lon") && jsonObj.has("lat")){
-                    int lon = jsonObj.getInt("lon");
-                    int lat = jsonObj.getInt("lat");
-
-                    // No exceptions? It's a valid geopoint object.
-                    return new int[]{lon, lat};
-
-                }else{
-                    throw new TypeInferringException();
-                }
-
-            }else{
-                throw new TypeInferringException();
-            }
-
-        }catch(Exception e){
-            throw new TypeInferringException(e);
-        }
-    }
-    
-    public JSONObject castObject(String format, String value) throws TypeInferringException{
-        return this.castObject(format, value, null);
-    }
- 
-    public JSONObject castObject(String format, String value, Map<String, Object> options) throws TypeInferringException{
-        try {
-            return new JSONObject(value);
-        }catch(JSONException je){
-            throw new TypeInferringException(je);
-        }       
-    }
-    
-    public JSONArray castArray(String format, String value) throws TypeInferringException{
-        return this.castArray(format, value, null);
-    }
-    
-    public JSONArray castArray(String format, String value, Map<String, Object> options) throws TypeInferringException{
-        try {
-            return new JSONArray(value);
-        }catch(JSONException je){
-            throw new TypeInferringException(je);
-        } 
-    }
-    
-    public DateTime castDatetime(String format, String value) throws TypeInferringException{
-        return this.castDatetime(format, value, null);
-    }
-    
-    public DateTime castDatetime(String format, String value, Map<String, Object> options) throws TypeInferringException{
-   
-        Pattern pattern = Pattern.compile(REGEX_DATETIME);
-        Matcher matcher = pattern.matcher(value);
-        
-        if(matcher.matches()){
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-            DateTime dt = formatter.parseDateTime(value);
-            
-            return dt;
-            
-        }else{
-            throw new TypeInferringException();
-        }  
-    }
-    
-    public DateTime castTime(String format, String value) throws TypeInferringException{
-        return this.castTime(format, value, null);
-    }
-    
-    public DateTime castTime(String format, String value, Map<String, Object> options) throws TypeInferringException{
-        Pattern pattern = Pattern.compile(REGEX_TIME);
-        Matcher matcher = pattern.matcher(value);
-        
-        if(matcher.matches()){
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("HH:mm:ss");
-            DateTime dt = formatter.parseDateTime(value);
-            
-            return dt;
-            
-        }else{
-            throw new TypeInferringException();
-        } 
-    }
-    
-    public DateTime castDate(String format, String value) throws TypeInferringException{
-        return this.castDate(format, value, null);
-    }
-    
-    public DateTime castDate(String format, String value, Map<String, Object> options) throws TypeInferringException{
-        
-        Pattern pattern = Pattern.compile(REGEX_DATE);
-        Matcher matcher = pattern.matcher(value);
-        
-        if(matcher.matches()){
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-            DateTime dt = formatter.parseDateTime(value);
-            
-            return dt;
-            
-        }else{
-            throw new TypeInferringException();
-        } 
-    }
-    
-    public int castYear(String format, String value) throws TypeInferringException{
-        return this.castYear(format, value, null);
-    }
-    
-    public int castYear(String format, String value, Map<String, Object> options) throws TypeInferringException{
-        Pattern pattern = Pattern.compile(REGEX_YEAR);
-        Matcher matcher = pattern.matcher(value);
-        
-        if(matcher.matches()){
-            int year = Integer.parseInt(value);
-            return year;
-            
-        }else{
-            throw new TypeInferringException();
-        } 
-    }
-    
-    public DateTime castYearmonth(String format, String value) throws TypeInferringException{
-        return this.castYearmonth(format, value, null);
-    }
-    
-    public DateTime castYearmonth(String format, String value, Map<String, Object> options) throws TypeInferringException{
-        Pattern pattern = Pattern.compile(REGEX_YEARMONTH);
-        Matcher matcher = pattern.matcher(value);
-        
-        if(matcher.matches()){
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM");
-            DateTime dt = formatter.parseDateTime(value);
-            
-            return dt;
-            
-        }else{
-            throw new TypeInferringException();
-        } 
-    }
-    
-    public int castInteger(String format, String value) throws TypeInferringException{
-        return this.castInteger(format, value, null);
-    }
-    
-    public int castInteger(String format, String value, Map<String, Object> options) throws TypeInferringException{
-        try{
-            return Integer.parseInt(value);
-        }catch(NumberFormatException nfe){
-            throw new TypeInferringException();
-        }
-    }
-    
-    public Object castNumber(String format, String value) throws TypeInferringException{   
-        return castNumber(format, value, null);
-    }
-    
-    public Object castNumber(String format, String value, Map<String, Object> options) throws TypeInferringException{ 
-        try{
-            
-            if(options != null){
-                if(options.containsKey(NUMBER_OPTION_DECIMAL_CHAR)){
-                    value = value.replace((String)options.get(NUMBER_OPTION_DECIMAL_CHAR), NUMBER_DEFAULT_DECIMAL_CHAR);
-                }
-            
-                if(options.containsKey(NUMBER_OPTION_GROUP_CHAR)){
-                    value = value.replace((String)options.get(NUMBER_OPTION_GROUP_CHAR), NUMBER_DEFAULT_GROUP_CHAR);
-                }
-
-                if(options.containsKey(NUMBER_OPTION_BARE_NUMBER) && !(boolean)options.get(NUMBER_OPTION_BARE_NUMBER)){
-                    value = value.replaceAll(REGEX_BARE_NUMBER, "");
-                }             
-            }
-            
-            // Try to match integer pattern
-            Pattern intergerPattern = Pattern.compile(REGEX_INTEGER);
-            Matcher integerMatcher = intergerPattern.matcher(value);
-            
-            if(integerMatcher.matches()){
-                return Integer.parseInt(value);
-            }
-            
-            // Try to match float pattern
-            Pattern floatPattern = Pattern.compile(REGEX_FLOAT);
-            Matcher floatMatcher = floatPattern.matcher(value);
-        
-            if(floatMatcher.matches()){
-                return Float.parseFloat(value);
-            }
-                        
-            // The value failed to match neither the Float or the Integer value.
-            // Throw exception.
-            throw new TypeInferringException();
-            
-        }catch(Exception e){
-            throw new TypeInferringException();
-        } 
-    }
-    
-    public boolean castBoolean(String format, String value) throws TypeInferringException{
-        return this.castBoolean(format, value, null);
-    }
-    
-    public boolean castBoolean(String format, String value, Map<String, Object> options) throws TypeInferringException{
-        if(Arrays.asList(new String[]{"yes", "y", "true", "t", "1"}).contains(value.toLowerCase())){
-            return true;
-            
-        }else if(Arrays.asList(new String[]{"no", "n", "false", "f", "0"}).contains(value.toLowerCase())){
-            return false;
-            
-        }else{
-            throw new TypeInferringException();
-        }
-    }
-    
-    public String castString(String format, String value) throws TypeInferringException{
-        return this.castAny(format, value, null);
-    }
-    
-    /**
-     * Can be either default, e-mail, uri, binary, or uuid.
-     * @param format
-     * @param value
-     * @param options
-     * @return
-     * @throws TypeInferringException 
-     */
-    public String castString(String format, String value, Map<String, Object> options) throws TypeInferringException{
-        return value;
-    }
-    
-    public String castAny(String format, String value) throws TypeInferringException{
-        return this.castAny(format, value, null);
-    }
-    
-    public String castAny(String format, String value, Map<String, Object> options) throws TypeInferringException{
-        return value;
-    }
-    
-    private Schema getGeoJsonSchema(){
-        return this.geoJsonSchema;
-    }
-    
-    private void setGeoJsonSchema(Schema geoJsonSchema){
-        this.geoJsonSchema = geoJsonSchema;
-    }
-    
-    private Schema getTopoJsonSchema(){
-        return this.topoJsonSchema;
-    }
-    
-    private void setTopoJsonSchema(Schema topoJsonSchema){
-        this.topoJsonSchema = topoJsonSchema;
-    }
-    
     private Map<String, Map<String, Integer>> getTypeInferralMap(){
         return this.typeInferralMap;
     }

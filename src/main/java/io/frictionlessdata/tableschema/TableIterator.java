@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema;
 
-import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import io.frictionlessdata.tableschema.field.Field;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -62,7 +62,7 @@ public class TableIterator<T> implements Iterator<T> {
         if(this.schema != null){
             for(int i=0; i<row.length; i++){
                 Field field = this.schema.getFields().get(i);
-                Object val = field.castValue(row[i], true);
+                Object val = field.castValue(row[i], true, null);
 
                 if(!extended && keyed){
                     keyedRow.put(this.headers[i], val);

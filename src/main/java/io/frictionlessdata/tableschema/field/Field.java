@@ -1,23 +1,29 @@
-package io.frictionlessdata.tableschema;
+package io.frictionlessdata.tableschema.field;
 
+import io.frictionlessdata.tableschema.TypeInferrer;
 import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
-import java.lang.reflect.Method;
+
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.ValidationException;
+import org.everit.json.schema.loader.SchemaLoader;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 /**
  *
  * 
  */
-public class Field {
+public abstract class Field<T> {
     public static final String FIELD_TYPE_STRING = "string";
     public static final String FIELD_TYPE_INTEGER = "integer";
     public static final String FIELD_TYPE_NUMBER = "number";
@@ -56,29 +62,17 @@ public class Field {
     public static final String JSON_KEY_CONSTRAINTS = "constraints";
   
     private String name = "";
-    private String type = "";
-    private String format = FIELD_FORMAT_DEFAULT;
+    String type = "";
+    String format = FIELD_FORMAT_DEFAULT;
     private String title = "";
     private String description = "";
-    private Map<String, Object> constraints = null;
+    Map<String, Object> constraints = null;
+    private Schema geoJsonSchema = null;
+    private Schema topoJsonSchema = null;
     
     public Field(String name, String type){
         this.name = name;
         this.type = type;
-    }
-    
-    public Field(String name, String type, String format){
-        this.name = name;
-        this.type = type;
-        this.format = format;
-    }
-    
-    public Field(String name, String type, String format, String title, String description){
-        this.name = name;
-        this.type = type;
-        this.format = format;
-        this.title = title;
-        this.description = description;
     }
     
     public Field(String name, String type, String format, String title, String description, Map constraints){
@@ -113,67 +107,39 @@ public class Field {
             this.constraints = field.has(JSON_KEY_CONSTRAINTS) ? field.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
         }
     }
-    
-    /**
-     * 
-     * @param <Any>
-     * @param value
-     * @return result of the cast operation
-     * @throws InvalidCastException
-     * @throws ConstraintsException 
-     */
-    public <Any> Any castValue(String value) throws InvalidCastException, ConstraintsException{
-        return this.castValue(value, true, null);
-    }
-    
+
+    public abstract T parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException;
+
     /**
      * Use the Field definition to cast a value into the Field type.
      * Enforces constraints by default.
-     * @param <Any>
-     * @param value
-     * @param options
+     * @param value the value string to cast
      * @return result of the cast operation
-     * @throws InvalidCastException
-     * @throws ConstraintsException 
+     * @throws InvalidCastException if the content of `value` cannot be cast to the destination type
+     * @throws ConstraintsException thrown if `enforceConstraints` was set to `true`and constraints were violated
      */
-    public <Any> Any castValue(String value, HashMap<String, Object> options) throws InvalidCastException, ConstraintsException{
-        return this.castValue(value, true, options);
+    public T castValue(String value) throws InvalidCastException, ConstraintsException{
+        return castValue(value, true, null);
     }
     
     /**
-     * 
-     * @param <Any>
-     * @param value
-     * @param enforceConstraints
+     * Use the Field definition to cast (=parse) a value into the Field type. Constraints enforcing
+     * can be switched on or off.
+     * @param value the value string to cast
+     * @param enforceConstraints whether to enforce Field constraints
+     * @param options casting options
      * @return result of the cast operation
-     * @throws InvalidCastException
-     * @throws ConstraintsException 
+     * @throws InvalidCastException if the content of `value` cannot be cast to the destination type
+     * @throws ConstraintsException thrown if `enforceConstraints` was set to `true`and constraints were violated
      */
-    public <Any> Any castValue(String value, boolean enforceConstraints) throws InvalidCastException, ConstraintsException{
-        return this.castValue(value, enforceConstraints, null);
-    }
-    
-    /**
-     * 
-     * @param <Any>
-     * @param value
-     * @param enforceConstraints
-     * @param options
-     * @return result of the cast operation
-     * @throws InvalidCastException
-     * @throws ConstraintsException 
-     */
-    public <Any> Any castValue(String value, boolean enforceConstraints, Map<String, Object> options) throws InvalidCastException, ConstraintsException{
+    public T castValue(String value, boolean enforceConstraints, Map<String, Object> options) throws InvalidCastException, ConstraintsException{
         if(this.type.isEmpty()){
             throw new InvalidCastException("Property 'type' must not be empty");
         } else if (StringUtils.isEmpty(value)) {
             return null;
         } else {
             try{
-                // Using reflection to invoke appropriate type casting method from the TypeInferrer class
-                String castMethodName = "cast" + (this.type.substring(0, 1).toUpperCase() + this.type.substring(1));
-                Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class, Map.class);
-                Object castValue = method.invoke(TypeInferrer.getInstance(), this.format, value, options);
+                T castValue = parseValue(value, format, options);
             
                 // Check for constraint violations
                 if(enforceConstraints && this.constraints != null){
@@ -183,7 +149,7 @@ public class Field {
                     }
                 }
                 
-                return (Any)castValue;
+                return castValue;
                 
             }catch(ConstraintsException ce){
                 throw ce;
@@ -412,6 +378,89 @@ public class Field {
         
         return violatedConstraints;
     }
+
+    public static Field forType(String type, String name) {
+        Field field = null;
+        switch (type) {
+            case FIELD_TYPE_STRING:
+                field = new StringField(name);
+                break;
+            case FIELD_TYPE_INTEGER:
+                field = new IntegerField(name);
+                break;
+            case FIELD_TYPE_NUMBER:
+                field = new NumberField(name);
+                break;
+            case FIELD_TYPE_ARRAY:
+                field = new ArrayField(name);
+                break;
+            case FIELD_TYPE_BOOLEAN:
+                field = new BooleanField(name);
+                break;
+            case FIELD_TYPE_DATETIME:
+                field = new DateTimeField(name);
+                break;
+            case FIELD_TYPE_DATE:
+                field = new DateField(name);
+                break;
+            case FIELD_TYPE_DURATION:
+                field = new DurationField(name);
+                break;
+            case FIELD_TYPE_GEOJSON:
+                field = new GeoJsonField(name);
+                break;
+            case FIELD_TYPE_GEOPOINT:
+                field = new GeoPointField(name);
+                break;
+            case FIELD_TYPE_ANY:
+                field = new AnyField(name);
+                break;
+            case FIELD_TYPE_OBJECT:
+                field = new ObjectField(name);
+                break;
+            case FIELD_TYPE_TIME:
+                field = new TimeField(name);
+                break;
+            case FIELD_TYPE_YEAR:
+                field = new YearField(name);
+                break;
+            case FIELD_TYPE_YEARMONTH:
+                field = new YearMonthField(name);
+                break;
+            default:
+                field = new AnyField(name);
+        }
+        return field;
+    }
+
+    public static Field fromJson (JSONObject fieldDef){
+        String type = fieldDef.has(JSON_KEY_TYPE) ? fieldDef.getString(JSON_KEY_TYPE) : "string";
+        String name = fieldDef.has(JSON_KEY_NAME) ? fieldDef.getString(JSON_KEY_NAME).trim() : null;
+
+        Field field = forType(type, name);
+
+        //TODO: Maybe use Gson serializer for this instead? Is it worth importing library just for this?
+        field.name = (!StringUtils.isEmpty(name)) ? name.trim() : null;
+
+
+
+        String format = fieldDef.has(JSON_KEY_FORMAT) ? fieldDef.getString(JSON_KEY_FORMAT) : null;
+        field.format = (!StringUtils.isEmpty(format)) ? format.trim() : FIELD_FORMAT_DEFAULT;
+
+        String title = fieldDef.has(JSON_KEY_TITLE) ? fieldDef.getString(JSON_KEY_TITLE) : null;
+        field.title = (!StringUtils.isEmpty(title)) ? title.trim() : null;
+
+        String description = fieldDef.has(JSON_KEY_DESCRIPTION) ? fieldDef.getString(JSON_KEY_DESCRIPTION) : null;
+        field.description = (!StringUtils.isEmpty(description)) ? description.trim() : null;
+
+        Map cstraints = null;
+        if (fieldDef.has(JSON_KEY_CONSTRAINTS))
+            cstraints = fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap();
+        if ((null != cstraints) && (!cstraints.isEmpty())) {
+            field.constraints = fieldDef.has(JSON_KEY_CONSTRAINTS) ? fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
+        }
+        return field;
+    }
     
     /**
      * Get the JSON representation of the Field.
@@ -429,6 +478,43 @@ public class Field {
             json.put(JSON_KEY_CONSTRAINTS, this.constraints);
         
         return json;
+    }
+
+    /**
+     * We only want to go through this initialization if we have to because it's a
+     * performance issue the first time it is executed.
+     * Because of this, so we don't include this logic in the constructor and only
+     * call it when it is actually required after trying all other type inferral.
+     * @param geoJson
+     * @throws ValidationException
+     */
+    void validateGeoJsonSchema(JSONObject geoJson) throws ValidationException{
+        if(this.geoJsonSchema == null){
+            // FIXME: Maybe this infering against geojson scheme is too much.
+            // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
+            InputStream geoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/geojson.json");
+            JSONObject rawGeoJsonSchema = new JSONObject(new JSONTokener(geoJsonSchemaInputStream));
+            geoJsonSchema = SchemaLoader.load(rawGeoJsonSchema);
+        }
+        geoJsonSchema.validate(geoJson);
+    }
+
+    /**
+     * We only want to go through this initialization if we have to because it's a
+     * performance issue the first time it is executed.
+     * Because of this, so we don't include this logic in the constructor and only
+     * call it when it is actually required after trying all other type inferral.
+     * @param topoJson
+     */
+    void validateTopoJsonSchema(JSONObject topoJson){
+        if(topoJsonSchema == null){
+            // FIXME: Maybe this infering against topojson scheme is too much.
+            // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema
+            InputStream topoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/topojson.json");
+            JSONObject rawTopoJsonSchema = new JSONObject(new JSONTokener(topoJsonSchemaInputStream));
+            topoJsonSchema = SchemaLoader.load(rawTopoJsonSchema);
+        }
+        topoJsonSchema.validate(topoJson);
     }
 
     public String getCastMethodName() {
@@ -459,6 +545,21 @@ public class Field {
         return this.constraints;
     }
 
+    private Schema getGeoJsonSchema(){
+        return this.geoJsonSchema;
+    }
+
+    private void setGeoJsonSchema(Schema geoJsonSchema){
+        this.geoJsonSchema = geoJsonSchema;
+    }
+
+    private Schema getTopoJsonSchema(){
+        return this.topoJsonSchema;
+    }
+
+    private void setTopoJsonSchema(Schema topoJsonSchema){
+        this.topoJsonSchema = topoJsonSchema;
+    }
 
     @Override
     public boolean equals(Object o) {

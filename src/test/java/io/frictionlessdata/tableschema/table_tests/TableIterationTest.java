@@ -1,9 +1,8 @@
 package io.frictionlessdata.tableschema.table_tests;
 
-import io.frictionlessdata.tableschema.Field;
+import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.Schema;
 import io.frictionlessdata.tableschema.Table;
-import org.apache.commons.csv.CSVFormat;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,9 +12,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -125,7 +122,7 @@ public class TableIterationTest {
         
         // We will iterate the rows and these are the values classes we expect:
         Class[] expectedTypes = new Class[]{
-            Integer.class,
+            Long.class,
             String.class,
             DateTime.class,
             Boolean.class,
@@ -155,25 +152,25 @@ public class TableIterationTest {
     private Schema getEmployeeTableSchema(){
         Schema schema = new Schema();
         
-        Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+        Field idField = new IntegerField("id");
         schema.addField(idField);
         
-        Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+        Field nameField = new StringField("name");
         schema.addField(nameField);
         
-        Field dobField = new Field("dateOfBirth", Field.FIELD_TYPE_DATE); 
+        Field dobField = new DateField("dateOfBirth");
         schema.addField(dobField);
         
-        Field isAdminField = new Field("isAdmin", Field.FIELD_TYPE_BOOLEAN);
+        Field isAdminField = new BooleanField("isAdmin");
         schema.addField(isAdminField);
         
-        Field addressCoordinatesField = new Field("addressCoordinatesField", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT);
+        Field addressCoordinatesField = new GeoPointField("addressCoordinatesField", Field.FIELD_FORMAT_OBJECT, null, null, null);
         schema.addField(addressCoordinatesField);
 
-        Field contractLengthField = new Field("contractLength", Field.FIELD_TYPE_DURATION);
+        Field contractLengthField = new DurationField("contractLength");
         schema.addField(contractLengthField);
         
-        Field infoField = new Field("info", Field.FIELD_TYPE_OBJECT);
+        Field infoField = new ObjectField("info");
         schema.addField(infoField);
         
         return schema;
