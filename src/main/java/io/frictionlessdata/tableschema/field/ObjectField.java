@@ -24,6 +24,6 @@ public class ObjectField extends Field<JSONObject> {
 
     @Override
     JSONObject getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return TypeInferrer.getInstance().castObject(format, value, options);
+        return TypeInferrer.getInstance().castObject(value, format, options);
     }
 }

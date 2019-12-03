@@ -24,6 +24,6 @@ public class IntegerField extends Field<Long> {
 
     @Override
     Long getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return TypeInferrer.getInstance().castInteger(format, value, options);
+        return TypeInferrer.getInstance().castInteger(value, format, options);
     }
 }

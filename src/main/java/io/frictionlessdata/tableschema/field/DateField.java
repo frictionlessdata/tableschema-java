@@ -25,6 +25,6 @@ public class DateField extends Field<DateTime> {
 
     @Override
     DateTime getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return TypeInferrer.getInstance().castDate(format, value, options);
+        return TypeInferrer.getInstance().castDate(value, format, options);
     }
 }

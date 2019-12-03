@@ -25,6 +25,6 @@ public class YearField extends Field<Integer> {
 
     @Override
     Integer getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return TypeInferrer.getInstance().castYear(format, value, options);
+        return TypeInferrer.getInstance().castYear(value, format, options);
     }
 }

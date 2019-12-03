@@ -25,6 +25,6 @@ public class DurationField extends Field<Duration> {
 
     @Override
     Duration getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return TypeInferrer.getInstance().castDuration(format, value, options);
+        return TypeInferrer.getInstance().castDuration(value, format, options);
     }
 }

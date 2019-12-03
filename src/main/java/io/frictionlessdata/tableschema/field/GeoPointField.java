@@ -24,6 +24,6 @@ public class GeoPointField extends Field<int[]> {
 
     @Override
     int[] getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return TypeInferrer.getInstance().castGeopoint(format, value, options);
+        return TypeInferrer.getInstance().castGeopoint(value, format, options);
     }
 }

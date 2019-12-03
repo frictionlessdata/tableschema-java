@@ -25,6 +25,6 @@ public class ArrayField extends Field<JSONArray> {
 
     @Override
     JSONArray getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return TypeInferrer.getInstance().castArray(format, value, options);
+        return TypeInferrer.getInstance().castArray(value, format, options);
     }
 }

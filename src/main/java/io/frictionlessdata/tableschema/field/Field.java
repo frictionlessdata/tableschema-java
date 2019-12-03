@@ -434,6 +434,9 @@ public abstract class Field<T> {
             case FIELD_TYPE_OBJECT:
                 field = new ObjectField(name);
                 break;
+            case FIELD_TYPE_TIME:
+                field = new TimeField(name);
+                break;
             case FIELD_TYPE_YEAR:
                 field = new YearField(name);
                 break;

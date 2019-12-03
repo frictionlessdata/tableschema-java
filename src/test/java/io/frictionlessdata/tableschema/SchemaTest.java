@@ -342,7 +342,7 @@ public class SchemaTest {
         Object[] castRow = schema.castRow(row);
        
         assertThat(castRow[0], instanceOf(String.class));
-        assertThat(castRow[1], instanceOf(Integer.class));
+        assertThat(castRow[1], instanceOf(Long.class));
         assertThat(castRow[2], instanceOf(Boolean.class));
         assertThat(castRow[3], instanceOf(JSONObject.class));
         assertThat(castRow[4], instanceOf(JSONArray.class));

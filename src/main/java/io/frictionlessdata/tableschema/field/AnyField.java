@@ -25,6 +25,6 @@ public class AnyField extends Field<Object> {
 
     @Override
     Object getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return TypeInferrer.getInstance().castAny(format, value, options);
+        return TypeInferrer.getInstance().castAny(value, format, options);
     }
 }

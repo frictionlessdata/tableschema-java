@@ -24,6 +24,6 @@ public class GeoJsonField extends Field<JSONObject> {
 
     @Override
     JSONObject getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return TypeInferrer.getInstance().castGeojson(format, value, options);
+        return TypeInferrer.getInstance().castGeojson(value, format, options);
     }
 }

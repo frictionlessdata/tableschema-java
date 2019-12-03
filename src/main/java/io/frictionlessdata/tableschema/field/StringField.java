@@ -24,6 +24,6 @@ public class StringField extends Field<String> {
 
     @Override
     String getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return TypeInferrer.getInstance().castString(format, value, options);
+        return TypeInferrer.getInstance().castString(value, format, options);
     }
 }

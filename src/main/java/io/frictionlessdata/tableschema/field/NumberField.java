@@ -24,6 +24,6 @@ public class NumberField extends Field<Number> {
 
     @Override
     Number getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return TypeInferrer.getInstance().castNumber(format, value, options);
+        return TypeInferrer.getInstance().castNumber(value, format, options);
     }
 }

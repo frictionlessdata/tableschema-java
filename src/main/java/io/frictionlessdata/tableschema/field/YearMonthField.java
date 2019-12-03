@@ -26,6 +26,6 @@ public class YearMonthField extends Field<DateTime> {
 
     @Override
     DateTime getCastValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return TypeInferrer.getInstance().castYearmonth(format, value, options);
+        return TypeInferrer.getInstance().castYearmonth(value, format, options);
     }
 }
