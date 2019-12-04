@@ -434,7 +434,7 @@ public abstract class Field<T> {
         }
         return field;
     }
-    
+
     /**
      * Get the JSON representation of the Field.
      * @return JSONObject containing the properties of this field as JSON
