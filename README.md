@@ -87,10 +87,13 @@ schema.addField(coordinatesFieldJsonObject);
 
 System.out.println(schema.getJson());
 
-// {"fields":[
-{"name":"name","format":"default","type":"string"},
-{"name":"id","format":"invalid","type":"integer"},
-{"name":"coordinates","format":"array","type":"geopoint"}]}
+/* 
+{"fields":[
+    {"name":"name","format":"default","type":"string"},
+    {"name":"id","format":"invalid","type":"integer"},
+    {"name":"coordinates","format":"array","type":"geopoint"}
+]}
+*/
 ```
 
 When using the `addField` method, the schema undergoes validation after every field addition.
