@@ -13,31 +13,26 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DatetimeField extends Field<DateTime> {
+public class DateTimeField extends Field<DateTime> {
     // ISO 8601 format of yyyy-MM-dd'T'HH:mm:ss.SSSZ in UTC time
-    private static final String REGEX_DATETIME =
-            "(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9])" +
-                    ":([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?";
+    private static final String REGEX_DATETIME = "(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?";
 
-    DatetimeField() {
-        super();
-    }
-
-    public DatetimeField(String name) {
+    public DateTimeField(String name) {
         super(name, FIELD_TYPE_DATETIME);
     }
 
-    public DatetimeField(String name, String format, String title, String description, Map constraints) {
+    public DateTimeField(String name, String format, String title, String description, Map constraints) {
         super(name, FIELD_TYPE_DATETIME, format, title, description, constraints);
     }
 
-    public DatetimeField(JSONObject field) {
+    public DateTimeField(JSONObject field) {
         super(field);
         type = FIELD_TYPE_DATETIME;
     }
 
     @Override
     public DateTime parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+
         Pattern pattern = Pattern.compile(REGEX_DATETIME);
         Matcher matcher = pattern.matcher(value);
 
