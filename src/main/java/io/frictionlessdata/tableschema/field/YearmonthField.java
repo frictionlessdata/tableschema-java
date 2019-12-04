@@ -14,19 +14,23 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class YearMonthField extends Field<DateTime> {
+public class YearmonthField extends Field<DateTime> {
     // yyyy-MM
     private static final String REGEX_YEARMONTH = "([0-9]{4})-(1[0-2]|0[1-9])";
 
-    public YearMonthField(String name) {
+    YearmonthField() {
+        super();
+    }
+
+    public YearmonthField(String name) {
         super(name, FIELD_TYPE_YEARMONTH);
     }
 
-    public YearMonthField(String name, String format, String title, String description, Map constraints) {
+    public YearmonthField(String name, String format, String title, String description, Map constraints) {
         super(name, FIELD_TYPE_YEARMONTH, format, title, description, constraints);
     }
 
-    public YearMonthField(JSONObject field) {
+    public YearmonthField(JSONObject field) {
         super(field);
         type = FIELD_TYPE_YEARMONTH;
     }

@@ -9,17 +9,21 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public class GeoPointField extends Field<int[]> {
+public class GeopointField extends Field<int[]> {
 
-    public GeoPointField(String name) {
+    GeopointField(){
+        super();
+    }
+
+    public GeopointField(String name) {
         super(name, FIELD_TYPE_GEOPOINT);
     }
 
-    public GeoPointField(String name, String format, String title, String description, Map constraints) {
+    public GeopointField(String name, String format, String title, String description, Map constraints) {
         super(name, FIELD_TYPE_GEOPOINT, format, title, description, constraints);
     }
 
-    public GeoPointField(JSONObject field) {
+    public GeopointField(JSONObject field) {
         super(field);
         type = FIELD_TYPE_GEOPOINT;
     }

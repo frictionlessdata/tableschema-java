@@ -10,17 +10,21 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public class GeoJsonField extends Field<JSONObject> {
+public class GeojsonField extends Field<JSONObject> {
 
-    public GeoJsonField(String name) {
+    GeojsonField(){
+        super();
+    }
+
+    public GeojsonField(String name) {
         super(name, FIELD_TYPE_GEOJSON);
     }
 
-    public GeoJsonField(String name, String format, String title, String description, Map constraints) {
+    public GeojsonField(String name, String format, String title, String description, Map constraints) {
         super(name, FIELD_TYPE_GEOJSON, format, title, description, constraints);
     }
 
-    public GeoJsonField(JSONObject field) {
+    public GeojsonField(JSONObject field) {
         super(field);
         type = FIELD_TYPE_GEOJSON;
     }

@@ -13,19 +13,23 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DateTimeField extends Field<DateTime> {
+public class DatetimeField extends Field<DateTime> {
     // ISO 8601 format of yyyy-MM-dd'T'HH:mm:ss.SSSZ in UTC time
     private static final String REGEX_DATETIME = "(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?";
 
-    public DateTimeField(String name) {
+    DatetimeField() {
+        super();
+    }
+
+    public DatetimeField(String name) {
         super(name, FIELD_TYPE_DATETIME);
     }
 
-    public DateTimeField(String name, String format, String title, String description, Map constraints) {
+    public DatetimeField(String name, String format, String title, String description, Map constraints) {
         super(name, FIELD_TYPE_DATETIME, format, title, description, constraints);
     }
 
-    public DateTimeField(JSONObject field) {
+    public DatetimeField(JSONObject field) {
         super(field);
         type = FIELD_TYPE_DATETIME;
     }
