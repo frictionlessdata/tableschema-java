@@ -13,11 +13,12 @@ A Java library for working with Table Schema. Snapshots on [Jitpack](https://jit
 Cast [data](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv) from a CSV without a schema:
 
 ```java
-URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
+URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
+	              "/src/test/resources/fixtures/data/simple_data.csv");
 Table table = new Table(url);
 
-// Iterate through rows          
-TableIterator<Object[]> iter = table.iterator();
+// Iterate through rows
+Iterator<Object[]> iter = table.iterator();
 while(iter.hasNext()){
     Object[] row = iter.next();
     System.out.println(Arrays.toString(row));
@@ -28,7 +29,8 @@ while(iter.hasNext()){
 // [3, baz]
 
 // Read the entire CSV and output it as a List:
-List<String[]> allData = table.read();
+List<Object[]> allData = table.read();
+
 ```
 
 ### Write a Table Into a File
@@ -48,15 +50,15 @@ You can build a `Schema` instance from scratch or modify an existing one:
 ```java
 Schema schema = new Schema();
 
-Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+Field nameField = new StringField("name");
 schema.addField(nameField);
 
-Field coordinatesField = new Field("coordinates", Field.FIELD_TYPE_GEOPOINT);
+Field coordinatesField = new GeopointField("coordinates");
 schema.addField(coordinatesField);
 
 System.out.println(schema.getJson());
 
-// {"fields":[{"name":"name","format":"default","description":"","type":"string","title":"","constraints":{}},{"name":"coordinates","format":"default","description":"","type":"geopoint","title":"","constraints":{}}]}
+// {"fields":[{"name":"name","format":"default","description":"","type":"string","title":""},{"name":"coordinates","format":"default","description":"","type":"geopoint","title":""}]}
 ```
 
 You can also build a `Schema` instance with `JSONObject` instances instead of `Field` instances:
