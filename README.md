@@ -87,7 +87,10 @@ schema.addField(coordinatesFieldJsonObject);
 
 System.out.println(schema.getJson());
 
-// {"fields":[{"name":"name","format":"default","description":"","type":"string","title":"","constraints":{}},{"name":"id","format":"invalid","description":"","type":"integer","title":"","constraints":{}},{"name":"coordinates","format":"array","description":"","type":"geopoint","title":"","constraints":{}}]}
+// {"fields":[
+{"name":"name","format":"default","type":"string"},
+{"name":"id","format":"invalid","type":"integer"},
+{"name":"coordinates","format":"array","type":"geopoint"}]}
 ```
 
 When using the `addField` method, the schema undergoes validation after every field addition.
@@ -105,7 +108,8 @@ Schema schema = new Schema(schemaFilePath, true); // enforce validation with str
 If you don't have a schema for a CSV and don't want to manually define one then you can generate it:
 
 ```java
-URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
+URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
+                                "/src/test/resources/fixtures/data/simple_data.csv");
 Table table = new Table(url);
 
 Schema schema = table.inferSchema();
