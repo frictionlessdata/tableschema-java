@@ -1,6 +1,6 @@
 package io.frictionlessdata.tableschema.fk;
 
-import io.frictionlessdata.tableschema.exceptions.ForeignKeyException;
+import io.frictionlessdata.tableschema.exception.ForeignKeyException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.json.JSONArray;

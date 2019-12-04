@@ -1,9 +1,8 @@
 package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.TypeInferrer;
-import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
-import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
+import io.frictionlessdata.tableschema.exception.ConstraintsException;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import org.json.JSONObject;
 
 import java.time.Duration;
@@ -19,8 +18,8 @@ public class DurationField extends Field<Duration> {
         super(name, FIELD_TYPE_DURATION);
     }
 
-    public DurationField(String name, String format, String title, String description, Map constraints) {
-        super(name, FIELD_TYPE_DURATION, format, title, description, constraints);
+    public DurationField(String name, String format, String title, String description, Map constraints, Map options){
+        super(name, FIELD_TYPE_DURATION, format, title, description, constraints, options);
     }
 
     public DurationField(JSONObject field) {
@@ -29,7 +28,8 @@ public class DurationField extends Field<Duration> {
     }
 
     @Override
-    public Duration parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public Duration parseValue(String value, String format, Map<String, Object> options)
+            throws InvalidCastException, ConstraintsException {
         try{
             return Duration.parse(value);
         }catch(Exception e){

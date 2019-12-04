@@ -1,14 +1,11 @@
 package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.TypeInferrer;
-import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
-import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
+import io.frictionlessdata.tableschema.exception.ConstraintsException;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BooleanField extends Field<Boolean> {
     List<String> trueValues = Arrays.asList("yes", "y", "true", "t", "1");
@@ -23,8 +20,8 @@ public class BooleanField extends Field<Boolean> {
         super(name, FIELD_TYPE_BOOLEAN);
     }
 
-    public BooleanField(String name, String format, String title, String description, Map constraints) {
-        super(name, FIELD_TYPE_BOOLEAN, format, title, description, constraints);
+    public BooleanField(String name, String format, String title, String description, Map constraints, Map options){
+        super(name, FIELD_TYPE_BOOLEAN, format, title, description, constraints, options);
     }
 
     public BooleanField(JSONObject field) {
@@ -41,7 +38,17 @@ public class BooleanField extends Field<Boolean> {
     }
 
     @Override
-    public Boolean parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public Boolean parseValue(String value, String format, Map<String, Object> options)
+            throws InvalidCastException, ConstraintsException {
+        if (null != options) {
+            if (options.containsKey("trueValues")) {
+                trueValues = new ArrayList<>((Collection) options.get("trueValues"));
+            }
+            if (options.containsKey("falseValues")) {
+                falseValues = new ArrayList<>((Collection) options.get("falseValues"));
+            }
+        }
+
         if (trueValues.contains(value.toLowerCase())){
             return true;
 

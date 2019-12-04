@@ -1,8 +1,7 @@
 package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.TypeInferrer;
-import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.ConstraintsException;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -17,8 +16,8 @@ public class ObjectField extends Field<JSONObject> {
         super(name, FIELD_TYPE_OBJECT);
     }
 
-    public ObjectField(String name, String format, String title, String description, Map constraints) {
-        super(name, FIELD_TYPE_OBJECT, format, title, description, constraints);
+    public ObjectField(String name, String format, String title, String description, Map constraints, Map options){
+        super(name, FIELD_TYPE_OBJECT, format, title, description, constraints, options);
     }
 
     public ObjectField(JSONObject field) {
@@ -27,7 +26,8 @@ public class ObjectField extends Field<JSONObject> {
     }
 
     @Override
-    public JSONObject parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public JSONObject parseValue(String value, String format, Map<String, Object> options)
+            throws InvalidCastException, ConstraintsException {
         return new JSONObject(value);
     }
 }

@@ -1,6 +1,6 @@
 package io.frictionlessdata.tableschema.fk;
 
-import io.frictionlessdata.tableschema.exceptions.ForeignKeyException;
+import io.frictionlessdata.tableschema.exception.ForeignKeyException;
 import org.json.JSONArray;
 import org.junit.Assert;
 import org.junit.Rule;

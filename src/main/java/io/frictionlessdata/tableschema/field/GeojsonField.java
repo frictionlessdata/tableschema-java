@@ -1,9 +1,8 @@
 package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.TypeInferrer;
-import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
-import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
+import io.frictionlessdata.tableschema.exception.ConstraintsException;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import org.everit.json.schema.ValidationException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,8 +19,8 @@ public class GeojsonField extends Field<JSONObject> {
         super(name, FIELD_TYPE_GEOJSON);
     }
 
-    public GeojsonField(String name, String format, String title, String description, Map constraints) {
-        super(name, FIELD_TYPE_GEOJSON, format, title, description, constraints);
+    public GeojsonField(String name, String format, String title, String description, Map constraints, Map options){
+        super(name, FIELD_TYPE_GEOJSON, format, title, description, constraints, options);
     }
 
     public GeojsonField(JSONObject field) {
@@ -30,7 +29,8 @@ public class GeojsonField extends Field<JSONObject> {
     }
 
     @Override
-    public JSONObject parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public JSONObject parseValue(String value, String format, Map<String, Object> options)
+            throws InvalidCastException, ConstraintsException {
         JSONObject jsonObj = null;
 
         try {

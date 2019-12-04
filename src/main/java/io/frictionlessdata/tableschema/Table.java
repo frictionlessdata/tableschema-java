@@ -1,9 +1,10 @@
 package io.frictionlessdata.tableschema;
 
-import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
+import io.frictionlessdata.tableschema.exception.TableSchemaException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import io.frictionlessdata.tableschema.datasources.CsvDataSource;
 import io.frictionlessdata.tableschema.datasources.DataSource;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import java.io.File;
 
 import org.apache.commons.csv.CSVFormat;
@@ -22,6 +23,7 @@ public class Table{
     private DataSource dataSource = null;
     private Schema schema = null;
     private CSVFormat format;
+    private Map<String, Object> fieldOptions;
 
     /**
      * Constructor using either a CSV or JSON array-containing string.
@@ -83,6 +85,9 @@ public class Table{
     }
 
     public List<Object[]> read(boolean cast) throws Exception{
+        if(cast && (null == schema)){
+            throw new TableSchemaException("Cannot cast without a schema");
+        }
         if(cast && !this.schema.hasFields()){
             throw new InvalidCastException("Schema has no fields");
         }
@@ -134,6 +139,14 @@ public class Table{
         return this;
     }
 
+    public void setFieldOptions(Map<String, Object> options) {
+        this.fieldOptions = options;
+    }
+
+    public Map<String, Object> getFieldOptions() {
+        return fieldOptions;
+    }
+
     public CSVFormat getCsvFormat() {
         return format;
     }
@@ -173,4 +186,5 @@ public class Table{
     public int hashCode() {
         return Objects.hash(dataSource, schema, format);
     }
+
 }

@@ -1,8 +1,7 @@
 package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.TypeInferrer;
-import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.ConstraintsException;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import org.json.JSONObject;
 
 import java.math.BigInteger;
@@ -22,8 +21,8 @@ public class IntegerField extends Field<BigInteger> {
         super(name, FIELD_TYPE_INTEGER);
     }
 
-    public IntegerField(String name, String format, String title, String description, Map constraints) {
-        super(name, FIELD_TYPE_INTEGER, format, title, description, constraints);
+    public IntegerField(String name, String format, String title, String description, Map constraints, Map options) {
+        super(name, FIELD_TYPE_INTEGER, format, title, description, constraints, options);
     }
 
     public IntegerField(JSONObject field) {

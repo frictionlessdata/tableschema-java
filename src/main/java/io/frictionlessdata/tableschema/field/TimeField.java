@@ -1,9 +1,8 @@
 package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.TypeInferrer;
-import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
-import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
+import io.frictionlessdata.tableschema.exception.ConstraintsException;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -25,8 +24,8 @@ public class TimeField extends Field<DateTime> {
         super(name, FIELD_TYPE_TIME);
     }
 
-    public TimeField(String name, String format, String title, String description, Map constraints) {
-        super(name, FIELD_TYPE_TIME, format, title, description, constraints);
+    public TimeField(String name, String format, String title, String description, Map constraints, Map options){
+        super(name, FIELD_TYPE_TIME, format, title, description, constraints, options);
     }
 
     public TimeField(JSONObject field) {

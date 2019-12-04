@@ -4,7 +4,7 @@ package io.frictionlessdata.tableschema.fk;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import io.frictionlessdata.tableschema.exceptions.ForeignKeyException;
+import io.frictionlessdata.tableschema.exception.ForeignKeyException;
 import org.junit.Assert;
 import org.json.JSONArray;
 

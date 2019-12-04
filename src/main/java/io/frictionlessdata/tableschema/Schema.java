@@ -1,11 +1,10 @@
 package io.frictionlessdata.tableschema;
 
-import io.frictionlessdata.tableschema.exceptions.*;
+import io.frictionlessdata.tableschema.exception.*;
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 
 import java.io.*;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;

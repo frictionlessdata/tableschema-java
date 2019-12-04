@@ -1,19 +1,10 @@
 package io.frictionlessdata.tableschema.table_tests;
-import java.io.File;
-import java.io.FileInputStream;
-import java.math.BigInteger;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
-import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.Schema;
 import io.frictionlessdata.tableschema.Table;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TableSchemaException;
+import io.frictionlessdata.tableschema.field.*;
 import org.apache.commons.csv.CSVFormat;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -21,15 +12,23 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.math.BigInteger;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
-/**
- *
- * 
- */
+
 public class TableOtherTest {
+
     private static JSONArray populationTestJson =  new JSONArray("[" +
              "{" +
              "\"city\": \"london\"," +
@@ -47,6 +46,7 @@ public class TableOtherTest {
              "\"population\": 2860000" +
              "}" +
              "]");
+
     private static JSONObject populationSchema = new JSONObject("{\n" +
             "  \"fields\": [\n" +
             "    {\n" +
@@ -80,6 +80,9 @@ public class TableOtherTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testReadFromValidJSONArrayWithSchema() throws Exception{
@@ -157,7 +160,7 @@ public class TableOtherTest {
         Schema employeeTableSchema = getEmployeeTableSchema();
         
         // Fetch the data and apply the schema
-        File file = new File("employee_data.csv");
+        File file = new File("data/employee_data.csv");
         Table employeeTable = new Table(file, testDataDir, employeeTableSchema);
         
         Iterator<Map> iter = employeeTable.iterator(true, false, false, false);
@@ -179,7 +182,7 @@ public class TableOtherTest {
     public void testFetchHeaders() throws Exception{
         File testDataDir = getTestDataDirectory();
         // get path of test CSV file
-        File file = new File("simple_data.csv");
+        File file = new File("data/simple_data.csv");
         Table table = new Table(file, testDataDir);
         
         Assert.assertEquals("[id, title]", Arrays.toString(table.getHeaders()));
@@ -188,7 +191,7 @@ public class TableOtherTest {
     @Test
     public void testReadUncastData() throws Exception{
         File testDataDir = getTestDataDirectory();
-        File file = new File("simple_data.csv");
+        File file = new File("data/simple_data.csv");
         Table table = new Table(file, testDataDir);
         
         Assert.assertEquals(3, table.read().size());
@@ -204,7 +207,7 @@ public class TableOtherTest {
         Schema employeeTableSchema = getEmployeeTableSchema();
         
         // Fetch the data and apply the schema
-        File file = new File("employee_data.csv");
+        File file = new File("data/employee_data.csv");
         Table employeeTable = new Table(file, testDataDir, employeeTableSchema);
         
         // We will iterate the rows and these are the values classes we expect:
@@ -235,7 +238,7 @@ public class TableOtherTest {
         String createdFileName = "test_data_table.csv";
         File createdFileDir = folder.newFile(createdFileName).getParentFile();
         File testDataDir = getTestDataDirectory();
-        File file = new File("simple_data.csv");
+        File file = new File("data/simple_data.csv");
         Table loadedTable = new Table(file, testDataDir);
         
         loadedTable.writeCsv(new File (createdFileDir, createdFileName), CSVFormat.RFC4180);
@@ -246,6 +249,14 @@ public class TableOtherTest {
         Assert.assertEquals(3, readTable.read().size());   
     }
 
+    @Test
+    public void testInvalidTableCast() throws Exception {
+        File file = new File("data/employee_data.csv");
+        Table table = new Table(file, getTestDataDirectory());
+
+        exception.expect(TableSchemaException.class);
+        table.read(true);
+    }
 
     private Schema getEmployeeTableSchema(){
         Schema schema = new Schema();
@@ -262,7 +273,8 @@ public class TableOtherTest {
         Field isAdminField = new BooleanField("isAdmin");
         schema.addField(isAdminField);
 
-        Field addressCoordinatesField = new GeopointField("addressCoordinatesField", Field.FIELD_FORMAT_OBJECT, null, null, null);
+        Field addressCoordinatesField
+                = new GeopointField("addressCoordinatesField", Field.FIELD_FORMAT_OBJECT, null, null, null, null);
         schema.addField(addressCoordinatesField);
 
         Field contractLengthField = new DurationField("contractLength");

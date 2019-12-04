@@ -97,7 +97,7 @@ public class TableIterationTest {
     public void testFetchHeaders() throws Exception{
         File testDataDir = getTestDataDirectory();
         // get path of test CSV file
-        File file = new File("simple_data.csv");
+        File file = new File("data/simple_data.csv");
         Table table = new Table(file, testDataDir);
         
         Assert.assertEquals("[id, title]", Arrays.toString(table.getHeaders()));
@@ -106,7 +106,7 @@ public class TableIterationTest {
     @Test
     public void testReadUncastData() throws Exception{
         File testDataDir = getTestDataDirectory();
-        File file = new File("simple_data.csv");
+        File file = new File("data/simple_data.csv");
         Table table = new Table(file, testDataDir);
         
         Assert.assertEquals(3, table.read().size());
@@ -122,7 +122,7 @@ public class TableIterationTest {
         Schema employeeTableSchema = getEmployeeTableSchema();
         
         // Fetch the data and apply the schema
-        File file = new File("employee_data.csv");
+        File file = new File("data/employee_data.csv");
         Table employeeTable = new Table(file, testDataDir, employeeTableSchema);
         
         // We will iterate the rows and these are the values classes we expect:
@@ -191,7 +191,8 @@ public class TableIterationTest {
         Field isAdminField = new BooleanField("isAdmin");
         schema.addField(isAdminField);
         
-        Field addressCoordinatesField = new GeopointField("addressCoordinatesField", Field.FIELD_FORMAT_OBJECT, null, null, null);
+        Field addressCoordinatesField
+                = new GeopointField("addressCoordinatesField", Field.FIELD_FORMAT_OBJECT, null, null, null, null);
         schema.addField(addressCoordinatesField);
 
         Field contractLengthField = new DurationField("contractLength");

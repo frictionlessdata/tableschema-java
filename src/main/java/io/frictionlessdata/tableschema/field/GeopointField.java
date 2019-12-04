@@ -1,9 +1,8 @@
 package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.TypeInferrer;
-import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
-import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
+import io.frictionlessdata.tableschema.exception.ConstraintsException;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -19,8 +18,8 @@ public class GeopointField extends Field<int[]> {
         super(name, FIELD_TYPE_GEOPOINT);
     }
 
-    public GeopointField(String name, String format, String title, String description, Map constraints) {
-        super(name, FIELD_TYPE_GEOPOINT, format, title, description, constraints);
+    public GeopointField(String name, String format, String title, String description, Map constraints, Map options){
+        super(name, FIELD_TYPE_GEOPOINT, format, title, description, constraints, options);
     }
 
     public GeopointField(JSONObject field) {
@@ -29,7 +28,8 @@ public class GeopointField extends Field<int[]> {
     }
 
     @Override
-    public int[] parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public int[] parseValue(String value, String format, Map<String, Object> options)
+            throws InvalidCastException, ConstraintsException {
         try{
             if(format.equalsIgnoreCase(io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT)){
                 String[] geopoint = value.split(",");
@@ -38,7 +38,7 @@ public class GeopointField extends Field<int[]> {
                     int lon = Integer.parseInt(geopoint[0]);
                     int lat = Integer.parseInt(geopoint[1]);
 
-                    // No exceptions? It's a valid geopoint object.
+                    // No exception? It's a valid geopoint object.
                     return new int[]{lon, lat};
 
                 }else{
@@ -54,7 +54,7 @@ public class GeopointField extends Field<int[]> {
                     int lon = jsonArray.getInt(0);
                     int lat = jsonArray.getInt(1);
 
-                    // No exceptions? It's a valid geopoint object.
+                    // No exception? It's a valid geopoint object.
                     return new int[]{lon, lat};
 
                 }else{
@@ -70,7 +70,7 @@ public class GeopointField extends Field<int[]> {
                     int lon = jsonObj.getInt("lon");
                     int lat = jsonObj.getInt("lat");
 
-                    // No exceptions? It's a valid geopoint object.
+                    // No exception? It's a valid geopoint object.
                     return new int[]{lon, lat};
 
                 }else{

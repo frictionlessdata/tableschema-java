@@ -1,8 +1,8 @@
 package io.frictionlessdata.tableschema;
 
-import io.frictionlessdata.tableschema.exceptions.ForeignKeyException;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
-import io.frictionlessdata.tableschema.exceptions.PrimaryKeyException;
+import io.frictionlessdata.tableschema.exception.ForeignKeyException;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.PrimaryKeyException;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 import io.frictionlessdata.tableschema.fk.Reference;
@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.frictionlessdata.tableschema.table_tests.TableOtherTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -73,7 +72,7 @@ public class SchemaTest {
 
     @Test
     public void testReadFromInValidSchemaFileWithStrictValidation() throws Exception{
-        File f = new File(getTestDataDirectory(), "schema/invalid_population_schema.json");
+        File f = new File(TestHelper.getTestDataDirectory(), "schema/invalid_population_schema.json");
         exception.expect(ValidationException.class);
         new Schema(f, true);
     }
@@ -109,7 +108,8 @@ public class SchemaTest {
     
     @Test
     public void testCreateSchemaFromValidSchemaUrl() throws Exception{
-        URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_schema.json");
+        URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/" +
+                "master/src/test/resources/fixtures/simple_schema.json");
         
         Schema validSchema = new Schema(url, true);
         Assert.assertTrue(validSchema.isValid());
@@ -117,7 +117,8 @@ public class SchemaTest {
     
     @Test
     public void testCreateSchemaFromBadUrl() throws Exception{ 
-        URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/BAD/URL/simple_schema.json");
+        URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/" +
+                "tableschema-java/BAD/URL/simple_schema.json");
         
         exception.expect(Exception.class);
         new Schema(url, true);
@@ -397,14 +398,14 @@ public class SchemaTest {
         Map<String, Object> intFieldConstraints = new HashMap();
         intFieldConstraints.put(Field.CONSTRAINT_KEY_REQUIRED, true);
                 
-        Field intField = new IntegerField("id",  Field.FIELD_FORMAT_DEFAULT, null, null, intFieldConstraints);
+        Field intField = new IntegerField("id",  Field.FIELD_FORMAT_DEFAULT, null, null, intFieldConstraints, null);
         createdSchema.addField(intField);
         
         Map<String, Object> stringFieldConstraints = new HashMap();
         stringFieldConstraints.put(Field.CONSTRAINT_KEY_MIN_LENGTH, 36);
         stringFieldConstraints.put(Field.CONSTRAINT_KEY_MAX_LENGTH, 45);
         
-        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, "the title", "the description", stringFieldConstraints);
+        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, "the title", "the description", stringFieldConstraints, null);
         createdSchema.addField(stringField);
 
         // Save schema
@@ -434,10 +435,10 @@ public class SchemaTest {
         
         Schema createdSchema = new Schema(true);
 
-        Field intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null);
+        Field intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
         createdSchema.addField(intField);
 
-        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null);
+        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
         createdSchema.addField(stringField);
         
         // Primary Key
@@ -458,10 +459,10 @@ public class SchemaTest {
         
         Schema createdSchema = new Schema(); 
         
-        Field intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null);
+        Field intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
         createdSchema.addField(intField);
         
-        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null);
+        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
         createdSchema.addField(stringField);
         
         // Foreign Keys
@@ -642,12 +643,6 @@ public class SchemaTest {
         Assert.assertEquals("name", schema.getForeignKeys().get(0).getReference().getFields());
     }
 
-
-    private File getTestDataDirectory()throws Exception {
-        URL u = TableOtherTest.class.getResource("/fixtures/simple_data.csv");
-        Path path = Paths.get(u.toURI());
-        return path.getParent().toFile();
-    }
 
     private static File getResourceFile(String fileName) throws URISyntaxException {
         try {

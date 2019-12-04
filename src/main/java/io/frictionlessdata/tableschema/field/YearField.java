@@ -1,10 +1,8 @@
 package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.TypeInferrer;
-import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
-import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
-import org.joda.time.DateTime;
+import io.frictionlessdata.tableschema.exception.ConstraintsException;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -23,8 +21,8 @@ public class YearField extends Field<Integer> {
         super(name, FIELD_TYPE_YEAR);
     }
 
-    public YearField(String name, String format, String title, String description, Map constraints) {
-        super(name, FIELD_TYPE_YEAR, format, title, description, constraints);
+    public YearField(String name, String format, String title, String description, Map constraints, Map options){
+        super(name, FIELD_TYPE_YEAR, format, title, description, constraints, options);
     }
 
     public YearField(JSONObject field) {

@@ -1,8 +1,8 @@
 package io.frictionlessdata.tableschema.field;
 
 import io.frictionlessdata.tableschema.TypeInferrer;
-import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.ConstraintsException;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
 
 import java.io.InputStream;
 import java.time.Duration;
@@ -67,11 +67,12 @@ public abstract class Field<T> {
     private String title = "";
     private String description = "";
     Map<String, Object> constraints = null;
+    Map<String, Object> options = null;
     private Schema geoJsonSchema = null;
     private Schema topoJsonSchema = null;
 
     /**
-     * Constructor only for our reflection-based instantiation
+     * Constructor for our reflection-based instantiation only
      */
     Field(){    }
 
@@ -79,17 +80,18 @@ public abstract class Field<T> {
         this.name = name;
         this.type = type;
     }
-    
-    public Field(String name, String type, String format, String title, String description, Map constraints){
+
+    public Field(String name, String type, String format, String title, String description, Map constraints, Map options){
         this.name = name;
         this.type = type;
         this.format = format;
         this.title = title;
         this.description = description;
         this.constraints = constraints;
+        this.options = options;
     }
 
-    public Field(JSONObject field){
+    public Field (JSONObject field){
         //TODO: Maybe use Gson serializer for this instead? Is it worth importing library just for this?
         String name = field.has(JSON_KEY_NAME) ? field.getString(JSON_KEY_NAME) : null;
         this.name = (!StringUtils.isEmpty(name)) ? name.trim() : null;

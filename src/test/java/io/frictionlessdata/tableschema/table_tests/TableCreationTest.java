@@ -74,7 +74,7 @@ public class TableCreationTest {
     @Test
     public void testReadFromValidCSVContentString() throws Exception{
         // get path of test CSV file
-        URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/simple_data.csv");
+        URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/data/simple_data.csv");
         Path path = Paths.get(sourceFileUrl.toURI());
         String csvContent = new String(Files.readAllBytes(path));
         

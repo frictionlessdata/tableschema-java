@@ -15,10 +15,11 @@ public class TableIterator<T> implements Iterator<T> {
     private String[] headers = null;
     private Schema schema = null;
     private Iterator<String[]> iter = null;
-    private boolean keyed = false;
-    private boolean extended = false;
-    private boolean cast = true;
-    private boolean relations = false;
+    private boolean keyed;
+    private boolean extended;
+    private boolean cast;
+    private boolean relations;
+    private Map<String, Object> fieldOptions;
     private int index = 0;
 
     public TableIterator(Table table) throws Exception{
@@ -26,7 +27,13 @@ public class TableIterator<T> implements Iterator<T> {
     }
 
 
-    public TableIterator(Table table, boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
+    public TableIterator(
+            Table table,
+            boolean keyed,
+            boolean extended,
+            boolean cast, boolean
+                    relations) throws Exception{
+
         this.init(table);
         this.keyed = keyed;
         this.extended = extended;
@@ -35,6 +42,7 @@ public class TableIterator<T> implements Iterator<T> {
     }
 
     private void init(Table table) throws Exception{
+        this.fieldOptions = table.getFieldOptions();
         this.headers = table.getHeaders();
         this.schema = table.schema();
         this.iter = table.dataSource().iterator();
@@ -62,7 +70,7 @@ public class TableIterator<T> implements Iterator<T> {
         if(this.schema != null){
             for(int i=0; i<row.length; i++){
                 Field field = this.schema.getFields().get(i);
-                Object val = field.castValue(row[i], true, null);
+                Object val = field.castValue(row[i], true, fieldOptions);
 
                 if(!extended && keyed){
                     keyedRow.put(this.headers[i], val);

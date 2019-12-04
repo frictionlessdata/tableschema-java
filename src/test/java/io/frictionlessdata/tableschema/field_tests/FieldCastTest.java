@@ -3,15 +3,12 @@ package io.frictionlessdata.tableschema.field_tests;
 import io.frictionlessdata.tableschema.Schema;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.field.*;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.QuoteMode;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +33,7 @@ class FieldCastTest {
 
     @Test
     void testFieldCastGeopointDefault() throws Exception{
-        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_DEFAULT, "title", "description", null);
+        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_DEFAULT, "title", "description", null, null);
         int[] val = field.castValue("12,21");
         Assertions.assertEquals(12, val[0]);
         Assertions.assertEquals(21, val[1]);
@@ -44,7 +41,7 @@ class FieldCastTest {
     
     @Test
     void testFieldCastGeopointArray() throws Exception{
-        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_ARRAY, "title", "description", null);
+        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_ARRAY, "title", "description", null, null);
         int[] val = field.castValue("[45,32]");
         Assertions.assertEquals(45, val[0]);
         Assertions.assertEquals(32, val[1]);   
@@ -52,7 +49,7 @@ class FieldCastTest {
     
     @Test
     void testFieldCastGeopointObject() throws Exception{
-        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_OBJECT, null, null, null);
+        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_OBJECT, null, null, null, null);
         int[] val = field.castValue("{\"lon\": 67, \"lat\": 19}");
         Assertions.assertEquals(67, val[0]);
         Assertions.assertEquals(19, val[1]);   
@@ -74,7 +71,7 @@ class FieldCastTest {
     
     @Test
     void testFieldCastValidGeojson() throws Exception{
-        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, null, null, null);
+        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
         JSONObject val = field.castValue("{\n" +
             "    \"type\": \"Feature\",\n" +
             "    \"properties\": {\n" +
@@ -96,7 +93,7 @@ class FieldCastTest {
     
     @Test
     void testFieldCastInvalidGeojson() throws Exception{
-        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, null, null, null);
+        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
         assertThrows(InvalidCastException.class, () -> {
             field.castValue("{\n" +
                 "    \"type\": \"INVALID_TYPE\",\n" + // The invalidity is here.
@@ -116,7 +113,7 @@ class FieldCastTest {
     
     @Test
     void testFieldCastValidTopojson() throws Exception{
-        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, null, null, null);
+        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, null, null, null, null);
 
         JSONObject val = field.castValue("{\n" +
             "  \"type\": \"Topology\",\n" +
@@ -142,7 +139,7 @@ class FieldCastTest {
         Assertions.assertEquals(-180, val.getJSONObject("transform").getJSONArray("translate").get(0));  
         Assertions.assertEquals(-89.99892578124998, val.getJSONObject("transform").getJSONArray("translate").get(1)); 
         
-        /**
+        /*
         // Another Geosjon to test
         JSONObject val2 = field.castValue("{ \"type\": \"GeometryCollection\",\n" +
             "\"geometries\": [\n" +
@@ -158,12 +155,12 @@ class FieldCastTest {
         Assertions.assertEquals("GeometryCollection", val.getString("type"));
         Assertions.assertEquals("Point", val.getJSONArray("geometries").getJSONObject(0).getString("type"));
         Assertions.assertEquals("LineString", val.getJSONArray("geometries").getJSONObject(1).getString("type"));
-        **/
+        */
     }
     
     @Test
     void testFieldCastInvalidTopojson() throws Exception{
-        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, null, null, null);
+        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, null, null, null, null);
         
         // This is an invalid Topojson, it's a Geojson:
         assertThrows(InvalidCastException.class, () -> {

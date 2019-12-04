@@ -1,31 +1,19 @@
 package io.frictionlessdata.tableschema;
 
-import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 
-import java.io.InputStream;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import io.frictionlessdata.tableschema.field.Field;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.ValidationException;
-import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
-import java.lang.reflect.*;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeMap;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 
 /**

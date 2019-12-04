@@ -11,8 +11,8 @@ public class TestHelper {
 
 
     public static File getTestDataDirectory()throws Exception {
-        URL u = TableCreationTest.class.getResource("/fixtures/simple_data.csv");
+        URL u = TableCreationTest.class.getResource("/fixtures/data/simple_data.csv");
         Path path = Paths.get(u.toURI());
-        return path.getParent().toFile();
+        return path.getParent().getParent().toFile();
     }
 }

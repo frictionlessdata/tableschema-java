@@ -1,9 +1,8 @@
 package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.TypeInferrer;
-import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
-import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
-import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
+import io.frictionlessdata.tableschema.exception.ConstraintsException;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import org.json.JSONObject;
 
 import java.math.BigDecimal;
@@ -37,8 +36,8 @@ public class NumberField extends Field<Number> {
         super(name, FIELD_TYPE_NUMBER);
     }
 
-    public NumberField(String name, String format, String title, String description, Map constraints) {
-        super(name, FIELD_TYPE_NUMBER, format, title, description, constraints);
+    public NumberField(String name, String format, String title, String description, Map constraints, Map options){
+        super(name, FIELD_TYPE_NUMBER, format, title, description, constraints, options);
     }
 
     public NumberField(JSONObject field) {
