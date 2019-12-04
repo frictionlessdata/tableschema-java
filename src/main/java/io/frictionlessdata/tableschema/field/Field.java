@@ -69,7 +69,12 @@ public abstract class Field<T> {
     Map<String, Object> constraints = null;
     private Schema geoJsonSchema = null;
     private Schema topoJsonSchema = null;
-    
+
+    /**
+     * Constructor only for our reflection-based instantiation
+     */
+    Field(){    }
+
     public Field(String name, String type){
         this.name = name;
         this.type = type;
@@ -381,59 +386,27 @@ public abstract class Field<T> {
 
     public static Field forType(String type, String name) {
         Field field = null;
-        switch (type) {
-            case FIELD_TYPE_STRING:
-                field = new StringField(name);
-                break;
-            case FIELD_TYPE_INTEGER:
-                field = new IntegerField(name);
-                break;
-            case FIELD_TYPE_NUMBER:
-                field = new NumberField(name);
-                break;
-            case FIELD_TYPE_ARRAY:
-                field = new ArrayField(name);
-                break;
-            case FIELD_TYPE_BOOLEAN:
-                field = new BooleanField(name);
-                break;
-            case FIELD_TYPE_DATETIME:
-                field = new DateTimeField(name);
-                break;
-            case FIELD_TYPE_DATE:
-                field = new DateField(name);
-                break;
-            case FIELD_TYPE_DURATION:
-                field = new DurationField(name);
-                break;
-            case FIELD_TYPE_GEOJSON:
-                field = new GeoJsonField(name);
-                break;
-            case FIELD_TYPE_GEOPOINT:
-                field = new GeoPointField(name);
-                break;
-            case FIELD_TYPE_ANY:
-                field = new AnyField(name);
-                break;
-            case FIELD_TYPE_OBJECT:
-                field = new ObjectField(name);
-                break;
-            case FIELD_TYPE_TIME:
-                field = new TimeField(name);
-                break;
-            case FIELD_TYPE_YEAR:
-                field = new YearField(name);
-                break;
-            case FIELD_TYPE_YEARMONTH:
-                field = new YearMonthField(name);
-                break;
-            default:
-                field = new AnyField(name);
+        Class<?> clazz = null;
+        try {
+            String className =
+                    "io.frictionlessdata.tableschema.field."
+                            + type.substring(0, 1).toUpperCase() + type.substring(1)
+                            + "Field";
+            clazz = Class.forName(className);
+            field = (Field)clazz.newInstance();
+            field.name = name;
+            field.type = type;
+        } catch (InstantiationException | IllegalAccessException ex) {
+            throw new RuntimeException(ex);
+            // didn't find a field definition, just return as
+            // AnyField
+        } catch (ClassNotFoundException ex) {
+            field = new AnyField(name);
         }
         return field;
     }
 
-    public static Field fromJson (JSONObject fieldDef){
+    public static Field fromJson (JSONObject fieldDef)  {
         String type = fieldDef.has(JSON_KEY_TYPE) ? fieldDef.getString(JSON_KEY_TYPE) : "string";
         String name = fieldDef.has(JSON_KEY_NAME) ? fieldDef.getString(JSON_KEY_NAME).trim() : null;
 

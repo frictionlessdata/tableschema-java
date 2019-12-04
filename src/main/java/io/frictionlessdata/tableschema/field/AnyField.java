@@ -10,6 +10,10 @@ import java.util.Map;
 
 public class AnyField extends Field<Object> {
 
+    AnyField() {
+        super();
+    }
+
     public AnyField(String name) {
         super(name, FIELD_TYPE_ANY);
     }

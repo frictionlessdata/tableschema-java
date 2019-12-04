@@ -297,7 +297,7 @@ public class SchemaTest {
         schema.addField(fieldTime);
         
         // Datetime
-        Field fieldDatetime = new DateTimeField("fieldDatetime");
+        Field fieldDatetime = new DatetimeField("fieldDatetime");
         schema.addField(fieldDatetime);
         
         // Year
@@ -305,7 +305,7 @@ public class SchemaTest {
         schema.addField(fieldYear);
         
         // Yearmonth
-        Field fieldYearmonth = new YearMonthField("fieldYearmonth");
+        Field fieldYearmonth = new YearmonthField("fieldYearmonth");
         schema.addField(fieldYearmonth);
         
         // Duration

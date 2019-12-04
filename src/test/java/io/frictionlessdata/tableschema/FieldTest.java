@@ -34,7 +34,7 @@ public class FieldTest {
 
         @Test
     public void testFieldCastGeopointDefault() throws Exception{
-        GeoPointField field = new GeoPointField("test", Field.FIELD_FORMAT_DEFAULT, "title", "description", null);
+        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_DEFAULT, "title", "description", null);
         int[] val = field.castValue("12,21");
         Assert.assertEquals(12, val[0]);
         Assert.assertEquals(21, val[1]);   
@@ -42,7 +42,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastGeopointArray() throws Exception{
-        GeoPointField field = new GeoPointField("test", Field.FIELD_FORMAT_ARRAY, "title", "description", null);
+        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_ARRAY, "title", "description", null);
         int[] val = field.castValue("[45,32]");
         Assert.assertEquals(45, val[0]);
         Assert.assertEquals(32, val[1]);   
@@ -50,7 +50,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastGeopointObject() throws Exception{
-        GeoPointField field = new GeoPointField("test", Field.FIELD_FORMAT_OBJECT, null, null, null);
+        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_OBJECT, null, null, null);
         int[] val = field.castValue("{\"lon\": 67, \"lat\": 19}");
         Assert.assertEquals(67, val[0]);
         Assert.assertEquals(19, val[1]);   
@@ -72,7 +72,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastValidGeojson() throws Exception{
-        GeoJsonField field = new GeoJsonField("test", Field.FIELD_FORMAT_DEFAULT, null, null, null);
+        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, null, null, null);
         JSONObject val = field.castValue("{\n" +
             "    \"type\": \"Feature\",\n" +
             "    \"properties\": {\n" +
@@ -94,7 +94,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastInvalidGeojson() throws Exception{
-        GeoJsonField field = new GeoJsonField("test", Field.FIELD_FORMAT_DEFAULT, null, null, null);
+        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, null, null, null);
         
         exception.expect(InvalidCastException.class);
         JSONObject val = field.castValue("{\n" +
@@ -113,7 +113,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastValidTopojson() throws Exception{
-        GeoJsonField field = new GeoJsonField("test", Field.FIELD_FORMAT_TOPOJSON, null, null, null);
+        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, null, null, null);
 
         JSONObject val = field.castValue("{\n" +
             "  \"type\": \"Topology\",\n" +
@@ -160,7 +160,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastInvalidTopojson() throws Exception{
-        GeoJsonField field = new GeoJsonField("test", Field.FIELD_FORMAT_TOPOJSON, null, null, null);
+        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, null, null, null);
         
         // This is an invalid Topojson, it's a Geojson:
         exception.expect(InvalidCastException.class);
@@ -252,7 +252,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastDateTime() throws Exception{
-        DateTimeField field = new DateTimeField("test");
+        DatetimeField field = new DatetimeField("test");
         DateTime val = field.castValue("2008-08-30T01:45:36.123Z");
         
         Assert.assertEquals(2008, val.withZone(DateTimeZone.UTC).getYear());
@@ -292,7 +292,7 @@ public class FieldTest {
     
     @Test
     public void testFieldCastYearmonth() throws Exception{
-        YearMonthField field = new YearMonthField("test");
+        YearmonthField field = new YearmonthField("test");
         DateTime val = field.castValue("2008-08");
         
         Assert.assertEquals(2008, val.getYear());

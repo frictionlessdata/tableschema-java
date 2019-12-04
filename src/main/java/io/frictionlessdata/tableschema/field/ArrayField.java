@@ -10,6 +10,10 @@ import java.util.Map;
 
 public class ArrayField extends Field<JSONArray> {
 
+    ArrayField() {
+        super();
+    }
+
     public ArrayField(String name) {
         super(name, FIELD_TYPE_ARRAY);
     }

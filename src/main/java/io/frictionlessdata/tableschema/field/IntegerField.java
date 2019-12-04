@@ -9,6 +9,10 @@ import java.util.Map;
 
 public class IntegerField extends Field<Long> {
 
+    IntegerField() {
+        super();
+    }
+
     public IntegerField(String name) {
         super(name, FIELD_TYPE_INTEGER);
     }

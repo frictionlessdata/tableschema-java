@@ -11,6 +11,10 @@ import java.util.Map;
 
 public class DurationField extends Field<Duration> {
 
+    DurationField() {
+        super();
+    }
+
     public DurationField(String name) {
         super(name, FIELD_TYPE_DURATION);
     }

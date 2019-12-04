@@ -9,6 +9,10 @@ import java.util.Map;
 
 public class ObjectField extends Field<JSONObject> {
 
+    ObjectField() {
+        super();
+    }
+
     public ObjectField(String name) {
         super(name, FIELD_TYPE_OBJECT);
     }

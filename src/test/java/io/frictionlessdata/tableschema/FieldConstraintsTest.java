@@ -341,7 +341,7 @@ public class FieldConstraintsTest {
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, datetimeMin);
         constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, datetimeMax);
         
-        Field field = new DateTimeField("test", null, null, null, constraints);
+        Field field = new DatetimeField("test", null, null, null, constraints);
         
         DateTime datetime2017 = formatter.parseDateTime("2017-01-15T13:44:33.000Z");
         violatedConstraints = field.checkConstraintViolations(datetime2017);
@@ -403,7 +403,7 @@ public class FieldConstraintsTest {
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, yearmonthMin);
         constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, yearmonthMax);
         
-        Field field = new YearMonthField("test", null, null, null, constraints);
+        Field field = new YearmonthField("test", null, null, null, constraints);
         
         DateTime yearmonth = formatter.parseDateTime("2005-05");
         violatedConstraints = field.checkConstraintViolations(yearmonth);
@@ -666,7 +666,7 @@ public class FieldConstraintsTest {
         enumDatetimes.add(datetime2);
         
         constraints.put(Field.CONSTRAINT_KEY_ENUM, enumDatetimes);
-        Field field = new DateTimeField("test", null, null, null, constraints);
+        Field field = new DatetimeField("test", null, null, null, constraints);
         
         violatedConstraints = field.checkConstraintViolations(datetime1);
         Assert.assertTrue(violatedConstraints.isEmpty());

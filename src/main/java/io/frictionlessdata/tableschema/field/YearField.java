@@ -15,6 +15,10 @@ public class YearField extends Field<Integer> {
     // yyyy
     private static final String REGEX_YEAR = "([0-9]{4})";
 
+    YearField() {
+        super();
+    }
+
     public YearField(String name) {
         super(name, FIELD_TYPE_YEAR);
     }

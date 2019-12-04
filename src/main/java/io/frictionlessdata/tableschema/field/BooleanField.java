@@ -14,6 +14,11 @@ public class BooleanField extends Field<Boolean> {
     List<String> trueValues = Arrays.asList("yes", "y", "true", "t", "1");
     List<String> falseValues = Arrays.asList("no", "n", "false", "f", "0");
 
+
+    BooleanField() {
+        super();
+    }
+
     public BooleanField(String name) {
         super(name, FIELD_TYPE_BOOLEAN);
     }

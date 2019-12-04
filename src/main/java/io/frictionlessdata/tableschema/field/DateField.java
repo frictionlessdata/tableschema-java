@@ -17,6 +17,10 @@ public class DateField extends Field<DateTime> {
     // ISO8601 format yyyy-MM-dd
     private static final String REGEX_DATE = "([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|0[1-9]|[1-2][0-9])";
 
+    DateField() {
+        super();
+    }
+
     public DateField(String name) {
         super(name, FIELD_TYPE_DATE);
     }

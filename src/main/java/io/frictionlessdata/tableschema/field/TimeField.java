@@ -17,6 +17,10 @@ public class TimeField extends Field<DateTime> {
     // An ISO8601 time string e.g. HH:mm:ss
     private static final String REGEX_TIME = "(2[0-3]|[01]?[0-9]):?([0-5]?[0-9]):?([0-5]?[0-9])";
 
+    TimeField() {
+        super();
+    }
+
     public TimeField(String name) {
         super(name, FIELD_TYPE_TIME);
     }

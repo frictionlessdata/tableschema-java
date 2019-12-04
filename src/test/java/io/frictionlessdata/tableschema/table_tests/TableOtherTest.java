@@ -241,7 +241,7 @@ public class TableOtherTest {
         Field isAdminField = new BooleanField("isAdmin");
         schema.addField(isAdminField);
 
-        Field addressCoordinatesField = new GeoPointField("addressCoordinatesField", Field.FIELD_FORMAT_OBJECT, null, null, null);
+        Field addressCoordinatesField = new GeopointField("addressCoordinatesField", Field.FIELD_FORMAT_OBJECT, null, null, null);
         schema.addField(addressCoordinatesField);
 
         Field contractLengthField = new DurationField("contractLength");

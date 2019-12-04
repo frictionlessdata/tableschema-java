@@ -21,6 +21,10 @@ public class NumberField extends Field<Number> {
     private static final String REGEX_INTEGER = "[+-]?\\d+";
     private static final String REGEX_BARE_NUMBER = "((^\\D*)|(\\D*$))";
 
+    NumberField() {
+        super();
+    }
+
     public NumberField(String name) {
         super(name, FIELD_TYPE_NUMBER);
     }

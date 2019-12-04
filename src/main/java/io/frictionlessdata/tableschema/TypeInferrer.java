@@ -168,17 +168,15 @@ public class TypeInferrer {
     
     private void findType(String header, String datum){
         
-        // Invoke all the type casting methods using reflection.
+        // Go through all the field types and call their parsing method to find
+        // the first that won't throw
         for(String[] typeInferralDefinition: TYPE_INFERRAL_ORDER_LIST){
             try{
                 // Keep invoking the type casting methods until one doesn't throw an exception
                 String dataType = typeInferralDefinition[0];
                 /*String castMethodName = "cast" + (dataType.substring(0, 1).toUpperCase() + dataType.substring(1));*/
                 String format = typeInferralDefinition[1];
-                 
-                /*Method method = TypeInferrer.class.getMethod(castMethodName, String.class, String.class);
-                // Single pattern is useful here:
-                method.invoke(TypeInferrer.getInstance(), format, datum);*/
+
                 Field field = Field.forType(dataType, dataType);
                 field.parseValue(datum, format, null);
                 
@@ -190,7 +188,7 @@ public class TypeInferrer {
                 // Let's break out of the loop.
                 break;
 
-            }catch (Exception e) {
+            } catch (Exception e) {
                 // Do nothing.
                 // An exception here means that we failed to infer with the current type.
                 // Move on to attempt with the next type in the following iteration.

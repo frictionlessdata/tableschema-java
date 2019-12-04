@@ -9,6 +9,10 @@ import java.util.Map;
 
 public class StringField extends Field<String> {
 
+    StringField() {
+        super();
+    }
+
     public StringField(String name) {
         super(name, FIELD_TYPE_STRING);
     }
