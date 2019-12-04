@@ -71,18 +71,15 @@ public class TableIterator<T> implements Iterator<T> {
                 }
             }
 
-            if(extended){
+            if (extended){
                 extendedRow = new Object[]{index, this.headers, castRow};
                 index++;
                 return (T)extendedRow;
-
-            }else if(keyed && !extended){
+            } else if(keyed){
                 return (T)keyedRow;
-
-            }else if(!keyed && !extended){
+            } else if(cast){
                 return (T)castRow;
-
-            }else{
+            } else{
                 return (T)row;
             }
         }else{
@@ -92,7 +89,7 @@ public class TableIterator<T> implements Iterator<T> {
                 index++;
                 return (T)extendedRow;
 
-            }else if(keyed && !extended){
+            }else if(keyed){
                 keyedRow = new HashMap();
                 for(int i=0; i<row.length; i++){
                     keyedRow.put(this.headers[i], row[i]);

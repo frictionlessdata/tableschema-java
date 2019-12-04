@@ -86,6 +86,7 @@ public class CsvDataSource extends AbstractDataSource {
         if (null == format) {
             format = CSVFormat
                     .RFC4180
+                    .withRecordSeparator('\n')
                     .withHeader();
         }
         if(dataSource instanceof String){

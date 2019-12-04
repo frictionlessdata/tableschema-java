@@ -99,7 +99,8 @@ public class Table{
     }
     
     public List<Object[]> read() throws Exception{
-        return this.read(false);
+        boolean cast =  (null != schema);
+        return this.read(cast);
     }
 
     public void writeCsv(Writer out, CSVFormat format) {
