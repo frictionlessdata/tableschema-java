@@ -7,6 +7,7 @@ import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 import io.frictionlessdata.tableschema.fk.Reference;
 import java.io.File;
+import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -342,7 +343,7 @@ public class SchemaTest {
         Object[] castRow = schema.castRow(row);
        
         assertThat(castRow[0], instanceOf(String.class));
-        assertThat(castRow[1], instanceOf(Long.class));
+        assertThat(castRow[1], instanceOf(BigInteger.class));
         assertThat(castRow[2], instanceOf(Boolean.class));
         assertThat(castRow[3], instanceOf(JSONObject.class));
         assertThat(castRow[4], instanceOf(JSONArray.class));

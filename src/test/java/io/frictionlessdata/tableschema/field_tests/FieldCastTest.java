@@ -7,8 +7,11 @@ import org.joda.time.DateTimeZone;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,8 +52,8 @@ public class FieldCastTest {
     @Test
     public void testFieldCastInteger() throws Exception{
         IntegerField field = new IntegerField("test");
-        long val = field.castValue("123");
-        Assertions.assertEquals(123, val); 
+        BigInteger val = field.castValue("123");
+        Assertions.assertEquals(123, val.intValue());
     }
     
     @Test
@@ -295,14 +298,14 @@ public class FieldCastTest {
         IntegerField intField = new IntegerField("intNum");
         NumberField floatField = new NumberField("floatNum");
         
-        long intValPositive1 = intField.castValue("123");
-        Assertions.assertEquals(123, intValPositive1);
+        BigInteger intValPositive1 = intField.castValue("123");
+        Assertions.assertEquals(123, intValPositive1.intValue());
 
-        long intValPositive2 = intField.castValue("+128127");
-        Assertions.assertEquals(128127, intValPositive2);
+        BigInteger intValPositive2 = intField.castValue("+128127");
+        Assertions.assertEquals(128127, intValPositive2.intValue());
 
-        long intValNegative = intField.castValue("-765");
-        Assertions.assertEquals(-765, intValNegative);
+        BigInteger intValNegative = intField.castValue("-765");
+        Assertions.assertEquals(-765, intValNegative.intValue());
              
         Number floatValPositive1 = floatField.castValue("123.9902");
         Assertions.assertEquals(123.9902, floatValPositive1.floatValue(), 0.01);
@@ -349,9 +352,16 @@ public class FieldCastTest {
         
         Assertions.assertEquals("John Doe", val);
     }
-    
+
     @Test
-    public void testFieldCastAny() throws Exception{   
-        //Assertions.fail("Test case not implemented yet.");
+    @DisplayName("Test fix for Issue https://github.com/frictionlessdata/tableschema-java/issues/21")
+    void testIssue21() {
+        IntegerField intField = new IntegerField("intNum");
+        NumberField floatField = new NumberField("floatNum");
+
+        BigInteger intVal = intField.castValue("16289212000");
+        Number floatVal = floatField.castValue("16289212000.0");
+        Assertions.assertTrue(floatVal instanceof BigDecimal);
+        Assertions.assertEquals(((BigDecimal)floatVal).toBigInteger(), intVal);
     }
 }

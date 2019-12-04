@@ -12,6 +12,7 @@ import org.junit.rules.TemporaryFolder;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.math.BigInteger;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,9 +46,9 @@ public class TableCreationTest {
 
     private static Object[][] populationTestData = new Object[][]
             {
-                new Object[]{"london",2017,8780000L},
-                new Object[]{"paris",2017,2240000L},
-                new Object[]{"rome",2017,2860000L}
+                new Object[]{"london",2017, new BigInteger("8780000")},
+                new Object[]{"paris",2017, new BigInteger("2240000")},
+                new Object[]{"rome",2017, new BigInteger("2860000")}
             };
 
     @Rule

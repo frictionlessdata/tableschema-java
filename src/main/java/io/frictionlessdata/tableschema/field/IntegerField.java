@@ -5,9 +5,10 @@ import io.frictionlessdata.tableschema.exceptions.ConstraintsException;
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import org.json.JSONObject;
 
+import java.math.BigInteger;
 import java.util.Map;
 
-public class IntegerField extends Field<Long> {
+public class IntegerField extends Field<BigInteger> {
 
     IntegerField() {
         super();
@@ -27,7 +28,7 @@ public class IntegerField extends Field<Long> {
     }
 
     @Override
-    public Long parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return Long.parseLong(value);
+    public BigInteger parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        return new BigInteger(value);
     }
 }

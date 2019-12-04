@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -122,7 +123,7 @@ public class TableIterationTest {
         
         // We will iterate the rows and these are the values classes we expect:
         Class[] expectedTypes = new Class[]{
-            Long.class,
+            BigInteger.class,
             String.class,
             DateTime.class,
             Boolean.class,

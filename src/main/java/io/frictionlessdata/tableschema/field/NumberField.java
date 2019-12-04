@@ -6,6 +6,8 @@ import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import io.frictionlessdata.tableschema.exceptions.TypeInferringException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,7 +62,7 @@ public class NumberField extends Field<Number> {
             Matcher integerMatcher = intergerPattern.matcher(value);
 
             if(integerMatcher.matches()){
-                return Integer.parseInt(value);
+                return new BigInteger(value);
             }
 
             // Try to match float pattern
@@ -68,7 +70,7 @@ public class NumberField extends Field<Number> {
             Matcher floatMatcher = floatPattern.matcher(value);
 
             if(floatMatcher.matches()){
-                return Float.parseFloat(value);
+                return new BigDecimal(value);
             }
 
             // The value failed to match neither the Float or the Integer value.

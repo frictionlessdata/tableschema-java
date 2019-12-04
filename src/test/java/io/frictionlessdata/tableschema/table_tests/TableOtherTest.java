@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.table_tests;
 import java.io.File;
+import java.math.BigInteger;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -139,7 +140,7 @@ public class TableOtherTest {
         while(iter.hasNext()){
             Map row = iter.next();
 
-            Assert.assertEquals(Long.class, row.get("id").getClass());
+            Assert.assertEquals(BigInteger.class, row.get("id").getClass());
             Assert.assertEquals(String.class, row.get("name").getClass());
             Assert.assertEquals(DateTime.class, row.get("dateOfBirth").getClass());
             Assert.assertEquals(Boolean.class, row.get("isAdmin").getClass());
@@ -183,7 +184,7 @@ public class TableOtherTest {
         
         // We will iterate the rows and these are the values classes we expect:
         Class[] expectedTypes = new Class[]{
-            Long.class,
+            BigInteger.class,
             String.class,
             DateTime.class,
             Boolean.class,
