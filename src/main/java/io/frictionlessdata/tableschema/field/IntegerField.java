@@ -8,6 +8,10 @@ import org.json.JSONObject;
 import java.math.BigInteger;
 import java.util.Map;
 
+/**
+ * [According to spec](http://frictionlessdata.io/specs/table-schema/index.html#number), a number field
+ * consists of "a non-empty finite-length sequence of decimal digits".
+ */
 public class IntegerField extends Field<BigInteger> {
 
     IntegerField() {

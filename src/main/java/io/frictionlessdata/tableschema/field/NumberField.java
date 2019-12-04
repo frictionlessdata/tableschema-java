@@ -12,6 +12,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+/**
+ * [According to spec](http://frictionlessdata.io/specs/table-schema/index.html#number), a number field
+ * consists of "a non-empty finite-length sequence of decimal digits".
+ */
+
 public class NumberField extends Field<Number> {
     private static final String NUMBER_OPTION_DECIMAL_CHAR = "decimalChar";
     private static final String NUMBER_OPTION_GROUP_CHAR = "groupChar";

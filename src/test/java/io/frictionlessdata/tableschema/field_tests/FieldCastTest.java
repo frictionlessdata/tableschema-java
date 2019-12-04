@@ -376,7 +376,7 @@ class FieldCastTest {
 
     @Test
     @DisplayName("Test fix for Issue https://github.com/frictionlessdata/tableschema-java/issues/21")
-    void testInferSchemaFromHugeTable() throws Exception{
+    void test2Issue21() throws Exception{
         File f = new File("data/gdp.csv");
         File schemaFile = new File(TestHelper.getTestDataDirectory(), "schema/gdp_schema.json");
         Schema schema = null;
