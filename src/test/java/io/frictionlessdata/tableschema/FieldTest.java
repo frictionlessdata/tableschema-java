@@ -2,6 +2,8 @@ package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.exceptions.InvalidCastException;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.frictionlessdata.tableschema.field.*;
 import org.joda.time.DateTime;
@@ -174,7 +176,58 @@ public class FieldTest {
             "}");
         
     }
-    
+
+    @Test
+    public void testCastNumberGroupChar() throws Exception{
+        String testValue = "1 564 1020";
+        Map<String, Object> options = new HashMap<>();
+        options.put("groupChar", " ");
+        NumberField field = new NumberField("int field");
+        Number num = field.castValue(testValue, false, options);
+
+        Assert.assertEquals(15641020L, num.intValue());
+    }
+
+    @Test
+    public void testCastNumberDecimalChar() throws Exception{
+        String testValue = "1020,123";
+        Map<String, Object> options = new HashMap();
+        options.put("decimalChar", ",");
+        NumberField field = new NumberField("int field");
+        Number num = field.castValue(testValue, false, options);
+
+        Assert.assertEquals(1020.123, num.floatValue(), 0.01);
+    }
+
+    @Test
+    public void testCastNumberNonBare() throws Exception{
+        String testValue = "150 EUR";
+        Map<String, Object> options = new HashMap();
+        options.put("bareNumber", false);
+
+        NumberField field = new NumberField("int field");
+        Number num = field.castValue(testValue, false, options);
+        Assert.assertEquals(150, num.intValue());
+
+        testValue = "$125";
+        num = field.castValue(testValue, false, options);
+        Assert.assertEquals(125, num.intValue());
+    }
+
+    @Test
+    public void testCastNumberGroupAndDecimalCharAsWellAsNonBare() throws Exception{
+        String testValue = "1 564,123 EUR";
+        Map<String, Object> options = new HashMap();
+        options.put("bareNumber", false);
+        options.put("groupChar", " ");
+        options.put("decimalChar", ",");
+        NumberField field = new NumberField("int field");
+        Number num = field.castValue(testValue, false, options);
+        Assert.assertEquals(1564.123, num.floatValue(), 0.01);
+
+    }
+
+
     @Test
     public void testFieldCastObject() throws Exception{
         ObjectField field = new ObjectField("test");
