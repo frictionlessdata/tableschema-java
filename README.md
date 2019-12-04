@@ -1,9 +1,12 @@
 # tableschema-java
-[![Build Status](https://travis-ci.org/frictionlessdata/tableschema-java.svg?branch=master)](https://travis-ci.org/frictionlessdata/tableschema-java)
-[![Coverage Status](https://coveralls.io/repos/github/frictionlessdata/tableschema-java/badge.svg?branch=master)](https://coveralls.io/github/frictionlessdata/tableschema-java?branch=master)
-[![Gitter](https://img.shields.io/gitter/room/frictionlessdata/chat.svg)](https://gitter.im/frictionlessdata/chat)
 
 A Java library for working with Table Schema. Snapshots on [Jitpack](https://jitpack.io/#frictionlessdata/tableschema-java/master-SNAPSHOT)
+
+[![Build Status](https://travis-ci.org/iSnow/tableschema-java.svg?branch=master)](https://travis-ci.org/frictionlessdata/tableschema-java)
+[![Coverage Status](https://coveralls.io/repos/github/iSnow/tableschema-java/badge.svg?branch=master)](https://coveralls.io/github/frictionlessdata/tableschema-java?branch=master)
+[![License](https://img.shields.io/github/license/frictionlessdata/tableschema-java.svg)](https://github.com/frictionlessdata/tableschema-java/blob/master/LICENSE)
+[![Github](https://img.shields.io/badge/github-master-brightgreen)](https://github.com/frictionlessdata/tableschema-java/tree/master/)
+[![Gitter](https://img.shields.io/gitter/room/frictionlessdata/chat.svg)](https://gitter.im/frictionlessdata/chat)
 
 
 ## Usage
@@ -13,11 +16,12 @@ A Java library for working with Table Schema. Snapshots on [Jitpack](https://jit
 Cast [data](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv) from a CSV without a schema:
 
 ```java
-URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
+URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
+	              "/src/test/resources/fixtures/data/simple_data.csv");
 Table table = new Table(url);
 
-// Iterate through rows          
-TableIterator<Object[]> iter = table.iterator();
+// Iterate through rows
+Iterator<Object[]> iter = table.iterator();
 while(iter.hasNext()){
     Object[] row = iter.next();
     System.out.println(Arrays.toString(row));
@@ -28,7 +32,8 @@ while(iter.hasNext()){
 // [3, baz]
 
 // Read the entire CSV and output it as a List:
-List<String[]> allData = table.read();
+List<Object[]> allData = table.read();
+
 ```
 
 ### Write a Table Into a File
@@ -48,15 +53,15 @@ You can build a `Schema` instance from scratch or modify an existing one:
 ```java
 Schema schema = new Schema();
 
-Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+Field nameField = new StringField("name");
 schema.addField(nameField);
 
-Field coordinatesField = new Field("coordinates", Field.FIELD_TYPE_GEOPOINT);
+Field coordinatesField = new GeopointField("coordinates");
 schema.addField(coordinatesField);
 
 System.out.println(schema.getJson());
 
-// {"fields":[{"name":"name","format":"default","description":"","type":"string","title":"","constraints":{}},{"name":"coordinates","format":"default","description":"","type":"geopoint","title":"","constraints":{}}]}
+// {"fields":[{"name":"name","format":"default","description":"","type":"string","title":""},{"name":"coordinates","format":"default","description":"","type":"geopoint","title":""}]}
 ```
 
 You can also build a `Schema` instance with `JSONObject` instances instead of `Field` instances:
@@ -85,7 +90,13 @@ schema.addField(coordinatesFieldJsonObject);
 
 System.out.println(schema.getJson());
 
-// {"fields":[{"name":"name","format":"default","description":"","type":"string","title":"","constraints":{}},{"name":"id","format":"invalid","description":"","type":"integer","title":"","constraints":{}},{"name":"coordinates","format":"array","description":"","type":"geopoint","title":"","constraints":{}}]}
+/* 
+{"fields":[
+    {"name":"name","format":"default","type":"string"},
+    {"name":"id","format":"invalid","type":"integer"},
+    {"name":"coordinates","format":"array","type":"geopoint"}
+]}
+*/
 ```
 
 When using the `addField` method, the schema undergoes validation after every field addition.
@@ -103,7 +114,8 @@ Schema schema = new Schema(schemaFilePath, true); // enforce validation with str
 If you don't have a schema for a CSV and don't want to manually define one then you can generate it:
 
 ```java
-URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
+URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
+                                "/src/test/resources/fixtures/data/simple_data.csv");
 Table table = new Table(url);
 
 Schema schema = table.inferSchema();
