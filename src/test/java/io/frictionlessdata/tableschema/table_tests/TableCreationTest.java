@@ -51,6 +51,13 @@ public class TableCreationTest {
                 new Object[]{"rome",2017, new BigInteger("2860000")}
             };
 
+    private static Object[][] populationStringTestData = new Object[][]
+            {
+                    new Object[]{"london","2017", "8780000"},
+                    new Object[]{"paris","2017", "2240000"},
+                    new Object[]{"rome","2017", "2860000"}
+            };
+
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
     
@@ -146,8 +153,9 @@ public class TableCreationTest {
         Assert.assertEquals(testTable, table);
     }
 
-
-
+    /*
+        With schema means data gets casted to objects
+     */
     @Test
     public void testReadFromValidFileWithValidSchema() throws Exception{
         // get path of test CSV file
@@ -172,6 +180,27 @@ public class TableCreationTest {
         }
     }
 
+    /*
+        With schema means data does not get casted to objects, we will
+        receive String-Arrays
+     */
+    @Test
+    public void testReadFromValidFileWithoutValidSchema() throws Exception{
+        // get path of test CSV file
+        URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/data/population.csv");
+        Path path = Paths.get(sourceFileUrl.toURI());
+        String csvContent = new String(Files.readAllBytes(path));
+
+        Table table = new Table(csvContent);
+
+        Assert.assertEquals(3, table.read().size());
+        List<Object[]> actualData = table.read();
+        for (int i = 0; i < actualData.size(); i++) {
+            Object[] actualRow = actualData.get(i);
+            Object[] testRow = populationStringTestData[i];
+            Assert.assertArrayEquals(testRow, actualRow);
+        }
+    }
 
     @Test
     public void testReadFromValidFileWithValidSchemaViaStream() throws Exception{

@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.table_tests;
 import java.io.File;
+import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.net.URL;
 import java.nio.file.Path;
@@ -21,6 +22,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
 /**
  *
@@ -126,6 +129,28 @@ public class TableOtherTest {
 
 
     @Test
+    public void testInferSchemaFromHugeTable() throws Exception{
+        File f = new File("data/gdp.csv");
+        Table table = new Table(f, getTestDataDirectory());
+        Assert.assertEquals(11507, table.read().size());
+        Schema schema = table.inferSchema();
+        File schemaFile = new File(getTestDataDirectory(), "schema/gdp_schema.json");
+        Schema expectedSchema = null;
+        try (FileInputStream fis = new FileInputStream(schemaFile)) {
+            expectedSchema = new Schema(fis, false);
+        }
+
+        if (!expectedSchema.equals(schema)) {
+            for (int i = 0; i < expectedSchema.getFields().size(); i++) {
+                Field expectedField = expectedSchema.getFields().get(i);
+                Field actualField = schema.getFields().get(i);
+                Assert.assertEquals(expectedField,actualField);
+            }
+        }
+        Assert.assertEquals(expectedSchema, schema);
+    }
+
+    @Test
     public void testIterateCastKeyedData() throws Exception{
         File testDataDir = getTestDataDirectory();
         // Let's start by defining and building the schema:
@@ -221,11 +246,6 @@ public class TableOtherTest {
         Assert.assertEquals(3, readTable.read().size());   
     }
 
-    private File getTestDataDirectory()throws Exception {
-        URL u = TableOtherTest.class.getResource("/fixtures/simple_data.csv");
-        Path path = Paths.get(u.toURI());
-        return path.getParent().toFile();
-    }
 
     private Schema getEmployeeTableSchema(){
         Schema schema = new Schema();

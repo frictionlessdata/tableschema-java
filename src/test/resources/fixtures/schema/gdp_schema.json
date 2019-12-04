@@ -1,0 +1,24 @@
+{
+  "fields":[
+    {
+      "name":"Country Name",
+      "format":"default",
+      "type":"string"
+    },
+    {
+      "name":"Country Code",
+      "format":"default",
+      "type":"string"
+    },
+    {
+      "name":"Year",
+      "format":"default",
+      "type":"year"
+    },
+    {
+      "name":"Value",
+      "format":"default",
+      "type":"number"
+    }
+  ]
+}

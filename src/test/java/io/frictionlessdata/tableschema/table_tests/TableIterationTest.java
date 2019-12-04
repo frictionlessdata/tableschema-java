@@ -12,12 +12,16 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.*;
+
+import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
 /**
  *
@@ -144,11 +148,33 @@ public class TableIterationTest {
         }
     }
 
-    private File getTestDataDirectory()throws Exception {
-        URL u = TableIterationTest.class.getResource("/fixtures/simple_data.csv");
-        Path path = Paths.get(u.toURI());
-        return path.getParent().toFile();
+    /*
+    Reading from a CR/LF CSV can switch the `population` property to string
+    as it has a trailing CR unless stripped
+     */
+    @Test
+    public void testReadFromValidFileWithCRLF() throws Exception{
+        // get path of test CSV file
+        URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/data/population.csv");
+        Path path = Paths.get(sourceFileUrl.toURI());
+        String csvContent = new String(Files.readAllBytes(path));
+
+        File f = new File(getTestDataDirectory(), "schema/population_schema.json");
+        Schema schema = null;
+        try (FileInputStream fis = new FileInputStream(f)) {
+            schema = new Schema(fis, false);
+        }
+
+        Table table = new Table(csvContent, schema);
+
+        Assert.assertEquals(3, table.read().size());
+        List<Object[]> actualData = table.read(true);
+        for (int i = 0; i < actualData.size(); i++) {
+            Assert.assertTrue("Expected Number for population figures, CR/LF problem"
+                    , actualData.get(i)[2] instanceof Number);
+        }
     }
+
     
     private Schema getEmployeeTableSchema(){
         Schema schema = new Schema();
