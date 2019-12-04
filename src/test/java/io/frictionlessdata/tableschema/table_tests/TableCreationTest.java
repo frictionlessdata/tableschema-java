@@ -130,7 +130,8 @@ public class TableCreationTest {
     @Test
     public void testReadFromValidUrl() throws Exception{
         // get path of test CSV file
-        URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
+        URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java" +
+                "/master/src/test/resources/fixtures/data/simple_data.csv");
         Table table = new Table(url);
         
         Assert.assertEquals(3, table.read().size());
