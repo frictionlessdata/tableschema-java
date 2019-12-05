@@ -160,7 +160,8 @@ class FieldFormatParsingTest {
                 "    \"geometry\": {\n" +
                 "        \"type\": \"Point\",\n" +
                 "        \"coordinates\": [-104.99404, 39.75621]\n" +
-                "    }\n";
+                "    }\n" +
+                "   }";
 
         String format = field.parseFormat( val, null);
         Assertions.assertEquals(Field.FIELD_TYPE_GEOJSON, format);
