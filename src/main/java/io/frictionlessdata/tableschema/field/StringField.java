@@ -65,7 +65,14 @@ public class StringField extends Field<String> {
         } else if (EmailValidator.getInstance().isValid(value)) {
             return FIELD_FORMAT_EMAIL;
         } else try {
-            new URI(value);
+            URI uri = new URI(value);
+            if ((null == uri.getAuthority())
+             && (null == uri.getScheme())
+             && (null == uri.getHost())
+             && (null == uri.getQuery())
+            ){
+                return FIELD_FORMAT_DEFAULT;
+            }
             return FIELD_FORMAT_URI;
         } catch (URISyntaxException ex) {
             return "default";

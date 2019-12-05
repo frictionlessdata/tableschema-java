@@ -132,6 +132,9 @@ class FieldFormatParsingTest {
 
         String mailFormat = field.parseFormat("mailto:John.Doe@example.com", null);
         Assertions.assertEquals(Field.FIELD_FORMAT_URI, mailFormat);
+
+        String invalidFormat = field.parseFormat("london", null);
+        Assertions.assertNotEquals(Field.FIELD_FORMAT_URI, invalidFormat);
     }
 
     // not gonna test all the possible edge cases for e-mail addresses,
