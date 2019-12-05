@@ -236,7 +236,7 @@ public class Schema {
      */
     private void validate() throws ValidationException{
         try{
-             this.tableJsonSchema.validate(new JSONObject(getJson()));
+             this.tableJsonSchema.validate(this.getJson());
              if (null != foreignKeys) {
                  for (ForeignKey fk : foreignKeys) {
                      Object fields = fk.getFields();

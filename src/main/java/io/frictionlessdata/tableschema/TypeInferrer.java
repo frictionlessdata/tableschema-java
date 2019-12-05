@@ -148,7 +148,7 @@ public class TypeInferrer {
         // Need to clear the inferral map for the next inferral call:
         this.getTypeInferralMap().clear();
         this.formatMap.clear();
-        
+
         // Now that the types have been inferred and set, we build and return the schema object.
         JSONObject schemaJsonObject = new JSONObject();
         schemaJsonObject.put(io.frictionlessdata.tableschema.Schema.JSON_KEY_FIELDS, fieldArray);
