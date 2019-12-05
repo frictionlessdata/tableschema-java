@@ -106,6 +106,7 @@ public abstract class Field<T> {
     private URI rdfType = null;
 
     Map<String, Object> constraints = null;
+
     Map<String, Object> options = null;
 
     /**
@@ -526,6 +527,22 @@ public abstract class Field<T> {
         return this.constraints;
     }
 
+    public URI getRdfType() {
+        return rdfType;
+    }
+
+    public void setRdfType(URI rdfType) {
+        this.rdfType = rdfType;
+    }
+
+    public Map<String, Object> getOptions() {
+        return options;
+    }
+
+    public void setOptions(Map<String, Object> options) {
+        this.options = options;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -552,4 +569,5 @@ public abstract class Field<T> {
                 ", title='" + title + '\'' +
                 '}';
     }
+
 }

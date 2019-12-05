@@ -136,7 +136,7 @@ public class TableOtherTest {
         File f = new File("data/gdp.csv");
         Table table = new Table(f, getTestDataDirectory());
         Assert.assertEquals(11507, table.read().size());
-        Schema schema = table.inferSchema();
+        Schema schema = table.inferSchema(1000);
         File schemaFile = new File(getTestDataDirectory(), "schema/gdp_schema.json");
         Schema expectedSchema = null;
         try (FileInputStream fis = new FileInputStream(schemaFile)) {

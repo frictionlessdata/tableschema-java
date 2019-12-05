@@ -166,8 +166,10 @@ public class TypeInferrer {
                 String dataType = typeInferralDefinition[0];
 
                 Field field = Field.forType(dataType, dataType);
-                //String format = typeInferralDefinition[1];
-                String format = field.parseFormat(datum, null);
+                String format = formatMap.get(header);
+                if (null == format) {
+                    format = field.parseFormat(datum, null);
+                }
                 field.parseValue(datum, format, null);
                 this.formatMap.put(header, format);
                 // If no exception is thrown, in means that a type has been inferred.
