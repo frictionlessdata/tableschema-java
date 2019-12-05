@@ -7,6 +7,7 @@ import io.frictionlessdata.tableschema.fk.ForeignKey;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,7 +58,7 @@ public class Schema {
      * @param strict whether to enforce strict validation
      * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
-    public Schema (InputStream inStream, boolean strict) throws Exception {
+    public Schema (InputStream inStream, boolean strict) throws IOException {
         this.strictValidation = strict;
         this.initValidator();
         initSchemaFromStream(inStream);
@@ -93,7 +94,7 @@ public class Schema {
      * @param strict whether to enforce strict validation
      * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
-    public Schema(String schemaJson, boolean strict) throws Exception {
+    public Schema(String schemaJson, boolean strict) throws IOException {
         this(new ByteArrayInputStream(schemaJson.getBytes()), strict);
     }
 
@@ -118,8 +119,8 @@ public class Schema {
      * @return Schema generated from the inferred input
      * @throws TypeInferringException 
      */
-    public static JSONObject infer(List<Object[]> data, String[] headers) throws TypeInferringException{
-        return TypeInferrer.getInstance().infer(data, headers);
+    public static Schema infer(List<Object[]> data, String[] headers) throws TypeInferringException, IOException {
+        return new Schema(TypeInferrer.getInstance().infer(data, headers), true);
     }
     
     /**
@@ -130,8 +131,8 @@ public class Schema {
      * @return Schema generated from the inferred input
      * @throws TypeInferringException 
      */
-    public static JSONObject infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
-        return TypeInferrer.getInstance().infer(data, headers, rowLimit);
+    public static Schema infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException, IOException {
+        return new Schema(TypeInferrer.getInstance().infer(data, headers, rowLimit), true);
     }
     
     /**
@@ -140,22 +141,21 @@ public class Schema {
      * @param inStream the `InputStream` to read and parse the Schema from
      * @throws Exception when reading fails
      */
-    private void initSchemaFromStream(InputStream inStream) throws Exception{
-        InputStreamReader inputStreamReader = new InputStreamReader(inStream, Charset.forName("UTF-8"));
+    private void initSchemaFromStream(InputStream inStream) throws IOException {
+        InputStreamReader inputStreamReader = new InputStreamReader(inStream, StandardCharsets.UTF_8);
         BufferedReader br = new BufferedReader(inputStreamReader);
         String schemaString = br.lines().collect(Collectors.joining("\n"));
         inputStreamReader.close();
         br.close();
-
-        JSONObject schemaJson = new JSONObject(schemaString);
         
-        this.initFromSchemaJson(schemaJson);
+        this.initFromSchemaJson(schemaString);
     }
     
-    private void initFromSchemaJson(JSONObject schema) throws PrimaryKeyException, ForeignKeyException{
+    private void initFromSchemaJson(String json) throws PrimaryKeyException, ForeignKeyException{
+        JSONObject schemaObj = new JSONObject(json);
         // Set Fields
-        if(schema.has(JSON_KEY_FIELDS)){
-            for (Object obj : schema.getJSONArray(JSON_KEY_FIELDS)) {
+        if(schemaObj.has(JSON_KEY_FIELDS)){
+            for (Object obj : schemaObj.getJSONArray(JSON_KEY_FIELDS)) {
                 Field field = null;
                 if (obj instanceof JSONObject) {
                     field = Field.fromJson(obj.toString());
@@ -167,25 +167,25 @@ public class Schema {
         }
         
         // Set Primary Key
-        if(schema.has(JSON_KEY_PRIMARY_KEY)){
+        if(schemaObj.has(JSON_KEY_PRIMARY_KEY)){
             
             // If primary key is a composite key.
-            if(schema.get(JSON_KEY_PRIMARY_KEY) instanceof JSONArray){
-                this.setPrimaryKey(schema.getJSONArray(JSON_KEY_PRIMARY_KEY));
+            if(schemaObj.get(JSON_KEY_PRIMARY_KEY) instanceof JSONArray){
+                this.setPrimaryKey(schemaObj.getJSONArray(JSON_KEY_PRIMARY_KEY));
             }else{
                 // Else if primary key is a single String key.
-                this.setPrimaryKey(schema.getString(JSON_KEY_PRIMARY_KEY));
+                this.setPrimaryKey(schemaObj.getString(JSON_KEY_PRIMARY_KEY));
             }
         }
         
         // Set Foreign Keys
-        if(schema.has(JSON_KEY_FOREIGN_KEYS)){
+        if(schemaObj.has(JSON_KEY_FOREIGN_KEYS)){
 
-            JSONArray fkJsonArray = schema.getJSONArray(JSON_KEY_FOREIGN_KEYS);
+            JSONArray fkJsonArray = schemaObj.getJSONArray(JSON_KEY_FOREIGN_KEYS);
             for(int i=0; i<fkJsonArray.length(); i++){
                 
                 JSONObject fkJsonObj = fkJsonArray.getJSONObject(i);
-                ForeignKey fk = new ForeignKey(fkJsonObj, this.strictValidation);
+                ForeignKey fk = new ForeignKey(fkJsonObj.toString(), this.strictValidation);
                 this.addForeignKey(fk);
                 
                 if(!this.strictValidation){
@@ -236,7 +236,7 @@ public class Schema {
      */
     private void validate() throws ValidationException{
         try{
-             this.tableJsonSchema.validate(getJson());
+             this.tableJsonSchema.validate(new JSONObject(getJson()));
              if (null != foreignKeys) {
                  for (ForeignKey fk : foreignKeys) {
                      Object fields = fk.getFields();
@@ -264,7 +264,7 @@ public class Schema {
         return this.errors;
     }
     
-    public JSONObject getJson(){
+    public String getJson(){
         //FIXME: Maybe we should use JSON serializer like Gson?
         JSONObject schemaJson = new JSONObject();
         
@@ -286,11 +286,11 @@ public class Schema {
             schemaJson.put(JSON_KEY_FOREIGN_KEYS, new JSONArray());
 
             this.foreignKeys.forEach((fk) -> {
-                schemaJson.getJSONArray(JSON_KEY_FOREIGN_KEYS).put(fk.getJson());
+                schemaJson.getJSONArray(JSON_KEY_FOREIGN_KEYS).put(new JSONObject(fk.getJson()));
             });            
         }
         
-        return schemaJson;
+        return schemaJson.toString(JSON_INDENT_FACTOR);
     }
     
     public Object[] castRow(String[] row) throws InvalidCastException{
@@ -323,7 +323,7 @@ public class Schema {
 
     public void writeJson (OutputStream output) throws IOException{
         try (BufferedWriter file = new BufferedWriter(new OutputStreamWriter(output))) {
-            file.write(this.getJson().toString(JSON_INDENT_FACTOR));
+            file.write(this.getJson());
         }
     }
     

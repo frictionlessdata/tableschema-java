@@ -74,7 +74,7 @@ public class TypeInferrer {
      * @return
      * @throws TypeInferringException 
      */
-    synchronized JSONObject infer(List<Object[]> data, String[] headers) throws TypeInferringException{
+    synchronized String infer(List<Object[]> data, String[] headers) throws TypeInferringException{
         return this.infer(data, headers, -1);
     }
     
@@ -86,7 +86,7 @@ public class TypeInferrer {
      * @return
      * @throws TypeInferringException 
      */
-    synchronized JSONObject infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
+    synchronized String infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
         
         // If the given row limit is bigger than the length of the data
         // then just use the length of the data.
@@ -153,7 +153,7 @@ public class TypeInferrer {
         JSONObject schemaJsonObject = new JSONObject();
         schemaJsonObject.put(io.frictionlessdata.tableschema.Schema.JSON_KEY_FIELDS, fieldArray);
         
-        return schemaJsonObject;
+        return schemaJsonObject.toString();
     }
     
     private void findType(String header, String datum){
