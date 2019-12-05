@@ -335,4 +335,21 @@ class FieldCreationTest {
         Assertions.assertEquals(testField.getType(), "any");
     }
 
+
+    // spec: https://frictionlessdata.io/specs/table-schema/#rich-types
+    @Test
+    @DisplayName("Test fix for Issue https://github.com/frictionlessdata/tableschema-java/issues/21")
+    void testIssue22() {
+        String testJson =
+                "        {\n" +
+                "          \"name\": \"Country\",\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"rdfType\": \"http://schema.org/Country\"\n" +
+                "        }\n";
+        Field testField = Field.fromJson(testJson);
+        Assertions.assertEquals( "Country", testField.getName());
+        Assertions.assertEquals("string", testField.getType());
+        Assertions.assertEquals("http://schema.org/Country", testField.getRdfType().toString());
+    }
+
 }

@@ -35,6 +35,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 class FieldFormatParsingTest {
 
+
+    // any fields have no format options
+    @Test
+    void testFieldParseFormatFromAny() throws Exception{
+        AnyField field = new AnyField("test");
+        String format = field.parseFormat("2008", null);
+        Assertions.assertEquals("default", format);
+    }
+
     // boolean fields have no format options
     @Test
     @DisplayName("Boolean Field returns default format")
