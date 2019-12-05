@@ -35,7 +35,8 @@ public class ForeignKey {
         this.validate();
     }
     
-    public ForeignKey(JSONObject fkJsonObject, boolean strict) throws ForeignKeyException{
+    public ForeignKey(String json, boolean strict) throws ForeignKeyException{
+        JSONObject fkJsonObject= new JSONObject(json);
         this.strictValidation = strict;
         
         if(fkJsonObject.has(JSON_KEY_FIELDS)){
@@ -44,7 +45,7 @@ public class ForeignKey {
         
         if(fkJsonObject.has(JSON_KEY_REFERENCE)){
             JSONObject refJsonObject = fkJsonObject.getJSONObject(JSON_KEY_REFERENCE);
-            this.reference = new Reference(refJsonObject, strict);
+            this.reference = new Reference(refJsonObject.toString(), strict);
         }
         
         this.validate();
@@ -100,7 +101,7 @@ public class ForeignKey {
 
     }
     
-    public JSONObject getJson(){
+    public String getJson(){
         //FIXME: Maybe we should use JSON serializer like Gson?
         JSONObject json = new JSONObject();
         
@@ -109,10 +110,10 @@ public class ForeignKey {
         }
         
         if(this.reference != null){
-            json.put(JSON_KEY_REFERENCE, this.reference.getJson());
+            json.put(JSON_KEY_REFERENCE, new JSONObject(reference.getJson()));
         }
   
-        return json;
+        return json.toString();
     }
     
     public List<Exception> getErrors(){

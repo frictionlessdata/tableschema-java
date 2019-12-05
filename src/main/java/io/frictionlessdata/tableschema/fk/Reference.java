@@ -49,7 +49,8 @@ public class Reference {
         }
     }
     
-    public Reference(JSONObject refJsonObject, boolean strict) throws ForeignKeyException{
+    public Reference(String json, boolean strict) throws ForeignKeyException{
+        JSONObject refJsonObject = new JSONObject(json);
         if(refJsonObject.has(JSON_KEY_DATAPACKAGE)){
             try{
                 this.datapackage = new URL(refJsonObject.getString(JSON_KEY_DATAPACKAGE));
@@ -102,7 +103,7 @@ public class Reference {
         }
     }
     
-    public JSONObject getJson(){
+    public String getJson(){
         //FIXME: Maybe we should use JSON serializer like Gson?
 
         JSONObject json = new JSONObject();
@@ -118,6 +119,6 @@ public class Reference {
             json.put(JSON_KEY_FIELDS, this.fields);
         }
 
-        return json;
+        return json.toString();
     }
 }
