@@ -13,14 +13,19 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -28,92 +33,140 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *
  * 
  */
-class FieldCastTest {
+class FieldFormatParsingTest {
 
+    // boolean fields have no format options
+    @Test
+    @DisplayName("Boolean Field returns default format")
+    void testFieldParseFormatFromBoolean() throws Exception {
+        BooleanField field = new BooleanField("test");
 
-    @Test
-    void testFieldCastGeopointDefault() throws Exception{
-        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_DEFAULT, "title", "description", null, null, null);
-        int[] val = field.castValue("12,21");
-        Assertions.assertEquals(12, val[0]);
-        Assertions.assertEquals(21, val[1]);
+        String format = field.parseFormat("f", null);
+        Assertions.assertEquals("default", format);
     }
-    
+
+    // geopoint field, test default format parsing
     @Test
-    void testFieldCastGeopointArray() throws Exception{
-        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_ARRAY, "title", "description", null, null, null);
-        int[] val = field.castValue("[45,32]");
-        Assertions.assertEquals(45, val[0]);
-        Assertions.assertEquals(32, val[1]);   
+    @DisplayName("Geopoint Field returns default format")
+    void testFieldParseFormatFromGeopointDefault() throws Exception{
+        GeopointField field = new GeopointField("test");
+        String format = field.parseFormat("12,21", null);
+        Assertions.assertEquals("default", format);
     }
-    
+
+    // geopoint field, test array format parsing
     @Test
-    void testFieldCastGeopointObject() throws Exception{
-        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_OBJECT, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
-        int[] val = field.castValue("{\"lon\": 67, \"lat\": 19}");
-        Assertions.assertEquals(67, val[0]);
-        Assertions.assertEquals(19, val[1]);   
+    @DisplayName("Geopoint Field returns array format")
+    void testFieldParseFormatFromGeopointArray() throws Exception{
+        GeopointField field = new GeopointField("test");
+        String format = field.parseFormat("[45,32]", null);
+        Assertions.assertEquals("array", format);
     }
-    
+
+    // geopoint field, test oject format parsing
     @Test
-    void testFieldCastInteger() throws Exception{
+    @DisplayName("Geopoint Field returns object format")
+    void testFieldParseFormatFromGeopointObject() throws Exception{
+        GeopointField field = new GeopointField("test");
+        String format = field.parseFormat("{\"lon\": 67, \"lat\": 19}", null);
+        Assertions.assertEquals("object", format);
+    }
+
+    // integer fields have no format options
+    @Test
+    @DisplayName("Integer Field returns default format")
+    void testFieldParseFormatFromInteger() throws Exception{
         IntegerField field = new IntegerField("test");
-        BigInteger val = field.castValue("123");
-        Assertions.assertEquals(123, val.intValue());
+        String format = field.parseFormat("123", null);
+        Assertions.assertEquals("default", format);
     }
-    
+
+    // number fields have no format options
     @Test
-    void testFieldCastDuration() throws Exception{
+    @DisplayName("Number Field returns default format")
+    void testFieldParseFormatFromNumber() throws Exception{
+        NumberField field = new NumberField("test");
+        String format = field.parseFormat("123.01", null);
+        Assertions.assertEquals("default", format);
+    }
+
+    // duration fields have no format options
+    @Test
+    @DisplayName("Duration Field returns default format")
+    void testFieldParseFormatFromDuration() throws Exception{
         DurationField field = new DurationField("test");
-        Duration val = field.castValue("P2DT3H4M");
-        Assertions.assertEquals(183840, val.getSeconds()); 
+        String format = field.parseFormat("P2DT3H4M", null);
+        Assertions.assertEquals("default", format);
     }
-    
+
     @Test
-    void testFieldCastValidGeojson() throws Exception{
-        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
-        JSONObject val = field.castValue("{\n" +
-            "    \"type\": \"Feature\",\n" +
-            "    \"properties\": {\n" +
-            "        \"name\": \"Coors Field\",\n" +
-            "        \"amenity\": \"Baseball Stadium\",\n" +
-            "        \"popupContent\": \"This is where the Rockies play!\"\n" +
-            "    },\n" +
-            "    \"geometry\": {\n" +
-            "        \"type\": \"Point\",\n" +
-            "        \"coordinates\": [-104.99404, 39.75621]\n" +
-            "    }\n" +
-            "}");
-        
-        Assertions.assertEquals("Feature", val.getString("type"));
-        Assertions.assertEquals("Baseball Stadium", val.getJSONObject("properties").getString("amenity"));
-        Assertions.assertEquals(-104.99404, val.getJSONObject("geometry").getJSONArray("coordinates").get(0));
-        Assertions.assertEquals(39.75621, val.getJSONObject("geometry").getJSONArray("coordinates").get(1));
+    @DisplayName("String Field returns default format")
+    void testFieldParseFormatFromString() throws Exception{
+        StringField field = new StringField("test");
+        String format = field.parseFormat("John Doe", null);
+        Assertions.assertEquals(Field.FIELD_FORMAT_DEFAULT, format);
     }
-    
+
     @Test
-    void testFieldCastInvalidGeojson() throws Exception{
-        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
-        assertThrows(InvalidCastException.class, () -> {
-            field.castValue("{\n" +
-                "    \"type\": \"INVALID_TYPE\",\n" + // The invalidity is here.
-                "    \"properties\": {\n" +
-                "        \"name\": \"Coors Field\",\n" +
-                "        \"amenity\": \"Baseball Stadium\",\n" +
-                "        \"popupContent\": \"This is where the Rockies play!\"\n" +
-                "    },\n" +
+    @DisplayName("String Field returns UUID format")
+    void testFieldParseUUIDFormatFromString() throws Exception{
+        StringField field = new StringField("test");
+
+        String format = field.parseFormat("6aed4d5f-de7c-4233-ab70-b64d054b11f3", null);
+        Assertions.assertEquals(Field.FIELD_FORMAT_UUID, format);
+
+        String nilFormat = field.parseFormat("00000000-0000-0000-0000-000000000000", null);
+        Assertions.assertEquals(Field.FIELD_FORMAT_UUID, nilFormat);
+    }
+
+    @Test
+    @DisplayName("String Field returns URI format")
+    void testFieldParseURIFormatFromString() throws Exception{
+        StringField field = new StringField("test");
+
+        String format = field.parseFormat("https://github.com", null);
+        Assertions.assertEquals(Field.FIELD_FORMAT_URI, format);
+
+        String urnFormat = field.parseFormat("urn:oasis:names:specification:docbook:dtd:xml:4.1.2", null);
+        Assertions.assertEquals(Field.FIELD_FORMAT_URI, urnFormat);
+
+        String mailFormat = field.parseFormat("mailto:John.Doe@example.com", null);
+        Assertions.assertEquals(Field.FIELD_FORMAT_URI, mailFormat);
+    }
+
+    // not gonna test all the possible edge cases for e-mail addresses,
+    // we just rely on the Apache Validator wisdom
+    @Test
+    @DisplayName("String Field returns email format")
+    void testFieldParseEmailFormatFromString() throws Exception{
+        StringField field = new StringField("test");
+
+        String format = field.parseFormat("john.smith@somewhere.com", null);
+        Assertions.assertEquals(Field.FIELD_FORMAT_EMAIL, format);
+
+        String invalidFormat = field.parseFormat("john.smith_somewhere.com", null);
+        Assertions.assertNotEquals(Field.FIELD_FORMAT_EMAIL, invalidFormat);
+    }
+
+
+    @DisplayName("Geojson Field returns Geojson format")
+    @Test
+    void testFieldParseFormatFromValidGeojson() throws Exception{
+        GeojsonField field = new GeojsonField("test");
+        String val = "{"+
                 "    \"geometry\": {\n" +
                 "        \"type\": \"Point\",\n" +
                 "        \"coordinates\": [-104.99404, 39.75621]\n" +
-                "    }\n" +
-                "}");
-        });
+                "    }\n";
 
+        String format = field.parseFormat( val, null);
+        Assertions.assertEquals(Field.FIELD_TYPE_GEOJSON, format);
     }
-    
+
+    /*
     @Test
-    void testFieldCastValidTopojson() throws Exception{
-        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+    void testFieldParseFormatFromValidTopojson() throws Exception{
+        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, null, null, null, null);
 
         JSONObject val = field.castValue("{\n" +
             "  \"type\": \"Topology\",\n" +
@@ -138,29 +191,12 @@ class FieldCastTest {
         Assertions.assertEquals(0.017361589674592462, val.getJSONObject("transform").getJSONArray("scale").get(1));
         Assertions.assertEquals(-180, val.getJSONObject("transform").getJSONArray("translate").get(0));  
         Assertions.assertEquals(-89.99892578124998, val.getJSONObject("transform").getJSONArray("translate").get(1)); 
-        
-        /*
-        // Another Geosjon to test
-        JSONObject val2 = field.castValue("{ \"type\": \"GeometryCollection\",\n" +
-            "\"geometries\": [\n" +
-            "  { \"type\": \"Point\",\n" +
-            "    \"coordinates\": [100.0, 0.0]\n" +
-            "    },\n" +
-            "  { \"type\": \"LineString\",\n" +
-            "    \"coordinates\": [ [101.0, 0.0], [102.0, 1.0] ]\n" +
-            "    }\n" +
-            " ]\n" +
-            "}");
-        
-        Assertions.assertEquals("GeometryCollection", val.getString("type"));
-        Assertions.assertEquals("Point", val.getJSONArray("geometries").getJSONObject(0).getString("type"));
-        Assertions.assertEquals("LineString", val.getJSONArray("geometries").getJSONObject(1).getString("type"));
-        */
+
     }
     
     @Test
-    void testFieldCastInvalidTopojson() throws Exception{
-        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+    void testFieldParseFormatFromInvalidTopojson() throws Exception{
+        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, null, null, null, null);
         
         // This is an invalid Topojson, it's a Geojson:
         assertThrows(InvalidCastException.class, () -> {
@@ -229,7 +265,7 @@ class FieldCastTest {
 
 
     @Test
-    void testFieldCastObject() throws Exception{
+    void testFieldParseFormatFromObject() throws Exception{
         ObjectField field = new ObjectField("test");
         JSONObject val = field.castValue("{\"one\": 1, \"two\": 2, \"three\": 3}");
         Assertions.assertEquals(3, val.length()); 
@@ -239,7 +275,7 @@ class FieldCastTest {
     }
     
     @Test
-    void testFieldCastArray() throws Exception{
+    void testFieldParseFormatFromArray() throws Exception{
         ArrayField field = new ArrayField("test");
         JSONArray val = field.castValue("[1,2,3,4]");
         
@@ -251,7 +287,7 @@ class FieldCastTest {
     }
     
     @Test
-    void testFieldCastDateTime() throws Exception{
+    void testFieldParseFormatFromDateTime() throws Exception{
         DatetimeField field = new DatetimeField("test");
         DateTime val = field.castValue("2008-08-30T01:45:36.123Z");
         
@@ -264,7 +300,7 @@ class FieldCastTest {
     }
     
     @Test
-    void testFieldCastDate() throws Exception{
+    void testFieldParseFormatFromDate() throws Exception{
         DateField field = new DateField("test");
         DateTime val = field.castValue("2008-08-30");
         
@@ -274,7 +310,7 @@ class FieldCastTest {
     }
     
     @Test
-    void testFieldCastTime() throws Exception{
+    void testFieldParseFormatFromTime() throws Exception{
         TimeField field = new TimeField("test");
         DateTime val = field.castValue("14:22:33");
         
@@ -284,14 +320,14 @@ class FieldCastTest {
     }
     
     @Test
-    void testFieldCastYear() throws Exception{
+    void testFieldParseFormatFromYear() throws Exception{
         YearField field = new YearField("test");
         int val = field.castValue("2008");
         Assertions.assertEquals(2008, val);
     }
     
     @Test
-    void testFieldCastYearmonth() throws Exception{
+    void testFieldParseFormatFromYearmonth() throws Exception{
         YearmonthField field = new YearmonthField("test");
         DateTime val = field.castValue("2008-08");
         
@@ -300,7 +336,7 @@ class FieldCastTest {
     }
     
     @Test
-    void testFieldCastNumber() throws Exception{
+    void testFieldParseFormatFromNumber() throws Exception{
         IntegerField intField = new IntegerField("intNum");
         NumberField floatField = new NumberField("floatNum");
         
@@ -325,7 +361,7 @@ class FieldCastTest {
     }
     
     @Test
-    void testFieldCastBoolean() throws Exception{
+    void testFieldParseFormatFromBoolean() throws Exception{
         BooleanField field = new BooleanField("test");
         
         Assertions.assertFalse(field.castValue("f"));
@@ -350,50 +386,7 @@ class FieldCastTest {
         Assertions.assertTrue(field.castValue("y"));
         Assertions.assertTrue(field.castValue("Y"));
     }
-    
-    @Test
-    void testFieldCastString() throws Exception{
-        StringField field = new StringField("test");
-        String val = field.castValue("John Doe");
-        
-        Assertions.assertEquals("John Doe", val);
-    }
 
-    @Test
-    @DisplayName("Test fix for Issue https://github.com/frictionlessdata/tableschema-java/issues/21")
-    void testIssue21() {
-        IntegerField intField = new IntegerField("intNum");
-        NumberField floatField = new NumberField("floatNum");
 
-        BigInteger intVal = intField.castValue("16289212000");
-        Number floatVal = floatField.castValue("16289212000.0");
-        Assertions.assertTrue(floatVal instanceof BigDecimal);
-        Assertions.assertEquals(((BigDecimal)floatVal).toBigInteger(), intVal);
-    }
-
-    @Test
-    @DisplayName("Test fix for Issue https://github.com/frictionlessdata/tableschema-java/issues/21")
-    void test2Issue21() throws Exception{
-        File f = new File("data/gdp.csv");
-        File schemaFile = new File(TestHelper.getTestDataDirectory(), "schema/gdp_schema.json");
-        Schema schema = null;
-        try (FileInputStream fis = new FileInputStream(schemaFile)) {
-            schema = new Schema(fis, false);
-        }
-        Table table = new Table(f, TestHelper.getTestDataDirectory(), schema);
-        Iterator iter = table.iterator(true, false, true, false);
-        Object obj = null;
-        int cnt = 0;
-        while (iter.hasNext()) {
-            obj = iter.next();
-            cnt++;
-            if (cnt == 11086) {
-                break;
-            }
-        }
-        Object valueObj = ((Map)obj).get("Value");
-        Assertions.assertTrue(valueObj instanceof BigInteger);
-        BigInteger val = (BigInteger)valueObj;
-        Assertions.assertEquals(18624475000000L, val.longValue());
-    }
+    */
 }

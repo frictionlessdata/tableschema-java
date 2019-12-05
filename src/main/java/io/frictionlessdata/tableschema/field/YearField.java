@@ -5,6 +5,7 @@ import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import org.json.JSONObject;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,8 +22,9 @@ public class YearField extends Field<Integer> {
         super(name, FIELD_TYPE_YEAR);
     }
 
-    public YearField(String name, String format, String title, String description, Map constraints, Map options){
-        super(name, FIELD_TYPE_YEAR, format, title, description, constraints, options);
+    public YearField(String name, String format, String title, String description,
+                     URI rdfType, Map constraints, Map options){
+        super(name, FIELD_TYPE_YEAR, format, title, description, rdfType, constraints, options);
     }
 
     @Override

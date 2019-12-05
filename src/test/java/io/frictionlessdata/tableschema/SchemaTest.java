@@ -402,14 +402,28 @@ public class SchemaTest {
         Map<String, Object> intFieldConstraints = new HashMap();
         intFieldConstraints.put(Field.CONSTRAINT_KEY_REQUIRED, true);
                 
-        Field intField = new IntegerField("id",  Field.FIELD_FORMAT_DEFAULT, null, null, intFieldConstraints, null);
+        Field intField = new IntegerField(
+                "id",
+                Field.FIELD_FORMAT_DEFAULT,
+                null,
+                null,
+                null,
+                intFieldConstraints,
+                null);
         createdSchema.addField(intField);
         
         Map<String, Object> stringFieldConstraints = new HashMap();
         stringFieldConstraints.put(Field.CONSTRAINT_KEY_MIN_LENGTH, 36);
         stringFieldConstraints.put(Field.CONSTRAINT_KEY_MAX_LENGTH, 45);
         
-        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, "the title", "the description", stringFieldConstraints, null);
+        Field stringField = new StringField(
+                "name",
+                Field.FIELD_FORMAT_DEFAULT,
+                "the title",
+                "the description",
+                null,
+                stringFieldConstraints,
+                null);
         createdSchema.addField(stringField);
 
         // Save schema
@@ -439,10 +453,10 @@ public class SchemaTest {
         
         Schema createdSchema = new Schema(true);
 
-        Field intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+        Field intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
         createdSchema.addField(intField);
 
-        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
         createdSchema.addField(stringField);
         
         // Primary Key
@@ -463,10 +477,10 @@ public class SchemaTest {
         
         Schema createdSchema = new Schema(); 
         
-        Field intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+        Field intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
         createdSchema.addField(intField);
         
-        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
         createdSchema.addField(stringField);
         
         // Foreign Keys

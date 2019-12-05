@@ -8,6 +8,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONObject;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,8 +25,9 @@ public class DateField extends Field<DateTime> {
         super(name, FIELD_TYPE_DATE);
     }
 
-    public DateField(String name, String format, String title, String description, Map constraints, Map options){
-        super(name, FIELD_TYPE_DATE, format, title, description, constraints, options);
+    public DateField(String name, String format, String title, String description,
+                     URI rdfType, Map constraints, Map options){
+        super(name, FIELD_TYPE_DATE, format, title, description, rdfType, constraints, options);
     }
 
     @Override

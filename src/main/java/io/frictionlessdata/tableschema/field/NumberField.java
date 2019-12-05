@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,8 +37,9 @@ public class NumberField extends Field<Number> {
         super(name, FIELD_TYPE_NUMBER);
     }
 
-    public NumberField(String name, String format, String title, String description, Map constraints, Map options){
-        super(name, FIELD_TYPE_NUMBER, format, title, description, constraints, options);
+    public NumberField(String name, String format, String title, String description,
+                       URI rdfType, Map constraints, Map options){
+        super(name, FIELD_TYPE_NUMBER, format, title, description, rdfType, constraints, options);
     }
 
     @Override

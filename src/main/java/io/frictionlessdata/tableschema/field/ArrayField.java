@@ -5,6 +5,7 @@ import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.URI;
 import java.util.Map;
 
 public class ArrayField extends Field<JSONArray> {
@@ -17,8 +18,9 @@ public class ArrayField extends Field<JSONArray> {
         super(name, FIELD_TYPE_ARRAY);
     }
 
-    public ArrayField(String name, String format, String title, String description, Map constraints, Map options){
-        super(name, FIELD_TYPE_ARRAY, format, title, description, constraints, options);
+    public ArrayField(String name, String format, String title, String description,
+                      URI rdfType, Map constraints, Map options){
+        super(name, FIELD_TYPE_ARRAY, format, title, description, rdfType, constraints, options);
     }
 
     @Override

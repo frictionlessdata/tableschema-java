@@ -1,26 +1,24 @@
 package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.TypeInferrer;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TableSchemaException;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.ValidationException;
-import org.everit.json.schema.loader.SchemaLoader;
-import org.joda.time.DateTime;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
 /**
+ * Definition of a field in a data table. Doesn't hold values
  *
+ * Spec: http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
  * 
  */
 
@@ -45,6 +43,10 @@ public abstract class Field<T> {
     public static final String FIELD_FORMAT_ARRAY = "array";
     public static final String FIELD_FORMAT_OBJECT = "object";
     public static final String FIELD_FORMAT_TOPOJSON = "topojson";
+    public static final String FIELD_FORMAT_URI = "uri";
+    public static final String FIELD_FORMAT_EMAIL = "email";
+    public static final String FIELD_FORMAT_BINARY = "binary";
+    public static final String FIELD_FORMAT_UUID = "uuid";
     
     public static final String CONSTRAINT_KEY_REQUIRED = "required";
     public static final String CONSTRAINT_KEY_UNIQUE = "unique";
@@ -59,14 +61,50 @@ public abstract class Field<T> {
     public static final String JSON_KEY_TYPE = "type";
     public static final String JSON_KEY_FORMAT = "format";
     public static final String JSON_KEY_TITLE = "title";
+    public static final String JSON_KEY_RDFTYPE = "rdfType";
     public static final String JSON_KEY_DESCRIPTION = "description";
     public static final String JSON_KEY_CONSTRAINTS = "constraints";
-  
+    /**
+     * The field descriptor MUST contain a `name` property.
+     * `name` SHOULD NOT be considered case sensitive in determining uniqueness.
+     * However, since it should correspond to the name of the field in the data file it
+     * may be important to preserve case.
+     * http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
+     */
     private String name = "";
+
+    /**
+     * A field's `type` property is a string indicating the type of this field.
+     * http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
+     */
     String type = "";
+
+    /**
+     * A field's `format` property is a string, indicating a format for the field type.
+     * http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
+     */
     String format = FIELD_FORMAT_DEFAULT;
+
+    /**
+     * A human readable label or title for the field
+     */
     private String title = "";
+
+    /**
+     * A description for this field e.g. "The recipient of the funds"
+     */
     private String description = "";
+
+    /**
+     * A richer, "semantic", description of the "type" of data in a given column MAY be
+     * provided using a rdfType property on a field descriptor.
+     *
+     * The value of of the rdfType property MUST be the URI of a RDF Class, that is an
+     * instance or subclass of RDF Schema Class object
+     * http://frictionlessdata.io/specs/table-schema/index.html#rich-types
+     */
+    private URI rdfType = null;
+
     Map<String, Object> constraints = null;
     Map<String, Object> options = null;
 
@@ -75,22 +113,31 @@ public abstract class Field<T> {
      */
     Field(){    }
 
-    public Field(String name, String type){
+    Field(String name, String type){
         this.name = name;
         this.type = type;
     }
 
-    public Field(String name, String type, String format, String title, String description, Map constraints, Map options){
+    public Field(
+            String name,
+            String type,
+            String format,
+            String title,
+            String description,
+            URI rdfType,
+            Map constraints,
+            Map options){
         this.name = name;
         this.type = type;
         this.format = format;
         this.title = title;
+        this.rdfType = rdfType;
         this.description = description;
         this.constraints = constraints;
         this.options = options;
     }
 
-    public static Field fromJson (String json)  {
+    public static Field fromJson (String json) {
         JSONObject fieldDef = new JSONObject(json);
         String type = fieldDef.has(JSON_KEY_TYPE) ? fieldDef.getString(JSON_KEY_TYPE) : "string";
         String name = fieldDef.has(JSON_KEY_NAME) ? fieldDef.getString(JSON_KEY_NAME).trim() : null;
@@ -106,17 +153,38 @@ public abstract class Field<T> {
         String description = fieldDef.has(JSON_KEY_DESCRIPTION) ? fieldDef.getString(JSON_KEY_DESCRIPTION) : null;
         field.description = (!StringUtils.isEmpty(description)) ? description.trim() : null;
 
-        Map cstraints = null;
+        String rdf = fieldDef.has(JSON_KEY_RDFTYPE) ? fieldDef.getString(JSON_KEY_RDFTYPE) : null;
+        try {
+            field.rdfType = (!StringUtils.isEmpty(rdf))
+                    ? new URI(rdf.trim())
+                    : null;
+        } catch (URISyntaxException ex){
+            throw new TableSchemaException(ex);
+        }
+
+        Map constraints = null;
         if (fieldDef.has(JSON_KEY_CONSTRAINTS))
-            cstraints = fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap();
-        if ((null != cstraints) && (!cstraints.isEmpty())) {
-            field.constraints = fieldDef.has(JSON_KEY_CONSTRAINTS) ? fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
+            constraints = fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap();
+        if ((null != constraints) && (!constraints.isEmpty())) {
+            field.constraints = fieldDef.has(JSON_KEY_CONSTRAINTS)
+                    ? fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap()
+                    : null;
         }
         return field;
     }
+
+
     public abstract T parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException;
 
+    /**
+     * Given a value, try to parse the format. Some Field types don't have variant
+     * formats and will always return `default`
+     *
+     * @param value sample value encoded as string
+     * @param options format options
+     * @return inferred format encoded as a string
+     */
     public abstract String parseFormat(String value, Map<String, Object> options);
 
     /**
@@ -176,7 +244,7 @@ public abstract class Field<T> {
      */
     public Map<String, Object> checkConstraintViolations(Object value){
        
-        Map<String, Object> violatedConstraints = new HashMap();
+        Map<String, Object> violatedConstraints = new HashMap<>();
         
         // Indicates whether this field is allowed to be null. If required is true, then null is disallowed. 
         if(this.constraints.containsKey(CONSTRAINT_KEY_REQUIRED)){
@@ -188,10 +256,10 @@ public abstract class Field<T> {
         // All values for that field MUST be unique within the data file in which it is found.
         // Can't check UNIQUE constraint when operating with only one value.
         // TODO: Implement a method that takes List<Object> value as argument.
-        /**
+        /*
         if(this.constraints.containsKey(CONSTRAINT_KEY_UNIQUE)){
     
-        }**/
+        }*/
         
         // An integer that specifies the minimum length of a value.
         if(this.constraints.containsKey(CONSTRAINT_KEY_MIN_LENGTH)){
@@ -235,7 +303,7 @@ public abstract class Field<T> {
             }  
         }
         
-        /**
+        /*
          * Specifies a minimum value for a field.
          * This is different to minLength which checks the number of items in the value.
          * A minimum value constraint checks whether a field value is greater than or equal to the specified value.

@@ -63,7 +63,7 @@ public class TableIterator<T> implements Iterator<T> {
         String[] row = this.iter.next();
 
         Map<String, Object> keyedRow = new HashMap();
-        Object[] extendedRow = new Object[3];
+        Object[] extendedRow;
         Object[] castRow = new Object[row.length];
 
         // If there's a schema, attempt to cast the row.

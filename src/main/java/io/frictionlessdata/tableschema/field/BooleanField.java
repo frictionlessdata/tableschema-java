@@ -5,6 +5,7 @@ import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import org.json.JSONObject;
 
+import java.net.URI;
 import java.util.*;
 
 public class BooleanField extends Field<Boolean> {
@@ -20,8 +21,9 @@ public class BooleanField extends Field<Boolean> {
         super(name, FIELD_TYPE_BOOLEAN);
     }
 
-    public BooleanField(String name, String format, String title, String description, Map constraints, Map options){
-        super(name, FIELD_TYPE_BOOLEAN, format, title, description, constraints, options);
+    public BooleanField(String name, String format, String title, String description,
+                        URI rdfType, Map constraints, Map options){
+        super(name, FIELD_TYPE_BOOLEAN, format, title, description, rdfType, constraints, options);
     }
 
     public void setTrueValues(List<String> newValues) {

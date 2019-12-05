@@ -143,8 +143,10 @@ public class Schema {
     private void initSchemaFromStream(InputStream inStream) throws Exception{
         InputStreamReader inputStreamReader = new InputStreamReader(inStream, Charset.forName("UTF-8"));
         BufferedReader br = new BufferedReader(inputStreamReader);
-
         String schemaString = br.lines().collect(Collectors.joining("\n"));
+        inputStreamReader.close();
+        br.close();
+
         JSONObject schemaJson = new JSONObject(schemaString);
         
         this.initFromSchemaJson(schemaJson);

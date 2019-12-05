@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Map;
 
 public class GeojsonField extends Field<JSONObject> {
@@ -26,8 +27,9 @@ public class GeojsonField extends Field<JSONObject> {
         super(name, FIELD_TYPE_GEOJSON);
     }
 
-    public GeojsonField(String name, String format, String title, String description, Map constraints, Map options){
-        super(name, FIELD_TYPE_GEOJSON, format, title, description, constraints, options);
+    public GeojsonField(String name, String format, String title, String description,
+                        URI rdfType, Map constraints, Map options){
+        super(name, FIELD_TYPE_GEOJSON, format, title, description, rdfType, constraints, options);
     }
 
     @Override

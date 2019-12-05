@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URI;
 import java.util.Map;
 
 public class GeopointField extends Field<int[]> {
@@ -20,8 +21,9 @@ public class GeopointField extends Field<int[]> {
         super(name, FIELD_TYPE_GEOPOINT);
     }
 
-    public GeopointField(String name, String format, String title, String description, Map constraints, Map options){
-        super(name, FIELD_TYPE_GEOPOINT, format, title, description, constraints, options);
+    public GeopointField(String name, String format, String title, String description,
+                         URI rdfType, Map constraints, Map options){
+        super(name, FIELD_TYPE_GEOPOINT, format, title, description, rdfType, constraints, options);
     }
 
     @Override
