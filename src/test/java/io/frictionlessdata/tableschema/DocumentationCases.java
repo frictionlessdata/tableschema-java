@@ -80,7 +80,7 @@ class DocumentationCases {
         JSONObject nameFieldJsonObject = new JSONObject();
         nameFieldJsonObject.put("name", "name");
         nameFieldJsonObject.put("type", Field.FIELD_TYPE_STRING);
-        schema.addField(nameFieldJsonObject);
+        schema.addField(nameFieldJsonObject.toString());
 
         // Because strict=false, an invalid Field definition will be included.
         // The error will be logged/tracked in the error list schema.getErrors().
@@ -88,13 +88,13 @@ class DocumentationCases {
         invalidFieldJsonObject.put("name", "id");
         invalidFieldJsonObject.put("type", Field.FIELD_TYPE_INTEGER);
         invalidFieldJsonObject.put("format", "invalid");
-        schema.addField(invalidFieldJsonObject);
+        schema.addField(invalidFieldJsonObject.toString());
 
         JSONObject coordinatesFieldJsonObject = new JSONObject();
         coordinatesFieldJsonObject.put("name", "coordinates");
         coordinatesFieldJsonObject.put("type", Field.FIELD_TYPE_GEOPOINT);
         coordinatesFieldJsonObject.put("format", Field.FIELD_FORMAT_ARRAY);
-        schema.addField(coordinatesFieldJsonObject);
+        schema.addField(coordinatesFieldJsonObject.toString());
 
         System.out.println(schema.getJson());
         /*

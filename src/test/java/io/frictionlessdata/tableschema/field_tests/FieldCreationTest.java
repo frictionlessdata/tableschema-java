@@ -29,7 +29,7 @@ class FieldCreationTest {
     void testAnyFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"anon\",\"format\":\"\",\"description\":\"\"," +
                 "\"title\":\"\",\"type\":\"any\",\"constraints\":{}}";
-        Field testField = new AnyField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "anon");
         Assertions.assertEquals(testField.getType(), "any");
     }
@@ -47,7 +47,7 @@ class FieldCreationTest {
     void testArrayFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"employees\",\"format\":\"default\",\"description\":\"\"," +
                 "\"type\":\"array\",\"title\":\"\"}";
-        Field testField = new ArrayField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "employees");
         Assertions.assertEquals(testField.getType(), "array");
     }
@@ -65,7 +65,7 @@ class FieldCreationTest {
     void testBooleanFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"is_valid\",\"format\":\"default\",\"description\":\"\"" +
                 ",\"type\":\"boolean\",\"title\":\"\"}";
-        Field testField = new BooleanField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "is_valid");
         Assertions.assertEquals(testField.getType(), "boolean");
     }
@@ -84,7 +84,7 @@ class FieldCreationTest {
     void testDateFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"today\",\"format\":\"default\",\"description\":\"\"," +
                 "\"type\":\"date\",\"title\":\"\"}";
-        Field testField = new DateField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "today");
         Assertions.assertEquals(testField.getType(), "date");
     }
@@ -103,7 +103,7 @@ class FieldCreationTest {
     void testDatetimeieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"today_noon\",\"format\":\"default\",\"description\":\"\"," +
                 "\"type\":\"datetime\",\"title\":\"\"}";
-        Field testField = new DatetimeField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "today_noon");
         Assertions.assertEquals(testField.getType(), "datetime");
     }
@@ -122,7 +122,7 @@ class FieldCreationTest {
     void testDurationFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"aday\",\"format\":\"default\",\"description\":\"\"," +
                 "\"type\":\"duration\",\"title\":\"\"}";
-        Field testField = new DurationField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "aday");
         Assertions.assertEquals(testField.getType(), "duration");
     }
@@ -141,7 +141,7 @@ class FieldCreationTest {
     void testGeojsonFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"latlong\",\"format\":\"default\",\"description\":\"\"," +
                 "\"type\":\"geojson\",\"title\":\"\"}";
-        Field testField = new GeojsonField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "latlong");
         Assertions.assertEquals(testField.getType(), "geojson");
     }
@@ -160,7 +160,7 @@ class FieldCreationTest {
     void testGeopointFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"latlong\",\"format\":\"default\",\"description\":\"\"," +
                 "\"type\":\"geopoint\",\"title\":\"\"}";
-        Field testField = new GeopointField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "latlong");
         Assertions.assertEquals(testField.getType(), "geopoint");
     }
@@ -179,7 +179,7 @@ class FieldCreationTest {
     void testIntegerFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"int\",\"format\":\"default\",\"description\":\"\"," +
                 "\"type\":\"integer\",\"title\":\"\"}";
-        Field testField = new IntegerField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "int");
         Assertions.assertEquals(testField.getType(), "integer");
     }
@@ -198,7 +198,7 @@ class FieldCreationTest {
     void testNumberFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"number\",\"format\":\"default\",\"description\":\"\"," +
                 "\"type\":\"number\",\"title\":\"\"}";
-        Field testField = new NumberField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "number");
         Assertions.assertEquals(testField.getType(), "number");
     }
@@ -217,7 +217,7 @@ class FieldCreationTest {
     void testObjectFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"obj\",\"format\":\"default\",\"description\":\"\"," +
                 "\"type\":\"object\",\"title\":\"\"}";
-        Field testField = new ObjectField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "obj");
         Assertions.assertEquals(testField.getType(), "object");
     }
@@ -235,7 +235,7 @@ class FieldCreationTest {
     void testStringFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"city\",\"format\":\"\",\"description\":\"\"," +
                 "\"title\":\"\",\"type\":\"string\",\"constraints\":{}}";
-        Field testField = new StringField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "city");
         Assertions.assertEquals(testField.getType(), "string");
     }
@@ -254,7 +254,7 @@ class FieldCreationTest {
     void testTimeFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"noon\",\"format\":\"default\",\"description\":\"\"," +
                 "\"type\":\"time\",\"title\":\"\"}";
-        Field testField = new TimeField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "noon");
         Assertions.assertEquals(testField.getType(), "time");
     }
@@ -273,7 +273,7 @@ class FieldCreationTest {
     void testYearFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"1997\",\"format\":\"default\",\"description\":\"\"," +
                 "\"type\":\"year\",\"title\":\"\"}";
-        Field testField = new YearField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "1997");
         Assertions.assertEquals(testField.getType(), "year");
     }
@@ -292,7 +292,7 @@ class FieldCreationTest {
     void testYearmonthFieldFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"dec1997\",\"format\":\"default\",\"description\":\"\"" +
                 ",\"type\":\"yearmonth\",\"title\":\"\"}";
-        Field testField = new YearmonthField(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertEquals(testField.getName(), "dec1997");
         Assertions.assertEquals(testField.getType(), "yearmonth");
     }
@@ -313,7 +313,7 @@ class FieldCreationTest {
     void testUndefinedFieldFieldCreationFromString() throws Exception{
         String testJson = "{\"name\":\"anon\",\"format\":\"default\",\"description\":\"\"," +
                 "\"type\":\"anon\",\"title\":\"\"}";
-        Field testField = Field.fromJson(new JSONObject(testJson));
+        Field testField = Field.fromJson(testJson);
         Assertions.assertTrue(testField instanceof AnyField);
         Assertions.assertEquals(testField.getName(), "anon");
         Assertions.assertEquals(testField.getType(), "any");

@@ -25,13 +25,13 @@ public class IntegerField extends Field<BigInteger> {
         super(name, FIELD_TYPE_INTEGER, format, title, description, constraints, options);
     }
 
-    public IntegerField(JSONObject field) {
-        super(field);
-        type = FIELD_TYPE_INTEGER;
-    }
-
     @Override
     public BigInteger parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return new BigInteger(value);
+    }
+
+    @Override
+    public String parseFormat(String value, Map<String, Object> options) {
+        return "default";
     }
 }

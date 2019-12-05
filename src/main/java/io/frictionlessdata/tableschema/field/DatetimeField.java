@@ -28,11 +28,6 @@ public class DatetimeField extends Field<DateTime> {
         super(name, FIELD_TYPE_DATETIME, format, title, description, constraints, options);
     }
 
-    public DatetimeField(JSONObject field) {
-        super(field);
-        type = FIELD_TYPE_DATETIME;
-    }
-
     @Override
     public DateTime parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
@@ -49,5 +44,10 @@ public class DatetimeField extends Field<DateTime> {
         }else{
             throw new TypeInferringException();
         }
+    }
+
+    @Override
+    public String parseFormat(String value, Map<String, Object> options) {
+        return "default";
     }
 }

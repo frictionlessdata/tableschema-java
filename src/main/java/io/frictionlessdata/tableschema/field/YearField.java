@@ -25,11 +25,6 @@ public class YearField extends Field<Integer> {
         super(name, FIELD_TYPE_YEAR, format, title, description, constraints, options);
     }
 
-    public YearField(JSONObject field) {
-        super(field);
-        type = FIELD_TYPE_YEAR;
-    }
-
     @Override
     public Integer parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         Pattern pattern = Pattern.compile(REGEX_YEAR);
@@ -42,5 +37,10 @@ public class YearField extends Field<Integer> {
         }else{
             throw new TypeInferringException();
         }
+    }
+
+    @Override
+    public String parseFormat(String value, Map<String, Object> options) {
+        return "default";
     }
 }

@@ -21,14 +21,14 @@ public class ArrayField extends Field<JSONArray> {
         super(name, FIELD_TYPE_ARRAY, format, title, description, constraints, options);
     }
 
-    public ArrayField(JSONObject field) {
-        super(field);
-        type = FIELD_TYPE_ARRAY;
-    }
-
     @Override
     public JSONArray parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
         return new JSONArray(value);
+    }
+
+    @Override
+    public String parseFormat(String value, Map<String, Object> options) {
+        return "default";
     }
 }

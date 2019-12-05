@@ -3,7 +3,9 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
+import org.everit.json.schema.ValidationException;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -20,11 +22,6 @@ public class GeopointField extends Field<int[]> {
 
     public GeopointField(String name, String format, String title, String description, Map constraints, Map options){
         super(name, FIELD_TYPE_GEOPOINT, format, title, description, constraints, options);
-    }
-
-    public GeopointField(JSONObject field) {
-        super(field);
-        type = FIELD_TYPE_GEOPOINT;
     }
 
     @Override
@@ -83,6 +80,21 @@ public class GeopointField extends Field<int[]> {
 
         }catch(Exception e){
             throw new TypeInferringException(e);
+        }
+    }
+
+    @Override
+    public String parseFormat(String value, Map<String, Object> options) {
+        try {
+            new JSONObject(value);
+            return FIELD_FORMAT_OBJECT;
+        } catch (JSONException ex) {
+            try {
+                new JSONArray(value);
+                return FIELD_FORMAT_ARRAY;
+            } catch (JSONException ex2) {
+                return FIELD_FORMAT_DEFAULT;
+            }
         }
     }
 }

@@ -20,13 +20,13 @@ public class StringField extends Field<String> {
         super(name, FIELD_TYPE_STRING, format, title, description, constraints, options);
     }
 
-    public StringField(JSONObject field) {
-        super(field);
-        type = FIELD_TYPE_STRING;
-    }
-
     @Override
     public String parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return value;
+    }
+
+    @Override
+    public String parseFormat(String value, Map<String, Object> options) {
+        return "default";
     }
 }

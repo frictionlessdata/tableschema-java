@@ -22,11 +22,6 @@ public class DurationField extends Field<Duration> {
         super(name, FIELD_TYPE_DURATION, format, title, description, constraints, options);
     }
 
-    public DurationField(JSONObject field) {
-        super(field);
-        type = FIELD_TYPE_DURATION;
-    }
-
     @Override
     public Duration parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
@@ -35,5 +30,10 @@ public class DurationField extends Field<Duration> {
         }catch(Exception e){
             throw new TypeInferringException(e);
         }
+    }
+
+    @Override
+    public String parseFormat(String value, Map<String, Object> options) {
+        return "default";
     }
 }

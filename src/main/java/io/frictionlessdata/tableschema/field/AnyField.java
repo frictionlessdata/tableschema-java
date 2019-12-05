@@ -20,14 +20,14 @@ public class AnyField extends Field<Object> {
         super(name, FIELD_TYPE_ANY, format, title, description, constraints, options);
     }
 
-    public AnyField(JSONObject field) {
-        super(field);
-        type = FIELD_TYPE_ANY;
-    }
-
     @Override
     public Object parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
         return value;
+    }
+
+    @Override
+    public String parseFormat(String value, Map<String, Object> options) {
+        return "default";
     }
 }

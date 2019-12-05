@@ -40,11 +40,6 @@ public class NumberField extends Field<Number> {
         super(name, FIELD_TYPE_NUMBER, format, title, description, constraints, options);
     }
 
-    public NumberField(JSONObject field) {
-        super(field);
-        type = FIELD_TYPE_NUMBER;
-    }
-
     @Override
     public Number parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         try{
@@ -85,5 +80,10 @@ public class NumberField extends Field<Number> {
         }catch(Exception e){
             throw new TypeInferringException();
         }
+    }
+
+    @Override
+    public String parseFormat(String value, Map<String, Object> options) {
+        return "default";
     }
 }

@@ -23,6 +23,7 @@ import org.json.JSONTokener;
  *
  * 
  */
+
 public abstract class Field<T> {
     public static final String FIELD_TYPE_STRING = "string";
     public static final String FIELD_TYPE_INTEGER = "integer";
@@ -68,8 +69,6 @@ public abstract class Field<T> {
     private String description = "";
     Map<String, Object> constraints = null;
     Map<String, Object> options = null;
-    private Schema geoJsonSchema = null;
-    private Schema topoJsonSchema = null;
 
     /**
      * Constructor for our reflection-based instantiation only
@@ -91,31 +90,34 @@ public abstract class Field<T> {
         this.options = options;
     }
 
-    public Field (JSONObject field){
-        //TODO: Maybe use Gson serializer for this instead? Is it worth importing library just for this?
-        String name = field.has(JSON_KEY_NAME) ? field.getString(JSON_KEY_NAME) : null;
-        this.name = (!StringUtils.isEmpty(name)) ? name.trim() : null;
+    public static Field fromJson (String json)  {
+        JSONObject fieldDef = new JSONObject(json);
+        String type = fieldDef.has(JSON_KEY_TYPE) ? fieldDef.getString(JSON_KEY_TYPE) : "string";
+        String name = fieldDef.has(JSON_KEY_NAME) ? fieldDef.getString(JSON_KEY_NAME).trim() : null;
 
-        this.type = field.has(JSON_KEY_TYPE) ? field.getString(JSON_KEY_TYPE) : "string";
+        Field field = forType(type, name);
 
-        String format = field.has(JSON_KEY_FORMAT) ? field.getString(JSON_KEY_FORMAT) : null;
-        this.format = (!StringUtils.isEmpty(format)) ? format.trim() : FIELD_FORMAT_DEFAULT;
+        String format = fieldDef.has(JSON_KEY_FORMAT) ? fieldDef.getString(JSON_KEY_FORMAT) : null;
+        field.format = (!StringUtils.isEmpty(format)) ? format.trim() : FIELD_FORMAT_DEFAULT;
 
-        String title = field.has(JSON_KEY_TITLE) ? field.getString(JSON_KEY_TITLE) : null;
-        this.title = (!StringUtils.isEmpty(title)) ? title.trim() : null;
+        String title = fieldDef.has(JSON_KEY_TITLE) ? fieldDef.getString(JSON_KEY_TITLE) : null;
+        field.title = (!StringUtils.isEmpty(title)) ? title.trim() : null;
 
-        String description = field.has(JSON_KEY_DESCRIPTION) ? field.getString(JSON_KEY_DESCRIPTION) : null;
-        this.description = (!StringUtils.isEmpty(description)) ? description.trim() : null;
+        String description = fieldDef.has(JSON_KEY_DESCRIPTION) ? fieldDef.getString(JSON_KEY_DESCRIPTION) : null;
+        field.description = (!StringUtils.isEmpty(description)) ? description.trim() : null;
 
         Map cstraints = null;
-        if (field.has(JSON_KEY_CONSTRAINTS))
-            cstraints = field.getJSONObject(JSON_KEY_CONSTRAINTS).toMap();
+        if (fieldDef.has(JSON_KEY_CONSTRAINTS))
+            cstraints = fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap();
         if ((null != cstraints) && (!cstraints.isEmpty())) {
-            this.constraints = field.has(JSON_KEY_CONSTRAINTS) ? field.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
+            field.constraints = fieldDef.has(JSON_KEY_CONSTRAINTS) ? fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
         }
+        return field;
     }
+    public abstract T parseValue(String value, String format, Map<String, Object> options)
+            throws InvalidCastException, ConstraintsException;
 
-    public abstract T parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException;
+    public abstract String parseFormat(String value, Map<String, Object> options);
 
     /**
      * Use the Field definition to cast a value into the Field type.
@@ -408,40 +410,11 @@ public abstract class Field<T> {
         return field;
     }
 
-    public static Field fromJson (JSONObject fieldDef)  {
-        String type = fieldDef.has(JSON_KEY_TYPE) ? fieldDef.getString(JSON_KEY_TYPE) : "string";
-        String name = fieldDef.has(JSON_KEY_NAME) ? fieldDef.getString(JSON_KEY_NAME).trim() : null;
-
-        Field field = forType(type, name);
-
-        //TODO: Maybe use Gson serializer for this instead? Is it worth importing library just for this?
-        field.name = (!StringUtils.isEmpty(name)) ? name.trim() : null;
-
-
-
-        String format = fieldDef.has(JSON_KEY_FORMAT) ? fieldDef.getString(JSON_KEY_FORMAT) : null;
-        field.format = (!StringUtils.isEmpty(format)) ? format.trim() : FIELD_FORMAT_DEFAULT;
-
-        String title = fieldDef.has(JSON_KEY_TITLE) ? fieldDef.getString(JSON_KEY_TITLE) : null;
-        field.title = (!StringUtils.isEmpty(title)) ? title.trim() : null;
-
-        String description = fieldDef.has(JSON_KEY_DESCRIPTION) ? fieldDef.getString(JSON_KEY_DESCRIPTION) : null;
-        field.description = (!StringUtils.isEmpty(description)) ? description.trim() : null;
-
-        Map cstraints = null;
-        if (fieldDef.has(JSON_KEY_CONSTRAINTS))
-            cstraints = fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap();
-        if ((null != cstraints) && (!cstraints.isEmpty())) {
-            field.constraints = fieldDef.has(JSON_KEY_CONSTRAINTS) ? fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
-        }
-        return field;
-    }
-
     /**
      * Get the JSON representation of the Field.
-     * @return JSONObject containing the properties of this field as JSON
+     * @return String-serialized JSON Object containing the properties of this field
      */
-    public JSONObject getJson(){
+    public String getJson(){
         //FIXME: Maybe we should use JSON serializer like Gson?
         JSONObject json = new JSONObject();
         json.put(JSON_KEY_NAME, this.name);
@@ -452,45 +425,10 @@ public abstract class Field<T> {
         if ((null != constraints) && (!constraints.isEmpty()))
             json.put(JSON_KEY_CONSTRAINTS, this.constraints);
         
-        return json;
+        return json.toString();
     }
 
-    /**
-     * We only want to go through this initialization if we have to because it's a
-     * performance issue the first time it is executed.
-     * Because of this, so we don't include this logic in the constructor and only
-     * call it when it is actually required after trying all other type inferral.
-     * @param geoJson
-     * @throws ValidationException
-     */
-    void validateGeoJsonSchema(JSONObject geoJson) throws ValidationException{
-        if(this.geoJsonSchema == null){
-            // FIXME: Maybe this infering against geojson scheme is too much.
-            // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
-            InputStream geoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/geojson.json");
-            JSONObject rawGeoJsonSchema = new JSONObject(new JSONTokener(geoJsonSchemaInputStream));
-            geoJsonSchema = SchemaLoader.load(rawGeoJsonSchema);
-        }
-        geoJsonSchema.validate(geoJson);
-    }
 
-    /**
-     * We only want to go through this initialization if we have to because it's a
-     * performance issue the first time it is executed.
-     * Because of this, so we don't include this logic in the constructor and only
-     * call it when it is actually required after trying all other type inferral.
-     * @param topoJson
-     */
-    void validateTopoJsonSchema(JSONObject topoJson){
-        if(topoJsonSchema == null){
-            // FIXME: Maybe this infering against topojson scheme is too much.
-            // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema
-            InputStream topoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/topojson.json");
-            JSONObject rawTopoJsonSchema = new JSONObject(new JSONTokener(topoJsonSchemaInputStream));
-            topoJsonSchema = SchemaLoader.load(rawTopoJsonSchema);
-        }
-        topoJsonSchema.validate(topoJson);
-    }
 
     public String getCastMethodName() {
         return "cast" + (this.type.substring(0, 1).toUpperCase() + this.type.substring(1));
@@ -520,22 +458,6 @@ public abstract class Field<T> {
         return this.constraints;
     }
 
-    private Schema getGeoJsonSchema(){
-        return this.geoJsonSchema;
-    }
-
-    private void setGeoJsonSchema(Schema geoJsonSchema){
-        this.geoJsonSchema = geoJsonSchema;
-    }
-
-    private Schema getTopoJsonSchema(){
-        return this.topoJsonSchema;
-    }
-
-    private void setTopoJsonSchema(Schema topoJsonSchema){
-        this.topoJsonSchema = topoJsonSchema;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -550,5 +472,16 @@ public abstract class Field<T> {
     @Override
     public int hashCode() {
         return Objects.hash(name, type, format, constraints);
+    }
+
+    @Override
+    public String toString() {
+        Class clazz = this.getClass();
+        return clazz.getName().replace(clazz.getPackage().getName(), "")
+                +" {" +
+                "name='" + name + '\'' +
+                ", format='" + format + '\'' +
+                ", title='" + title + '\'' +
+                '}';
     }
 }

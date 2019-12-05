@@ -28,11 +28,6 @@ public class TimeField extends Field<DateTime> {
         super(name, FIELD_TYPE_TIME, format, title, description, constraints, options);
     }
 
-    public TimeField(JSONObject field) {
-        super(field);
-        type = FIELD_TYPE_TIME;
-    }
-
     @Override
     public DateTime parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         Pattern pattern = Pattern.compile(REGEX_TIME);
@@ -47,5 +42,10 @@ public class TimeField extends Field<DateTime> {
         }else{
             throw new TypeInferringException();
         }
+    }
+
+    @Override
+    public String parseFormat(String value, Map<String, Object> options) {
+        return "default";
     }
 }

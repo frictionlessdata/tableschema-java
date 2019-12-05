@@ -24,11 +24,6 @@ public class BooleanField extends Field<Boolean> {
         super(name, FIELD_TYPE_BOOLEAN, format, title, description, constraints, options);
     }
 
-    public BooleanField(JSONObject field) {
-        super(field);
-        type = FIELD_TYPE_BOOLEAN;
-    }
-
     public void setTrueValues(List<String> newValues) {
         trueValues = newValues;
     }
@@ -58,5 +53,10 @@ public class BooleanField extends Field<Boolean> {
         }else{
             throw new TypeInferringException();
         }
+    }
+
+    @Override
+    public String parseFormat(String value, Map<String, Object> options) {
+        return "default";
     }
 }

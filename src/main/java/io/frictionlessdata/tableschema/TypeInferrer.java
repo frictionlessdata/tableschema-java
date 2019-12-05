@@ -30,36 +30,37 @@ public class TypeInferrer {
      */
     private static TypeInferrer instance = null;
 
-    private Map<String, Map<String, Integer>> typeInferralMap = new HashMap();
+    private Map<String, Map<String, Integer>> typeInferralMap = new HashMap<>();
+    private Map<String, String> formatMap = new HashMap<>();
     
     // The order in which the types will be attempted to be inferred.
     // Once a type is successfully inferred, we do not bother with the remaining types.
     private static final List<String[]> TYPE_INFERRAL_ORDER_LIST = new ArrayList<>(Arrays.asList(
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_GEOPOINT, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT},
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_GEOPOINT, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_ARRAY},
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_GEOPOINT, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_OBJECT},
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_DURATION, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_YEAR, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_YEARMONTH, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_DATE, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_TIME, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_DATETIME, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_INTEGER, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_NUMBER, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_BOOLEAN, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_GEOJSON, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT},
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_GEOJSON, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_TOPOJSON},
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_OBJECT, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT},
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_ARRAY, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT},
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_STRING, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_ANY, io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT})); // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_DEFAULT},
+        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_ARRAY},
+        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT},
+        new String[]{Field.FIELD_TYPE_DURATION, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_YEAR, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_YEARMONTH, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_DATE, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_TIME, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_DATETIME, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_INTEGER, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_NUMBER, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_BOOLEAN, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_DEFAULT},
+        new String[]{Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_TOPOJSON},
+        new String[]{Field.FIELD_TYPE_OBJECT, Field.FIELD_FORMAT_DEFAULT},
+        new String[]{Field.FIELD_TYPE_ARRAY, Field.FIELD_FORMAT_DEFAULT},
+        new String[]{Field.FIELD_TYPE_STRING, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_ANY, Field.FIELD_FORMAT_DEFAULT})); // No different formats, just use default.
 
     
     private TypeInferrer(){
         // Private to inforce use of Singleton pattern.
     }
     
-    public static TypeInferrer getInstance() {
+    static TypeInferrer getInstance() {
       if(instance == null) {
          instance = new TypeInferrer();
       }
@@ -73,7 +74,7 @@ public class TypeInferrer {
      * @return
      * @throws TypeInferringException 
      */
-    public synchronized JSONObject infer(List<Object[]> data, String[] headers) throws TypeInferringException{
+    synchronized JSONObject infer(List<Object[]> data, String[] headers) throws TypeInferringException{
         return this.infer(data, headers, -1);
     }
     
@@ -85,7 +86,7 @@ public class TypeInferrer {
      * @return
      * @throws TypeInferringException 
      */
-    public synchronized JSONObject infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
+    synchronized JSONObject infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
         
         // If the given row limit is bigger than the length of the data
         // then just use the length of the data.
@@ -98,7 +99,7 @@ public class TypeInferrer {
 
 
         // The JSON Array that will define the fields in the schema JSON Object.
-        JSONArray tableFieldJsonArray = new JSONArray();
+        JSONArray fieldArray = new JSONArray();
         
         // Init the type inferral map and init the schema objects
         for (String header : headers) {
@@ -107,15 +108,15 @@ public class TypeInferrer {
             
             // Init the schema objects
             JSONObject fieldObj = new JSONObject();
-            fieldObj.put(io.frictionlessdata.tableschema.field.Field.JSON_KEY_NAME, header);
-            fieldObj.put(io.frictionlessdata.tableschema.field.Field.JSON_KEY_TITLE, ""); // This will stay blank.
-            fieldObj.put(io.frictionlessdata.tableschema.field.Field.JSON_KEY_DESCRIPTION, ""); // This will stay blank.
-            fieldObj.put(io.frictionlessdata.tableschema.field.Field.JSON_KEY_CONSTRAINTS, new JSONObject()); // This will stay blank.
-            fieldObj.put(io.frictionlessdata.tableschema.field.Field.JSON_KEY_FORMAT, ""); // This will bet set post inferral.
-            fieldObj.put(io.frictionlessdata.tableschema.field.Field.JSON_KEY_TYPE, ""); // This will bet set post inferral.
+            fieldObj.put(Field.JSON_KEY_NAME, header);
+            fieldObj.put(Field.JSON_KEY_TITLE, ""); // This will stay blank.
+            fieldObj.put(Field.JSON_KEY_DESCRIPTION, ""); // This will stay blank.
+            fieldObj.put(Field.JSON_KEY_CONSTRAINTS, new JSONObject()); // This will stay blank.
+            fieldObj.put(Field.JSON_KEY_FORMAT, ""); // This will bet set post inferral.
+            fieldObj.put(Field.JSON_KEY_TYPE, ""); // This will bet set post inferral.
             
             // Wrap it all in an array.
-            tableFieldJsonArray.put(fieldObj);
+            fieldArray.put(fieldObj);
         }
 
         // Find the type for each column data for each row.
@@ -132,24 +133,25 @@ public class TypeInferrer {
         // We are done inferring types.
         // Now for each field we figure out which type was the most inferred and settle for that type
         // as the final type for the field.
-        for(int j=0; j < tableFieldJsonArray.length(); j++){
-            String fieldName = tableFieldJsonArray.getJSONObject(j).getString(io.frictionlessdata.tableschema.field.Field.JSON_KEY_NAME);
+        for(int j=0; j < fieldArray.length(); j++){
+            String fieldName = fieldArray.getJSONObject(j).getString(Field.JSON_KEY_NAME);
             HashMap<String, Integer> typeInferralCountMap = (HashMap<String, Integer>)this.getTypeInferralMap().get(fieldName);
             TreeMap<String, Integer> typeInferralCountMapSortedByCount = sortMapByValue(typeInferralCountMap); 
            
             if(!typeInferralCountMapSortedByCount.isEmpty()){
                 String inferredType = typeInferralCountMapSortedByCount.firstEntry().getKey();
-                tableFieldJsonArray.getJSONObject(j).put(io.frictionlessdata.tableschema.field.Field.JSON_KEY_TYPE, inferredType);
+                fieldArray.getJSONObject(j).put(Field.JSON_KEY_TYPE, inferredType);
+                fieldArray.getJSONObject(j).put(Field.JSON_KEY_FORMAT, formatMap.get(headers[j]));
             }
-            
         }
         
         // Need to clear the inferral map for the next inferral call:
         this.getTypeInferralMap().clear();
+        this.formatMap.clear();
         
         // Now that the types have been inferred and set, we build and return the schema object.
         JSONObject schemaJsonObject = new JSONObject();
-        schemaJsonObject.put(io.frictionlessdata.tableschema.Schema.JSON_KEY_FIELDS, tableFieldJsonArray);
+        schemaJsonObject.put(io.frictionlessdata.tableschema.Schema.JSON_KEY_FIELDS, fieldArray);
         
         return schemaJsonObject;
     }
@@ -162,12 +164,12 @@ public class TypeInferrer {
             try{
                 // Keep invoking the type casting methods until one doesn't throw an exception
                 String dataType = typeInferralDefinition[0];
-                /*String castMethodName = "cast" + (dataType.substring(0, 1).toUpperCase() + dataType.substring(1));*/
-                String format = typeInferralDefinition[1];
 
                 Field field = Field.forType(dataType, dataType);
+                //String format = typeInferralDefinition[1];
+                String format = field.parseFormat(datum, null);
                 field.parseValue(datum, format, null);
-                
+                this.formatMap.put(header, format);
                 // If no exception is thrown, in means that a type has been inferred.
                 // Let's keep track of it in the inferral map.
                 this.updateInferralScoreMap(header, field.getType());

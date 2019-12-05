@@ -20,14 +20,14 @@ public class ObjectField extends Field<JSONObject> {
         super(name, FIELD_TYPE_OBJECT, format, title, description, constraints, options);
     }
 
-    public ObjectField(JSONObject field) {
-        super(field);
-        type = FIELD_TYPE_OBJECT;
-    }
-
     @Override
     public JSONObject parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
         return new JSONObject(value);
+    }
+
+    @Override
+    public String parseFormat(String value, Map<String, Object> options) {
+        return "default";
     }
 }
