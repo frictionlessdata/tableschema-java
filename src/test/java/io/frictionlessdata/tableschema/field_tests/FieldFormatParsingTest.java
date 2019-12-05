@@ -156,12 +156,16 @@ class FieldFormatParsingTest {
     @Test
     void testFieldParseFormatFromValidGeojson() throws Exception{
         GeojsonField field = new GeojsonField("test");
-        String val = "{"+
-                "    \"geometry\": {\n" +
-                "        \"type\": \"Point\",\n" +
-                "        \"coordinates\": [-104.99404, 39.75621]\n" +
+        String val = "{ \"type\": \"GeometryCollection\",\n" +
+                "\"geometries\": [\n" +
+                "  { \"type\": \"Point\",\n" +
+                "    \"coordinates\": [100.0, 0.0]\n" +
+                "    },\n" +
+                "  { \"type\": \"LineString\",\n" +
+                "    \"coordinates\": [ [101.0, 0.0], [102.0, 1.0] ]\n" +
                 "    }\n" +
-                "   }";
+                " ]\n" +
+                "}";
 
         String format = field.parseFormat( val, null);
         Assertions.assertEquals(Field.FIELD_TYPE_GEOJSON, format);
