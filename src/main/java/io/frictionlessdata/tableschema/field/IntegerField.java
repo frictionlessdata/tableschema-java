@@ -5,6 +5,7 @@ import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import org.json.JSONObject;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.util.Map;
 
 /**
@@ -21,17 +22,18 @@ public class IntegerField extends Field<BigInteger> {
         super(name, FIELD_TYPE_INTEGER);
     }
 
-    public IntegerField(String name, String format, String title, String description, Map constraints, Map options) {
-        super(name, FIELD_TYPE_INTEGER, format, title, description, constraints, options);
-    }
-
-    public IntegerField(JSONObject field) {
-        super(field);
-        type = FIELD_TYPE_INTEGER;
+    public IntegerField(String name, String format, String title, String description,
+                        URI rdfType, Map constraints, Map options) {
+        super(name, FIELD_TYPE_INTEGER, format, title, description, rdfType, constraints, options);
     }
 
     @Override
     public BigInteger parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return new BigInteger(value);
+    }
+
+    @Override
+    public String parseFormat(String value, Map<String, Object> options) {
+        return "default";
     }
 }

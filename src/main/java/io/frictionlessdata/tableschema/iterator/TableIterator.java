@@ -1,5 +1,7 @@
-package io.frictionlessdata.tableschema;
+package io.frictionlessdata.tableschema.iterator;
 
+import io.frictionlessdata.tableschema.Schema;
+import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.field.Field;
 
 import java.util.HashMap;
@@ -11,21 +13,19 @@ import java.util.Map;
  *
  */
 public class TableIterator<T> implements Iterator<T> {
-
-    private String[] headers = null;
-    private Schema schema = null;
-    private Iterator<String[]> iter = null;
-    private boolean keyed;
-    private boolean extended;
-    private boolean cast;
-    private boolean relations;
-    private Map<String, Object> fieldOptions;
-    private int index = 0;
+    String[] headers = null;
+    Schema schema = null;
+    Iterator<String[]> iter = null;
+    boolean keyed;
+    boolean extended;
+    boolean cast;
+    boolean relations;
+    Map<String, Object> fieldOptions;
+    int index = 0;
 
     public TableIterator(Table table) throws Exception{
         this(table, false, false, true, false);
     }
-
 
     public TableIterator(
             Table table,
@@ -63,7 +63,7 @@ public class TableIterator<T> implements Iterator<T> {
         String[] row = this.iter.next();
 
         Map<String, Object> keyedRow = new HashMap();
-        Object[] extendedRow = new Object[3];
+        Object[] extendedRow;
         Object[] castRow = new Object[row.length];
 
         // If there's a schema, attempt to cast the row.

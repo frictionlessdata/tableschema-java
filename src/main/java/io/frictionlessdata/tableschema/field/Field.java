@@ -1,28 +1,27 @@
 package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.TypeInferrer;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TableSchemaException;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.ValidationException;
-import org.everit.json.schema.loader.SchemaLoader;
-import org.joda.time.DateTime;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
 /**
+ * Definition of a field in a data table. Doesn't hold values
  *
+ * Spec: http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
  * 
  */
+
 public abstract class Field<T> {
     public static final String FIELD_TYPE_STRING = "string";
     public static final String FIELD_TYPE_INTEGER = "integer";
@@ -44,6 +43,10 @@ public abstract class Field<T> {
     public static final String FIELD_FORMAT_ARRAY = "array";
     public static final String FIELD_FORMAT_OBJECT = "object";
     public static final String FIELD_FORMAT_TOPOJSON = "topojson";
+    public static final String FIELD_FORMAT_URI = "uri";
+    public static final String FIELD_FORMAT_EMAIL = "email";
+    public static final String FIELD_FORMAT_BINARY = "binary";
+    public static final String FIELD_FORMAT_UUID = "uuid";
     
     public static final String CONSTRAINT_KEY_REQUIRED = "required";
     public static final String CONSTRAINT_KEY_UNIQUE = "unique";
@@ -58,64 +61,132 @@ public abstract class Field<T> {
     public static final String JSON_KEY_TYPE = "type";
     public static final String JSON_KEY_FORMAT = "format";
     public static final String JSON_KEY_TITLE = "title";
+    public static final String JSON_KEY_RDFTYPE = "rdfType";
     public static final String JSON_KEY_DESCRIPTION = "description";
     public static final String JSON_KEY_CONSTRAINTS = "constraints";
-  
+    /**
+     * The field descriptor MUST contain a `name` property.
+     * `name` SHOULD NOT be considered case sensitive in determining uniqueness.
+     * However, since it should correspond to the name of the field in the data file it
+     * may be important to preserve case.
+     * http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
+     */
     private String name = "";
+
+    /**
+     * A field's `type` property is a string indicating the type of this field.
+     * http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
+     */
     String type = "";
+
+    /**
+     * A field's `format` property is a string, indicating a format for the field type.
+     * http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
+     */
     String format = FIELD_FORMAT_DEFAULT;
+
+    /**
+     * A human readable label or title for the field
+     */
     private String title = "";
+
+    /**
+     * A description for this field e.g. "The recipient of the funds"
+     */
     private String description = "";
+
+    /**
+     * A richer, "semantic", description of the "type" of data in a given column MAY be
+     * provided using a rdfType property on a field descriptor.
+     *
+     * The value of of the rdfType property MUST be the URI of a RDF Class, that is an
+     * instance or subclass of RDF Schema Class object
+     * http://frictionlessdata.io/specs/table-schema/index.html#rich-types
+     */
+    private URI rdfType = null;
+
     Map<String, Object> constraints = null;
+
     Map<String, Object> options = null;
-    private Schema geoJsonSchema = null;
-    private Schema topoJsonSchema = null;
 
     /**
      * Constructor for our reflection-based instantiation only
      */
     Field(){    }
 
-    public Field(String name, String type){
+    Field(String name, String type){
         this.name = name;
         this.type = type;
     }
 
-    public Field(String name, String type, String format, String title, String description, Map constraints, Map options){
+    public Field(
+            String name,
+            String type,
+            String format,
+            String title,
+            String description,
+            URI rdfType,
+            Map constraints,
+            Map options){
         this.name = name;
         this.type = type;
         this.format = format;
         this.title = title;
+        this.rdfType = rdfType;
         this.description = description;
         this.constraints = constraints;
         this.options = options;
     }
 
-    public Field (JSONObject field){
-        //TODO: Maybe use Gson serializer for this instead? Is it worth importing library just for this?
-        String name = field.has(JSON_KEY_NAME) ? field.getString(JSON_KEY_NAME) : null;
-        this.name = (!StringUtils.isEmpty(name)) ? name.trim() : null;
+    public static Field fromJson (String json) {
+        JSONObject fieldDef = new JSONObject(json);
+        String type = fieldDef.has(JSON_KEY_TYPE) ? fieldDef.getString(JSON_KEY_TYPE) : "string";
+        String name = fieldDef.has(JSON_KEY_NAME) ? fieldDef.getString(JSON_KEY_NAME).trim() : null;
 
-        this.type = field.has(JSON_KEY_TYPE) ? field.getString(JSON_KEY_TYPE) : "string";
+        Field field = forType(type, name);
 
-        String format = field.has(JSON_KEY_FORMAT) ? field.getString(JSON_KEY_FORMAT) : null;
-        this.format = (!StringUtils.isEmpty(format)) ? format.trim() : FIELD_FORMAT_DEFAULT;
+        String format = fieldDef.has(JSON_KEY_FORMAT) ? fieldDef.getString(JSON_KEY_FORMAT) : null;
+        field.format = (!StringUtils.isEmpty(format)) ? format.trim() : FIELD_FORMAT_DEFAULT;
 
-        String title = field.has(JSON_KEY_TITLE) ? field.getString(JSON_KEY_TITLE) : null;
-        this.title = (!StringUtils.isEmpty(title)) ? title.trim() : null;
+        String title = fieldDef.has(JSON_KEY_TITLE) ? fieldDef.getString(JSON_KEY_TITLE) : null;
+        field.title = (!StringUtils.isEmpty(title)) ? title.trim() : null;
 
-        String description = field.has(JSON_KEY_DESCRIPTION) ? field.getString(JSON_KEY_DESCRIPTION) : null;
-        this.description = (!StringUtils.isEmpty(description)) ? description.trim() : null;
+        String description = fieldDef.has(JSON_KEY_DESCRIPTION) ? fieldDef.getString(JSON_KEY_DESCRIPTION) : null;
+        field.description = (!StringUtils.isEmpty(description)) ? description.trim() : null;
 
-        Map cstraints = null;
-        if (field.has(JSON_KEY_CONSTRAINTS))
-            cstraints = field.getJSONObject(JSON_KEY_CONSTRAINTS).toMap();
-        if ((null != cstraints) && (!cstraints.isEmpty())) {
-            this.constraints = field.has(JSON_KEY_CONSTRAINTS) ? field.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
+        String rdf = fieldDef.has(JSON_KEY_RDFTYPE) ? fieldDef.getString(JSON_KEY_RDFTYPE) : null;
+        try {
+            field.rdfType = (!StringUtils.isEmpty(rdf))
+                    ? new URI(rdf.trim())
+                    : null;
+        } catch (URISyntaxException ex){
+            throw new TableSchemaException(ex);
         }
+
+        Map constraints = null;
+        if (fieldDef.has(JSON_KEY_CONSTRAINTS))
+            constraints = fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap();
+        if ((null != constraints) && (!constraints.isEmpty())) {
+            field.constraints = fieldDef.has(JSON_KEY_CONSTRAINTS)
+                    ? fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap()
+                    : null;
+        }
+        return field;
     }
 
-    public abstract T parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException;
+
+    public abstract T parseValue(String value, String format, Map<String, Object> options)
+            throws InvalidCastException, ConstraintsException;
+
+    /**
+     * Given a value, try to parse the format. Some Field types don't have variant
+     * formats and will always return `default`
+     *
+     * @param value sample value encoded as string
+     * @param options format options
+     * @return inferred format encoded as a string
+     */
+    public abstract String parseFormat(String value, Map<String, Object> options);
 
     /**
      * Use the Field definition to cast a value into the Field type.
@@ -174,7 +245,7 @@ public abstract class Field<T> {
      */
     public Map<String, Object> checkConstraintViolations(Object value){
        
-        Map<String, Object> violatedConstraints = new HashMap();
+        Map<String, Object> violatedConstraints = new HashMap<>();
         
         // Indicates whether this field is allowed to be null. If required is true, then null is disallowed. 
         if(this.constraints.containsKey(CONSTRAINT_KEY_REQUIRED)){
@@ -186,10 +257,10 @@ public abstract class Field<T> {
         // All values for that field MUST be unique within the data file in which it is found.
         // Can't check UNIQUE constraint when operating with only one value.
         // TODO: Implement a method that takes List<Object> value as argument.
-        /**
+        /*
         if(this.constraints.containsKey(CONSTRAINT_KEY_UNIQUE)){
     
-        }**/
+        }*/
         
         // An integer that specifies the minimum length of a value.
         if(this.constraints.containsKey(CONSTRAINT_KEY_MIN_LENGTH)){
@@ -233,7 +304,7 @@ public abstract class Field<T> {
             }  
         }
         
-        /**
+        /*
          * Specifies a minimum value for a field.
          * This is different to minLength which checks the number of items in the value.
          * A minimum value constraint checks whether a field value is greater than or equal to the specified value.
@@ -408,40 +479,11 @@ public abstract class Field<T> {
         return field;
     }
 
-    public static Field fromJson (JSONObject fieldDef)  {
-        String type = fieldDef.has(JSON_KEY_TYPE) ? fieldDef.getString(JSON_KEY_TYPE) : "string";
-        String name = fieldDef.has(JSON_KEY_NAME) ? fieldDef.getString(JSON_KEY_NAME).trim() : null;
-
-        Field field = forType(type, name);
-
-        //TODO: Maybe use Gson serializer for this instead? Is it worth importing library just for this?
-        field.name = (!StringUtils.isEmpty(name)) ? name.trim() : null;
-
-
-
-        String format = fieldDef.has(JSON_KEY_FORMAT) ? fieldDef.getString(JSON_KEY_FORMAT) : null;
-        field.format = (!StringUtils.isEmpty(format)) ? format.trim() : FIELD_FORMAT_DEFAULT;
-
-        String title = fieldDef.has(JSON_KEY_TITLE) ? fieldDef.getString(JSON_KEY_TITLE) : null;
-        field.title = (!StringUtils.isEmpty(title)) ? title.trim() : null;
-
-        String description = fieldDef.has(JSON_KEY_DESCRIPTION) ? fieldDef.getString(JSON_KEY_DESCRIPTION) : null;
-        field.description = (!StringUtils.isEmpty(description)) ? description.trim() : null;
-
-        Map cstraints = null;
-        if (fieldDef.has(JSON_KEY_CONSTRAINTS))
-            cstraints = fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap();
-        if ((null != cstraints) && (!cstraints.isEmpty())) {
-            field.constraints = fieldDef.has(JSON_KEY_CONSTRAINTS) ? fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap() : null;
-        }
-        return field;
-    }
-
     /**
      * Get the JSON representation of the Field.
-     * @return JSONObject containing the properties of this field as JSON
+     * @return String-serialized JSON Object containing the properties of this field
      */
-    public JSONObject getJson(){
+    public String getJson(){
         //FIXME: Maybe we should use JSON serializer like Gson?
         JSONObject json = new JSONObject();
         json.put(JSON_KEY_NAME, this.name);
@@ -452,45 +494,10 @@ public abstract class Field<T> {
         if ((null != constraints) && (!constraints.isEmpty()))
             json.put(JSON_KEY_CONSTRAINTS, this.constraints);
         
-        return json;
+        return json.toString();
     }
 
-    /**
-     * We only want to go through this initialization if we have to because it's a
-     * performance issue the first time it is executed.
-     * Because of this, so we don't include this logic in the constructor and only
-     * call it when it is actually required after trying all other type inferral.
-     * @param geoJson
-     * @throws ValidationException
-     */
-    void validateGeoJsonSchema(JSONObject geoJson) throws ValidationException{
-        if(this.geoJsonSchema == null){
-            // FIXME: Maybe this infering against geojson scheme is too much.
-            // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
-            InputStream geoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/geojson.json");
-            JSONObject rawGeoJsonSchema = new JSONObject(new JSONTokener(geoJsonSchemaInputStream));
-            geoJsonSchema = SchemaLoader.load(rawGeoJsonSchema);
-        }
-        geoJsonSchema.validate(geoJson);
-    }
 
-    /**
-     * We only want to go through this initialization if we have to because it's a
-     * performance issue the first time it is executed.
-     * Because of this, so we don't include this logic in the constructor and only
-     * call it when it is actually required after trying all other type inferral.
-     * @param topoJson
-     */
-    void validateTopoJsonSchema(JSONObject topoJson){
-        if(topoJsonSchema == null){
-            // FIXME: Maybe this infering against topojson scheme is too much.
-            // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema
-            InputStream topoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/topojson.json");
-            JSONObject rawTopoJsonSchema = new JSONObject(new JSONTokener(topoJsonSchemaInputStream));
-            topoJsonSchema = SchemaLoader.load(rawTopoJsonSchema);
-        }
-        topoJsonSchema.validate(topoJson);
-    }
 
     public String getCastMethodName() {
         return "cast" + (this.type.substring(0, 1).toUpperCase() + this.type.substring(1));
@@ -520,20 +527,20 @@ public abstract class Field<T> {
         return this.constraints;
     }
 
-    private Schema getGeoJsonSchema(){
-        return this.geoJsonSchema;
+    public URI getRdfType() {
+        return rdfType;
     }
 
-    private void setGeoJsonSchema(Schema geoJsonSchema){
-        this.geoJsonSchema = geoJsonSchema;
+    public void setRdfType(URI rdfType) {
+        this.rdfType = rdfType;
     }
 
-    private Schema getTopoJsonSchema(){
-        return this.topoJsonSchema;
+    public Map<String, Object> getOptions() {
+        return options;
     }
 
-    private void setTopoJsonSchema(Schema topoJsonSchema){
-        this.topoJsonSchema = topoJsonSchema;
+    public void setOptions(Map<String, Object> options) {
+        this.options = options;
     }
 
     @Override
@@ -551,4 +558,16 @@ public abstract class Field<T> {
     public int hashCode() {
         return Objects.hash(name, type, format, constraints);
     }
+
+    @Override
+    public String toString() {
+        Class clazz = this.getClass();
+        return clazz.getName().replace(clazz.getPackage().getName(), "")
+                +" {" +
+                "name='" + name + '\'' +
+                ", format='" + format + '\'' +
+                ", title='" + title + '\'' +
+                '}';
+    }
+
 }

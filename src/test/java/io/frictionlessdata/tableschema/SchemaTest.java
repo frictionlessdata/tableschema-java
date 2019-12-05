@@ -7,6 +7,7 @@ import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 import io.frictionlessdata.tableschema.fk.Reference;
 import java.io.File;
+import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -23,10 +24,13 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.everit.json.schema.ValidationException;
 import org.joda.time.DateTime;
+
+import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.instanceOf;
 
@@ -398,14 +402,28 @@ public class SchemaTest {
         Map<String, Object> intFieldConstraints = new HashMap();
         intFieldConstraints.put(Field.CONSTRAINT_KEY_REQUIRED, true);
                 
-        Field intField = new IntegerField("id",  Field.FIELD_FORMAT_DEFAULT, null, null, intFieldConstraints, null);
+        Field intField = new IntegerField(
+                "id",
+                Field.FIELD_FORMAT_DEFAULT,
+                null,
+                null,
+                null,
+                intFieldConstraints,
+                null);
         createdSchema.addField(intField);
         
         Map<String, Object> stringFieldConstraints = new HashMap();
         stringFieldConstraints.put(Field.CONSTRAINT_KEY_MIN_LENGTH, 36);
         stringFieldConstraints.put(Field.CONSTRAINT_KEY_MAX_LENGTH, 45);
         
-        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, "the title", "the description", stringFieldConstraints, null);
+        Field stringField = new StringField(
+                "name",
+                Field.FIELD_FORMAT_DEFAULT,
+                "the title",
+                "the description",
+                null,
+                stringFieldConstraints,
+                null);
         createdSchema.addField(stringField);
 
         // Save schema
@@ -435,10 +453,10 @@ public class SchemaTest {
         
         Schema createdSchema = new Schema(true);
 
-        Field intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+        Field intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
         createdSchema.addField(intField);
 
-        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
         createdSchema.addField(stringField);
         
         // Primary Key
@@ -459,10 +477,10 @@ public class SchemaTest {
         
         Schema createdSchema = new Schema(); 
         
-        Field intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+        Field intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
         createdSchema.addField(intField);
         
-        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+        Field stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
         createdSchema.addField(stringField);
         
         // Foreign Keys
@@ -643,6 +661,29 @@ public class SchemaTest {
         Assert.assertEquals("name", schema.getForeignKeys().get(0).getReference().getFields());
     }
 
+    @Test
+    public void testInferTypesComplexSchema() throws Exception{
+        Table table = new Table(new File ("data/employee_data.csv"), getTestDataDirectory());
+
+        JSONObject schemaObj = table.inferSchema().getJson();
+        Schema schema = new Schema (schemaObj.toString(), true);
+
+        File f = new File(getTestDataDirectory(), "schema/employee_schema.json");
+        Schema expectedSchema;
+        try (FileInputStream fis = new FileInputStream(f)) {
+            expectedSchema = new Schema(fis, false);
+        }
+
+        if (!expectedSchema.equals(schema)) {
+            for (int i = 0; i < expectedSchema.getFields().size(); i++) {
+                Field expectedField = expectedSchema.getFields().get(i);
+                Field testField = schema.getFields().get(i);
+                Assertions.assertEquals(expectedField, testField);
+
+            }
+        }
+        Assert.assertEquals(expectedSchema, schema);
+    }
 
     private static File getResourceFile(String fileName) throws URISyntaxException {
         try {

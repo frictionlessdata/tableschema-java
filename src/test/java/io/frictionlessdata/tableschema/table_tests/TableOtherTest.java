@@ -130,13 +130,14 @@ public class TableOtherTest {
         }
     }*/
 
-
+    // FIXME too slow
+/*
     @Test
     public void testInferSchemaFromHugeTable() throws Exception{
         File f = new File("data/gdp.csv");
         Table table = new Table(f, getTestDataDirectory());
         Assert.assertEquals(11507, table.read().size());
-        Schema schema = table.inferSchema();
+        Schema schema = table.inferSchema(10);
         File schemaFile = new File(getTestDataDirectory(), "schema/gdp_schema.json");
         Schema expectedSchema = null;
         try (FileInputStream fis = new FileInputStream(schemaFile)) {
@@ -151,7 +152,7 @@ public class TableOtherTest {
             }
         }
         Assert.assertEquals(expectedSchema, schema);
-    }
+    }*/
 
     @Test
     public void testIterateCastKeyedData() throws Exception{
@@ -163,7 +164,7 @@ public class TableOtherTest {
         File file = new File("data/employee_data.csv");
         Table employeeTable = new Table(file, testDataDir, employeeTableSchema);
         
-        Iterator<Map> iter = employeeTable.iterator(true, false, false, false);
+        Iterator<Map> iter = employeeTable.keyedIterator(true, false, false, false);
 
         while(iter.hasNext()){
             Map row = iter.next();
@@ -274,7 +275,7 @@ public class TableOtherTest {
         schema.addField(isAdminField);
 
         Field addressCoordinatesField
-                = new GeopointField("addressCoordinatesField", Field.FIELD_FORMAT_OBJECT, null, null, null, null);
+                = new GeopointField("addressCoordinatesField", Field.FIELD_FORMAT_OBJECT, null, null, null, null, null);
         schema.addField(addressCoordinatesField);
 
         Field contractLengthField = new DurationField("contractLength");
@@ -284,5 +285,23 @@ public class TableOtherTest {
         schema.addField(infoField);
 
         return schema;
+    }
+
+
+    @Test
+    public void testSetCsvFormat() throws Exception {
+        File testDataDir = getTestDataDirectory();
+
+        // Let's start by defining and building the schema:
+        Schema employeeTableSchema = getEmployeeTableSchema();
+
+        // Fetch the data and apply the schema
+        File file = new File("data/employee_data.csv");
+        Table employeeTable = new Table(file, testDataDir, employeeTableSchema);
+
+        CSVFormat expectedFmt = CSVFormat.INFORMIX_UNLOAD_CSV;
+        employeeTable.setCsvFormat(expectedFmt);
+        CSVFormat testFmt = employeeTable.getCsvFormat();
+        Assert.assertEquals(expectedFmt, testFmt);
     }
 }

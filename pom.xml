@@ -218,7 +218,29 @@
             <artifactId>commons-lang3</artifactId>
             <version>${apache-commons-lang3.version}</version>
         </dependency>
-        
+
+		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.13</version>
+		</dependency>
+
+
+		<!-- https://mvnrepository.com/artifact/commons-validator/commons-validator -->
+		<dependency>
+			<groupId>commons-validator</groupId>
+			<artifactId>commons-validator</artifactId>
+			<version>1.6</version>
+		</dependency>
+
+        <!-- https://commons.apache.org/proper/commons-csv/ -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>${apache-commons-csv.version}</version>
+        </dependency>
+
         <!-- JSON Schema Validator -->
         <dependency>
             <groupId>org.everit.json</groupId>
@@ -232,14 +254,7 @@
             <artifactId>joda-time</artifactId>
             <version>${joda-time.version}</version>
         </dependency>
-        
-        <!-- https://commons.apache.org/proper/commons-csv/ -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-csv</artifactId>
-            <version>${apache-commons-csv.version}</version>
-        </dependency>
-        
+
         <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
         <dependency>
             <groupId>com.google.guava</groupId>

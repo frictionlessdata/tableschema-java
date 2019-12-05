@@ -7,6 +7,7 @@ import io.frictionlessdata.tableschema.datasources.DataSource;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import java.io.File;
 
+import io.frictionlessdata.tableschema.iterator.TableIterator;
 import org.apache.commons.csv.CSVFormat;
 import org.json.*;
 
@@ -72,12 +73,20 @@ public class Table{
         this(dataSource, new Schema(schema, true));
     }
 
-    public Iterator iterator() throws Exception{
-       return new TableIterator(this);
+    public Iterator<Object[]> iterator() throws Exception{
+       return new TableIterator<Object[]>(this);
     }
 
-    public Iterator iterator(boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
-       return new TableIterator(this, keyed, extended, cast, relations);
+    public Iterator<Object[]> iterator(boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
+       return new TableIterator<Object[]>(this, keyed, extended, cast, relations);
+    }
+
+    public Iterator<Map> keyedIterator() throws Exception{
+        return new TableIterator<Map>(this);
+    }
+
+    public Iterator<Map> keyedIterator(boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
+        return new TableIterator<Map>(this, keyed, extended, cast, relations);
     }
     
     public String[] getHeaders() throws Exception{

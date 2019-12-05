@@ -8,6 +8,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONObject;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,13 +25,9 @@ public class TimeField extends Field<DateTime> {
         super(name, FIELD_TYPE_TIME);
     }
 
-    public TimeField(String name, String format, String title, String description, Map constraints, Map options){
-        super(name, FIELD_TYPE_TIME, format, title, description, constraints, options);
-    }
-
-    public TimeField(JSONObject field) {
-        super(field);
-        type = FIELD_TYPE_TIME;
+    public TimeField(String name, String format, String title, String description,
+                     URI rdfType, Map constraints, Map options){
+        super(name, FIELD_TYPE_TIME, format, title, description, rdfType, constraints, options);
     }
 
     @Override
@@ -47,5 +44,10 @@ public class TimeField extends Field<DateTime> {
         }else{
             throw new TypeInferringException();
         }
+    }
+
+    @Override
+    public String parseFormat(String value, Map<String, Object> options) {
+        return "default";
     }
 }

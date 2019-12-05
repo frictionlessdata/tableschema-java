@@ -143,8 +143,10 @@ public class Schema {
     private void initSchemaFromStream(InputStream inStream) throws Exception{
         InputStreamReader inputStreamReader = new InputStreamReader(inStream, Charset.forName("UTF-8"));
         BufferedReader br = new BufferedReader(inputStreamReader);
-
         String schemaString = br.lines().collect(Collectors.joining("\n"));
+        inputStreamReader.close();
+        br.close();
+
         JSONObject schemaJson = new JSONObject(schemaString);
         
         this.initFromSchemaJson(schemaJson);
@@ -153,10 +155,13 @@ public class Schema {
     private void initFromSchemaJson(JSONObject schema) throws PrimaryKeyException, ForeignKeyException{
         // Set Fields
         if(schema.has(JSON_KEY_FIELDS)){
-            Iterator iter = schema.getJSONArray(JSON_KEY_FIELDS).iterator();
-            while(iter.hasNext()){
-                JSONObject fieldJsonObj = (JSONObject)iter.next();
-                Field field = Field.fromJson(fieldJsonObj);
+            for (Object obj : schema.getJSONArray(JSON_KEY_FIELDS)) {
+                Field field = null;
+                if (obj instanceof JSONObject) {
+                    field = Field.fromJson(obj.toString());
+                } else if (obj instanceof String) {
+                    field = Field.fromJson((String) obj);
+                }
                 this.fields.add(field);
             }  
         }
@@ -231,7 +236,7 @@ public class Schema {
      */
     private void validate() throws ValidationException{
         try{
-             this.tableJsonSchema.validate(this.getJson());
+             this.tableJsonSchema.validate(getJson());
              if (null != foreignKeys) {
                  for (ForeignKey fk : foreignKeys) {
                      Object fields = fk.getFields();
@@ -267,7 +272,7 @@ public class Schema {
         if(this.fields != null && this.fields.size() > 0){
             schemaJson.put(JSON_KEY_FIELDS, new JSONArray());
             this.fields.forEach((field) -> {
-                schemaJson.getJSONArray(JSON_KEY_FIELDS).put(field.getJson());
+                schemaJson.getJSONArray(JSON_KEY_FIELDS).put(new JSONObject(field.getJson()));
             });
         }
         
@@ -326,9 +331,13 @@ public class Schema {
         this.fields.add(field);
         this.validate();
     }
-    
-    public void addField(JSONObject fieldJsonObj){
-        Field field = Field.fromJson(fieldJsonObj);
+
+    /**
+     * Add a field from a JSON string representation.
+     * @param json serialized JSON oject
+     */
+    public void addField(String json){
+        Field field = Field.fromJson(json);
         this.addField(field);
     }
     

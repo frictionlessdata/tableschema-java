@@ -58,7 +58,7 @@ class FieldOptionsTest {
         options.put("trueValues", trueValues);
         options.put("falseValues", falseValues);
 
-        Field testField = new BooleanField("name", "default", null, null, null, options);
+        Field testField = new BooleanField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, options);
 
         assertThrows(InvalidCastException.class, () -> {
             testField.castValue("true", false, options);
