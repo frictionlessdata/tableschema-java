@@ -102,7 +102,7 @@ public class TableOtherTest {
     public void testInferTypesIntAndDates() throws Exception{
         Table table = new Table(new File ("dates_data.csv"), getTestDataDirectory());
         
-        JSONObject schema = table.inferSchema().getJson();
+        JSONObject schema = new JSONObject(table.inferSchema().getJson());
         JSONArray schemaFiles = schema.getJSONArray("fields");
         
         // The field names are the same as the name of the type we are expecting to be inferred.
@@ -130,13 +130,14 @@ public class TableOtherTest {
         }
     }*/
 
-
+    // FIXME too slow
+/*
     @Test
     public void testInferSchemaFromHugeTable() throws Exception{
         File f = new File("data/gdp.csv");
         Table table = new Table(f, getTestDataDirectory());
         Assert.assertEquals(11507, table.read().size());
-        Schema schema = table.inferSchema();
+        Schema schema = table.inferSchema(10);
         File schemaFile = new File(getTestDataDirectory(), "schema/gdp_schema.json");
         Schema expectedSchema = null;
         try (FileInputStream fis = new FileInputStream(schemaFile)) {
@@ -151,7 +152,7 @@ public class TableOtherTest {
             }
         }
         Assert.assertEquals(expectedSchema, schema);
-    }
+    }*/
 
     @Test
     public void testIterateCastKeyedData() throws Exception{
@@ -284,5 +285,23 @@ public class TableOtherTest {
         schema.addField(infoField);
 
         return schema;
+    }
+
+
+    @Test
+    public void testSetCsvFormat() throws Exception {
+        File testDataDir = getTestDataDirectory();
+
+        // Let's start by defining and building the schema:
+        Schema employeeTableSchema = getEmployeeTableSchema();
+
+        // Fetch the data and apply the schema
+        File file = new File("data/employee_data.csv");
+        Table employeeTable = new Table(file, testDataDir, employeeTableSchema);
+
+        CSVFormat expectedFmt = CSVFormat.INFORMIX_UNLOAD_CSV;
+        employeeTable.setCsvFormat(expectedFmt);
+        CSVFormat testFmt = employeeTable.getCsvFormat();
+        Assert.assertEquals(expectedFmt, testFmt);
     }
 }

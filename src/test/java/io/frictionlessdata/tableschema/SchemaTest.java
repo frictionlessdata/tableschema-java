@@ -665,8 +665,8 @@ public class SchemaTest {
     public void testInferTypesComplexSchema() throws Exception{
         Table table = new Table(new File ("data/employee_data.csv"), getTestDataDirectory());
 
-        JSONObject schemaObj = table.inferSchema().getJson();
-        Schema schema = new Schema (schemaObj.toString(), true);
+        String schemaObjStr = table.inferSchema().getJson();
+        Schema schema = new Schema (schemaObjStr, true);
 
         File f = new File(getTestDataDirectory(), "schema/employee_schema.json");
         Schema expectedSchema;

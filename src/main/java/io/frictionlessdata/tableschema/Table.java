@@ -131,8 +131,8 @@ public class Table{
     
     public Schema inferSchema(int rowLimit) throws TypeInferringException{
         try{
-            JSONObject schemaJson = TypeInferrer.getInstance().infer(read(), getHeaders(), rowLimit);
-            schema = new Schema(schemaJson.toString(), false);
+            String schemaJson = TypeInferrer.getInstance().infer(read(), getHeaders(), rowLimit);
+            schema = new Schema(schemaJson, false);
             return schema;
             
         }catch(Exception e){

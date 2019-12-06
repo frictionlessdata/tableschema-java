@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  * Definition of a field in a data table. Doesn't hold values
  *
  * Spec: http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
- * 
+ *
  */
 
 public abstract class Field<T> {
@@ -47,7 +47,7 @@ public abstract class Field<T> {
     public static final String FIELD_FORMAT_EMAIL = "email";
     public static final String FIELD_FORMAT_BINARY = "binary";
     public static final String FIELD_FORMAT_UUID = "uuid";
-    
+
     public static final String CONSTRAINT_KEY_REQUIRED = "required";
     public static final String CONSTRAINT_KEY_UNIQUE = "unique";
     public static final String CONSTRAINT_KEY_MIN_LENGTH = "minLength";
@@ -106,6 +106,7 @@ public abstract class Field<T> {
     private URI rdfType = null;
 
     Map<String, Object> constraints = null;
+
     Map<String, Object> options = null;
 
     /**
@@ -524,6 +525,22 @@ public abstract class Field<T> {
     
     public Map<String, Object> getConstraints(){
         return this.constraints;
+    }
+
+    public URI getRdfType() {
+        return rdfType;
+    }
+
+    public void setRdfType(URI rdfType) {
+        this.rdfType = rdfType;
+    }
+
+    public Map<String, Object> getOptions() {
+        return options;
+    }
+
+    public void setOptions(Map<String, Object> options) {
+        this.options = options;
     }
 
     @Override

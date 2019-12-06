@@ -9,6 +9,8 @@ import org.junit.rules.ExpectedException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.util.Map;
 
 /**
  *
@@ -22,6 +24,20 @@ class FieldCreationTest {
         Field testField = new AnyField("anon");
         Assertions.assertEquals(testField.getName(), "anon");
         Assertions.assertEquals(testField.getType(), "any");
+    }
+
+    @Test
+    @DisplayName("Create AnyField, full constructor")
+    void testAnyFieldCreation2() throws Exception{
+        Field testField = new AnyField("anon", Field.FIELD_FORMAT_DEFAULT, "title", "descriptions",
+                new URI("https://github.com"), null, null);
+        Assertions.assertEquals( "anon", testField.getName());
+        Assertions.assertEquals( "any", testField.getType());
+        Assertions.assertEquals("title", testField.getTitle());
+        Assertions.assertEquals("descriptions", testField.getDescription());
+        Assertions.assertEquals(new URI("https://github.com"), testField.getRdfType());
+        Assertions.assertNull(testField.getConstraints());
+        Assertions.assertNull(testField.getOptions());
     }
 
     @Test
@@ -317,6 +333,23 @@ class FieldCreationTest {
         Assertions.assertTrue(testField instanceof AnyField);
         Assertions.assertEquals(testField.getName(), "anon");
         Assertions.assertEquals(testField.getType(), "any");
+    }
+
+
+    // spec: https://frictionlessdata.io/specs/table-schema/#rich-types
+    @Test
+    @DisplayName("Test fix for Issue https://github.com/frictionlessdata/tableschema-java/issues/21")
+    void testIssue22() {
+        String testJson =
+                "        {\n" +
+                "          \"name\": \"Country\",\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"rdfType\": \"http://schema.org/Country\"\n" +
+                "        }\n";
+        Field testField = Field.fromJson(testJson);
+        Assertions.assertEquals( "Country", testField.getName());
+        Assertions.assertEquals("string", testField.getType());
+        Assertions.assertEquals("http://schema.org/Country", testField.getRdfType().toString());
     }
 
 }
