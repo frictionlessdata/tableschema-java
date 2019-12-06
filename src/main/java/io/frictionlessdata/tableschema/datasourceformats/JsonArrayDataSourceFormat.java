@@ -1,27 +1,24 @@
-package io.frictionlessdata.tableschema.datasources;
+package io.frictionlessdata.tableschema.datasourceformats;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
 import org.json.CDL;
 import org.json.JSONArray;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.Iterator;
 import java.util.stream.Collectors;
 
 /**
  *
  */
-public class JsonArrayDataSource extends AbstractDataSource {
+public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
 
-    JsonArrayDataSource(JSONArray dataSource){
+    JsonArrayDataSourceFormat(JSONArray dataSource){
         super(dataSource.toString());
     }
 
-    public JsonArrayDataSource(InputStream inStream) throws IOException {
+    public JsonArrayDataSourceFormat(InputStream inStream) throws IOException {
        //this(new JSONArray(inStream));
         InputStreamReader inputStreamReader = new InputStreamReader(inStream, Charset.forName("UTF-8"));
         BufferedReader br = new BufferedReader(inputStreamReader);

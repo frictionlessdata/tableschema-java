@@ -2,14 +2,13 @@ package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
-import io.frictionlessdata.tableschema.datasources.CsvDataSource;
-import io.frictionlessdata.tableschema.datasources.DataSource;
+import io.frictionlessdata.tableschema.datasourceformats.CsvDataSourceFormat;
+import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import java.io.File;
 
 import io.frictionlessdata.tableschema.iterator.TableIterator;
 import org.apache.commons.csv.CSVFormat;
-import org.json.*;
 
 import java.io.InputStream;
 import java.io.Writer;
@@ -21,7 +20,7 @@ import java.util.*;
  * 
  */
 public class Table{
-    private DataSource dataSource = null;
+    private DataSourceFormat dataSourceFormat = null;
     private Schema schema = null;
     private CSVFormat format;
     private Map<String, Object> fieldOptions;
@@ -31,7 +30,7 @@ public class Table{
      * @param dataSource the CSV or JSON content for the Table
      */
     public Table(String dataSource) {
-        this.dataSource = DataSource.createDataSource(dataSource);
+        this.dataSourceFormat = DataSourceFormat.createDataSource(dataSource);
     }
 
     /**
@@ -42,30 +41,30 @@ public class Table{
      * @throws Exception if either reading or parsing throws an Exception
      */
     public Table(InputStream dataSource, InputStream schema) throws Exception{
-        this.dataSource = DataSource.createDataSource(dataSource);
+        this.dataSourceFormat = DataSourceFormat.createDataSource(dataSource);
         this.schema = new Schema(schema, true);
     }
 
     public Table(File dataSource, File basePath) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource, basePath);
+        this.dataSourceFormat = new CsvDataSourceFormat(dataSource, basePath);
     }
 
     public Table(File dataSource, File basePath, Schema schema) throws Exception{
-        this.dataSource = new CsvDataSource(dataSource, basePath);
+        this.dataSourceFormat = new CsvDataSourceFormat(dataSource, basePath);
         this.schema = schema;
     }
 
     public Table(String dataSource, Schema schema) {
-        this.dataSource = DataSource.createDataSource(dataSource);
+        this.dataSourceFormat = DataSourceFormat.createDataSource(dataSource);
         this.schema = schema;
     }
 
     public Table(URL dataSource) {
-        this.dataSource = new CsvDataSource(dataSource);
+        this.dataSourceFormat = new CsvDataSourceFormat(dataSource);
     }
 
     public Table(URL dataSource, Schema schema) {
-        this.dataSource = new CsvDataSource(dataSource);
+        this.dataSourceFormat = new CsvDataSourceFormat(dataSource);
         this.schema = schema;
     }
     
@@ -98,7 +97,7 @@ public class Table{
     }
     
     public String[] getHeaders() throws Exception{
-        return this.dataSource.getHeaders();
+        return this.dataSourceFormat.getHeaders();
     }
 
     public List<Object[]> read(boolean cast) throws Exception{
@@ -126,11 +125,11 @@ public class Table{
     }
 
     public void writeCsv(Writer out, CSVFormat format) {
-        this.dataSource.writeCsv(out, format);
+        this.dataSourceFormat.writeCsv(out, format);
     }
 
     public void writeCsv(File outputFile, CSVFormat format) throws Exception{
-        this.dataSource.writeCsv(outputFile, format);
+        this.dataSourceFormat.writeCsv(outputFile, format);
     }
     
     public Schema inferSchema() throws TypeInferringException{
@@ -150,8 +149,8 @@ public class Table{
 
     public Table setCsvFormat(CSVFormat format) {
         this.format = format;
-        if ((null != dataSource) && (dataSource instanceof CsvDataSource)) {
-            ((CsvDataSource)dataSource).format(format);
+        if ((null != dataSourceFormat) && (dataSourceFormat instanceof CsvDataSourceFormat)) {
+            ((CsvDataSourceFormat) dataSourceFormat).format(format);
         }
         return this;
     }
@@ -172,8 +171,8 @@ public class Table{
         return this.schema;
     }
     
-    public DataSource dataSource(){
-        return this.dataSource;
+    public DataSourceFormat dataSource(){
+        return this.dataSourceFormat;
     }
 
     @Override
@@ -201,7 +200,7 @@ public class Table{
 
     @Override
     public int hashCode() {
-        return Objects.hash(dataSource, schema, format);
+        return Objects.hash(dataSourceFormat, schema, format);
     }
 
 }

@@ -1,4 +1,4 @@
-package io.frictionlessdata.tableschema.datasources;
+package io.frictionlessdata.tableschema.datasourceformats;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -18,15 +18,15 @@ import java.util.stream.Collectors;
 /**
  *
  */
-public class CsvDataSource extends AbstractDataSource {
+public class CsvDataSourceFormat extends AbstractDataSourceFormat {
 
     private CSVFormat format = CSVFormat
             .RFC4180
             .withHeader();;
 
-    public CsvDataSource(){};
+    public CsvDataSourceFormat(){};
 
-    public CsvDataSource(InputStream inStream) throws Exception{
+    public CsvDataSourceFormat(InputStream inStream) throws Exception{
         InputStreamReader inputStreamReader = new InputStreamReader(inStream, Charset.forName("UTF-8"));
         BufferedReader br = new BufferedReader(inputStreamReader);
 
@@ -48,20 +48,20 @@ public class CsvDataSource extends AbstractDataSource {
         throw new IllegalArgumentException("Input seems to be in JSON format");
     }
 
-    public CsvDataSource(URL dataSource){
+    public CsvDataSourceFormat(URL dataSource){
         super(dataSource);
     }
     
-    public CsvDataSource(File dataSource, File workDir){
+    public CsvDataSourceFormat(File dataSource, File workDir){
         super(dataSource, workDir);
     }
     
-    public CsvDataSource(String dataSource){
+    public CsvDataSourceFormat(String dataSource){
         super(dataSource);
     }
 
 
-    public CsvDataSource format(CSVFormat format) {
+    public CsvDataSourceFormat format(CSVFormat format) {
         this.format = format;
         return this;
     }

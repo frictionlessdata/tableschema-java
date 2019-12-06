@@ -1,7 +1,7 @@
 /*
  *
  */
-package io.frictionlessdata.tableschema.datasources;
+package io.frictionlessdata.tableschema.datasourceformats;
 
 import org.apache.commons.csv.CSVFormat;
 import org.json.JSONArray;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 /**
  * Interface for a source of tabular data.
  */
-public interface DataSource {  
+public interface DataSourceFormat {
     public Iterator<String[]> iterator() throws Exception;
     public String[] getHeaders() throws Exception;
     public List<String[]> data() throws Exception;
@@ -48,13 +48,13 @@ public interface DataSource {
      * CsvDataSource based on input format
      * @return DataSource created from input String
      */
-    public static DataSource createDataSource(String input) {
+    public static DataSourceFormat createDataSource(String input) {
         try {
             JSONArray arr = new JSONArray(input);
-            return new JsonArrayDataSource(arr);
+            return new JsonArrayDataSourceFormat(arr);
         } catch (JSONException ex) {
             // JSON parsing failed, treat it as a CSV
-            return new CsvDataSource(input);
+            return new CsvDataSourceFormat(input);
         }
     }
 
@@ -63,8 +63,8 @@ public interface DataSource {
      * CsvDataSource based on input format
      * @return DataSource created from input File
      */
-    public static DataSource createDataSource(File input, File workDir) throws IOException {
-        Path resolvedPath = DataSource.toSecure(input.toPath(), workDir.toPath());
+    public static DataSourceFormat createDataSource(File input, File workDir) throws IOException {
+        Path resolvedPath = DataSourceFormat.toSecure(input.toPath(), workDir.toPath());
         try (InputStream is = new FileInputStream(resolvedPath.toFile())) { // Read the file.
             return createDataSource(is);
         }
@@ -75,7 +75,7 @@ public interface DataSource {
      * CsvDataSource based on input format
      * @return DataSource created from input String
      */
-    public static DataSource createDataSource(InputStream input) throws IOException {
+    public static DataSourceFormat createDataSource(InputStream input) throws IOException {
         String content = null;
 
         // Read the file.

@@ -1,11 +1,10 @@
-package io.frictionlessdata.tableschema.datasources;
+package io.frictionlessdata.tableschema.datasourceformats;
 
 import com.google.common.collect.Iterators;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
-import org.json.JSONArray;
 
 import java.io.*;
 import java.net.URL;
@@ -23,23 +22,23 @@ import java.util.zip.ZipFile;
  *
  * 
  */
-public abstract class AbstractDataSource implements DataSource {
+public abstract class AbstractDataSourceFormat implements DataSourceFormat {
     Object dataSource = null;
     File workDir;
 
-    AbstractDataSource(){}
+    AbstractDataSourceFormat(){}
 
 
-    public AbstractDataSource(URL dataSource){
+    public AbstractDataSourceFormat(URL dataSource){
         this.dataSource = dataSource;
     }
 
-    public AbstractDataSource(File dataSource, File workDir){
+    public AbstractDataSourceFormat(File dataSource, File workDir){
         this.dataSource = dataSource;
         this.workDir = workDir;
     }
 
-    public AbstractDataSource(String dataSource){
+    public AbstractDataSourceFormat(String dataSource){
         this.dataSource = dataSource;
     }
 
@@ -137,7 +136,7 @@ public abstract class AbstractDataSource implements DataSource {
             //    - https://github.com/frictionlessdata/tableschema-java/issues/29
             //    - https://frictionlessdata.io/specs/data-resource/#url-or-path
             Path inPath = ((File)dataSource).toPath();
-            Path resolvedPath = DataSource.toSecure(inPath, workDir.toPath());
+            Path resolvedPath = DataSourceFormat.toSecure(inPath, workDir.toPath());
 
             // Read the file.
             try (BufferedReader rdr = new BufferedReader(new FileReader(resolvedPath.toFile()))) {
