@@ -74,19 +74,27 @@ public class Table{
     }
 
     public Iterator<Object[]> iterator() throws Exception{
-       return new TableIterator<Object[]>(this);
+       return new TableIterator<>(this, false, false, true, false);
     }
 
     public Iterator<Object[]> iterator(boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
-       return new TableIterator<Object[]>(this, keyed, extended, cast, relations);
+       return new TableIterator<>(this, keyed, extended, cast, relations);
+    }
+
+    public Iterator<String[]> stringArrayIterator() throws Exception{
+        return new TableIterator<>(this, false, false, true, false);
+    }
+
+    public Iterator<String[]> stringArrayIterator(boolean extended, boolean relations) throws Exception{
+        return new TableIterator<>(this, false, extended, true, relations);
     }
 
     public Iterator<Map> keyedIterator() throws Exception{
-        return new TableIterator<Map>(this);
+        return new TableIterator<Map>(this, true, false, true, false);
     }
 
-    public Iterator<Map> keyedIterator(boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
-        return new TableIterator<Map>(this, keyed, extended, cast, relations);
+    public Iterator<Map> keyedIterator(boolean extended, boolean cast, boolean relations) throws Exception{
+        return new TableIterator<Map>(this, true, extended, cast, relations);
     }
     
     public String[] getHeaders() throws Exception{

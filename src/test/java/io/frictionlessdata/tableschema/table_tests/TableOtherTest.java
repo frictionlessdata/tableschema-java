@@ -164,7 +164,7 @@ public class TableOtherTest {
         File file = new File("data/employee_data.csv");
         Table employeeTable = new Table(file, testDataDir, employeeTableSchema);
         
-        Iterator<Map> iter = employeeTable.keyedIterator(true, false, false, false);
+        Iterator<Map> iter = employeeTable.keyedIterator(false, false, false);
 
         while(iter.hasNext()){
             Map row = iter.next();

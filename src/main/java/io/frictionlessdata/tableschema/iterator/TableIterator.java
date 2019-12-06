@@ -31,8 +31,8 @@ public class TableIterator<T> implements Iterator<T> {
             Table table,
             boolean keyed,
             boolean extended,
-            boolean cast, boolean
-                    relations) throws Exception{
+            boolean cast,
+            boolean relations) throws Exception{
 
         this.init(table);
         this.keyed = keyed;
