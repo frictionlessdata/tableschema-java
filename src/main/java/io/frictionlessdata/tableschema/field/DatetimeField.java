@@ -6,7 +6,6 @@ import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.json.JSONObject;
 
 import java.net.URI;
 import java.util.Map;
@@ -45,7 +44,7 @@ public class DatetimeField extends Field<DateTime> {
             return dt;
 
         }else{
-            throw new TypeInferringException();
+            throw new TypeInferringException("DateTime field not in ISO 8601 format yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         }
     }
 

@@ -30,7 +30,7 @@ public class GeopointField extends Field<int[]> {
     public int[] parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
         try{
-            if(format.equalsIgnoreCase(io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_DEFAULT)){
+            if(format.equalsIgnoreCase(Field.FIELD_FORMAT_DEFAULT)){
                 String[] geopoint = value.split(",");
 
                 if(geopoint.length == 2){
@@ -44,7 +44,7 @@ public class GeopointField extends Field<int[]> {
                     throw new TypeInferringException("Geo points must have two coordinates");
                 }
 
-            }else if(format.equalsIgnoreCase(io.frictionlessdata.tableschema.field.Field.FIELD_FORMAT_ARRAY)){
+            }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_ARRAY)){
 
                 // This will throw an exception if the value is not an array.
                 JSONArray jsonArray = new JSONArray(value);
@@ -98,5 +98,14 @@ public class GeopointField extends Field<int[]> {
                 return FIELD_FORMAT_DEFAULT;
             }
         }
+    }
+
+    @Override
+    public String[] formats() {
+        return new String[]{
+                FIELD_FORMAT_DEFAULT,
+                FIELD_FORMAT_ARRAY,
+                FIELD_FORMAT_OBJECT
+        };
     }
 }

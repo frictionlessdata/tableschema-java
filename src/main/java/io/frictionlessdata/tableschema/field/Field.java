@@ -174,6 +174,17 @@ public abstract class Field<T> {
         return field;
     }
 
+    /**
+     * Default implementation signals a Field only accepts
+     * "default" as a format. More complex Fields override this
+     * to accept additional formats.
+     * @return Array of acceptable formats
+     */
+    public String[] formats(){
+        return new String[]{
+            Field.FIELD_FORMAT_DEFAULT
+        };
+    }
 
     public abstract T parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException;
@@ -486,11 +497,23 @@ public abstract class Field<T> {
     public String getJson(){
         //FIXME: Maybe we should use JSON serializer like Gson?
         JSONObject json = new JSONObject();
-        json.put(JSON_KEY_NAME, this.name);
-        json.put(JSON_KEY_TYPE, this.type);
-        json.put(JSON_KEY_FORMAT, this.format);
-        json.put(JSON_KEY_TITLE, this.title);
-        json.put(JSON_KEY_DESCRIPTION, this.description);
+
+        if (!StringUtils.isEmpty(name)) {
+            json.put(JSON_KEY_NAME, name);
+        }
+        if (!StringUtils.isEmpty(type)) {
+            json.put(JSON_KEY_TYPE, type);
+        }
+        if (!StringUtils.isEmpty(format)) {
+            json.put(JSON_KEY_FORMAT, format);
+        }
+        if (!StringUtils.isEmpty(title)) {
+            json.put(JSON_KEY_TITLE, title);
+        }
+
+        if (!StringUtils.isEmpty(description)) {
+            json.put(JSON_KEY_DESCRIPTION, description);
+        }
         if ((null != constraints) && (!constraints.isEmpty()))
             json.put(JSON_KEY_CONSTRAINTS, this.constraints);
         
@@ -541,6 +564,29 @@ public abstract class Field<T> {
 
     public void setOptions(Map<String, Object> options) {
         this.options = options;
+    }
+
+    /**
+     * Similar to {@link #equals(Object)}, but disregards the `format` property
+     * to allow for Schemas that are similar except that Fields have no
+     * defined format. Also treats null and empty string the same for `name` and
+     * `type`.
+     *
+     * @param other the Field to compare against
+     * @return true if the other Field is equals ignoring the format, false otherwise
+     */
+    public boolean similar(Field other) {
+        if (this == other) return true;
+        if (other == null || getClass() != other.getClass()) return false;
+        if ((!StringUtils.isEmpty(name)) && (!StringUtils.isEmpty(other.name))){
+            if (!name.equals(other.name))
+                return false;
+        }
+        if ((!StringUtils.isEmpty(type)) && (!StringUtils.isEmpty(other.type))){
+            if (!type.equals(other.type))
+                return false;
+        }
+        return Objects.equals(constraints, other.constraints);
     }
 
     @Override

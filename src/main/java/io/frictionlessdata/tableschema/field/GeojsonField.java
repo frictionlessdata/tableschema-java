@@ -53,6 +53,14 @@ public class GeojsonField extends Field<JSONObject> {
     }
 
 
+    @Override
+    public String[] formats() {
+        return new String[]{
+                FIELD_FORMAT_DEFAULT,
+                FIELD_FORMAT_TOPOJSON
+        };
+    }
+
     /**
      * We only want to go through this initialization if we have to because it's a
      * performance issue the first time it is executed.
@@ -61,7 +69,7 @@ public class GeojsonField extends Field<JSONObject> {
      * @param json String-encoded JSON object
      * @throws ValidationException if validation fails
      */
-    void validateGeoJsonSchema(String json) throws ValidationException{
+    private void validateGeoJsonSchema(String json) throws ValidationException{
         if(this.geoJsonSchema == null){
             // FIXME: Maybe this infering against geojson scheme is too much.
             // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
@@ -80,7 +88,7 @@ public class GeojsonField extends Field<JSONObject> {
      * call it when it is actually required after trying all other type inferral.
      * @param json String-encoded JSON object
      */
-    void validateTopoJsonSchema(String json){
+    private void validateTopoJsonSchema(String json){
         if(topoJsonSchema == null){
             // FIXME: Maybe this infering against topojson scheme is too much.
             // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema

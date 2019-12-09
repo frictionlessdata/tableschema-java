@@ -16,9 +16,8 @@ public class SimpleTableIterator extends TableIterator<String[]> {
             Table table,
             boolean keyed,
             boolean extended,
-            boolean cast,
             boolean relations) throws Exception{
-        super(table, keyed, extended, cast,  relations);
+        super(table, keyed, extended, false,  relations);
     }
 
 }
