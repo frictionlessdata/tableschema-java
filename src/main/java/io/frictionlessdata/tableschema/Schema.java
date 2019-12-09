@@ -64,18 +64,32 @@ public class Schema {
     }
 
     /**
+     * Create and validate a new table schema using a collection of fields.
+     *
+     * @param fields the fields to use for the Table
+     * @param strict whether to enforce strict validation
+     * @throws ValidationException thrown if parsing throws an exception
+     */
+    public Schema(Collection<Field> fields, boolean strict) throws ValidationException{
+        this.strictValidation = strict;
+        this.fields = new ArrayList<>(fields);
+
+        initValidator();
+        validate();
+    }
+
+    /**
      * Read, create, and validate a table schema from an {@link java.io.InputStream}.
      *
      * @param inStream the InputStream to read the schema JSON data from
      * @param strict whether to enforce strict validation
      * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
-    public Schema (InputStream inStream, boolean strict) throws IOException {
-        this.strictValidation = strict;
-        this.initValidator();
-        initSchemaFromStream(inStream);
-
-        validate();
+    public static Schema fromJson (InputStream inStream, boolean strict) throws IOException {
+        Schema schema = new Schema(strict);
+        schema.initSchemaFromStream(inStream);
+        schema.validate();
+        return schema;
     }
 
     /**
@@ -85,8 +99,8 @@ public class Schema {
      * @param strict whether to enforce strict validation
      * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
-    public Schema(URL schemaUrl, boolean strict) throws Exception{
-        this(schemaUrl.openStream(), strict);
+    public static Schema fromJson(URL schemaUrl, boolean strict) throws Exception{
+        return fromJson (schemaUrl.openStream(), strict);
     }
 
     /**
@@ -96,8 +110,8 @@ public class Schema {
      * @param strict whether to enforce strict validation
      * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
-    public Schema(File schemaFile, boolean strict) throws Exception {
-        this(new FileInputStream(schemaFile), strict);
+    public static Schema fromJson (File schemaFile, boolean strict) throws Exception {
+        return fromJson (new FileInputStream(schemaFile), strict);
     }
     /**
      * Read, create, and validate a table schema from a JSON string.
@@ -106,23 +120,10 @@ public class Schema {
      * @param strict whether to enforce strict validation
      * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
-    public Schema(String schemaJson, boolean strict) throws IOException {
-        this(new ByteArrayInputStream(schemaJson.getBytes()), strict);
+    public  static Schema fromJson (String schemaJson, boolean strict) throws IOException {
+        return fromJson (new ByteArrayInputStream(schemaJson.getBytes()), strict);
     }
 
-    /**
-     * Read, create, and validate a table schema using a collection of fields.
-     * @param fields the fields to use for the Table
-     * @param strict whether to enforce strict validation
-     * @throws ValidationException thrown if parsing throws an exception
-     */
-    public Schema(Collection<Field> fields, boolean strict) throws ValidationException{
-        this.strictValidation = strict;
-        this.fields = new ArrayList<>(fields);
-        
-        initValidator(); 
-        validate();
-    }
 
     public static Schema infer(Class beanClass) throws NoSuchFieldException {
         List<Field> fields = new ArrayList<>();
@@ -204,7 +205,7 @@ public class Schema {
      * @throws TypeInferringException 
      */
     public static Schema infer(List<Object[]> data, String[] headers) throws TypeInferringException, IOException {
-        return new Schema(TypeInferrer.getInstance().infer(data, headers), true);
+        return fromJson(TypeInferrer.getInstance().infer(data, headers), true);
     }
     
     /**
@@ -216,7 +217,7 @@ public class Schema {
      * @throws TypeInferringException 
      */
     public static Schema infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException, IOException {
-        return new Schema(TypeInferrer.getInstance().infer(data, headers, rowLimit), true);
+        return fromJson(TypeInferrer.getInstance().infer(data, headers, rowLimit), true);
     }
     
     /**
