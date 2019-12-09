@@ -2,6 +2,7 @@ package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.field.GeopointField;
+import io.frictionlessdata.tableschema.field.IntegerField;
 import io.frictionlessdata.tableschema.field.StringField;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +18,31 @@ import java.util.List;
  * the examples are still valid
  */
 class DocumentationCases {
+
+    /**
+     * Example
+     * https://github.com/frictionlessdata/tableschema-java#parsing-a-csv-using-a-schema
+     */
+
+    @Test
+    @DisplayName("Parsing a CSV using a Schema")
+    void csvParsingWithSchema() throws Exception{
+        // Let's start by defining and building the schema of a table that contains data on employees:
+        Schema schema = new Schema();
+
+        schema.addField(new IntegerField("id"));
+        schema.addField(new StringField("title"));
+        // Load the data from URL with the schema.
+        Table table = new Table(
+                new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/data/simple_data.csv"),
+                schema);
+
+        List<Object[]> allData = table.read();
+
+        // [1, foo]
+        // [2, bar]
+        // [3, baz]
+    }
 
     /**
      * Example
