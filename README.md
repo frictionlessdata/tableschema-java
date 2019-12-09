@@ -11,7 +11,7 @@ A Java library for working with Table Schema. Snapshots on [Jitpack](https://jit
 
 
 tableschema-java is a library aimed at parsing CSV and JSON-Array documents into a tabular format according 
-to a [Table Schema](https://frictionlessdata.io/specs/table-schema/), a format definition based on 
+to [Table Schema](https://frictionlessdata.io/specs/table-schema/), a format definition based on 
 [JSON Schema](https://json-schema.org/understanding-json-schema/).
 
 It allows you to read and write tabular data with assurances to format integrity (it also allows reading and writing
@@ -22,7 +22,7 @@ CSV free-form, ie. without a Schema).
 
 
 ```java
-// Let's start by defining and building the schema of a table that contains data on employees:
+// Let's start by defining and building the schema of a table with an `id`- and a `title` column:
 Schema schema = new Schema();
 
 schema.addField(new IntegerField("id"));
