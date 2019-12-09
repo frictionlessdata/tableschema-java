@@ -7,6 +7,7 @@ import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import java.io.File;
 
+import io.frictionlessdata.tableschema.iterator.SimpleTableIterator;
 import io.frictionlessdata.tableschema.iterator.TableIterator;
 import org.apache.commons.csv.CSVFormat;
 
@@ -81,11 +82,11 @@ public class Table{
     }
 
     public Iterator<String[]> stringArrayIterator() throws Exception{
-        return new TableIterator<>(this, false, false, true, false);
+        return new SimpleTableIterator(this, false);
     }
 
-    public Iterator<String[]> stringArrayIterator(boolean extended, boolean relations) throws Exception{
-        return new TableIterator<>(this, false, extended, true, relations);
+    public Iterator<String[]> stringArrayIterator(boolean relations) throws Exception{
+        return new SimpleTableIterator(this, relations);
     }
 
     public Iterator<Map> keyedIterator() throws Exception{

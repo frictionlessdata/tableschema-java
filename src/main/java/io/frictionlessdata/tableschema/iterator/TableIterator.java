@@ -2,6 +2,7 @@ package io.frictionlessdata.tableschema.iterator;
 
 import io.frictionlessdata.tableschema.Schema;
 import io.frictionlessdata.tableschema.Table;
+import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import io.frictionlessdata.tableschema.field.Field;
 
 import java.util.HashMap;
@@ -15,13 +16,15 @@ import java.util.Map;
 public class TableIterator<T> implements Iterator<T> {
     String[] headers = null;
     Schema schema = null;
-    Iterator<String[]> iter = null;
+    Iterator<String[]> wrappedIterator = null;
     boolean keyed;
     boolean extended;
     boolean cast;
     boolean relations;
     Map<String, Object> fieldOptions;
     int index = 0;
+
+    TableIterator() {    }
 
     public TableIterator(Table table) throws Exception{
         this(table, false, false, true, false);
@@ -41,16 +44,69 @@ public class TableIterator<T> implements Iterator<T> {
         this.relations = relations;
     }
 
-    private void init(Table table) throws Exception{
+    void init(Table table) throws Exception{
         this.fieldOptions = table.getFieldOptions();
         this.headers = table.getHeaders();
         this.schema = table.schema();
-        this.iter = table.dataSource().iterator();
+        this.wrappedIterator = table.dataSource().iterator();
+    }
+
+    static TableIterator fromTable(Table table) throws Exception {
+        return new SimpleTableIterator(table);
+    }
+
+    TableIterator withSchema(Schema schema) {
+        TableIterator newIter = null;
+        try {
+            newIter = this.getClass().newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new TableSchemaException(e);
+        }
+        newIter.fieldOptions = fieldOptions;
+        newIter.headers = headers;
+        newIter.wrappedIterator = wrappedIterator;
+        newIter.keyed = keyed;
+        newIter.extended = extended;
+        newIter.cast = cast;
+        newIter.relations = relations;
+        newIter.schema = schema;
+        return newIter;
+    }
+
+    TableIterator withExtendedRows(boolean extended) {
+        TableIterator newIter = null;
+        try {
+            newIter = this.getClass().newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new TableSchemaException(e);
+        }
+        newIter.fieldOptions = fieldOptions;
+        newIter.headers = headers;
+        newIter.wrappedIterator = wrappedIterator;
+        newIter.schema = schema;
+        newIter.keyed = keyed;
+        newIter.extended = extended;
+        newIter.cast = cast;
+        newIter.relations = relations;
+        return newIter;
+    }
+
+    TableIterator withKeyedRows(boolean extended) {
+        TableIterator newIter = new TableIterator();
+        newIter.fieldOptions = fieldOptions;
+        newIter.headers = headers;
+        newIter.wrappedIterator = wrappedIterator;
+        newIter.schema = schema;
+        newIter.keyed = keyed;
+        newIter.extended = extended;
+        newIter.cast = cast;
+        newIter.relations = relations;
+        return newIter;
     }
 
     @Override
     public boolean hasNext() {
-        return this.iter.hasNext();
+        return this.wrappedIterator.hasNext();
     }
 
     @Override
@@ -60,7 +116,7 @@ public class TableIterator<T> implements Iterator<T> {
 
     @Override
     public T next() {
-        String[] row = this.iter.next();
+        String[] row = this.wrappedIterator.next();
 
         Map<String, Object> keyedRow = new HashMap();
         Object[] extendedRow;
