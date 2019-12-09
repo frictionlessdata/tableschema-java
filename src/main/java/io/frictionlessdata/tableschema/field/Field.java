@@ -594,7 +594,7 @@ public abstract class Field<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Field field = (Field) o;
-        return name.equals(field.name) &&
+        return name.equalsIgnoreCase(field.name) &&
                 type.equals(field.type) &&
                 Objects.equals(format, field.format) &&
                 Objects.equals(constraints, field.constraints);
