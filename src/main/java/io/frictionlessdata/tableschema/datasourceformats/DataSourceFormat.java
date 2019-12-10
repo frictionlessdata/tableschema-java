@@ -18,23 +18,23 @@ import java.util.stream.Collectors;
  * Interface for a source of tabular data.
  */
 public interface DataSourceFormat {
-    public Iterator<String[]> iterator() throws Exception;
-    public String[] getHeaders() throws Exception;
-    public List<String[]> data() throws Exception;
+    Iterator<String[]> iterator() throws Exception;
+    String[] getHeaders() throws Exception;
+    List<String[]> data() throws Exception;
 
     /**
      * Write to native format
      * @param outputFile the File to write to
      * @throws Exception thrown if write operation fails
      */
-    public void write(File outputFile) throws Exception;
+    void write(File outputFile) throws Exception;
 
     /**
      * Write as CSV, the `format` parameter decides on the CSV options
      * @param out the Writer to write to
      * @throws Exception thrown if write operation fails
      */
-    public void writeCsv(Writer out, CSVFormat format);
+    void writeCsv(Writer out, CSVFormat format);
 
     /**
      * Write as CSV file, the `format` parameter decides on the CSV options
@@ -48,7 +48,7 @@ public interface DataSourceFormat {
      * CsvDataSource based on input format
      * @return DataSource created from input String
      */
-    public static DataSourceFormat createDataSource(String input) {
+    static DataSourceFormat createDataSource(String input) {
         try {
             JSONArray arr = new JSONArray(input);
             return new JsonArrayDataSourceFormat(arr);
@@ -63,19 +63,21 @@ public interface DataSourceFormat {
      * CsvDataSource based on input format
      * @return DataSource created from input File
      */
-    public static DataSourceFormat createDataSource(File input, File workDir) throws IOException {
+    static DataSourceFormat createDataSource(File input, File workDir) throws IOException {
         Path resolvedPath = DataSourceFormat.toSecure(input.toPath(), workDir.toPath());
         try (InputStream is = new FileInputStream(resolvedPath.toFile())) { // Read the file.
             return createDataSource(is);
         }
     }
 
+
+
     /**
      * Factory method to instantiate either a JsonArrayDataSource or a
      * CsvDataSource based on input format
      * @return DataSource created from input String
      */
-    public static DataSourceFormat createDataSource(InputStream input) throws IOException {
+    static DataSourceFormat createDataSource(InputStream input) throws IOException {
         String content = null;
 
         // Read the file.
@@ -91,7 +93,7 @@ public interface DataSourceFormat {
     }
 
     //https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html
-    public static Path toSecure(Path testPath, Path referencePath) throws IOException {
+    static Path toSecure(Path testPath, Path referencePath) throws IOException {
         // catch paths starting with "/" but on Windows where they get rewritten
         // to start with "\"
         if (testPath.startsWith(File.separator))

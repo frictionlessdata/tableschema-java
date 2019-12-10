@@ -22,7 +22,7 @@ class TableIteratorTest {
     void setUp() throws Exception {
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
         try (FileInputStream fis = new FileInputStream(f)) {
-            validPopulationSchema = new Schema(fis, false);
+            validPopulationSchema = Schema.fromJson (fis, false);
         }
         File testDataDir = getTestDataDirectory();
         File file = new File("data/population.csv");

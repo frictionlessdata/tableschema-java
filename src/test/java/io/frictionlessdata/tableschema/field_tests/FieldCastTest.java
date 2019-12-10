@@ -378,7 +378,7 @@ class FieldCastTest {
         File schemaFile = new File(TestHelper.getTestDataDirectory(), "schema/gdp_schema.json");
         Schema schema = null;
         try (FileInputStream fis = new FileInputStream(schemaFile)) {
-            schema = new Schema(fis, false);
+            schema = Schema.fromJson (fis, false);
         }
         Table table = new Table(f, TestHelper.getTestDataDirectory(), schema);
         Iterator iter = table.iterator(true, false, true, false);

@@ -35,7 +35,7 @@ class FieldOptionsTest {
         File f = new File(getTestDataDirectory(), "schema/employee_schema.json");
         Schema schema;
         try (FileInputStream fis = new FileInputStream(f)) {
-            schema = new Schema(fis, false);
+            schema = Schema.fromJson (fis, false);
         }
         File file = new File("data/employee_data_alternative_boolean.csv");
         Table table = new Table(file, getTestDataDirectory(), schema);
@@ -72,7 +72,7 @@ class FieldOptionsTest {
         File f = new File(getTestDataDirectory(), "schema/employee_schema.json");
         Schema schema;
         try (FileInputStream fis = new FileInputStream(f)) {
-            schema = new Schema(fis, false);
+            schema = Schema.fromJson (fis, false);
         }
         File file = new File("data/employee_data_alternative_boolean.csv");
         Table table = new Table(file, getTestDataDirectory(), schema);

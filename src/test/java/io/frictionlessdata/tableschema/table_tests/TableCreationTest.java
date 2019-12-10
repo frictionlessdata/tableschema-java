@@ -91,7 +91,7 @@ public class TableCreationTest {
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema expectedSchema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
-            expectedSchema = new Schema(fis, false);
+            expectedSchema = Schema.fromJson (fis, false);
         }
 
         if (!expectedSchema.equals(schema)) {
@@ -109,12 +109,12 @@ public class TableCreationTest {
     public void testReadFromValidJSONArrayWithSchema() throws Exception{
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
 
-        Schema schema = new Schema(f, true);
+        Schema schema = Schema.fromJson (f, true);
         Table table = new Table(populationTestJson.toString(), schema);
         Assert.assertEquals(3, table.read().size());
         Schema expectedSchema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
-            expectedSchema = new Schema(fis, false);
+            expectedSchema = Schema.fromJson (fis, false);
         }
 
         if (!expectedSchema.equals(schema)) {
@@ -148,7 +148,7 @@ public class TableCreationTest {
         Table table = new Table(tableUrl, schemaUrl);
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
-        Schema testSchema = new Schema(schemaFile, true);
+        Schema testSchema = Schema.fromJson (schemaFile, true);
         Table testTable = new Table(populationTestJson.toString(), testSchema);
 
         Assert.assertEquals(testTable, table);
@@ -167,7 +167,7 @@ public class TableCreationTest {
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema schema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
-            schema = new Schema(fis, false);
+            schema = Schema.fromJson (fis, false);
         }
 
         Table table = new Table(csvContent, schema);
@@ -217,7 +217,7 @@ public class TableCreationTest {
         Table table = new Table(bis, fis);
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
-        Schema testSchema = new Schema(schemaFile, true);
+        Schema testSchema = Schema.fromJson (schemaFile, true);
         Table testTable = new Table(populationTestJson.toString(), testSchema);
         Assert.assertEquals(testTable, table);
         try {

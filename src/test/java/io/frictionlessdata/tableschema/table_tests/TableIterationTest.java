@@ -162,7 +162,7 @@ public class TableIterationTest {
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema schema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
-            schema = new Schema(fis, false);
+            schema = Schema.fromJson (fis, false);
         }
 
         Table table = new Table(csvContent, schema);

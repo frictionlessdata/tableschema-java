@@ -87,11 +87,11 @@ public class TableOtherTest {
     @Test
     public void testReadFromValidJSONArrayWithSchema() throws Exception{
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
-        Schema schema = new Schema(schemaFile, true);
+        Schema schema = Schema.fromJson (schemaFile, true);
         Table table = new Table(populationTestJson.toString(), schema);
 
         Assert.assertEquals(3, table.read().size());
-        Schema expectedSchema = new Schema (populationSchema.toString(), true);
+        Schema expectedSchema = Schema.fromJson (populationSchema.toString(), true);
         Table expectedTable = new Table(new File(getTestDataDirectory()
                 , "data/population.csv")
                 , getTestDataDirectory(), expectedSchema);

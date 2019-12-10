@@ -43,7 +43,7 @@ public class Table{
      */
     public Table(InputStream dataSource, InputStream schema) throws Exception{
         this.dataSourceFormat = DataSourceFormat.createDataSource(dataSource);
-        this.schema = new Schema(schema, true);
+        this.schema = Schema.fromJson(schema, true);
     }
 
     public Table(File dataSource, File basePath) throws Exception{
@@ -70,7 +70,7 @@ public class Table{
     }
     
     public Table(URL dataSource, URL schema) throws Exception{
-        this(dataSource, new Schema(schema, true));
+        this(dataSource, Schema.fromJson(schema, true));
     }
 
     public Iterator<Object[]> iterator() throws Exception{
@@ -140,7 +140,7 @@ public class Table{
     public Schema inferSchema(int rowLimit) throws TypeInferringException{
         try{
             String schemaJson = TypeInferrer.getInstance().infer(read(), getHeaders(), rowLimit);
-            schema = new Schema(schemaJson, false);
+            schema = Schema.fromJson(schemaJson, true);
             return schema;
             
         }catch(Exception e){

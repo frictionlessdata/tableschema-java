@@ -113,6 +113,7 @@ public class Schema {
     public static Schema fromJson (File schemaFile, boolean strict) throws Exception {
         return fromJson (new FileInputStream(schemaFile), strict);
     }
+
     /**
      * Read, create, and validate a table schema from a JSON string.
      *
@@ -207,14 +208,14 @@ public class Schema {
     public static Schema infer(List<Object[]> data, String[] headers) throws TypeInferringException, IOException {
         return fromJson(TypeInferrer.getInstance().infer(data, headers), true);
     }
-    
+
     /**
      * Infer the data types and return the generated schema.
      * @param data
      * @param headers
      * @param rowLimit
      * @return Schema generated from the inferred input
-     * @throws TypeInferringException 
+     * @throws TypeInferringException
      */
     public static Schema infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException, IOException {
         return fromJson(TypeInferrer.getInstance().infer(data, headers, rowLimit), true);
@@ -377,7 +378,7 @@ public class Schema {
         
         return schemaJson.toString(JSON_INDENT_FACTOR);
     }
-    
+
     public Object[] castRow(String[] row) throws InvalidCastException{
         
         if(row.length != this.fields.size()){
