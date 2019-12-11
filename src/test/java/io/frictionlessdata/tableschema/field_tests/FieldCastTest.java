@@ -1,6 +1,6 @@
 package io.frictionlessdata.tableschema.field_tests;
 
-import io.frictionlessdata.tableschema.Schema;
+import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
@@ -17,7 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.Duration;
+import java.time.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -34,24 +34,24 @@ class FieldCastTest {
     @Test
     void testFieldCastGeopointDefault() throws Exception{
         GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_DEFAULT, "title", "description", null, null, null);
-        int[] val = field.castValue("12,21");
-        Assertions.assertEquals(12, val[0]);
+        double[] val = field.castValue("0.00012,21");
+        Assertions.assertEquals(0.00012, val[0]);
         Assertions.assertEquals(21, val[1]);
     }
     
     @Test
     void testFieldCastGeopointArray() throws Exception{
         GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_ARRAY, "title", "description", null, null, null);
-        int[] val = field.castValue("[45,32]");
+        double[] val = field.castValue("[45,32.54]");
         Assertions.assertEquals(45, val[0]);
-        Assertions.assertEquals(32, val[1]);   
+        Assertions.assertEquals(32.54, val[1]);
     }
     
     @Test
     void testFieldCastGeopointObject() throws Exception{
         GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_OBJECT, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
-        int[] val = field.castValue("{\"lon\": 67, \"lat\": 19}");
-        Assertions.assertEquals(67, val[0]);
+        double[] val = field.castValue("{\"lon\": 67.123, \"lat\": 19}");
+        Assertions.assertEquals(67.123, val[0]);
         Assertions.assertEquals(19, val[1]);   
     }
     
@@ -231,7 +231,7 @@ class FieldCastTest {
     @Test
     void testFieldCastObject() throws Exception{
         ObjectField field = new ObjectField("test");
-        JSONObject val = field.castValue("{\"one\": 1, \"two\": 2, \"three\": 3}");
+        JSONObject val = new JSONObject(field.castValue("{\"one\": 1, \"two\": 2, \"three\": 3}"));
         Assertions.assertEquals(3, val.length()); 
         Assertions.assertEquals(1, val.getInt("one")); 
         Assertions.assertEquals(2, val.getInt("two")); 
@@ -241,35 +241,37 @@ class FieldCastTest {
     @Test
     void testFieldCastArray() throws Exception{
         ArrayField field = new ArrayField("test");
-        JSONArray val = field.castValue("[1,2,3,4]");
+        Object[] val = field.castValue("[1,2,3,4]");
         
-        Assertions.assertEquals(4, val.length()); 
-        Assertions.assertEquals(1, val.get(0));
-        Assertions.assertEquals(2, val.get(1));
-        Assertions.assertEquals(3, val.get(2));
-        Assertions.assertEquals(4, val.get(3));
+        Assertions.assertEquals(4, val.length);
+        Assertions.assertEquals(1, val[0]);
+        Assertions.assertEquals(2, val[1]);
+        Assertions.assertEquals(3, val[2]);
+        Assertions.assertEquals(4, val[3]);
     }
     
     @Test
     void testFieldCastDateTime() throws Exception{
         DatetimeField field = new DatetimeField("test");
-        DateTime val = field.castValue("2008-08-30T01:45:36.123Z");
-        
-        Assertions.assertEquals(2008, val.withZone(DateTimeZone.UTC).getYear());
-        Assertions.assertEquals(8, val.withZone(DateTimeZone.UTC).getMonthOfYear());
-        Assertions.assertEquals(30, val.withZone(DateTimeZone.UTC).getDayOfMonth());
-        Assertions.assertEquals(1, val.withZone(DateTimeZone.UTC).getHourOfDay());
-        Assertions.assertEquals(45, val.withZone(DateTimeZone.UTC).getMinuteOfHour());
-        Assertions.assertEquals("2008-08-30T01:45:36.123Z", val.withZone(DateTimeZone.UTC).toString());
+        ZonedDateTime val = field.castValue("2008-08-30T01:45:36.123Z");
+
+        Assertions.assertEquals(2008, val.getYear());
+        Assertions.assertEquals(8, val.getMonthValue());
+        Assertions.assertEquals(30, val.getDayOfMonth());
+        Assertions.assertEquals(1, val.getHour());
+        Assertions.assertEquals(45, val.getMinute());
+        Assertions.assertEquals(36, val.getSecond());
+        Assertions.assertEquals(123000000, val.getNano());
+        Assertions.assertEquals("2008-08-30T01:45:36.123Z", val.toString());
     }
     
     @Test
     void testFieldCastDate() throws Exception{
         DateField field = new DateField("test");
-        DateTime val = field.castValue("2008-08-30");
+        LocalDate val = field.castValue("2008-08-30");
         
         Assertions.assertEquals(2008, val.getYear());
-        Assertions.assertEquals(8, val.getMonthOfYear());
+        Assertions.assertEquals(8, val.getMonthValue());
         Assertions.assertEquals(30, val.getDayOfMonth());
     }
     
@@ -286,17 +288,17 @@ class FieldCastTest {
     @Test
     void testFieldCastYear() throws Exception{
         YearField field = new YearField("test");
-        int val = field.castValue("2008");
-        Assertions.assertEquals(2008, val);
+        Year val = field.castValue("2008");
+        Assertions.assertEquals(2008, val.getValue());
     }
     
     @Test
     void testFieldCastYearmonth() throws Exception{
         YearmonthField field = new YearmonthField("test");
-        DateTime val = field.castValue("2008-08");
+        YearMonth val = field.castValue("2008-08");
         
         Assertions.assertEquals(2008, val.getYear());
-        Assertions.assertEquals(8, val.getMonthOfYear());
+        Assertions.assertEquals(8, val.getMonthValue());
     }
     
     @Test
@@ -378,7 +380,7 @@ class FieldCastTest {
         File schemaFile = new File(TestHelper.getTestDataDirectory(), "schema/gdp_schema.json");
         Schema schema = null;
         try (FileInputStream fis = new FileInputStream(schemaFile)) {
-            schema = new Schema(fis, false);
+            schema = Schema.fromJson (fis, false);
         }
         Table table = new Table(f, TestHelper.getTestDataDirectory(), schema);
         Iterator iter = table.iterator(true, false, true, false);

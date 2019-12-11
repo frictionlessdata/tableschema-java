@@ -1,4 +1,4 @@
-package io.frictionlessdata.tableschema;
+package io.frictionlessdata.tableschema.schema;
 
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
 
@@ -151,13 +151,12 @@ public class TypeInferrer {
 
         // Now that the types have been inferred and set, we build and return the schema object.
         JSONObject schemaJsonObject = new JSONObject();
-        schemaJsonObject.put(io.frictionlessdata.tableschema.Schema.JSON_KEY_FIELDS, fieldArray);
+        schemaJsonObject.put(Schema.JSON_KEY_FIELDS, fieldArray);
         
         return schemaJsonObject.toString();
     }
     
     private void findType(String header, String datum){
-        
         // Go through all the field types and call their parsing method to find
         // the first that won't throw
         for(String[] typeInferralDefinition: TYPE_INFERRAL_ORDER_LIST){

@@ -34,6 +34,19 @@ public class EmployeeBean {
 
  private JSONObject info;
 
+ @Override
+ public String toString() {
+  return "EmployeeBean{" +
+          "id=" + id +
+          ", name='" + name + '\'' +
+          ", dateOfBirth=" + dateOfBirth +
+          ", admin=" + admin +
+          ", addressCoordinates=" + addressCoordinates +
+          ", contractLength=" + contractLength +
+          ", info=" + info +
+          '}';
+ }
+
  public Integer getId() {
   return id;
  }
@@ -56,6 +69,14 @@ public class EmployeeBean {
 
  public void setDateOfBirth(LocalDate dateOfBirth) {
   this.dateOfBirth = dateOfBirth;
+ }
+
+ public Boolean getAdmin() {
+  return admin;
+ }
+
+ public void setAdmin(Boolean admin) {
+  this.admin = admin;
  }
 
  public Coordinate getAddressCoordinates() {

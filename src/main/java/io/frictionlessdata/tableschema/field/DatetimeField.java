@@ -3,16 +3,16 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.net.URI;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DatetimeField extends Field<DateTime> {
+public class DatetimeField extends Field<ZonedDateTime> {
     // ISO 8601 format of yyyy-MM-dd'T'HH:mm:ss.SSSZ in UTC time
     private static final String REGEX_DATETIME
             = "(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?";
@@ -31,22 +31,28 @@ public class DatetimeField extends Field<DateTime> {
     }
 
     @Override
-    public DateTime parseValue(String value, String format, Map<String, Object> options)
+    public ZonedDateTime parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
 
         Pattern pattern = Pattern.compile(REGEX_DATETIME);
         Matcher matcher = pattern.matcher(value);
 
         if(matcher.matches()){
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-            DateTime dt = formatter.parseDateTime(value);
+            String locValue = value.endsWith("Z") ? value.replace("Z", "")+"+0000" : value;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+            TemporalAccessor dt = formatter.parse(locValue);
 
-            return dt;
-
+            return ZonedDateTime.from(dt);
         }else{
             throw new TypeInferringException("DateTime field not in ISO 8601 format yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         }
     }
+
+    @Override
+    public String formatValue(ZonedDateTime value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        return value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
+    }
+
 
     @Override
     public String parseFormat(String value, Map<String, Object> options) {

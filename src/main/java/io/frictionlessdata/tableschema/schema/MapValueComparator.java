@@ -1,4 +1,4 @@
-package io.frictionlessdata.tableschema;
+package io.frictionlessdata.tableschema.schema;
 
 import java.util.Comparator;
 import java.util.HashMap;

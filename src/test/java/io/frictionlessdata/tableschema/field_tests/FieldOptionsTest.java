@@ -1,11 +1,9 @@
 package io.frictionlessdata.tableschema.field_tests;
 
-import io.frictionlessdata.tableschema.Schema;
+import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.field.*;
-import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +33,7 @@ class FieldOptionsTest {
         File f = new File(getTestDataDirectory(), "schema/employee_schema.json");
         Schema schema;
         try (FileInputStream fis = new FileInputStream(f)) {
-            schema = new Schema(fis, false);
+            schema = Schema.fromJson (fis, false);
         }
         File file = new File("data/employee_data_alternative_boolean.csv");
         Table table = new Table(file, getTestDataDirectory(), schema);
@@ -72,7 +70,7 @@ class FieldOptionsTest {
         File f = new File(getTestDataDirectory(), "schema/employee_schema.json");
         Schema schema;
         try (FileInputStream fis = new FileInputStream(f)) {
-            schema = new Schema(fis, false);
+            schema = Schema.fromJson (fis, false);
         }
         File file = new File("data/employee_data_alternative_boolean.csv");
         Table table = new Table(file, getTestDataDirectory(), schema);

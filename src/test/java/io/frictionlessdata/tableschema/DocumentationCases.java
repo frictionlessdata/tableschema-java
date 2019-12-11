@@ -4,6 +4,7 @@ import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.field.GeopointField;
 import io.frictionlessdata.tableschema.field.IntegerField;
 import io.frictionlessdata.tableschema.field.StringField;
+import io.frictionlessdata.tableschema.schema.Schema;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

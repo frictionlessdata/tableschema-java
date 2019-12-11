@@ -11,7 +11,7 @@ import org.json.JSONObject;
 import java.net.URI;
 import java.util.Map;
 
-public class GeopointField extends Field<int[]> {
+public class GeopointField extends Field<double[]> {
 
     GeopointField(){
         super();
@@ -27,18 +27,18 @@ public class GeopointField extends Field<int[]> {
     }
 
     @Override
-    public int[] parseValue(String value, String format, Map<String, Object> options)
+    public double[] parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
         try{
             if(format.equalsIgnoreCase(Field.FIELD_FORMAT_DEFAULT)){
-                String[] geopoint = value.split(",");
+                String[] geopoint = value.split(", *");
 
                 if(geopoint.length == 2){
-                    int lon = Integer.parseInt(geopoint[0]);
-                    int lat = Integer.parseInt(geopoint[1]);
+                    double lon = Double.parseDouble(geopoint[0]);
+                    double lat = Double.parseDouble(geopoint[1]);
 
                     // No exception? It's a valid geopoint object.
-                    return new int[]{lon, lat};
+                    return new double[]{lon, lat};
 
                 }else{
                     throw new TypeInferringException("Geo points must have two coordinates");
@@ -50,11 +50,11 @@ public class GeopointField extends Field<int[]> {
                 JSONArray jsonArray = new JSONArray(value);
 
                 if (jsonArray.length() == 2){
-                    int lon = jsonArray.getInt(0);
-                    int lat = jsonArray.getInt(1);
+                    double lon = jsonArray.getDouble(0);
+                    double lat = jsonArray.getDouble(1);
 
                     // No exception? It's a valid geopoint object.
-                    return new int[]{lon, lat};
+                    return new double[]{lon, lat};
 
                 }else{
                     throw new TypeInferringException("Geo points must have two coordinates");
@@ -66,11 +66,11 @@ public class GeopointField extends Field<int[]> {
                 JSONObject jsonObj = new JSONObject(value);
 
                 if (jsonObj.length() == 2 && jsonObj.has("lon") && jsonObj.has("lat")){
-                    int lon = jsonObj.getInt("lon");
-                    int lat = jsonObj.getInt("lat");
+                    double lon = jsonObj.getDouble("lon");
+                    double lat = jsonObj.getDouble("lat");
 
                     // No exception? It's a valid geopoint object.
-                    return new int[]{lon, lat};
+                    return new double[]{lon, lat};
 
                 }else{
                     throw new TypeInferringException();
@@ -83,6 +83,18 @@ public class GeopointField extends Field<int[]> {
         }catch(Exception e){
             throw new TypeInferringException(e);
         }
+    }
+
+    @Override
+    public String formatValue(double[] value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        if ((null == format) || (format.equalsIgnoreCase(Field.FIELD_FORMAT_DEFAULT))){
+            return value[0]+","+value[1];
+        }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_ARRAY)){
+            return "["+value[0]+","+value[1]+"]";
+        } else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_OBJECT)){
+            return "{\"lat\": "+value[0]+", \"lon\":"+value[1]+"}";
+        }
+        return null;
     }
 
     @Override
@@ -100,12 +112,4 @@ public class GeopointField extends Field<int[]> {
         }
     }
 
-    @Override
-    public String[] formats() {
-        return new String[]{
-                FIELD_FORMAT_DEFAULT,
-                FIELD_FORMAT_ARRAY,
-                FIELD_FORMAT_OBJECT
-        };
-    }
 }

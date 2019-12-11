@@ -1,6 +1,6 @@
 package io.frictionlessdata.tableschema.iterator;
 
-import io.frictionlessdata.tableschema.Schema;
+import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.field.Field;
 
@@ -15,13 +15,15 @@ import java.util.Map;
 public class TableIterator<T> implements Iterator<T> {
     String[] headers = null;
     Schema schema = null;
-    Iterator<String[]> iter = null;
+    Iterator<String[]> wrappedIterator = null;
     boolean keyed;
     boolean extended;
     boolean cast;
     boolean relations;
     Map<String, Object> fieldOptions;
     int index = 0;
+
+    TableIterator() {    }
 
     public TableIterator(Table table) throws Exception{
         this(table, false, false, true, false);
@@ -41,16 +43,17 @@ public class TableIterator<T> implements Iterator<T> {
         this.relations = relations;
     }
 
-    private void init(Table table) throws Exception{
+    void init(Table table) throws Exception{
         this.fieldOptions = table.getFieldOptions();
         this.headers = table.getHeaders();
         this.schema = table.schema();
-        this.iter = table.dataSource().iterator();
+        this.wrappedIterator = table.dataSource().iterator();
     }
+
 
     @Override
     public boolean hasNext() {
-        return this.iter.hasNext();
+        return this.wrappedIterator.hasNext();
     }
 
     @Override
@@ -60,7 +63,7 @@ public class TableIterator<T> implements Iterator<T> {
 
     @Override
     public T next() {
-        String[] row = this.iter.next();
+        String[] row = this.wrappedIterator.next();
 
         Map<String, Object> keyedRow = new HashMap();
         Object[] extendedRow;

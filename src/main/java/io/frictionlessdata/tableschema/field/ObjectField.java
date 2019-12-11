@@ -7,7 +7,7 @@ import org.json.JSONObject;
 import java.net.URI;
 import java.util.Map;
 
-public class ObjectField extends Field<JSONObject> {
+public class ObjectField extends Field<String> {
 
     ObjectField() {
         super();
@@ -23,10 +23,17 @@ public class ObjectField extends Field<JSONObject> {
     }
 
     @Override
-    public JSONObject parseValue(String value, String format, Map<String, Object> options)
+    public String parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
-        return new JSONObject(value);
+        JSONObject obj = new JSONObject(value);
+        return obj.toString();
     }
+
+    @Override
+    public String formatValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        return value.toString();
+    }
+
 
     @Override
     public String parseFormat(String value, Map<String, Object> options) {

@@ -44,45 +44,42 @@ public class NumberField extends Field<Number> {
 
     @Override
     public Number parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        String locValue = value.trim();
         try{
             if(options != null){
                 if(options.containsKey(NUMBER_OPTION_DECIMAL_CHAR)){
-                    value = value.replace((String)options.get(NUMBER_OPTION_DECIMAL_CHAR), NUMBER_DEFAULT_DECIMAL_CHAR);
+                    locValue = locValue.replace((String)options.get(NUMBER_OPTION_DECIMAL_CHAR), NUMBER_DEFAULT_DECIMAL_CHAR);
                 }
 
                 if(options.containsKey(NUMBER_OPTION_GROUP_CHAR)){
-                    value = value.replace((String)options.get(NUMBER_OPTION_GROUP_CHAR), NUMBER_DEFAULT_GROUP_CHAR);
+                    locValue = locValue.replace((String)options.get(NUMBER_OPTION_GROUP_CHAR), NUMBER_DEFAULT_GROUP_CHAR);
                 }
 
                 if(options.containsKey(NUMBER_OPTION_BARE_NUMBER) && !(boolean)options.get(NUMBER_OPTION_BARE_NUMBER)){
-                    value = value.replaceAll(REGEX_BARE_NUMBER, "");
+                    locValue = locValue.replaceAll(REGEX_BARE_NUMBER, "");
                 }
             }
 
             // Try to match integer pattern
             Pattern intergerPattern = Pattern.compile(REGEX_INTEGER);
-            Matcher integerMatcher = intergerPattern.matcher(value);
+            Matcher integerMatcher = intergerPattern.matcher(locValue);
 
             if(integerMatcher.matches()){
-                return new BigInteger(value);
+                return new BigInteger(locValue);
             }
 
-            // Try to match float pattern
-            Pattern floatPattern = Pattern.compile(REGEX_FLOAT);
-            Matcher floatMatcher = floatPattern.matcher(value);
-
-            if(floatMatcher.matches()){
-                return new BigDecimal(value);
-            }
-
-            // The value failed to match neither the Float or the Integer value.
-            // Throw exception.
-            throw new TypeInferringException();
-
+            BigDecimal bd = new BigDecimal(locValue);
+            return bd;
         }catch(Exception e){
             throw new TypeInferringException();
         }
     }
+
+    @Override
+    public String formatValue(Number value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        return value.toString();
+    }
+
 
     @Override
     public String parseFormat(String value, Map<String, Object> options) {

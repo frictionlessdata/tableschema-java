@@ -35,6 +35,12 @@ public class DurationField extends Field<Duration> {
     }
 
     @Override
+    public String formatValue(Duration value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        return value.toString();
+    }
+
+
+    @Override
     public String parseFormat(String value, Map<String, Object> options) {
         return "default";
     }

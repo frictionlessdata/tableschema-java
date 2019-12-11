@@ -7,7 +7,10 @@ import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import java.io.File;
 
+import io.frictionlessdata.tableschema.iterator.SimpleTableIterator;
 import io.frictionlessdata.tableschema.iterator.TableIterator;
+import io.frictionlessdata.tableschema.schema.Schema;
+import io.frictionlessdata.tableschema.schema.TypeInferrer;
 import org.apache.commons.csv.CSVFormat;
 
 import java.io.InputStream;
@@ -30,7 +33,7 @@ public class Table{
      * @param dataSource the CSV or JSON content for the Table
      */
     public Table(String dataSource) {
-        this.dataSourceFormat = DataSourceFormat.createDataSource(dataSource);
+        this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
     }
 
     /**
@@ -41,8 +44,8 @@ public class Table{
      * @throws Exception if either reading or parsing throws an Exception
      */
     public Table(InputStream dataSource, InputStream schema) throws Exception{
-        this.dataSourceFormat = DataSourceFormat.createDataSource(dataSource);
-        this.schema = new Schema(schema, true);
+        this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
+        this.schema = Schema.fromJson(schema, true);
     }
 
     public Table(File dataSource, File basePath) throws Exception{
@@ -55,7 +58,7 @@ public class Table{
     }
 
     public Table(String dataSource, Schema schema) {
-        this.dataSourceFormat = DataSourceFormat.createDataSource(dataSource);
+        this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
         this.schema = schema;
     }
 
@@ -69,7 +72,7 @@ public class Table{
     }
     
     public Table(URL dataSource, URL schema) throws Exception{
-        this(dataSource, new Schema(schema, true));
+        this(dataSource, Schema.fromJson(schema, true));
     }
 
     public Iterator<Object[]> iterator() throws Exception{
@@ -81,11 +84,11 @@ public class Table{
     }
 
     public Iterator<String[]> stringArrayIterator() throws Exception{
-        return new TableIterator<>(this, false, false, true, false);
+        return new SimpleTableIterator(this, false);
     }
 
-    public Iterator<String[]> stringArrayIterator(boolean extended, boolean relations) throws Exception{
-        return new TableIterator<>(this, false, extended, true, relations);
+    public Iterator<String[]> stringArrayIterator(boolean relations) throws Exception{
+        return new SimpleTableIterator(this, relations);
     }
 
     public Iterator<Map> keyedIterator() throws Exception{
@@ -138,8 +141,9 @@ public class Table{
     
     public Schema inferSchema(int rowLimit) throws TypeInferringException{
         try{
-            String schemaJson = TypeInferrer.getInstance().infer(read(), getHeaders(), rowLimit);
-            schema = new Schema(schemaJson, false);
+            List<Object[]> data = read();
+            String[] headers = getHeaders();
+            schema = Schema.infer(data, headers, rowLimit);
             return schema;
             
         }catch(Exception e){

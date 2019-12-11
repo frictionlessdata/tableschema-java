@@ -79,6 +79,7 @@ public abstract class Field<T> {
      */
     String type = "";
 
+
     /**
      * A field's `format` property is a string, indicating a format for the field type.
      * http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
@@ -174,19 +175,11 @@ public abstract class Field<T> {
         return field;
     }
 
-    /**
-     * Default implementation signals a Field only accepts
-     * "default" as a format. More complex Fields override this
-     * to accept additional formats.
-     * @return Array of acceptable formats
-     */
-    public String[] formats(){
-        return new String[]{
-            Field.FIELD_FORMAT_DEFAULT
-        };
-    }
 
     public abstract T parseValue(String value, String format, Map<String, Object> options)
+            throws InvalidCastException, ConstraintsException;
+
+    public abstract String formatValue(T value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException;
 
     /**
@@ -537,7 +530,11 @@ public abstract class Field<T> {
     public String getFormat(){
         return this.format;
     }
-    
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
     public String getTitle(){
         return this.title;
     }

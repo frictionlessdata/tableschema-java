@@ -1,8 +1,8 @@
 package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.TypeInferrer;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.schema.TypeInferrer;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
@@ -52,14 +52,11 @@ public class GeojsonField extends Field<JSONObject> {
         return new JSONObject(value);
     }
 
-
     @Override
-    public String[] formats() {
-        return new String[]{
-                FIELD_FORMAT_DEFAULT,
-                FIELD_FORMAT_TOPOJSON
-        };
+    public String formatValue(JSONObject value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        return value.toString();
     }
+
 
     /**
      * We only want to go through this initialization if we have to because it's a

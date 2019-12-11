@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema.table_tests;
 
 import io.frictionlessdata.tableschema.field.*;
-import io.frictionlessdata.tableschema.Schema;
+import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.*;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
@@ -129,11 +130,11 @@ public class TableIterationTest {
         Class[] expectedTypes = new Class[]{
             BigInteger.class,
             String.class,
-            DateTime.class,
+            LocalDate.class,
             Boolean.class,
-            int[].class,
+            double[].class,
             Duration.class,
-            JSONObject.class
+            String.class
         };
         
         List<Object[]> data = employeeTable.read(true);
@@ -162,7 +163,7 @@ public class TableIterationTest {
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema schema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
-            schema = new Schema(fis, false);
+            schema = Schema.fromJson (fis, false);
         }
 
         Table table = new Table(csvContent, schema);

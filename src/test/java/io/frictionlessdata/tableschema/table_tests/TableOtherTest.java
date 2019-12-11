@@ -1,8 +1,7 @@
 package io.frictionlessdata.tableschema.table_tests;
 
-import io.frictionlessdata.tableschema.Schema;
+import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
-import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import io.frictionlessdata.tableschema.field.*;
 import org.apache.commons.csv.CSVFormat;
@@ -16,9 +15,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -87,11 +86,11 @@ public class TableOtherTest {
     @Test
     public void testReadFromValidJSONArrayWithSchema() throws Exception{
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
-        Schema schema = new Schema(schemaFile, true);
+        Schema schema = Schema.fromJson (schemaFile, true);
         Table table = new Table(populationTestJson.toString(), schema);
 
         Assert.assertEquals(3, table.read().size());
-        Schema expectedSchema = new Schema (populationSchema.toString(), true);
+        Schema expectedSchema = Schema.fromJson (populationSchema.toString(), true);
         Table expectedTable = new Table(new File(getTestDataDirectory()
                 , "data/population.csv")
                 , getTestDataDirectory(), expectedSchema);
@@ -171,11 +170,11 @@ public class TableOtherTest {
 
             Assert.assertEquals(BigInteger.class, row.get("id").getClass());
             Assert.assertEquals(String.class, row.get("name").getClass());
-            Assert.assertEquals(DateTime.class, row.get("dateOfBirth").getClass());
+            Assert.assertEquals(LocalDate.class, row.get("dateOfBirth").getClass());
             Assert.assertEquals(Boolean.class, row.get("isAdmin").getClass());
-            Assert.assertEquals(int[].class, row.get("addressCoordinates").getClass());
+            Assert.assertEquals(double[].class, row.get("addressCoordinates").getClass());
             Assert.assertEquals(Duration.class, row.get("contractLength").getClass());
-            Assert.assertEquals(JSONObject.class, row.get("info").getClass());      
+            Assert.assertEquals(String.class, row.get("info").getClass());
         }
     }
 
@@ -215,11 +214,11 @@ public class TableOtherTest {
         Class[] expectedTypes = new Class[]{
             BigInteger.class,
             String.class,
-            DateTime.class,
+            LocalDate.class,
             Boolean.class,
-            int[].class,
+            double[].class,
             Duration.class,
-            JSONObject.class
+            String.class
         };
         
         List<Object[]> data = employeeTable.read(true);

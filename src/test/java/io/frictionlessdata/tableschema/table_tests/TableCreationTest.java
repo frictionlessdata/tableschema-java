@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema.table_tests;
 
 import io.frictionlessdata.tableschema.field.Field;
-import io.frictionlessdata.tableschema.Schema;
+import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
 import org.json.JSONArray;
 import org.junit.Assert;
@@ -17,6 +17,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Year;
 import java.util.*;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
@@ -46,9 +47,9 @@ public class TableCreationTest {
 
     private static Object[][] populationTestData = new Object[][]
             {
-                new Object[]{"london",2017, new BigInteger("8780000")},
-                new Object[]{"paris",2017, new BigInteger("2240000")},
-                new Object[]{"rome",2017, new BigInteger("2860000")}
+                new Object[]{"london", Year.of(2017), new BigInteger("8780000")},
+                new Object[]{"paris",Year.of(2017), new BigInteger("2240000")},
+                new Object[]{"rome",Year.of(2017), new BigInteger("2860000")}
             };
 
     private static Object[][] populationStringTestData = new Object[][]
@@ -91,7 +92,7 @@ public class TableCreationTest {
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema expectedSchema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
-            expectedSchema = new Schema(fis, false);
+            expectedSchema = Schema.fromJson (fis, false);
         }
 
         if (!expectedSchema.equals(schema)) {
@@ -109,12 +110,12 @@ public class TableCreationTest {
     public void testReadFromValidJSONArrayWithSchema() throws Exception{
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
 
-        Schema schema = new Schema(f, true);
+        Schema schema = Schema.fromJson (f, true);
         Table table = new Table(populationTestJson.toString(), schema);
         Assert.assertEquals(3, table.read().size());
         Schema expectedSchema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
-            expectedSchema = new Schema(fis, false);
+            expectedSchema = Schema.fromJson (fis, false);
         }
 
         if (!expectedSchema.equals(schema)) {
@@ -148,7 +149,7 @@ public class TableCreationTest {
         Table table = new Table(tableUrl, schemaUrl);
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
-        Schema testSchema = new Schema(schemaFile, true);
+        Schema testSchema = Schema.fromJson (schemaFile, true);
         Table testTable = new Table(populationTestJson.toString(), testSchema);
 
         Assert.assertEquals(testTable, table);
@@ -167,7 +168,7 @@ public class TableCreationTest {
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema schema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
-            schema = new Schema(fis, false);
+            schema = Schema.fromJson (fis, false);
         }
 
         Table table = new Table(csvContent, schema);
@@ -217,7 +218,7 @@ public class TableCreationTest {
         Table table = new Table(bis, fis);
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
-        Schema testSchema = new Schema(schemaFile, true);
+        Schema testSchema = Schema.fromJson (schemaFile, true);
         Table testTable = new Table(populationTestJson.toString(), testSchema);
         Assert.assertEquals(testTable, table);
         try {

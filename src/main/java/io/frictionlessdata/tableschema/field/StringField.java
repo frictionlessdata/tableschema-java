@@ -46,6 +46,12 @@ public class StringField extends Field<String> {
         return value;
     }
 
+    @Override
+    public String formatValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        return value;
+    }
+
+
     /**
      * Given a value, try to parse the format.
      *

@@ -1,31 +1,9 @@
 package io.frictionlessdata.tableschema.field_tests;
 
-import io.frictionlessdata.tableschema.Schema;
-import io.frictionlessdata.tableschema.Table;
-import io.frictionlessdata.tableschema.TestHelper;
-import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.field.*;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.nio.file.Files;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

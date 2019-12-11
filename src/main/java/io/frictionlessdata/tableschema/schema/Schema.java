@@ -1,33 +1,20 @@
-package io.frictionlessdata.tableschema;
+package io.frictionlessdata.tableschema.schema;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import io.frictionlessdata.tableschema.exception.*;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 
-import java.awt.geom.Point2D;
 import java.io.*;
-import java.math.BigInteger;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
-import org.geotools.geometry.DirectPosition2D;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.locationtech.jts.geom.Coordinate;
-import org.opengis.geometry.DirectPosition;
 
 /**
  *
@@ -64,18 +51,32 @@ public class Schema {
     }
 
     /**
+     * Create and validate a new table schema using a collection of fields.
+     *
+     * @param fields the fields to use for the Table
+     * @param strict whether to enforce strict validation
+     * @throws ValidationException thrown if parsing throws an exception
+     */
+    public Schema(Collection<Field> fields, boolean strict) throws ValidationException{
+        this.strictValidation = strict;
+        this.fields = new ArrayList<>(fields);
+
+        initValidator();
+        validate();
+    }
+
+    /**
      * Read, create, and validate a table schema from an {@link java.io.InputStream}.
      *
      * @param inStream the InputStream to read the schema JSON data from
      * @param strict whether to enforce strict validation
      * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
-    public Schema (InputStream inStream, boolean strict) throws IOException {
-        this.strictValidation = strict;
-        this.initValidator();
-        initSchemaFromStream(inStream);
-
-        validate();
+    public static Schema fromJson (InputStream inStream, boolean strict) throws IOException {
+        Schema schema = new Schema(strict);
+        schema.initSchemaFromStream(inStream);
+        schema.validate();
+        return schema;
     }
 
     /**
@@ -85,8 +86,8 @@ public class Schema {
      * @param strict whether to enforce strict validation
      * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
-    public Schema(URL schemaUrl, boolean strict) throws Exception{
-        this(schemaUrl.openStream(), strict);
+    public static Schema fromJson(URL schemaUrl, boolean strict) throws Exception{
+        return fromJson (schemaUrl.openStream(), strict);
     }
 
     /**
@@ -96,9 +97,10 @@ public class Schema {
      * @param strict whether to enforce strict validation
      * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
-    public Schema(File schemaFile, boolean strict) throws Exception {
-        this(new FileInputStream(schemaFile), strict);
+    public static Schema fromJson (File schemaFile, boolean strict) throws Exception {
+        return fromJson (new FileInputStream(schemaFile), strict);
     }
+
     /**
      * Read, create, and validate a table schema from a JSON string.
      *
@@ -106,95 +108,11 @@ public class Schema {
      * @param strict whether to enforce strict validation
      * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
-    public Schema(String schemaJson, boolean strict) throws IOException {
-        this(new ByteArrayInputStream(schemaJson.getBytes()), strict);
+    public  static Schema fromJson (String schemaJson, boolean strict) throws IOException {
+        return fromJson (new ByteArrayInputStream(schemaJson.getBytes()), strict);
     }
 
-    /**
-     * Read, create, and validate a table schema using a collection of fields.
-     * @param fields the fields to use for the Table
-     * @param strict whether to enforce strict validation
-     * @throws ValidationException thrown if parsing throws an exception
-     */
-    public Schema(Collection<Field> fields, boolean strict) throws ValidationException{
-        this.strictValidation = strict;
-        this.fields = new ArrayList<>(fields);
-        
-        initValidator(); 
-        validate();
-    }
 
-    public static Schema infer(Class beanClass) throws NoSuchFieldException {
-        List<Field> fields = new ArrayList<>();
-        CsvMapper mapper = new CsvMapper();
-        CsvSchema csvSchema = mapper.typedSchemaFor(beanClass);
-        Iterator<CsvSchema.Column> iterator = csvSchema.iterator();
-        while (iterator.hasNext()) {
-            CsvSchema.Column next = iterator.next();
-            String name = next.getName();
-            CsvSchema.ColumnType type = next.getType();
-            Field field = null;
-            switch (type) {
-                case ARRAY:
-                    field = new ArrayField(name);
-                    break;
-                case STRING:
-                    field = new StringField(name);
-                    break;
-                case BOOLEAN:
-                    field = new BooleanField(name);
-                    break;
-                case NUMBER: {
-                        java.lang.reflect.Field declaredField = beanClass.getDeclaredField(name);
-                        java.lang.Class declaredClass = declaredField.getType();
-                            if ((declaredClass.equals(Integer.class))
-                            || (declaredClass.equals(Long.class))
-                            || (declaredClass.equals(Short.class))
-                            || (declaredClass.equals(Byte.class))
-                            || (declaredClass.equals(BigInteger.class))
-                            || (declaredClass.equals(AtomicInteger.class))
-                            || (declaredClass.equals(AtomicLong.class))) {
-                            field = new IntegerField(name);
-                        } else {
-                            field = new NumberField(name);
-                        }
-                    }
-                    break;
-                case NUMBER_OR_STRING: {
-                        java.lang.reflect.Field declaredField = beanClass.getDeclaredField(name);
-                        java.lang.Class declaredClass = declaredField.getType();
-                        if (declaredClass.equals(Year.class))
-                            field = new YearField(name);
-                        else if (declaredClass.equals(YearMonth.class))
-                            field = new YearmonthField(name);
-                        else if (declaredClass.equals(LocalDate.class))
-                            field = new DateField(name);
-                        else if ((declaredClass.equals(ZonedDateTime.class))
-                                || (declaredClass.equals(LocalDateTime.class))
-                                || (declaredClass.equals(OffsetDateTime.class))
-                                || (declaredClass.equals(Calendar.class))
-                                || (declaredClass.equals(Date.class)))
-                            field = new DatetimeField(name);
-                        else if ((declaredClass.equals(Duration.class))
-                                || (declaredClass.equals(Period.class)))
-                            field = new DurationField(name);
-                        else if ((declaredClass.equals(LocalTime.class))
-                                || (declaredClass.equals(OffsetTime.class)))
-                            field = new TimeField(name);
-                        else if ((declaredClass.equals(Coordinate.class))
-                                || (declaredClass.equals(DirectPosition2D.class)))
-                            field = new GeopointField(name);
-                        else if (declaredClass.equals(JSONObject.class))
-                            field = new ObjectField(name);
-                    }
-                    break;
-                default:
-                    field = new AnyField(name);
-            }
-            fields.add(field);
-        }
-        return new Schema(fields, true);
-    }
     
     /**
      * Infer the data types and return the generated schema.
@@ -204,19 +122,19 @@ public class Schema {
      * @throws TypeInferringException 
      */
     public static Schema infer(List<Object[]> data, String[] headers) throws TypeInferringException, IOException {
-        return new Schema(TypeInferrer.getInstance().infer(data, headers), true);
+        return fromJson(TypeInferrer.getInstance().infer(data, headers), true);
     }
-    
+
     /**
      * Infer the data types and return the generated schema.
      * @param data
      * @param headers
      * @param rowLimit
      * @return Schema generated from the inferred input
-     * @throws TypeInferringException 
+     * @throws TypeInferringException
      */
     public static Schema infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException, IOException {
-        return new Schema(TypeInferrer.getInstance().infer(data, headers, rowLimit), true);
+        return fromJson(TypeInferrer.getInstance().infer(data, headers, rowLimit), true);
     }
     
     /**
@@ -376,7 +294,7 @@ public class Schema {
         
         return schemaJson.toString(JSON_INDENT_FACTOR);
     }
-    
+
     public Object[] castRow(String[] row) throws InvalidCastException{
         
         if(row.length != this.fields.size()){

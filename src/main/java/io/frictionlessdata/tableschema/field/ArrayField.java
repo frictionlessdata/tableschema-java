@@ -3,12 +3,13 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URI;
 import java.util.Map;
 
-public class ArrayField extends Field<JSONArray> {
+public class ArrayField extends Field<Object[]> {
 
     ArrayField() {
         super();
@@ -24,13 +25,27 @@ public class ArrayField extends Field<JSONArray> {
     }
 
     @Override
-    public JSONArray parseValue(String value, String format, Map<String, Object> options)
+    public Object[] parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
-        return new JSONArray(value);
+        Object[] retVal;
+        try {
+            JSONArray arr = new JSONArray(value);
+            retVal = arr.toList().toArray();
+        } catch (JSONException ex) {
+            throw new InvalidCastException(ex);
+        }
+        return retVal;
     }
+
+    @Override
+    public String formatValue(Object[] value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        return value.toString();
+    }
+
 
     @Override
     public String parseFormat(String value, Map<String, Object> options) {
         return "default";
     }
+
 }
