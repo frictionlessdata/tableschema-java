@@ -697,6 +697,26 @@ public class SchemaTest {
         assertEquals(expectedSchema, schema);
     }
 
+    @Test
+    public void testIssue20() throws Exception {
+        Schema expectedschema = Schema.fromJson (new File(getTestDataDirectory()
+                , "schema/employee_schema.json"), true);
+        Assert.assertNotNull(expectedschema);
+    }
+
+
+    @Test
+    public void test2Issue20() throws Exception {
+        URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/" +
+                "master/src/test/resources/fixtures/data/simple_data.csv");
+        Table table = new Table(url);
+
+        Schema schema = table.inferSchema();
+        String json = schema.getJson();
+        Schema newSchema = Schema.fromJson(json, true);
+        Assert.assertTrue(newSchema.isValid());
+    }
+
     // Create schema from a provided Bean class and compare with
     // human-defined schema. Allow for slight differences eg. in the
     // field format.
