@@ -1,33 +1,20 @@
-package io.frictionlessdata.tableschema;
+package io.frictionlessdata.tableschema.schema;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import io.frictionlessdata.tableschema.exception.*;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 
-import java.awt.geom.Point2D;
 import java.io.*;
-import java.math.BigInteger;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
-import org.geotools.geometry.DirectPosition2D;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.locationtech.jts.geom.Coordinate;
-import org.opengis.geometry.DirectPosition;
 
 /**
  *
@@ -126,77 +113,6 @@ public class Schema {
     }
 
 
-    public static Schema infer(Class beanClass) throws NoSuchFieldException {
-        List<Field> fields = new ArrayList<>();
-        CsvMapper mapper = new CsvMapper();
-        CsvSchema csvSchema = mapper.typedSchemaFor(beanClass);
-        Iterator<CsvSchema.Column> iterator = csvSchema.iterator();
-        while (iterator.hasNext()) {
-            CsvSchema.Column next = iterator.next();
-            String name = next.getName();
-            CsvSchema.ColumnType type = next.getType();
-            Field field = null;
-            switch (type) {
-                case ARRAY:
-                    field = new ArrayField(name);
-                    break;
-                case STRING:
-                    field = new StringField(name);
-                    break;
-                case BOOLEAN:
-                    field = new BooleanField(name);
-                    break;
-                case NUMBER: {
-                        java.lang.reflect.Field declaredField = beanClass.getDeclaredField(name);
-                        java.lang.Class declaredClass = declaredField.getType();
-                            if ((declaredClass.equals(Integer.class))
-                            || (declaredClass.equals(Long.class))
-                            || (declaredClass.equals(Short.class))
-                            || (declaredClass.equals(Byte.class))
-                            || (declaredClass.equals(BigInteger.class))
-                            || (declaredClass.equals(AtomicInteger.class))
-                            || (declaredClass.equals(AtomicLong.class))) {
-                            field = new IntegerField(name);
-                        } else {
-                            field = new NumberField(name);
-                        }
-                    }
-                    break;
-                case NUMBER_OR_STRING: {
-                        java.lang.reflect.Field declaredField = beanClass.getDeclaredField(name);
-                        java.lang.Class declaredClass = declaredField.getType();
-                        if (declaredClass.equals(Year.class))
-                            field = new YearField(name);
-                        else if (declaredClass.equals(YearMonth.class))
-                            field = new YearmonthField(name);
-                        else if (declaredClass.equals(LocalDate.class))
-                            field = new DateField(name);
-                        else if ((declaredClass.equals(ZonedDateTime.class))
-                                || (declaredClass.equals(LocalDateTime.class))
-                                || (declaredClass.equals(OffsetDateTime.class))
-                                || (declaredClass.equals(Calendar.class))
-                                || (declaredClass.equals(Date.class)))
-                            field = new DatetimeField(name);
-                        else if ((declaredClass.equals(Duration.class))
-                                || (declaredClass.equals(Period.class)))
-                            field = new DurationField(name);
-                        else if ((declaredClass.equals(LocalTime.class))
-                                || (declaredClass.equals(OffsetTime.class)))
-                            field = new TimeField(name);
-                        else if ((declaredClass.equals(Coordinate.class))
-                                || (declaredClass.equals(DirectPosition2D.class)))
-                            field = new GeopointField(name);
-                        else if (declaredClass.equals(JSONObject.class))
-                            field = new ObjectField(name);
-                    }
-                    break;
-                default:
-                    field = new AnyField(name);
-            }
-            fields.add(field);
-        }
-        return new Schema(fields, true);
-    }
     
     /**
      * Infer the data types and return the generated schema.

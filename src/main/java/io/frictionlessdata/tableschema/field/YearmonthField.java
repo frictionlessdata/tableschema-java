@@ -3,17 +3,16 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.json.JSONObject;
 
 import java.net.URI;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class YearmonthField extends Field<DateTime> {
+public class YearmonthField extends Field<YearMonth> {
     // yyyy-MM
     private static final String REGEX_YEARMONTH = "([0-9]{4})-(1[0-2]|0[1-9])";
 
@@ -31,19 +30,25 @@ public class YearmonthField extends Field<DateTime> {
     }
 
     @Override
-    public DateTime parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public YearMonth parseValue(String value, String format, Map<String, Object> options)
+            throws InvalidCastException, ConstraintsException {
         Pattern pattern = Pattern.compile(REGEX_YEARMONTH);
         Matcher matcher = pattern.matcher(value);
 
         if(matcher.matches()){
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM");
-            DateTime dt = formatter.parseDateTime(value);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+            TemporalAccessor dt = formatter.parse(value);
 
-            return dt;
-
+            return YearMonth.from(dt);
         }else{
             throw new TypeInferringException();
         }
+    }
+
+    @Override
+    public String formatValue(YearMonth value, String format, Map<String, Object> options)
+            throws InvalidCastException, ConstraintsException {
+        return value.toString();
     }
 
     @Override

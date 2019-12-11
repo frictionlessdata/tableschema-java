@@ -53,13 +53,13 @@ public class DataSourceTest {
 
     @Test
     public void testCreateJsonArrayDataSource() throws Exception{
-        DataSourceFormat ds = DataSourceFormat.createDataSource(populationJson);
+        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(populationJson);
         Assert.assertTrue(ds instanceof JsonArrayDataSourceFormat);
     }
 
     @Test
     public void testJsonArrayDataSourceHeaders() throws Exception{
-        DataSourceFormat ds = DataSourceFormat.createDataSource(populationJson);
+        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(populationJson);
         String[] headers = ds.getHeaders();
         Assert.assertArrayEquals(populationHeaders, headers);
     }
@@ -67,7 +67,7 @@ public class DataSourceTest {
     @Test
     public void createCsvDataSource() throws Exception{
         String dates = this.getDatesCsvData();
-        DataSourceFormat ds = DataSourceFormat.createDataSource(dates);
+        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(dates);
         Assert.assertTrue(ds instanceof CsvDataSourceFormat);
     }
 
@@ -76,7 +76,7 @@ public class DataSourceTest {
         String dates = this.getDatesCsvData();
         String content = null;
 
-        DataSourceFormat ds = DataSourceFormat.createDataSource(dates);
+        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(dates);
         File tempFile = Files.createTempFile("tableschema-", ".csv").toFile();
         ds.writeCsv(tempFile, CSVFormat.RFC4180);
         try (FileReader fr = new FileReader(tempFile)) {
@@ -131,13 +131,13 @@ public class DataSourceTest {
 
     @Test
     public void testSafePathCreationCsv() throws Exception {
-        DataSourceFormat ds = DataSourceFormat.createDataSource(new File ("data/population.csv"), TestHelper.getTestDataDirectory());
+        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(new File ("data/population.csv"), TestHelper.getTestDataDirectory());
         Assert.assertNotNull(ds);
     }
 
     @Test
     public void testSafePathCreationJson() throws Exception {
-        DataSourceFormat ds = DataSourceFormat.createDataSource(new File ("simple_geojson.json"), TestHelper.getTestDataDirectory());
+        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(new File ("simple_geojson.json"), TestHelper.getTestDataDirectory());
         Assert.assertNotNull(ds);
     }
 
@@ -213,7 +213,7 @@ public class DataSourceTest {
 
     @Test
     public void testSafeStreamCreationJson() throws Exception {
-        DataSourceFormat ds = DataSourceFormat.createDataSource(new File ("data/population.json"), TestHelper.getTestDataDirectory());
+        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(new File ("data/population.json"), TestHelper.getTestDataDirectory());
         Assert.assertNotNull(ds);
     }
 
@@ -227,7 +227,7 @@ public class DataSourceTest {
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.csv");
         try (FileInputStream is = new FileInputStream(inFile)) {
             String popCsv = new String(Files.readAllBytes(inFile.toPath()));
-            ds = DataSourceFormat.createDataSource(popCsv);
+            ds = DataSourceFormat.createDataSourceFormat(popCsv);
             Assert.assertArrayEquals(populationHeaders, ds.getHeaders());
         }
         ds.write(tempFile);
@@ -248,7 +248,7 @@ public class DataSourceTest {
 
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.json");
         popCsv = new String(Files.readAllBytes(inFile.toPath()));
-        DataSourceFormat ds = DataSourceFormat.createDataSource(popCsv);
+        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(popCsv);
 
         File tempFile = Files.createTempFile("tableschema-", ".json").toFile();
         ds.write(tempFile);

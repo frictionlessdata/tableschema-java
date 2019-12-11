@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema.table_tests;
 
 import io.frictionlessdata.tableschema.field.Field;
-import io.frictionlessdata.tableschema.Schema;
+import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
 import org.json.JSONArray;
 import org.junit.Assert;
@@ -17,6 +17,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Year;
 import java.util.*;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
@@ -46,9 +47,9 @@ public class TableCreationTest {
 
     private static Object[][] populationTestData = new Object[][]
             {
-                new Object[]{"london",2017, new BigInteger("8780000")},
-                new Object[]{"paris",2017, new BigInteger("2240000")},
-                new Object[]{"rome",2017, new BigInteger("2860000")}
+                new Object[]{"london", Year.of(2017), new BigInteger("8780000")},
+                new Object[]{"paris",Year.of(2017), new BigInteger("2240000")},
+                new Object[]{"rome",Year.of(2017), new BigInteger("2860000")}
             };
 
     private static Object[][] populationStringTestData = new Object[][]

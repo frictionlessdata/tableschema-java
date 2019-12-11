@@ -48,7 +48,7 @@ public interface DataSourceFormat {
      * CsvDataSource based on input format
      * @return DataSource created from input String
      */
-    static DataSourceFormat createDataSource(String input) {
+    static DataSourceFormat createDataSourceFormat(String input) {
         try {
             JSONArray arr = new JSONArray(input);
             return new JsonArrayDataSourceFormat(arr);
@@ -63,10 +63,10 @@ public interface DataSourceFormat {
      * CsvDataSource based on input format
      * @return DataSource created from input File
      */
-    static DataSourceFormat createDataSource(File input, File workDir) throws IOException {
+    static DataSourceFormat createDataSourceFormat(File input, File workDir) throws IOException {
         Path resolvedPath = DataSourceFormat.toSecure(input.toPath(), workDir.toPath());
         try (InputStream is = new FileInputStream(resolvedPath.toFile())) { // Read the file.
-            return createDataSource(is);
+            return createDataSourceFormat(is);
         }
     }
 
@@ -77,7 +77,7 @@ public interface DataSourceFormat {
      * CsvDataSource based on input format
      * @return DataSource created from input String
      */
-    static DataSourceFormat createDataSource(InputStream input) throws IOException {
+    static DataSourceFormat createDataSourceFormat(InputStream input) throws IOException {
         String content = null;
 
         // Read the file.
@@ -89,7 +89,7 @@ public interface DataSourceFormat {
             throw ex;
         }
 
-        return createDataSource(content);
+        return createDataSourceFormat(content);
     }
 
     //https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html

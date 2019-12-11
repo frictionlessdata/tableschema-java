@@ -29,8 +29,14 @@ public class IntegerField extends Field<BigInteger> {
 
     @Override
     public BigInteger parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return new BigInteger(value);
+        return new BigInteger(value.trim());
     }
+
+    @Override
+    public String formatValue(BigInteger value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        return value.toString();
+    }
+
 
     @Override
     public String parseFormat(String value, Map<String, Object> options) {

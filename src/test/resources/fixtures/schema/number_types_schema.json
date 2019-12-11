@@ -1,0 +1,77 @@
+{"fields": [
+  {
+    "name": "id",
+    "format": "default",
+    "type": "integer"
+  },
+  {
+    "name": "byteVal",
+    "format": "default",
+    "type": "integer"
+  },
+  {
+    "name": "shortVal",
+    "format": "default",
+    "type": "integer"
+  },
+  {
+    "name": "intVal",
+    "format": "default",
+    "type": "integer"
+  },
+  {
+    "name": "longClassVal",
+    "format": "default",
+    "type": "integer"
+  },
+  {
+    "name": "longVal",
+    "format": "default",
+    "type": "integer"
+  },
+  {
+    "name": "floatVal",
+    "format": "default",
+    "type": "number"
+  },
+  {
+    "name": "doubleVal",
+    "format": "default",
+    "type": "number"
+  },
+  {
+    "name": "floatClassVal",
+    "format": "default",
+    "type": "number"
+  },
+  {
+    "name": "doubleClassVal",
+    "format": "default",
+    "type": "number"
+  },
+  {
+    "name": "bigIntVal",
+    "format": "default",
+    "type": "integer"
+  },
+  {
+    "name": "bigDecimalVal",
+    "format": "default",
+    "type": "number"
+  },
+  {
+    "name": "atomicIntegerVal",
+    "format": "default",
+    "type": "integer"
+  },
+  {
+    "name": "atomicLongVal",
+    "format": "default",
+    "type": "integer"
+  },
+  {
+    "name": "atomicDoubleVal",
+    "format": "default",
+    "type": "number"
+  }
+]}

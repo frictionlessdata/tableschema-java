@@ -9,8 +9,8 @@ import java.net.URI;
 import java.util.*;
 
 public class BooleanField extends Field<Boolean> {
-    List<String> trueValues = Arrays.asList("yes", "y", "true", "t", "1");
-    List<String> falseValues = Arrays.asList("no", "n", "false", "f", "0");
+    List<String> trueValues = Arrays.asList("true", "yes", "y", "t", "1");
+    List<String> falseValues = Arrays.asList("false", "no", "n", "f", "0");
 
 
     BooleanField() {
@@ -58,7 +58,24 @@ public class BooleanField extends Field<Boolean> {
     }
 
     @Override
+    public String formatValue(Boolean value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        String trueValue = trueValues.get(0);
+        String falseValue = falseValues.get(0);
+        if (null != options) {
+            if (options.containsKey("trueValues")) {
+                trueValue = new ArrayList<String>((Collection) options.get("trueValues")).iterator().next();
+            }
+            if (options.containsKey("falseValues")) {
+                falseValue = new ArrayList<String>((Collection) options.get("falseValues")).iterator().next();
+            }
+        }
+        return (value) ? trueValue : falseValue;
+    }
+
+
+    @Override
     public String parseFormat(String value, Map<String, Object> options) {
         return "default";
     }
+
 }

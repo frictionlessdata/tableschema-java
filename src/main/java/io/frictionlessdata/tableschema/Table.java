@@ -9,6 +9,8 @@ import java.io.File;
 
 import io.frictionlessdata.tableschema.iterator.SimpleTableIterator;
 import io.frictionlessdata.tableschema.iterator.TableIterator;
+import io.frictionlessdata.tableschema.schema.Schema;
+import io.frictionlessdata.tableschema.schema.TypeInferrer;
 import org.apache.commons.csv.CSVFormat;
 
 import java.io.InputStream;
@@ -31,7 +33,7 @@ public class Table{
      * @param dataSource the CSV or JSON content for the Table
      */
     public Table(String dataSource) {
-        this.dataSourceFormat = DataSourceFormat.createDataSource(dataSource);
+        this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
     }
 
     /**
@@ -42,7 +44,7 @@ public class Table{
      * @throws Exception if either reading or parsing throws an Exception
      */
     public Table(InputStream dataSource, InputStream schema) throws Exception{
-        this.dataSourceFormat = DataSourceFormat.createDataSource(dataSource);
+        this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
         this.schema = Schema.fromJson(schema, true);
     }
 
@@ -56,7 +58,7 @@ public class Table{
     }
 
     public Table(String dataSource, Schema schema) {
-        this.dataSourceFormat = DataSourceFormat.createDataSource(dataSource);
+        this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
         this.schema = schema;
     }
 
@@ -139,8 +141,9 @@ public class Table{
     
     public Schema inferSchema(int rowLimit) throws TypeInferringException{
         try{
-            String schemaJson = TypeInferrer.getInstance().infer(read(), getHeaders(), rowLimit);
-            schema = Schema.fromJson(schemaJson, true);
+            List<Object[]> data = read();
+            String[] headers = getHeaders();
+            schema = Schema.infer(data, headers, rowLimit);
             return schema;
             
         }catch(Exception e){
