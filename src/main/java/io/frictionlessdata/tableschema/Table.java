@@ -48,7 +48,9 @@ public class Table{
     public Table(InputStream dataSource, InputStream schema, CSVFormat format) throws Exception{
         this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
         this.schema = Schema.fromJson(schema, true);
-        this.format = format;
+        if (null != format) {
+            this.format = format;
+        }
         validate();
     }
 
@@ -59,14 +61,18 @@ public class Table{
     public Table(File dataSource, File basePath, Schema schema, CSVFormat format) throws Exception{
         this(dataSource, basePath);
         this.schema = schema;
-        this.format = format;
+        if (null != format) {
+            this.format = format;
+        }
         validate();
     }
 
     public Table(String dataSource, Schema schema, CSVFormat format) {
         this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
         this.schema = schema;
-        this.format = format;
+        if (null != format) {
+            this.format = format;
+        }
         validate();
     }
 
@@ -77,7 +83,9 @@ public class Table{
     public Table(URL dataSource, Schema schema, CSVFormat format) throws IOException {
         this(dataSource);
         this.schema = schema;
-        this.format = format;
+        if (null != format) {
+            this.format = format;
+        }
         validate();
     }
     
