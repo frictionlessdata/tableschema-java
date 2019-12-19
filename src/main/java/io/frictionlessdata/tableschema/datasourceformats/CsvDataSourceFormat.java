@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.datasourceformats;
 
+import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -20,9 +21,7 @@ import java.util.stream.Collectors;
  */
 public class CsvDataSourceFormat extends AbstractDataSourceFormat {
 
-    private CSVFormat format = CSVFormat
-            .RFC4180
-            .withHeader();;
+    private CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
 
     public CsvDataSourceFormat(){};
 
@@ -56,7 +55,7 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
         super(dataSource, workDir);
     }
     
-    public CsvDataSourceFormat(String dataSource){
+    CsvDataSourceFormat(String dataSource){
         super(dataSource);
     }
 
@@ -77,17 +76,16 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
      * needs to be recreated every time:
      * https://commons.apache.org/proper/commons-csv/apidocs/index.html?org/apache/commons/csv/CSVParser.html
      * 
-     * @return
-     * @throws Exception 
+     * @return a CSVParser instance
+     * @throws Exception if either the data has the wrong format or some I/O exception occurs
      */
     @Override
     CSVParser getCSVParser() throws Exception{
         CSVFormat format = this.format;
         if (null == format) {
-            format = CSVFormat
-                    .RFC4180
-                    .withRecordSeparator('\n')
-                    .withHeader();
+            format = DataSourceFormat
+                    .getDefaultCsvFormat()
+                    .withRecordSeparator('\n');
         }
         if(dataSource instanceof String){
             Reader sr = new StringReader((String)dataSource);
@@ -110,21 +108,20 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
             
         } else if(dataSource instanceof URL){
             return CSVParser.parse((URL)dataSource, StandardCharsets.UTF_8, format);
-            //return CSVParser.parse((URL)dataSource, Charset.forName("UTF-8"), CSVFormat.RFC4180.withHeader());
             
         } else{
-            throw new Exception("Data source is of invalid type.");
+            throw new TableSchemaException("Data source is of invalid type.");
         }
     }
 
     @Override
     public void write(File outputFile) throws Exception {
+        CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
+        if (this.getHeaders() != null) {
+            format = format.withHeader(this.getHeaders());
+        }
         try (Writer out = new BufferedWriter(new FileWriter(outputFile));
-             CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.RFC4180)) {
-
-            if (this.getHeaders() != null) {
-                csvPrinter.printRecord(this.getHeaders());
-            }
+                CSVPrinter csvPrinter = new CSVPrinter(out, format)) {
 
             Iterator<CSVRecord> recordIter = this.getCSVParser().iterator();
             while(recordIter.hasNext()){

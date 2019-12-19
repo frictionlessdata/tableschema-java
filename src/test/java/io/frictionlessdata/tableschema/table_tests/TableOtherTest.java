@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.table_tests;
 
+import io.frictionlessdata.tableschema.exception.TableValidationException;
 import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
@@ -91,8 +92,7 @@ public class TableOtherTest {
 
         Assert.assertEquals(3, table.read().size());
         Schema expectedSchema = Schema.fromJson (populationSchema.toString(), true);
-        Table expectedTable = new Table(new File(getTestDataDirectory()
-                , "data/population.csv")
+        Table expectedTable = new Table(new File("data/population.csv")
                 , getTestDataDirectory(), expectedSchema);
         Assert.assertEquals(expectedTable, table);
     }
@@ -187,6 +187,18 @@ public class TableOtherTest {
         
         Assert.assertEquals("[id, title]", Arrays.toString(table.getHeaders()));
     }
+
+
+    // schema doesn't fit data -> expect exception
+    @Test
+    public void loadTableWithMismatchingSchema() throws Exception {
+        File testDataDir = getTestDataDirectory();
+        File file = new File("data/population.json");
+        Schema schema = Schema.fromJson(new File(testDataDir, "schema/employee_schema.json"), true);
+
+        exception.expect(TableValidationException.class);
+        new Table(file, testDataDir, schema);
+    }
     
     @Test
     public void testReadUncastData() throws Exception{
@@ -250,6 +262,26 @@ public class TableOtherTest {
     }
 
     @Test
+    public void saveTableAlternateSchema() throws Exception{
+        String createdFileName = "test_data_table.csv";
+        File createdFileDir = folder.newFile(createdFileName).getParentFile();
+        File testDataDir = getTestDataDirectory();
+        File file = new File("data/population.json");
+        Schema schema = Schema.fromJson(new File (testDataDir, "schema/population_schema_alternate.json"), true);
+        Table loadedTable = new Table(file, testDataDir, schema);
+
+        loadedTable.writeCsv(new File (createdFileDir, createdFileName), CSVFormat.RFC4180);
+
+        Table readTable = new Table(new File(createdFileName), createdFileDir);
+        String[] headers = readTable.getHeaders();
+
+        Assert.assertEquals("year", headers[0]);
+        Assert.assertEquals("city", headers[1]);
+        Assert.assertEquals("population", headers[2]);
+        Assert.assertEquals(3, readTable.read().size());
+    }
+
+    @Test
     public void testInvalidTableCast() throws Exception {
         File file = new File("data/employee_data.csv");
         Table table = new Table(file, getTestDataDirectory());
@@ -274,7 +306,7 @@ public class TableOtherTest {
         schema.addField(isAdminField);
 
         Field addressCoordinatesField
-                = new GeopointField("addressCoordinatesField", Field.FIELD_FORMAT_OBJECT, null, null, null, null, null);
+                = new GeopointField("addressCoordinates", Field.FIELD_FORMAT_OBJECT, null, null, null, null, null);
         schema.addField(addressCoordinatesField);
 
         Field contractLengthField = new DurationField("contractLength");

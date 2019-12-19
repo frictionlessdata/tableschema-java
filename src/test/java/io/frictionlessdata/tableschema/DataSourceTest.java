@@ -222,7 +222,7 @@ public class DataSourceTest {
         String content = null;
 
         DataSourceFormat ds;
-        File tempFile = Files.createTempFile("tableschema-", ".json").toFile();
+        File tempFile = Files.createTempFile("tableschema-", ".csv").toFile();
 
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.csv");
         try (FileInputStream is = new FileInputStream(inFile)) {

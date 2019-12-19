@@ -1,0 +1,23 @@
+{
+  "fields": [
+    {
+      "name": "year",
+      "description": "The year.",
+      "type": "year",
+      "title": "year"
+    },
+    {
+      "name": "city",
+      "format": "default",
+      "description": "The city.",
+      "type": "string",
+      "title": "city"
+    },
+    {
+      "name": "population",
+      "description": "The population.",
+      "type": "integer",
+      "title": "population"
+    }
+  ]
+}

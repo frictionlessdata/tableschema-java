@@ -10,10 +10,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -23,22 +20,22 @@ import java.util.zip.ZipFile;
  * 
  */
 public abstract class AbstractDataSourceFormat implements DataSourceFormat {
+    String[] headers;
     Object dataSource = null;
-    File workDir;
+    private File workDir;
 
     AbstractDataSourceFormat(){}
 
-
-    public AbstractDataSourceFormat(URL dataSource){
+    AbstractDataSourceFormat(URL dataSource){
         this.dataSource = dataSource;
     }
 
-    public AbstractDataSourceFormat(File dataSource, File workDir){
+    AbstractDataSourceFormat(File dataSource, File workDir){
         this.dataSource = dataSource;
         this.workDir = workDir;
     }
 
-    public AbstractDataSourceFormat(String dataSource){
+    AbstractDataSourceFormat(String dataSource){
         this.dataSource = dataSource;
     }
 
@@ -48,34 +45,30 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
     public Iterator<String[]> iterator() throws Exception{
         Iterator<CSVRecord> iterCSVRecords = this.getCSVParser().iterator();
 
-        Iterator<String[]> iterStringArrays = Iterators.transform(iterCSVRecords, (CSVRecord input) -> {
+        return Iterators.transform(iterCSVRecords, (CSVRecord input) -> {
             Iterator<String> iterCols = input.iterator();
 
-            List<String> cols = new ArrayList();
+            List<String> cols = new ArrayList<>();
             while(iterCols.hasNext()){
                 cols.add(iterCols.next());
             }
 
-            String[] output = cols.toArray(new String[0]);
-
-            return output;
+            return cols.toArray(new String[0]);
         });
-
-        return iterStringArrays;
     }
 
     @Override
     public List<String[]> data() throws Exception{
         // This is pretty much what happens when we call this.parser.getRecords()...
         Iterator<CSVRecord> iter = this.getCSVParser().iterator();
-        List<String[]> data = new ArrayList();
+        List<String[]> data = new ArrayList<>();
 
         while(iter.hasNext()){
             CSVRecord record = iter.next();
             Iterator<String> colIter = record.iterator();
 
             //...except that we want list of String[] rather than list of CSVRecord.
-            List<String> cols = new ArrayList();
+            List<String> cols = new ArrayList<>();
             while(colIter.hasNext()){
                 cols.add(colIter.next());
             }
@@ -89,27 +82,30 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
 
     @Override
     public String[] getHeaders() throws Exception{
-        try{
-            // Get a copy of the header map that iterates in column order.
-            // The map keys are column names. The map values are 0-based indices.
-            Map<String, Integer> headerMap = this.getCSVParser().getHeaderMap();
-
-            // Generate list of keys
-            List<String> headerVals = new ArrayList();
-
-            headerMap.entrySet().forEach((pair) -> {
-                headerVals.add((String)pair.getKey());
-            });
-
-            // Return string array of keys.
-            return headerVals.toArray(new String[0]);
-
-        }catch(Exception e){
-            throw e;
-        }
-
+        if (null != headers)
+            return headers;
+        return getDataHeaders();
     }
 
+    public void setHeaders(String[] newHeaders) {
+        this.headers = newHeaders;
+    }
+
+    String[] getDataHeaders() throws Exception{
+        // Get a copy of the header map that iterates in column order.
+        // The map keys are column names. The map values are 0-based indices.
+        Map<String, Integer> headerMap = this.getCSVParser().getHeaderMap();
+
+        // Generate list of keys
+        List<String> headerVals = new ArrayList();
+
+        headerMap.entrySet().forEach((pair) -> {
+            headerVals.add((String)pair.getKey());
+        });
+
+        // Return string array of keys.
+        return headerVals.toArray(new String[0]);
+    }
 
     String getFileContents(String path) throws IOException {
         String lines;
@@ -159,17 +155,30 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
         try {
             CSVFormat locFormat = (null != format)
                     ? format
-                    : CSVFormat.RFC4180
-                    .withHeader();
+                    : DataSourceFormat.getDefaultCsvFormat();
             CSVPrinter csvPrinter = new CSVPrinter(out, locFormat);
 
+            String[] dataHeaders = getDataHeaders();
             String[] headers = getHeaders();
             if (headers != null) {
                 csvPrinter.printRecord((Object[]) headers);
             }
 
+            Map<Integer, Integer> mapping = new HashMap<>();
+            for (int i = 0; i < dataHeaders.length; i++) {
+                for (int j = 0; j < headers.length; j++) {
+                    if (dataHeaders[i].equals(headers[j])) {
+                        mapping.put(i, j);
+                    }
+                }
+            }
+
             for (String[] record : data()) {
-                csvPrinter.printRecord(record);
+                String[] sortedRec = new String[record.length];
+                for (int i = 0; i < record.length; i++) {
+                    sortedRec[mapping.get(i)] = record[i];
+                }
+                csvPrinter.printRecord(sortedRec);
             }
         } catch (Exception ex) {
             throw new RuntimeException(ex);
@@ -186,8 +195,7 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
     public void writeCsv(File outputFile, CSVFormat format) throws Exception {
         CSVFormat locFormat = (null != format)
                 ? format
-                : CSVFormat.RFC4180
-                .withHeader();
+                : DataSourceFormat.getDefaultCsvFormat();
         try (Writer out = new BufferedWriter(new FileWriter(outputFile))) {
             writeCsv(out, locFormat);
         }

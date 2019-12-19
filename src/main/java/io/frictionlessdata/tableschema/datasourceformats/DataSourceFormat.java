@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public interface DataSourceFormat {
     Iterator<String[]> iterator() throws Exception;
     String[] getHeaders() throws Exception;
+    void setHeaders(String[] newHeaders);
     List<String[]> data() throws Exception;
 
     /**
@@ -70,7 +71,11 @@ public interface DataSourceFormat {
         }
     }
 
-
+    public static CSVFormat getDefaultCsvFormat() {
+        return CSVFormat.RFC4180
+                .withHeader()
+                .withIgnoreSurroundingSpaces(true);
+    }
 
     /**
      * Factory method to instantiate either a JsonArrayDataSource or a

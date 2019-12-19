@@ -65,6 +65,6 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
         String dataCsv = CDL.toString(new JSONArray(dataSourceString));
         Reader sr = new StringReader(dataCsv);
         // Get the parser.
-        return CSVParser.parse(sr, CSVFormat.RFC4180.withHeader());
+        return CSVParser.parse(sr, DataSourceFormat.getDefaultCsvFormat());
     }
 }
