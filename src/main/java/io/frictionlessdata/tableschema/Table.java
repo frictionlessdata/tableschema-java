@@ -1,22 +1,24 @@
 package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
+import io.frictionlessdata.tableschema.exception.TableValidationException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import io.frictionlessdata.tableschema.datasourceformats.CsvDataSourceFormat;
 import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
-import java.io.File;
 
+import java.io.*;
+
+import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.iterator.SimpleTableIterator;
 import io.frictionlessdata.tableschema.iterator.TableIterator;
 import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.schema.TypeInferrer;
 import org.apache.commons.csv.CSVFormat;
 
-import java.io.InputStream;
-import java.io.Writer;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a CSV table
@@ -46,29 +48,33 @@ public class Table{
     public Table(InputStream dataSource, InputStream schema) throws Exception{
         this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
         this.schema = Schema.fromJson(schema, true);
+        validate();
     }
 
     public Table(File dataSource, File basePath) throws Exception{
-        this.dataSourceFormat = new CsvDataSourceFormat(dataSource, basePath);
+        this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource, basePath);
     }
 
     public Table(File dataSource, File basePath, Schema schema) throws Exception{
-        this.dataSourceFormat = new CsvDataSourceFormat(dataSource, basePath);
+        this(dataSource, basePath);
         this.schema = schema;
+        validate();
     }
 
     public Table(String dataSource, Schema schema) {
         this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
         this.schema = schema;
+        validate();
     }
 
-    public Table(URL dataSource) {
-        this.dataSourceFormat = new CsvDataSourceFormat(dataSource);
+    public Table(URL dataSource) throws IOException {
+        this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource.openStream());
     }
 
-    public Table(URL dataSource, Schema schema) {
-        this.dataSourceFormat = new CsvDataSourceFormat(dataSource);
+    public Table(URL dataSource, Schema schema) throws IOException {
+        this(dataSource);
         this.schema = schema;
+        validate();
     }
     
     public Table(URL dataSource, URL schema) throws Exception{
@@ -98,9 +104,36 @@ public class Table{
     public Iterator<Map> keyedIterator(boolean extended, boolean cast, boolean relations) throws Exception{
         return new TableIterator<Map>(this, true, extended, cast, relations);
     }
-    
+
+    /**
+     * Returns either the headers in the order declared in the Schema or in the order found in
+     * the data if no Schema has been set. In the case where we don't have a Schema, the order
+     * is only well-defined for Tables read from CSV.
+     *
+     * If the input source is a JSON array of JSON objects, the order of columns is arbitrary:
+     *
+     * "An object is an unordered set of name/value pairs"
+     * (https://www.json.org/json-en.html)
+     *
+     * @return an array of header names
+     * @throws Exception if reading headers from the input source raises an exception
+     */
     public String[] getHeaders() throws Exception{
+        if (null != schema) {
+            return getDeclaredHeaders();
+        }
         return this.dataSourceFormat.getHeaders();
+    }
+
+    String[] getDeclaredHeaders() {
+        if (null == schema)
+            return null;
+
+        return schema
+                .getFields()
+                .stream()
+                .map(Field::getName)
+                .toArray(String[]::new);
     }
 
     public List<Object[]> read(boolean cast) throws Exception{
@@ -128,11 +161,52 @@ public class Table{
     }
 
     public void writeCsv(Writer out, CSVFormat format) {
+        if (null != schema) {
+            this.dataSourceFormat.setHeaders(getDeclaredHeaders());
+        }
         this.dataSourceFormat.writeCsv(out, format);
     }
 
     public void writeCsv(File outputFile, CSVFormat format) throws Exception{
-        this.dataSourceFormat.writeCsv(outputFile, format);
+        try (FileWriter fw = new FileWriter(outputFile)) {
+            writeCsv(fw, format);
+        }
+    }
+
+    /**
+     * Validates that names of the headers are as declared in the Schema, and
+     * throws a TableValidationException if they aren't.
+     * Sort order is neglected to allow a Schema to define column order. This is intentional,
+     * as JSON-objects do not have a sort order of their keys. Therefore, reading not from
+     * a CSV but a JSON array of JSON objects needs this flexibility.
+     *
+     * @throws TableValidationException thrown if the header names do not match the
+     *          fields declared in the schema
+     * @throws TableSchemaException thrown if something goes wrong retrieving the table headers
+     */
+    void validate() throws TableValidationException, TableSchemaException {
+        if (null == schema)
+            return;
+        String[] headers = null;
+        try {
+            headers = this.dataSourceFormat.getHeaders();
+        } catch (Exception ex) {
+            throw new TableSchemaException(ex);
+        }
+        List<Field> fields = schema.getFields();
+        List<String> declaredHeaders = Arrays.asList(getDeclaredHeaders());
+        List<String> foundHeaders = Arrays.asList(headers);
+        for (String col : declaredHeaders) {
+            if (!foundHeaders.contains(col)) {
+                throw new TableValidationException("Declared column "+col+" not found in data");
+            }
+        }
+        for (String col : headers) {
+            if (!declaredHeaders.contains(col)) {
+                throw new TableValidationException("Found undeclared column: "+col);
+            }
+        }
+
     }
     
     public Schema inferSchema() throws TypeInferringException{

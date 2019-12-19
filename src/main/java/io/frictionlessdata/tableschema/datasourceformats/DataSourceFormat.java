@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public interface DataSourceFormat {
     Iterator<String[]> iterator() throws Exception;
     String[] getHeaders() throws Exception;
+    void setHeaders(String[] newHeaders);
     List<String[]> data() throws Exception;
 
     /**

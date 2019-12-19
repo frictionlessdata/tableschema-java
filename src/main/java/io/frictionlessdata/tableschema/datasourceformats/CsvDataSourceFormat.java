@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.datasourceformats;
 
+import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -56,7 +57,7 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
         super(dataSource, workDir);
     }
     
-    public CsvDataSourceFormat(String dataSource){
+    CsvDataSourceFormat(String dataSource){
         super(dataSource);
     }
 
@@ -77,8 +78,8 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
      * needs to be recreated every time:
      * https://commons.apache.org/proper/commons-csv/apidocs/index.html?org/apache/commons/csv/CSVParser.html
      * 
-     * @return
-     * @throws Exception 
+     * @return a CSVParser instance
+     * @throws Exception if either the data has the wrong format or some I/O exception occurs
      */
     @Override
     CSVParser getCSVParser() throws Exception{
@@ -113,7 +114,7 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
             //return CSVParser.parse((URL)dataSource, Charset.forName("UTF-8"), CSVFormat.RFC4180.withHeader());
             
         } else{
-            throw new Exception("Data source is of invalid type.");
+            throw new TableSchemaException("Data source is of invalid type.");
         }
     }
 
