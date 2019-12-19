@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class Table{
     private DataSourceFormat dataSourceFormat = null;
     private Schema schema = null;
-    private CSVFormat format;
+    private CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
     private Map<String, Object> fieldOptions;
 
     /**
