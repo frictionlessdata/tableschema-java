@@ -197,8 +197,21 @@ public class TableOtherTest {
         File file = new File("data/population.json");
         Schema schema = Schema.fromJson(new File(testDataDir, "schema/employee_schema.json"), true);
 
+        Table table = new Table(file, testDataDir, schema, DataSourceFormat.getDefaultCsvFormat());
         exception.expect(TableValidationException.class);
-        new Table(file, testDataDir, schema, DataSourceFormat.getDefaultCsvFormat());
+        table.validate();
+    }
+
+    // schema doesn't fit data -> expect exception
+    @Test
+    public void loadTableWithMismatchingSchema2() throws Exception {
+        File testDataDir = getTestDataDirectory();
+        File file = new File("data/population.json");
+        Schema schema = Schema.fromJson(new File(testDataDir, "schema/employee_schema.json"), true);
+
+        Table table = new Table(file, testDataDir, schema, DataSourceFormat.getDefaultCsvFormat());
+        exception.expect(TableValidationException.class);
+        table.read();
     }
 
     @Test

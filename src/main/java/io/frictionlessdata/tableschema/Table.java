@@ -51,7 +51,6 @@ public class Table{
         if (null != format) {
             this.format = format;
         }
-        validate();
     }
 
     public Table(File dataSource, File basePath) throws Exception{
@@ -64,7 +63,6 @@ public class Table{
         if (null != format) {
             this.format = format;
         }
-        validate();
     }
 
     public Table(String dataSource, Schema schema, CSVFormat format) {
@@ -73,7 +71,6 @@ public class Table{
         if (null != format) {
             this.format = format;
         }
-        validate();
     }
 
     public Table(URL dataSource) throws IOException {
@@ -86,7 +83,6 @@ public class Table{
         if (null != format) {
             this.format = format;
         }
-        validate();
     }
     
     public Table(URL dataSource, URL schema) throws Exception{
@@ -196,7 +192,7 @@ public class Table{
      *          fields declared in the schema
      * @throws TableSchemaException thrown if something goes wrong retrieving the table headers
      */
-    void validate() throws TableValidationException, TableSchemaException {
+    public void validate() throws TableValidationException, TableSchemaException {
         if (null == schema)
             return;
         String[] headers = null;
@@ -205,7 +201,6 @@ public class Table{
         } catch (Exception ex) {
             throw new TableSchemaException(ex);
         }
-        List<Field> fields = schema.getFields();
         List<String> declaredHeaders = Arrays.asList(getDeclaredHeaders());
         List<String> foundHeaders = Arrays.asList(headers);
         for (String col : declaredHeaders) {

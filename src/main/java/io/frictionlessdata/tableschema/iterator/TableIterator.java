@@ -47,6 +47,7 @@ public class TableIterator<T> implements Iterator<T> {
         this.fieldOptions = table.getFieldOptions();
         this.headers = table.getHeaders();
         this.schema = table.schema();
+        table.validate();
         this.wrappedIterator = table.dataSource().iterator();
     }
 
