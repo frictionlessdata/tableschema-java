@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.field_tests;
 
+import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
 import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
@@ -382,7 +383,7 @@ class FieldCastTest {
         try (FileInputStream fis = new FileInputStream(schemaFile)) {
             schema = Schema.fromJson (fis, false);
         }
-        Table table = new Table(f, TestHelper.getTestDataDirectory(), schema);
+        Table table = new Table(f, TestHelper.getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
         Iterator iter = table.iterator(true, false, true, false);
         Object obj = null;
         int cnt = 0;

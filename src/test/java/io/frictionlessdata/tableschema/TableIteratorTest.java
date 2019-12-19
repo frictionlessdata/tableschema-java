@@ -2,6 +2,7 @@ package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.beans.EmployeeBean;
 import io.frictionlessdata.tableschema.beans.GrossDomesticProductBean;
+import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.field.DateField;
 import io.frictionlessdata.tableschema.field.GeopointField;
@@ -35,11 +36,14 @@ class TableIteratorTest {
         }
         File testDataDir = getTestDataDirectory();
         File file = new File("data/population.csv");
-        validPopulationTable = new Table(file, testDataDir, validPopulationSchema);
+        validPopulationTable
+                = new Table(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
         file = new File("data/population-null-values.csv");
-        nullValuesPopulationTable = new Table(file, testDataDir, validPopulationSchema);
+        nullValuesPopulationTable
+                = new Table(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
         file = new File("data/population-invalid.csv");
-        invalidPopulationTable = new Table(file, testDataDir, validPopulationSchema);
+        invalidPopulationTable
+                = new Table(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
 
     }
 

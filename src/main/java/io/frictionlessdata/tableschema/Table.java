@@ -45,9 +45,10 @@ public class Table{
      * @param schema InputStream for reading table schema from
      * @throws Exception if either reading or parsing throws an Exception
      */
-    public Table(InputStream dataSource, InputStream schema) throws Exception{
+    public Table(InputStream dataSource, InputStream schema, CSVFormat format) throws Exception{
         this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
         this.schema = Schema.fromJson(schema, true);
+        this.format = format;
         validate();
     }
 
@@ -55,15 +56,17 @@ public class Table{
         this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource, basePath);
     }
 
-    public Table(File dataSource, File basePath, Schema schema) throws Exception{
+    public Table(File dataSource, File basePath, Schema schema, CSVFormat format) throws Exception{
         this(dataSource, basePath);
         this.schema = schema;
+        this.format = format;
         validate();
     }
 
-    public Table(String dataSource, Schema schema) {
+    public Table(String dataSource, Schema schema, CSVFormat format) {
         this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
         this.schema = schema;
+        this.format = format;
         validate();
     }
 
@@ -71,14 +74,15 @@ public class Table{
         this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource.openStream());
     }
 
-    public Table(URL dataSource, Schema schema) throws IOException {
+    public Table(URL dataSource, Schema schema, CSVFormat format) throws IOException {
         this(dataSource);
         this.schema = schema;
+        this.format = format;
         validate();
     }
     
     public Table(URL dataSource, URL schema) throws Exception{
-        this(dataSource, Schema.fromJson(schema, true));
+        this(dataSource, Schema.fromJson(schema, true), null);
     }
 
     public Iterator<Object[]> iterator() throws Exception{

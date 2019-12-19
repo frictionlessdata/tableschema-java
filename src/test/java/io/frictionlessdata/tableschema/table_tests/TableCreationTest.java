@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.table_tests;
 
+import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
@@ -79,7 +80,7 @@ public class TableCreationTest {
         Path path = Paths.get(sourceFileUrl.toURI());
         String csvContent = new String(Files.readAllBytes(path));
         
-        Table table = new Table(csvContent, null);
+        Table table = new Table(csvContent, null, DataSourceFormat.getDefaultCsvFormat());
         
         Assert.assertEquals(3, table.read().size()); 
     }
@@ -111,7 +112,7 @@ public class TableCreationTest {
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
 
         Schema schema = Schema.fromJson (f, true);
-        Table table = new Table(populationTestJson.toString(), schema);
+        Table table = new Table(populationTestJson.toString(), schema, DataSourceFormat.getDefaultCsvFormat());
         Assert.assertEquals(3, table.read().size());
         Schema expectedSchema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
@@ -150,7 +151,7 @@ public class TableCreationTest {
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema testSchema = Schema.fromJson (schemaFile, true);
-        Table testTable = new Table(populationTestJson.toString(), testSchema);
+        Table testTable = new Table(populationTestJson.toString(), testSchema, DataSourceFormat.getDefaultCsvFormat());
 
         Assert.assertEquals(testTable, table);
     }
@@ -171,7 +172,7 @@ public class TableCreationTest {
             schema = Schema.fromJson (fis, false);
         }
 
-        Table table = new Table(csvContent, schema);
+        Table table = new Table(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
 
         Assert.assertEquals(3, table.read().size());
         List<Object[]> actualData = table.read();
@@ -215,11 +216,11 @@ public class TableCreationTest {
 
         ByteArrayInputStream bis = new ByteArrayInputStream(csvContent.getBytes());
         FileInputStream fis = new FileInputStream(f);
-        Table table = new Table(bis, fis);
+        Table table = new Table(bis, fis, DataSourceFormat.getDefaultCsvFormat());
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema testSchema = Schema.fromJson (schemaFile, true);
-        Table testTable = new Table(populationTestJson.toString(), testSchema);
+        Table testTable = new Table(populationTestJson.toString(), testSchema, DataSourceFormat.getDefaultCsvFormat());
         Assert.assertEquals(testTable, table);
         try {
             bis.close();

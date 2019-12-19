@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema;
 
+import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.field.GeopointField;
 import io.frictionlessdata.tableschema.field.IntegerField;
@@ -36,7 +37,7 @@ class DocumentationCases {
         // Load the data from URL with the schema.
         Table table = new Table(
                 new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/data/simple_data.csv"),
-                schema);
+                schema, DataSourceFormat.getDefaultCsvFormat());
 
         List<Object[]> allData = table.read();
 
