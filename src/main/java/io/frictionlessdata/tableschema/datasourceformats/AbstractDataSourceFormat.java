@@ -155,8 +155,7 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
         try {
             CSVFormat locFormat = (null != format)
                     ? format
-                    : CSVFormat.RFC4180
-                    .withHeader();
+                    : DataSourceFormat.getDefaultCsvFormat();
             CSVPrinter csvPrinter = new CSVPrinter(out, locFormat);
 
             String[] dataHeaders = getDataHeaders();
@@ -196,8 +195,7 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
     public void writeCsv(File outputFile, CSVFormat format) throws Exception {
         CSVFormat locFormat = (null != format)
                 ? format
-                : CSVFormat.RFC4180
-                .withHeader();
+                : DataSourceFormat.getDefaultCsvFormat();
         try (Writer out = new BufferedWriter(new FileWriter(outputFile))) {
             writeCsv(out, locFormat);
         }

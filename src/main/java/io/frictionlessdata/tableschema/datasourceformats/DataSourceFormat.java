@@ -71,7 +71,11 @@ public interface DataSourceFormat {
         }
     }
 
-
+    public static CSVFormat getDefaultCsvFormat() {
+        return CSVFormat.RFC4180
+                .withHeader()
+                .withIgnoreSurroundingSpaces(true);
+    }
 
     /**
      * Factory method to instantiate either a JsonArrayDataSource or a

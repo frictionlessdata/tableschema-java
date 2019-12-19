@@ -21,9 +21,7 @@ import java.util.stream.Collectors;
  */
 public class CsvDataSourceFormat extends AbstractDataSourceFormat {
 
-    private CSVFormat format = CSVFormat
-            .RFC4180
-            .withHeader();;
+    private CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
 
     public CsvDataSourceFormat(){};
 
@@ -85,10 +83,9 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
     CSVParser getCSVParser() throws Exception{
         CSVFormat format = this.format;
         if (null == format) {
-            format = CSVFormat
-                    .RFC4180
-                    .withRecordSeparator('\n')
-                    .withHeader();
+            format = DataSourceFormat
+                    .getDefaultCsvFormat()
+                    .withRecordSeparator('\n');
         }
         if(dataSource instanceof String){
             Reader sr = new StringReader((String)dataSource);
@@ -111,7 +108,6 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
             
         } else if(dataSource instanceof URL){
             return CSVParser.parse((URL)dataSource, StandardCharsets.UTF_8, format);
-            //return CSVParser.parse((URL)dataSource, Charset.forName("UTF-8"), CSVFormat.RFC4180.withHeader());
             
         } else{
             throw new TableSchemaException("Data source is of invalid type.");
@@ -121,7 +117,7 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
     @Override
     public void write(File outputFile) throws Exception {
         try (Writer out = new BufferedWriter(new FileWriter(outputFile));
-             CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.RFC4180)) {
+             CSVPrinter csvPrinter = new CSVPrinter(out, DataSourceFormat.getDefaultCsvFormat())) {
 
             if (this.getHeaders() != null) {
                 csvPrinter.printRecord(this.getHeaders());
