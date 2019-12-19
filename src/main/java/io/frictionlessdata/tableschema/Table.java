@@ -49,7 +49,7 @@ public class Table{
         this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
         this.schema = Schema.fromJson(schema, true);
         if (null != format) {
-            this.format = format;
+            setCsvFormat(format);
         }
     }
 
@@ -61,7 +61,7 @@ public class Table{
         this(dataSource, basePath);
         this.schema = schema;
         if (null != format) {
-            this.format = format;
+            setCsvFormat(format);
         }
     }
 
@@ -69,7 +69,7 @@ public class Table{
         this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
         this.schema = schema;
         if (null != format) {
-            this.format = format;
+            setCsvFormat(format);
         }
     }
 
@@ -81,7 +81,7 @@ public class Table{
         this(dataSource);
         this.schema = schema;
         if (null != format) {
-            this.format = format;
+            setCsvFormat(format);
         }
     }
     
