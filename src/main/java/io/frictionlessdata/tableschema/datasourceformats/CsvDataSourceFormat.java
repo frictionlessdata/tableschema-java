@@ -116,12 +116,12 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
 
     @Override
     public void write(File outputFile) throws Exception {
+        CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
+        if (this.getHeaders() != null) {
+            format = format.withHeader(this.getHeaders());
+        }
         try (Writer out = new BufferedWriter(new FileWriter(outputFile));
-             CSVPrinter csvPrinter = new CSVPrinter(out, DataSourceFormat.getDefaultCsvFormat())) {
-
-            if (this.getHeaders() != null) {
-                csvPrinter.printRecord(this.getHeaders());
-            }
+                CSVPrinter csvPrinter = new CSVPrinter(out, format)) {
 
             Iterator<CSVRecord> recordIter = this.getCSVParser().iterator();
             while(recordIter.hasNext()){

@@ -92,8 +92,7 @@ public class TableOtherTest {
 
         Assert.assertEquals(3, table.read().size());
         Schema expectedSchema = Schema.fromJson (populationSchema.toString(), true);
-        Table expectedTable = new Table(new File(getTestDataDirectory()
-                , "data/population.csv")
+        Table expectedTable = new Table(new File("data/population.csv")
                 , getTestDataDirectory(), expectedSchema);
         Assert.assertEquals(expectedTable, table);
     }
