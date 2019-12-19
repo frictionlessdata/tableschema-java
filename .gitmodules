@@ -1,3 +1,3 @@
-[submodule "src\\test\\resources\\testsuite-data"]
-	path = src\\test\\resources\\testsuite-data
+[submodule "src/test/resources/testsuite-data"]
+	path = src/test/resources/testsuite-data
 	url = https://github.com/frictionlessdata/testsuite-data.git
