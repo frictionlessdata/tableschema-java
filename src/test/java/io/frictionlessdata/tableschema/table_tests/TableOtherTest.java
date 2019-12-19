@@ -200,7 +200,7 @@ public class TableOtherTest {
         exception.expect(TableValidationException.class);
         new Table(file, testDataDir, schema, DataSourceFormat.getDefaultCsvFormat());
     }
-    
+
     @Test
     public void testReadUncastData() throws Exception{
         File testDataDir = getTestDataDirectory();
