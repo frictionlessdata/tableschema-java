@@ -144,6 +144,10 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
      */
     @Override
     public void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders) {
+        if (null == sortedHeaders) {
+            writeCsv(out, format);
+            return;
+        }
         try {
             CSVFormat locFormat = (null != format)
                     ? format
@@ -154,6 +158,7 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
 
             String[] headers = getHeaders();
             Map<Integer, Integer> mapping = new HashMap<>();
+
             for (int i = 0; i < sortedHeaders.length; i++) {
                 for (int j = 0; j < headers.length; j++) {
                     if (sortedHeaders[i].equals(headers[j])) {
@@ -161,15 +166,44 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
                     }
                 }
             }
-            for (String[] record : data()) {
+            writeData(data(), mapping, csvPrinter);
+            csvPrinter.close();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    void writeCsv(Writer out, CSVFormat format) {
+        try {
+            CSVFormat locFormat = (null != format)
+                    ? format
+                    : DataSourceFormat.getDefaultCsvFormat();
+
+            String[] headers = getHeaders();
+            locFormat = locFormat.withHeader(headers);
+            CSVPrinter csvPrinter = new CSVPrinter(out, locFormat);
+
+            Map<Integer, Integer> mapping = new HashMap<>();
+            for (int i = 0; i < headers.length; i++) {
+                mapping.put(i, i);
+            }
+            writeData(data(), mapping, csvPrinter);
+            csvPrinter.close();
+
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private static void writeData(List<String[]> data, Map<Integer, Integer> mapping, CSVPrinter csvPrinter) {
+        try {
+            for (String[] record : data) {
                 String[] sortedRec = new String[record.length];
                 for (int i = 0; i < record.length; i++) {
                     sortedRec[mapping.get(i)] = record[i];
                 }
                 csvPrinter.printRecord(sortedRec);
             }
-            csvPrinter.close();
-
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
