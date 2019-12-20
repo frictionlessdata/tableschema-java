@@ -1,6 +1,7 @@
 package io.frictionlessdata.tableschema.table_tests;
 
 import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
+import io.frictionlessdata.tableschema.exception.TableValidationException;
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
@@ -8,6 +9,7 @@ import org.json.JSONArray;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.ByteArrayInputStream;
@@ -62,7 +64,10 @@ public class TableCreationTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-    
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+
     @Test
     public void testReadFromValidFilePath() throws Exception{
         File testDataDir = getTestDataDirectory();
@@ -70,7 +75,9 @@ public class TableCreationTest {
         File file = new File("data/simple_data.csv");
         Table table = new Table(file, testDataDir);
         
-        Assert.assertEquals(3, table.read().size()); 
+        Assert.assertEquals(3, table.read().size());
+        // must not throw an exception
+        table.validate();
     }
     
     @Test
@@ -82,7 +89,9 @@ public class TableCreationTest {
         
         Table table = new Table(csvContent, null, DataSourceFormat.getDefaultCsvFormat());
         
-        Assert.assertEquals(3, table.read().size()); 
+        Assert.assertEquals(3, table.read().size());
+        // must not throw an exception
+        table.validate();
     }
     
     @Test
@@ -104,6 +113,7 @@ public class TableCreationTest {
             }
         }
         Assert.assertEquals(expectedSchema, schema);
+
     }
 
 
@@ -127,6 +137,8 @@ public class TableCreationTest {
             }
         }
         Assert.assertEquals(expectedSchema, schema);
+        // must not throw an exception
+        table.validate();
     }
     
     @Test
@@ -137,6 +149,8 @@ public class TableCreationTest {
         Table table = new Table(url);
         
         Assert.assertEquals(3, table.read().size());
+        // must not throw an exception
+        table.validate();
     }
 
 
@@ -181,6 +195,8 @@ public class TableCreationTest {
             Object[] testRow = populationTestData[i];
             Assert.assertArrayEquals(testRow, actualRow);
         }
+        // must not throw an exception
+        table.validate();
     }
 
     /*
@@ -203,6 +219,8 @@ public class TableCreationTest {
             Object[] testRow = populationStringTestData[i];
             Assert.assertArrayEquals(testRow, actualRow);
         }
+        // must not throw an exception
+        table.validate();
     }
 
     @Test
@@ -227,6 +245,27 @@ public class TableCreationTest {
         } finally {
             fis.close();
         }
+        // must not throw an exception
+        table.validate();
+    }
+
+
+    @Test
+    public void testReadFromValidFileWithMismatchingValidSchemaViaStream() throws Exception{
+        // get path of test CSV file
+        URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/data/population.csv");
+        Path path = Paths.get(sourceFileUrl.toURI());
+        String csvContent = new String(Files.readAllBytes(path));
+
+        File f = new File(getTestDataDirectory(), "schema/employee_schema.json");
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(csvContent.getBytes());
+        FileInputStream fis = new FileInputStream(f);
+        Table table = new Table(bis, fis, DataSourceFormat.getDefaultCsvFormat());
+
+        // must throw an exception
+        exception.expect(TableValidationException.class);
+        table.validate();
     }
 
 }

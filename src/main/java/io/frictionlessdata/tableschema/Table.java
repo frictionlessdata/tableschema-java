@@ -14,6 +14,7 @@ import io.frictionlessdata.tableschema.iterator.SimpleTableIterator;
 import io.frictionlessdata.tableschema.iterator.TableIterator;
 import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.schema.TypeInferrer;
+import io.frictionlessdata.tableschema.util.TableSchemaUtil;
 import org.apache.commons.csv.CSVFormat;
 
 import java.net.URL;
@@ -111,6 +112,20 @@ public class Table{
 
     public Iterator<Map> keyedIterator(boolean extended, boolean cast, boolean relations) throws Exception{
         return new TableIterator<Map>(this, true, extended, cast, relations);
+    }
+
+    public Map<Integer, Integer> getSchemaHeaderMapping() {
+        try {
+            if (null == schema) {
+                return TableSchemaUtil
+                        .createSchemaHeaderMapping(dataSourceFormat.getHeaders(), dataSourceFormat.getHeaders());
+            } else {
+                return TableSchemaUtil
+                        .createSchemaHeaderMapping(dataSourceFormat.getHeaders(), getDeclaredHeaders());
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     /**

@@ -21,6 +21,7 @@ public class TableIterator<T> implements Iterator<T> {
     boolean cast;
     boolean relations;
     Map<String, Object> fieldOptions;
+    Map<Integer, Integer> mapping = null;
     int index = 0;
 
     TableIterator() {    }
@@ -45,6 +46,7 @@ public class TableIterator<T> implements Iterator<T> {
 
     void init(Table table) throws Exception{
         this.fieldOptions = table.getFieldOptions();
+        this.mapping = table.getSchemaHeaderMapping();
         this.headers = table.getHeaders();
         this.schema = table.schema();
         table.validate();
@@ -66,7 +68,7 @@ public class TableIterator<T> implements Iterator<T> {
     public T next() {
         String[] row = this.wrappedIterator.next();
 
-        Map<String, Object> keyedRow = new HashMap();
+        Map<String, Object> keyedRow = new HashMap<>();
         Object[] extendedRow;
         Object[] castRow = new Object[row.length];
 
@@ -74,7 +76,8 @@ public class TableIterator<T> implements Iterator<T> {
         if(this.schema != null){
             for(int i=0; i<row.length; i++){
                 Field field = this.schema.getFields().get(i);
-                Object val = field.castValue(row[i], true, fieldOptions);
+                String rawVal = row[mapping.get(i)];
+                Object val = field.castValue(rawVal, true, fieldOptions);
 
                 if(!extended && keyed){
                     keyedRow.put(this.headers[i], val);

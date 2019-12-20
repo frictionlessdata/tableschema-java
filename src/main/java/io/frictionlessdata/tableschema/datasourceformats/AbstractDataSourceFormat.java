@@ -1,6 +1,7 @@
 package io.frictionlessdata.tableschema.datasourceformats;
 
 import com.google.common.collect.Iterators;
+import io.frictionlessdata.tableschema.util.TableSchemaUtil;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -157,15 +158,8 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
             CSVPrinter csvPrinter = new CSVPrinter(out, locFormat);
 
             String[] headers = getHeaders();
-            Map<Integer, Integer> mapping = new HashMap<>();
-
-            for (int i = 0; i < sortedHeaders.length; i++) {
-                for (int j = 0; j < headers.length; j++) {
-                    if (sortedHeaders[i].equals(headers[j])) {
-                        mapping.put(i, j);
-                    }
-                }
-            }
+            Map<Integer, Integer> mapping
+                    = TableSchemaUtil.createSchemaHeaderMapping(headers, sortedHeaders);
             writeData(data(), mapping, csvPrinter);
             csvPrinter.close();
         } catch (Exception ex) {

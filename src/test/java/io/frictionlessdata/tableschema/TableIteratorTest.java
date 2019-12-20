@@ -1,13 +1,7 @@
 package io.frictionlessdata.tableschema;
 
-import io.frictionlessdata.tableschema.beans.EmployeeBean;
-import io.frictionlessdata.tableschema.beans.GrossDomesticProductBean;
 import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
-import io.frictionlessdata.tableschema.field.DateField;
-import io.frictionlessdata.tableschema.field.GeopointField;
-import io.frictionlessdata.tableschema.iterator.BeanIterator;
-import io.frictionlessdata.tableschema.schema.BeanSchema;
 import io.frictionlessdata.tableschema.schema.Schema;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,9 +64,6 @@ class TableIteratorTest {
         Assertions.assertNull(obj.get("year"));
         obj =  (Map<String, Object>)iter.next();
         Assertions.assertNull(obj.get("year"));
-
-        //});
-
     }
 
     @Test
@@ -80,6 +71,156 @@ class TableIteratorTest {
         Assertions.assertThrows(InvalidCastException.class, () -> {
             invalidPopulationTable.iterator(true, false, true, false).next();
         });
+    }
 
+    @Test
+    void testStringArrayIterateDataFromJSONFormatAlternateSchema() throws Exception{
+        String jsonData = "[" +
+                "{" +
+                "\"city\": \"london\"," +
+                "\"year\": 2017," +
+                "\"population\": 8780000" +
+                "}," +
+                "{" +
+                "\"city\": \"paris\"," +
+                "\"year\": 2017," +
+                "\"population\": 2240000" +
+                "}," +
+                "{" +
+                "\"city\": \"rome\"," +
+                "\"year\": 2017," +
+                "\"population\": 2860000" +
+                "}" +
+                "]";
+
+
+        //set a schema to guarantee the ordering of properties
+        Schema schema = Schema.fromJson(new File(getTestDataDirectory(), "/schema/population_schema_alternate.json"), true);
+        Table table = new Table(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
+
+        // Expected data.
+        List<String[]> expectedData = this.getExpectedAlternatePopulationData();
+
+        // Get Iterator.
+        Iterator<String[]> iter = table.stringArrayIterator();
+        int expectedDataIndex = 0;
+
+        // Assert data.
+        while(iter.hasNext()){
+            String[] record = iter.next();
+            String year = record[0];
+            String city = record[1];
+            String population = record[2];
+
+            Assertions.assertEquals(expectedData.get(expectedDataIndex)[0], year);
+            Assertions.assertEquals(expectedData.get(expectedDataIndex)[1], city);
+            Assertions.assertEquals(expectedData.get(expectedDataIndex)[2], population);
+
+            expectedDataIndex++;
+        }
+    }
+
+    @Test
+    void testStringObjectArrayIterateDataFromJSONFormatAlternateSchema() throws Exception{
+        String jsonData = "[" +
+                "{" +
+                "\"city\": \"london\"," +
+                "\"year\": 2017," +
+                "\"population\": 8780000" +
+                "}," +
+                "{" +
+                "\"city\": \"paris\"," +
+                "\"year\": 2017," +
+                "\"population\": 2240000" +
+                "}," +
+                "{" +
+                "\"city\": \"rome\"," +
+                "\"year\": 2017," +
+                "\"population\": 2860000" +
+                "}" +
+                "]";
+
+
+        //set a schema to guarantee the ordering of properties
+        Schema schema = Schema.fromJson(new File(getTestDataDirectory(), "/schema/population_schema_alternate.json"), true);
+        Table table = new Table(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
+
+        // Expected data.
+        List<String[]> expectedData = this.getExpectedAlternatePopulationData();
+
+        // Get Iterator.
+        Iterator<Object[]> iter = table.iterator(false, false, true, false);
+        int expectedDataIndex = 0;
+
+        // Assert data.
+        while(iter.hasNext()){
+            Object[] record = iter.next();
+            String year = record[0].toString();
+            String city = record[1].toString();
+            String population = record[2].toString();
+
+            Assertions.assertEquals(expectedData.get(expectedDataIndex)[0], year);
+            Assertions.assertEquals(expectedData.get(expectedDataIndex)[1], city);
+            Assertions.assertEquals(expectedData.get(expectedDataIndex)[2], population);
+
+            expectedDataIndex++;
+        }
+    }
+
+
+    @Test
+    void testStringObjectMapIterateDataFromJSONFormatAlternateSchema() throws Exception{
+        String jsonData = "[" +
+                "{" +
+                "\"city\": \"london\"," +
+                "\"year\": 2017," +
+                "\"population\": 8780000" +
+                "}," +
+                "{" +
+                "\"city\": \"paris\"," +
+                "\"year\": 2017," +
+                "\"population\": 2240000" +
+                "}," +
+                "{" +
+                "\"city\": \"rome\"," +
+                "\"year\": 2017," +
+                "\"population\": 2860000" +
+                "}" +
+                "]";
+
+
+        //set a schema to guarantee the ordering of properties
+        Schema schema = Schema.fromJson(new File(getTestDataDirectory(), "/schema/population_schema_alternate.json"), true);
+        Table table = new Table(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
+
+        // Expected data.
+        List<String[]> expectedData = this.getExpectedAlternatePopulationData();
+
+        // Get Iterator.
+        Iterator<Map> iter = table.keyedIterator(false, true, false);
+        int expectedDataIndex = 0;
+
+        // Assert data.
+        while(iter.hasNext()){
+            Map record = iter.next();
+            String year = record.get("year").toString();
+            String city = record.get("city").toString();
+            String population = record.get("population").toString();
+
+            Assertions.assertEquals(expectedData.get(expectedDataIndex)[0], year);
+            Assertions.assertEquals(expectedData.get(expectedDataIndex)[1], city);
+            Assertions.assertEquals(expectedData.get(expectedDataIndex)[2], population);
+
+            expectedDataIndex++;
+        }
+    }
+
+    private List<String[]> getExpectedAlternatePopulationData(){
+        List<String[]> expectedData  = new ArrayList<>();
+        expectedData.add(new String[]{"2017", "london", "8780000"});
+        expectedData.add(new String[]{"2017", "paris", "2240000"});
+        expectedData.add(new String[]{"2017", "rome", "2860000"});
+
+        return expectedData;
     }
 }
