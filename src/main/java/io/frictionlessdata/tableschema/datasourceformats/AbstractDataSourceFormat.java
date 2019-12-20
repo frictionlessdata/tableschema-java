@@ -82,16 +82,6 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
 
     @Override
     public String[] getHeaders() throws Exception{
-        if (null != headers)
-            return headers;
-        return getDataHeaders();
-    }
-
-    public void setHeaders(String[] newHeaders) {
-        this.headers = newHeaders;
-    }
-
-    String[] getDataHeaders() throws Exception{
         // Get a copy of the header map that iterates in column order.
         // The map keys are column names. The map values are 0-based indices.
         Map<String, Integer> headerMap = this.getCSVParser().getHeaderMap();
@@ -148,31 +138,29 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
      * Write as CSV file, the `format` parameter decides on the CSV options. If it is
      * null, then the file will be written as RFC 4180 compliant CSV
      * @param out the Writer to write to
-     * @throws Exception thrown if write operation fails
+     * @param format the CSV format to use
+     * @param sortedHeaders the header row names in the order in which data should be
+     *                      exported
      */
     @Override
-    public void writeCsv(Writer out, CSVFormat format) {
+    public void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders) {
         try {
             CSVFormat locFormat = (null != format)
                     ? format
                     : DataSourceFormat.getDefaultCsvFormat();
+
+            locFormat = locFormat.withHeader(sortedHeaders);
             CSVPrinter csvPrinter = new CSVPrinter(out, locFormat);
 
-            String[] dataHeaders = getDataHeaders();
             String[] headers = getHeaders();
-            if (headers != null) {
-                csvPrinter.printRecord((Object[]) headers);
-            }
-
             Map<Integer, Integer> mapping = new HashMap<>();
-            for (int i = 0; i < dataHeaders.length; i++) {
+            for (int i = 0; i < sortedHeaders.length; i++) {
                 for (int j = 0; j < headers.length; j++) {
-                    if (dataHeaders[i].equals(headers[j])) {
+                    if (sortedHeaders[i].equals(headers[j])) {
                         mapping.put(i, j);
                     }
                 }
             }
-
             for (String[] record : data()) {
                 String[] sortedRec = new String[record.length];
                 for (int i = 0; i < record.length; i++) {
@@ -180,6 +168,8 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
                 }
                 csvPrinter.printRecord(sortedRec);
             }
+            csvPrinter.close();
+
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -189,15 +179,17 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
      * Write as CSV file, the `format` parameter decides on the CSV options. If it is
      * null, then the file will be written as RFC 4180 compliant CSV
      * @param outputFile the File to write to
-     * @throws Exception thrown if write operation fails
+     * @param format the CSV format to use
+     * @param sortedHeaders the header row names in the order in which data should be
+     *                      exported
      */
     @Override
-    public void writeCsv(File outputFile, CSVFormat format) throws Exception {
+    public void writeCsv(File outputFile, CSVFormat format, String[] sortedHeaders) throws Exception {
         CSVFormat locFormat = (null != format)
                 ? format
                 : DataSourceFormat.getDefaultCsvFormat();
         try (Writer out = new BufferedWriter(new FileWriter(outputFile))) {
-            writeCsv(out, locFormat);
+            writeCsv(out, locFormat, sortedHeaders);
         }
     }
 

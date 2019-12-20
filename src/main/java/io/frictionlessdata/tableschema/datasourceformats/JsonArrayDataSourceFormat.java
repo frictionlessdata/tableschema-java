@@ -40,6 +40,11 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
         }
     }
 
+    @Override
+    public boolean hasReliableHeaders() {
+        return false;
+    }
+
     /**
      * Retrieve the CSV Parser.
      * The parser works record wise. It is not possible to go back, once a

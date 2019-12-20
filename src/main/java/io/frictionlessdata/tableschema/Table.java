@@ -169,10 +169,18 @@ public class Table{
     }
 
     public void writeCsv(Writer out, CSVFormat format) {
-        if (null != schema) {
-            this.dataSourceFormat.setHeaders(getDeclaredHeaders());
+        try {
+            String[] headers = null;
+            if (null != schema) {
+                List<String> fieldNames = schema.getFieldNames();
+                headers = fieldNames.toArray(new String[fieldNames.size()]);
+            } else {
+                headers = dataSourceFormat.getHeaders();
+            }
+            dataSourceFormat.writeCsv(out, format, headers);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
-        this.dataSourceFormat.writeCsv(out, format);
     }
 
     public void writeCsv(File outputFile, CSVFormat format) throws Exception{
@@ -183,7 +191,11 @@ public class Table{
 
     /**
      * Validates that names of the headers are as declared in the Schema, and
-     * throws a TableValidationException if they aren't.
+     * throws a TableValidationException if they aren't. If the headers derived from the
+     * DataSourceFormat aren't reliable (eg. JSON array of JSON objects where properties
+     * that are `null` would be omitted), then we don't test whether all declared header
+     * names are present.
+     *
      * Sort order is neglected to allow a Schema to define column order. This is intentional,
      * as JSON-objects do not have a sort order of their keys. Therefore, reading not from
      * a CSV but a JSON array of JSON objects needs this flexibility.
@@ -203,9 +215,11 @@ public class Table{
         }
         List<String> declaredHeaders = Arrays.asList(getDeclaredHeaders());
         List<String> foundHeaders = Arrays.asList(headers);
-        for (String col : declaredHeaders) {
-            if (!foundHeaders.contains(col)) {
-                throw new TableValidationException("Declared column "+col+" not found in data");
+        if (dataSourceFormat.hasReliableHeaders()) {
+            for (String col : declaredHeaders) {
+                if (!foundHeaders.contains(col)) {
+                    throw new TableValidationException("Declared column " + col + " not found in data");
+                }
             }
         }
         for (String col : headers) {

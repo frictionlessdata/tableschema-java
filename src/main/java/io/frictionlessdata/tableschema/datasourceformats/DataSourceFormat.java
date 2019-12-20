@@ -18,9 +18,25 @@ import java.util.stream.Collectors;
  * Interface for a source of tabular data.
  */
 public interface DataSourceFormat {
+    /**
+     * Returns an Iterator that returns String arrays containing
+     * one row of data each.
+     * @return Iterator over the data
+     * @throws Exception thrown if reading the data fails
+     */
     Iterator<String[]> iterator() throws Exception;
+
+    /**
+     * Returns the data headers if no headers were set or the set headers
+     * @return Column headers as a String array
+     */
     String[] getHeaders() throws Exception;
-    void setHeaders(String[] newHeaders);
+
+    /**
+     * Returns the whole data as a List of String arrays, each List entry is one row
+     * @return List containing the data
+     * @throws Exception thrown if reading the data fails
+     */
     List<String[]> data() throws Exception;
 
     /**
@@ -31,19 +47,31 @@ public interface DataSourceFormat {
     void write(File outputFile) throws Exception;
 
     /**
-     * Write as CSV, the `format` parameter decides on the CSV options
+     * Write as CSV file, the `format` parameter decides on the CSV options. If it is
+     * null, then the file will be written as RFC 4180 compliant CSV
      * @param out the Writer to write to
-     * @throws Exception thrown if write operation fails
+     * @param format the CSV format to use
+     * @param sortedHeaders the header row names in the order in which data should be
+     *                      exported
      */
-    void writeCsv(Writer out, CSVFormat format);
+    void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders);
 
     /**
-     * Write as CSV file, the `format` parameter decides on the CSV options
+     * Write as CSV file, the `format` parameter decides on the CSV options. If it is
+     * null, then the file will be written as RFC 4180 compliant CSV
      * @param outputFile the File to write to
-     * @throws Exception thrown if write operation fails
+     * @param format the CSV format to use
+     * @param sortedHeaders the header row names in the order in which data should be
+     *                      exported
      */
-    void writeCsv(File outputFile, CSVFormat format) throws Exception;
+    void writeCsv(File outputFile, CSVFormat format, String[] sortedHeaders) throws Exception;
 
+    /**
+     * Signals whether extracted headers can be trusted (CSV with header row) or not
+     * (JSON array of JSON objects where null values are omitted).
+     * @return true if extracted headers can be trusted, false otherwise
+     */
+    boolean hasReliableHeaders();
     /**
      * Factory method to instantiate either a JsonArrayDataSource or a
      * CsvDataSource based on input format

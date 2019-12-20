@@ -117,22 +117,15 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
     @Override
     public void write(File outputFile) throws Exception {
         CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
-        if (this.getHeaders() != null) {
-            format = format.withHeader(this.getHeaders());
-        }
-        try (Writer out = new BufferedWriter(new FileWriter(outputFile));
-                CSVPrinter csvPrinter = new CSVPrinter(out, format)) {
+        super.writeCsv(outputFile, format, this.headers);
+    }
 
-            Iterator<CSVRecord> recordIter = this.getCSVParser().iterator();
-            while(recordIter.hasNext()){
-                CSVRecord record = recordIter.next();
-                csvPrinter.printRecord(record);
-            }
-
-            csvPrinter.flush();
-
-        } catch (Exception e) {
-            throw e;
+    @Override
+    public boolean hasReliableHeaders() {
+        try {
+            return this.getHeaders() != null;
+        } catch (Exception ex) {
+            return false;
         }
     }
 }

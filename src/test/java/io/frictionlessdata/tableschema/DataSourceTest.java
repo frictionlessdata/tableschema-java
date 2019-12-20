@@ -78,7 +78,7 @@ public class DataSourceTest {
 
         DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(dates);
         File tempFile = Files.createTempFile("tableschema-", ".csv").toFile();
-        ds.writeCsv(tempFile, CSVFormat.RFC4180);
+        ds.writeCsv(tempFile, CSVFormat.RFC4180, ds.getHeaders());
         try (FileReader fr = new FileReader(tempFile)) {
             try (BufferedReader rdr = new BufferedReader(fr)) {
                 content = rdr.lines().collect(Collectors.joining("\n"));
