@@ -58,8 +58,17 @@ class TableIteratorTest {
 
     @Test
     void testNextCast() throws Exception {
-        // assertThrows(InvalidCastException.class, () -> {
-        Iterator iter = nullValuesPopulationTable.iterator(true, false, true, false);
+        Iterator<Map<String, Object>> iter
+                = nullValuesPopulationTable.keyedIterator( false, true, false);
+        Map<String, Object> obj =  (Map<String, Object>)iter.next();
+        Assertions.assertNull(obj.get("year"));
+        obj =  (Map<String, Object>)iter.next();
+        Assertions.assertNull(obj.get("year"));
+    }
+
+    @Test
+    void testNextCast2() throws Exception {
+        Iterator<Map<String, Object>> iter = nullValuesPopulationTable.keyedIterator();
         Map<String, Object> obj =  (Map<String, Object>)iter.next();
         Assertions.assertNull(obj.get("year"));
         obj =  (Map<String, Object>)iter.next();
@@ -197,7 +206,7 @@ class TableIteratorTest {
         List<String[]> expectedData = this.getExpectedAlternatePopulationData();
 
         // Get Iterator.
-        Iterator<Map> iter = table.keyedIterator(false, true, false);
+        Iterator<Map<String, Object>> iter = table.keyedIterator(false, true, false);
         int expectedDataIndex = 0;
 
         // Assert data.

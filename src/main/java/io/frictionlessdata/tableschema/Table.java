@@ -106,12 +106,12 @@ public class Table{
         return new SimpleTableIterator(this, relations);
     }
 
-    public Iterator<Map> keyedIterator() throws Exception{
-        return new TableIterator<Map>(this, true, false, true, false);
+    public Iterator<Map<String, Object>> keyedIterator() throws Exception{
+        return new TableIterator<Map<String, Object>>(this, true, false, true, false);
     }
 
-    public Iterator<Map> keyedIterator(boolean extended, boolean cast, boolean relations) throws Exception{
-        return new TableIterator<Map>(this, true, extended, cast, relations);
+    public Iterator<Map<String, Object>> keyedIterator(boolean extended, boolean cast, boolean relations) throws Exception{
+        return new TableIterator<Map<String, Object>>(this, true, extended, cast, relations);
     }
 
     public Map<Integer, Integer> getSchemaHeaderMapping() {
