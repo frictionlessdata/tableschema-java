@@ -102,7 +102,8 @@ public interface DataSourceFormat {
     public static CSVFormat getDefaultCsvFormat() {
         return CSVFormat.RFC4180
                 .withHeader()
-                .withIgnoreSurroundingSpaces(true);
+                .withIgnoreSurroundingSpaces(true)
+                .withRecordSeparator("\n");
     }
 
     /**

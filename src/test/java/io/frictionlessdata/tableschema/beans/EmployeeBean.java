@@ -8,6 +8,7 @@ import org.locationtech.jts.geom.Coordinate;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Calendar;
+import java.util.Map;
 
 @JsonPropertyOrder({
    "id", "name", "dateOfBirth", "isAdmin", "addressCoordinates", "contractLength", "info"
@@ -32,7 +33,7 @@ public class EmployeeBean {
 
  private Duration contractLength;
 
- private JSONObject info;
+ private Map info;
 
  @Override
  public String toString() {
@@ -95,11 +96,11 @@ public class EmployeeBean {
   this.contractLength = contractLength;
  }
 
- public JSONObject getInfo() {
+ public Map getInfo() {
   return info;
  }
 
- public void setInfo(JSONObject info) {
+ public void setInfo(Map info) {
   this.info = info;
  }
 }

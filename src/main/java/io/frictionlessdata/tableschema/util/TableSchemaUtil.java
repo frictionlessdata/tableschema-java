@@ -6,6 +6,8 @@ import java.util.Map;
 public class TableSchemaUtil {
 
     public static Map<Integer, Integer> createSchemaHeaderMapping(String[] headers, String[] sortedHeaders) {
+        if ((null == headers) || (null == sortedHeaders))
+            return null;
         Map<Integer, Integer> mapping = new HashMap<>();
 
         for (int i = 0; i < sortedHeaders.length; i++) {

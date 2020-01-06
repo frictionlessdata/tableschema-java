@@ -1,19 +1,24 @@
 package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
-import io.frictionlessdata.tableschema.field.Field;
-import io.frictionlessdata.tableschema.field.GeopointField;
-import io.frictionlessdata.tableschema.field.IntegerField;
-import io.frictionlessdata.tableschema.field.StringField;
+import io.frictionlessdata.tableschema.field.*;
+import io.frictionlessdata.tableschema.iterator.TableIterator;
 import io.frictionlessdata.tableschema.schema.Schema;
+import org.apache.commons.csv.CSVFormat;
+import org.joda.time.DateTime;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.math.BigInteger;
 import java.net.URL;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Test cases that mirror the code examples in the documentation to ensure
@@ -150,6 +155,70 @@ class DocumentationCases {
             {"name":"title","format":"","description":"","title":"","type":"string","constraints":{}}
         ]}
          */
+    }
+
+    @Test
+    @DisplayName("Write a Schema into a File")
+    void writeASchemaToFile() throws Exception{
+        Schema schema = new Schema();
+
+        Field nameField = new StringField("name");
+        schema.addField(nameField);
+
+        Field coordinatesField = new GeopointField("coordinates");
+        schema.addField(coordinatesField);
+
+        schema.writeJson(new File("schema.json"));
+    }
+
+    @Test
+    @DisplayName("Parse a CSV with a Schema")
+    void parseCsvWithSchema() throws Exception{
+        // Let's start by defining and building the schema of a table that contains data on employees:
+        Schema schema = new Schema();
+
+        Field idField = new IntegerField("id");
+        schema.addField(idField);
+
+        Field nameField = new StringField("name");
+        schema.addField(nameField);
+
+        Field dobField = new DateField("dateOfBirth");
+        schema.addField(dobField);
+
+        Field isAdminField = new BooleanField("isAdmin");
+        schema.addField(isAdminField);
+
+        Field addressCoordinatesField = new GeopointField("addressCoordinates");
+        addressCoordinatesField.setFormat(Field.FIELD_FORMAT_OBJECT);
+        schema.addField(addressCoordinatesField);
+
+        Field contractLengthField = new DurationField("contractLength");
+        schema.addField(contractLengthField);
+
+        Field infoField = new ObjectField("info");
+        schema.addField(infoField);
+
+        // Load the data from URL with the schema.
+        URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
+                "/src/test/resources/fixtures/data/employee_data.csv");
+        Table table = new Table(url, schema, DataSourceFormat.getDefaultCsvFormat());
+
+        Iterator<Object[]> iter = table.iterator(false, false, true, false);
+        while(iter.hasNext()){
+
+            // The fetched array will contain row values that have been cast into their
+            // appropriate types as per field definitions in the schema.
+            Object[] row = iter.next();
+
+            BigInteger id = (BigInteger)row[0];
+            String name = (String)row[1];
+            LocalDate dob = (LocalDate)row[2];
+            boolean isAdmin = (boolean)row[3];
+            double[] addressCoordinates = (double[])row[4];
+            Duration contractLength = (Duration)row[5];
+            Map info = (Map)row[6];
+        }
     }
 }
 

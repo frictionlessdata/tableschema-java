@@ -20,10 +20,7 @@ import java.io.File;
 import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
@@ -175,7 +172,7 @@ public class TableOtherTest {
             Assert.assertEquals(Boolean.class, row.get("isAdmin").getClass());
             Assert.assertEquals(double[].class, row.get("addressCoordinates").getClass());
             Assert.assertEquals(Duration.class, row.get("contractLength").getClass());
-            Assert.assertEquals(String.class, row.get("info").getClass());
+            Assert.assertEquals(HashMap.class, row.get("info").getClass());
         }
     }
 
@@ -244,7 +241,7 @@ public class TableOtherTest {
             Boolean.class,
             double[].class,
             Duration.class,
-            String.class
+            HashMap.class
         };
         
         List<Object[]> data = employeeTable.read(true);

@@ -135,7 +135,7 @@ public class TableIterationTest {
             Boolean.class,
             double[].class,
             Duration.class,
-            String.class
+            HashMap.class
         };
         
         List<Object[]> data = employeeTable.read(true);

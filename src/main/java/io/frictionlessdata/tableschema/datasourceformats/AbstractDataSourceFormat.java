@@ -88,7 +88,7 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
         Map<String, Integer> headerMap = this.getCSVParser().getHeaderMap();
 
         // Generate list of keys
-        List<String> headerVals = new ArrayList();
+        List<String> headerVals = new ArrayList<>();
 
         headerMap.entrySet().forEach((pair) -> {
             headerVals.add((String)pair.getKey());

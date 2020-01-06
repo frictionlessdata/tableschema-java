@@ -81,12 +81,9 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
      */
     @Override
     CSVParser getCSVParser() throws Exception{
-        CSVFormat format = this.format;
-        if (null == format) {
-            format = DataSourceFormat
-                    .getDefaultCsvFormat()
-                    .withRecordSeparator('\n');
-        }
+        CSVFormat format = (this.format != null)
+                ? this.format
+                : DataSourceFormat.getDefaultCsvFormat();
         if(dataSource instanceof String){
             Reader sr = new StringReader((String)dataSource);
             return CSVParser.parse(sr, format);

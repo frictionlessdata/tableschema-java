@@ -1,16 +1,10 @@
-package io.frictionlessdata.tableschema.field_tests;
+package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.field.*;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.net.URI;
-import java.util.Map;
 
 /**
  *

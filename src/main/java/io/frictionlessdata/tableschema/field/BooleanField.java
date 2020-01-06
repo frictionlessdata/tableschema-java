@@ -3,10 +3,12 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BooleanField extends Field<Boolean> {
     List<String> trueValues = Arrays.asList("true", "yes", "y", "t", "1");
@@ -78,4 +80,17 @@ public class BooleanField extends Field<Boolean> {
         return "default";
     }
 
+    public static Field fromJson (String json) {
+        BooleanField field = (BooleanField)Field.fromJson(json);
+        JSONObject fieldDef = new JSONObject(json);
+        JSONArray trueValues = fieldDef.has("trueValues") ? fieldDef.getJSONArray("trueValues") : null;
+        if (null != trueValues) {
+            field.trueValues = trueValues.toList().stream().map(Object::toString).collect(Collectors.toList());
+        }
+        JSONArray falseValues = fieldDef.has("falseValues") ? fieldDef.getJSONArray("falseValues") : null;
+        if (null != falseValues) {
+            field.falseValues = falseValues.toList().stream().map(Object::toString).collect(Collectors.toList());
+        }
+        return field;
+    }
 }

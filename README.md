@@ -184,13 +184,14 @@ You can write a `Schema` into a JSON file:
 ```java
 Schema schema = new Schema();
 
-Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+Field nameField = new StringField("name");
 schema.addField(nameField);
 
-Field coordinatesField = new Field("coordinates", Field.FIELD_TYPE_GEOPOINT);
+Field coordinatesField = new GeopointField("coordinates");
 schema.addField(coordinatesField);
 
-schema.write("/path/to/write/schema.json");
+schema.writeJson(new File("schema.json"));
+   
 ```
 
 ### Parse a CSV with a Schema

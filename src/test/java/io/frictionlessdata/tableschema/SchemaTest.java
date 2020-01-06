@@ -357,8 +357,9 @@ public class SchemaTest {
         assertThat(castRow[0], instanceOf(String.class));
         assertThat(castRow[1], instanceOf(BigInteger.class));
         assertThat(castRow[2], instanceOf(Boolean.class));
-        assertThat(castRow[3], instanceOf(String.class));
-        JSONObject obj = new JSONObject((String)castRow[3]);
+        assertThat(castRow[3], instanceOf(Map.class));
+        assertTrue(Map.class.isAssignableFrom(castRow[3].getClass()));
+        Map<String, Object> obj = (Map<String, Object>)castRow[3];
         assertTrue(obj.keySet().contains("one"));
         assertEquals(1, obj.get("one"));
         assertThat(castRow[4], instanceOf(Object[].class));
