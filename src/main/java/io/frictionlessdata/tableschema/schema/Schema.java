@@ -274,7 +274,9 @@ public class Schema {
         if(this.fields != null && this.fields.size() > 0){
             schemaJson.put(JSON_KEY_FIELDS, new JSONArray());
             this.fields.forEach((field) -> {
-                schemaJson.getJSONArray(JSON_KEY_FIELDS).put(new JSONObject(field.getJson()));
+                if (null != field) {
+                    schemaJson.getJSONArray(JSON_KEY_FIELDS).put(new JSONObject(field.getJson()));
+                }
             });
         }
         

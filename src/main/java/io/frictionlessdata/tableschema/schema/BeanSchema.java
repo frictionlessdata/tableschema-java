@@ -93,6 +93,8 @@ public class BeanSchema extends Schema{
                         field = new GeopointField(name);
                     else if (declaredClass.equals(JSONObject.class))
                         field = new ObjectField(name);
+                    else if (declaredClass.equals(Map.class))
+                        field = new ObjectField(name);
                 }
                 break;
                 default:

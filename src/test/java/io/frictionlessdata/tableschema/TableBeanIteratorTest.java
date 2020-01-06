@@ -82,7 +82,11 @@ class TableBeanIteratorTest {
         Assertions.assertFalse(frank.getAdmin());
         Assertions.assertEquals("(90.0, 45.0, NaN)", frank.getAddressCoordinates().toString());
         Assertions.assertEquals("PT15M", frank.getContractLength().toString());
-        Assertions.assertEquals("{\"pin\":45,\"rate\":83.23,\"ssn\":90}", frank.getInfo().toString());
+        Map info = frank.getInfo();
+        Assertions.assertEquals(45, info.get("pin"));
+        Assertions.assertEquals(83.23, info.get("rate"));
+        Assertions.assertEquals(90, info.get("ssn"));
+        //Assertions.assertEquals("{\"pin\":45,\"rate\":83.23,\"ssn\":90}", frank.getInfo().toString());
     }
 
     @Test
