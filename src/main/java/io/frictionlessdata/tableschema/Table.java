@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema;
 
+import io.frictionlessdata.tableschema.datasourceformats.StringArrayDataSourceFormat;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import io.frictionlessdata.tableschema.exception.TableValidationException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
@@ -13,13 +14,11 @@ import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.iterator.SimpleTableIterator;
 import io.frictionlessdata.tableschema.iterator.TableIterator;
 import io.frictionlessdata.tableschema.schema.Schema;
-import io.frictionlessdata.tableschema.schema.TypeInferrer;
 import io.frictionlessdata.tableschema.util.TableSchemaUtil;
 import org.apache.commons.csv.CSVFormat;
 
 import java.net.URL;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class represents a CSV table
@@ -34,45 +33,78 @@ public class Table{
     /**
      * Constructor for an empty Table
      */
-    public Table() {
-    }
+    public Table() { }
 
     /**
-     * Constructor using either a CSV or JSON array-containing string.
-     * @param dataSource the CSV or JSON content for the Table
+     * Constructor for a Table from String array input data and optionally
+     * a Schema. Data is parsed into a DataSourceFormat object
      */
-    public Table(String dataSource) {
-        this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
+    public Table(Collection<String[]> data, String[] headers, Schema schema) {
+        this.dataSourceFormat = new StringArrayDataSourceFormat(data, headers);
+        this.schema = schema;
+        if (null != schema)
+            validate();
     }
 
     /**
-     * Constructor using an {@link java.io.InputStream} for reading both the CSV
+     * Create Table on an {@link java.io.InputStream} for reading both the CSV/JSON
      * data and the table schema.
-     * @param dataSource InputStream for reading the CSV from
+     * @param dataSource InputStream for reading the data from
      * @param schema InputStream for reading table schema from
+     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data
      * @throws Exception if either reading or parsing throws an Exception
      */
-    public Table(InputStream dataSource, InputStream schema, CSVFormat format) throws Exception{
-        this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
-        this.schema = Schema.fromJson(schema, true);
+    public static Table fromSource(InputStream dataSource, InputStream schema, CSVFormat format) throws Exception{
+        Table table = new Table();
+        table.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
+        table.schema = Schema.fromJson(schema, true);
         if (null != format) {
-            setCsvFormat(format);
+            table.setCsvFormat(format);
         }
+        return table;
     }
 
-    public Table(File dataSource, File basePath) throws Exception{
-        this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource, basePath);
+    /**
+     * Create Table from a {@link java.io.File} containing the CSV/JSON
+     * data and without either a Schema or a CSVFormat.
+     * @param dataSource InputStream for reading the data from
+     * @throws Exception if either reading or parsing throws an Exception
+     */
+    public static Table fromSource(File dataSource, File basePath) throws Exception{
+        Table table = new Table();
+        table.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource, basePath);
+        return table;
     }
 
-    public Table(File dataSource, File basePath, Schema schema, CSVFormat format) throws Exception{
-        this(dataSource, basePath);
-        this.schema = schema;
+    /**
+     * Create Table from a {@link java.io.File} containing the CSV/JSON
+     * data and with  a Schema and a CSVFormat.
+     * @param dataSource InputStream for reading the data from
+     * @param schema InputStream for reading table schema from
+     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data
+     * @throws Exception if either reading or parsing throws an Exception
+     */
+    public static Table fromSource(File dataSource, File basePath, Schema schema, CSVFormat format) throws Exception{
+        Table table = fromSource(dataSource, basePath);
+        table.schema = schema;
         if (null != format) {
-            setCsvFormat(format);
+            table.setCsvFormat(format);
         }
+        return table;
     }
 
-    public static Table fromJson (String dataSource, Schema schema, CSVFormat format) {
+    /**
+     * Construct Table using either a CSV or JSON array-containing string  and without either a Schema or a CSVFormat.
+     * @param dataSource the CSV or JSON content for the Table
+     */
+    public static Table fromSource(String dataSource) {
+        Table table = new Table();
+        table.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
+        return table;
+    }
+
+
+    public static Table fromSource(String dataSource, Schema schema, CSVFormat format) {
         Table table = new Table();
         table.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
         table.schema = schema;
@@ -82,18 +114,18 @@ public class Table{
         return table;
     }
 
-    public static Table fromJson (URL dataSource) throws IOException {
+    public static Table fromSource(URL dataSource) throws IOException {
         Table table = new Table();
         table.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource.openStream());
         return table;
     }
 
-    public static Table fromJson (URL dataSource, URL schema) throws Exception{
-        return fromJson(dataSource, Schema.fromJson(schema, true), null);
+    public static Table fromSource(URL dataSource, URL schema) throws Exception{
+        return fromSource(dataSource, Schema.fromJson(schema, true), null);
     }
 
-    public static Table fromJson (URL dataSource, Schema schema, CSVFormat format) throws IOException {
-        Table table = fromJson(dataSource);
+    public static Table fromSource(URL dataSource, Schema schema, CSVFormat format) throws IOException {
+        Table table = fromSource(dataSource);
         table.schema = schema;
         if (null != format) {
             table.setCsvFormat(format);
@@ -178,7 +210,7 @@ public class Table{
             throw new InvalidCastException("Schema has no fields");
         }
         
-        List<Object[]> rows = new ArrayList();
+        List<Object[]> rows = new ArrayList<>();
         
         Iterator<Object[]> iter = this.iterator(false, false, cast, false);
         while(iter.hasNext()){
@@ -190,8 +222,8 @@ public class Table{
     }
     
     public List<Object[]> read() throws Exception{
-        boolean cast =  (null != schema);
-        return this.read(cast);
+        boolean cast = (null != schema);
+        return read(cast);
     }
 
     public void writeCsv(Writer out, CSVFormat format) {
@@ -292,12 +324,42 @@ public class Table{
         return format;
     }
 
-    public Schema schema(){
+    /**
+     * Get the current Schema for this Table
+     * @return the active Schema
+     */
+    public Schema getSchema(){
         return this.schema;
     }
-    
-    public DataSourceFormat dataSource(){
+
+    /**
+     * Set a Schema for this Table. If the Table is connected to a DataSourceFormat, ie. holds data,
+     * then the data will be validated against the new Schema.
+     * @param schema the Schema to set
+     */
+    public void setSchema(Schema schema) {
+        this.schema = schema;
+        if (null != dataSourceFormat)
+            validate();
+    }
+
+    /**
+     * Get the current DataSourceFormat for this Table
+     * @return the active DataSourceFormat
+     */
+    public DataSourceFormat getDataSourceFormat(){
         return this.dataSourceFormat;
+    }
+
+    /**
+     * Set a DataSourceFormat for this Table, ie. set the data for the Table. If this Table has an active Schema,
+     * then the data will be validated against the Schema.
+     * @param fmt the DataSourceFormat to set
+     */
+    public void setDataSourceFormat(DataSourceFormat fmt) {
+        this.dataSourceFormat = fmt;
+        if (null != schema)
+            validate();
     }
 
     @Override

@@ -48,19 +48,17 @@ public class TableCreationTest {
              "}" +
              "]");
 
-    private static Object[][] populationTestData = new Object[][]
-            {
-                new Object[]{"london", Year.of(2017), new BigInteger("8780000")},
-                new Object[]{"paris",Year.of(2017), new BigInteger("2240000")},
-                new Object[]{"rome",Year.of(2017), new BigInteger("2860000")}
-            };
+    private static Object[][] populationTestData = new Object[][] {
+        new Object[]{"london", Year.of(2017), new BigInteger("8780000")},
+        new Object[]{"paris",Year.of(2017), new BigInteger("2240000")},
+        new Object[]{"rome",Year.of(2017), new BigInteger("2860000")}
+    };
 
-    private static Object[][] populationStringTestData = new Object[][]
-            {
-                    new Object[]{"london","2017", "8780000"},
-                    new Object[]{"paris","2017", "2240000"},
-                    new Object[]{"rome","2017", "2860000"}
-            };
+    private static Object[][] populationStringTestData = new Object[][] {
+            new Object[]{"london","2017", "8780000"},
+            new Object[]{"paris","2017", "2240000"},
+            new Object[]{"rome","2017", "2860000"}
+    };
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -68,12 +66,49 @@ public class TableCreationTest {
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
+
+    @Test
+    public void testCreate1() {
+        List<String[]> data = new ArrayList<>();
+        for (Object[] row: populationStringTestData) {
+            String[] strArr = new String[row.length];
+            for (int j = 0; j < row.length; j++) {
+                strArr[j] = row[j].toString();
+            }
+            data.add(strArr);
+        }
+        String[] headers = new String[]{"city", "year", "population"};
+        Table testTable = new Table(data, headers, null);
+        Table expectedTable = Table.fromSource(populationTestJson.toString());
+        Assert.assertEquals(expectedTable, testTable);
+    }
+
+
+    @Test
+    public void testCreate2() throws Exception {
+        File f = new File(getTestDataDirectory(), "schema/population_schema.json");
+        Schema schema = Schema.fromJson (f, true);
+
+        List<String[]> data = new ArrayList<>();
+        for (Object[] row: populationStringTestData) {
+            String[] strArr = new String[row.length];
+            for (int j = 0; j < row.length; j++) {
+                strArr[j] = row[j].toString();
+            }
+            data.add(strArr);
+        }
+        String[] headers = new String[]{"city", "year", "population"};
+        Table testTable = new Table(data, headers, schema);
+        Table expectedTable = Table.fromSource(populationTestJson.toString(), schema, null);
+        Assert.assertEquals(expectedTable, testTable);
+    }
+
     @Test
     public void testReadFromValidFilePath() throws Exception{
         File testDataDir = getTestDataDirectory();
         // get path of test CSV file
         File file = new File("data/simple_data.csv");
-        Table table = new Table(file, testDataDir);
+        Table table = Table.fromSource(file, testDataDir);
         
         Assert.assertEquals(3, table.read().size());
         // must not throw an exception
@@ -87,7 +122,7 @@ public class TableCreationTest {
         Path path = Paths.get(sourceFileUrl.toURI());
         String csvContent = new String(Files.readAllBytes(path));
         
-        Table table = Table.fromJson(csvContent, null, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(csvContent, null, DataSourceFormat.getDefaultCsvFormat());
         
         Assert.assertEquals(3, table.read().size());
         // must not throw an exception
@@ -96,7 +131,7 @@ public class TableCreationTest {
     
     @Test
     public void testReadFromValidJSONArray() throws Exception{
-        Table table = new Table(populationTestJson.toString());
+        Table table = Table.fromSource(populationTestJson.toString());
         Assert.assertEquals(3, table.read().size());
         Schema schema = table.inferSchema();
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
@@ -122,7 +157,7 @@ public class TableCreationTest {
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
 
         Schema schema = Schema.fromJson (f, true);
-        Table table = Table.fromJson(populationTestJson.toString(), schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(populationTestJson.toString(), schema, DataSourceFormat.getDefaultCsvFormat());
         Assert.assertEquals(3, table.read().size());
         Schema expectedSchema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
@@ -146,7 +181,7 @@ public class TableCreationTest {
         // get path of test CSV file
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java" +
                 "/master/src/test/resources/fixtures/data/simple_data.csv");
-        Table table = Table.fromJson(url);
+        Table table = Table.fromSource(url);
         
         Assert.assertEquals(3, table.read().size());
         // must not throw an exception
@@ -161,11 +196,11 @@ public class TableCreationTest {
                 "/tableschema-java/master/src/test/resources/fixtures/data/population.csv");
         URL schemaUrl = new URL("https://raw.githubusercontent.com/frictionlessdata" +
                 "/tableschema-java/master/src/test/resources/fixtures/schema/population_schema.json");
-        Table table = Table.fromJson(tableUrl, schemaUrl);
+        Table table = Table.fromSource(tableUrl, schemaUrl);
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema testSchema = Schema.fromJson (schemaFile, true);
-        Table testTable = Table.fromJson(populationTestJson.toString(), testSchema, DataSourceFormat.getDefaultCsvFormat());
+        Table testTable = Table.fromSource(populationTestJson.toString(), testSchema, DataSourceFormat.getDefaultCsvFormat());
 
         Assert.assertEquals(testTable, table);
     }
@@ -186,7 +221,7 @@ public class TableCreationTest {
             schema = Schema.fromJson (fis, false);
         }
 
-        Table table = Table.fromJson(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
 
         Assert.assertEquals(3, table.read().size());
         List<Object[]> actualData = table.read();
@@ -210,7 +245,7 @@ public class TableCreationTest {
         Path path = Paths.get(sourceFileUrl.toURI());
         String csvContent = new String(Files.readAllBytes(path));
 
-        Table table = new Table(csvContent);
+        Table table = Table.fromSource(csvContent);
 
         Assert.assertEquals(3, table.read().size());
         List<Object[]> actualData = table.read();
@@ -224,7 +259,7 @@ public class TableCreationTest {
     }
 
     @Test
-    public void testReadFromValidFileWithValidSchemaViaStream() throws Exception{
+    public void testReadFromValidCSVFileWithValidSchemaViaStream() throws Exception{
         // get path of test CSV file
         URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/data/population.csv");
         Path path = Paths.get(sourceFileUrl.toURI());
@@ -234,11 +269,38 @@ public class TableCreationTest {
 
         ByteArrayInputStream bis = new ByteArrayInputStream(csvContent.getBytes());
         FileInputStream fis = new FileInputStream(f);
-        Table table = new Table(bis, fis, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(bis, fis, DataSourceFormat.getDefaultCsvFormat());
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema testSchema = Schema.fromJson (schemaFile, true);
-        Table testTable = Table.fromJson(populationTestJson.toString(), testSchema, DataSourceFormat.getDefaultCsvFormat());
+        Table testTable = Table.fromSource(populationTestJson.toString(), testSchema, DataSourceFormat.getDefaultCsvFormat());
+        Assert.assertEquals(testTable, table);
+        try {
+            bis.close();
+        } finally {
+            fis.close();
+        }
+        // must not throw an exception
+        table.validate();
+    }
+
+
+    @Test
+    public void testReadFromValidJSONFileWithValidSchemaViaStream() throws Exception{
+        // get path of test CSV file
+        URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/data/population.json");
+        Path path = Paths.get(sourceFileUrl.toURI());
+        String jsonContent = new String(Files.readAllBytes(path));
+
+        File f = new File(getTestDataDirectory(), "schema/population_schema.json");
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(jsonContent.getBytes());
+        FileInputStream fis = new FileInputStream(f);
+        Table table = Table.fromSource(bis, fis, DataSourceFormat.getDefaultCsvFormat());
+
+        File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
+        Schema testSchema = Schema.fromJson (schemaFile, true);
+        Table testTable = Table.fromSource(populationTestJson.toString(), testSchema, DataSourceFormat.getDefaultCsvFormat());
         Assert.assertEquals(testTable, table);
         try {
             bis.close();
@@ -261,7 +323,7 @@ public class TableCreationTest {
 
         ByteArrayInputStream bis = new ByteArrayInputStream(csvContent.getBytes());
         FileInputStream fis = new FileInputStream(f);
-        Table table = new Table(bis, fis, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(bis, fis, DataSourceFormat.getDefaultCsvFormat());
 
         // must throw an exception
         exception.expect(TableValidationException.class);

@@ -4,9 +4,7 @@ import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
-import org.joda.time.DateTime;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -100,7 +98,7 @@ public class TableIterationTest {
         File testDataDir = getTestDataDirectory();
         // get path of test CSV file
         File file = new File("data/simple_data.csv");
-        Table table = new Table(file, testDataDir);
+        Table table = Table.fromSource(file, testDataDir);
         
         Assert.assertEquals("[id, title]", Arrays.toString(table.getHeaders()));
     }
@@ -109,7 +107,7 @@ public class TableIterationTest {
     public void testReadUncastData() throws Exception{
         File testDataDir = getTestDataDirectory();
         File file = new File("data/simple_data.csv");
-        Table table = new Table(file, testDataDir);
+        Table table = Table.fromSource(file, testDataDir);
         
         Assert.assertEquals(3, table.read().size());
         Assert.assertEquals("1", table.read().get(0)[0]);
@@ -125,7 +123,7 @@ public class TableIterationTest {
         
         // Fetch the data and apply the schema
         File file = new File("data/employee_data.csv");
-        Table employeeTable = new Table(file, testDataDir, employeeTableSchema, DataSourceFormat.getDefaultCsvFormat());
+        Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, DataSourceFormat.getDefaultCsvFormat());
         
         // We will iterate the rows and these are the values classes we expect:
         Class[] expectedTypes = new Class[]{
@@ -167,7 +165,7 @@ public class TableIterationTest {
             schema = Schema.fromJson (fis, false);
         }
 
-        Table table = Table.fromJson(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
 
         Assert.assertEquals(3, table.read().size());
         List<Object[]> actualData = table.read(true);

@@ -72,6 +72,7 @@ public interface DataSourceFormat {
      * @return true if extracted headers can be trusted, false otherwise
      */
     boolean hasReliableHeaders();
+
     /**
      * Factory method to instantiate either a JsonArrayDataSource or a
      * CsvDataSource based on input format
@@ -79,8 +80,9 @@ public interface DataSourceFormat {
      */
     static DataSourceFormat createDataSourceFormat(String input) {
         try {
-            JSONArray arr = new JSONArray(input);
-            return new JsonArrayDataSourceFormat(arr);
+            // JSON array generation only to see if an exception is thrown -> probably CSV data
+            new JSONArray(input);
+            return new JsonArrayDataSourceFormat(input);
         } catch (JSONException ex) {
             // JSON parsing failed, treat it as a CSV
             return new CsvDataSourceFormat(input);

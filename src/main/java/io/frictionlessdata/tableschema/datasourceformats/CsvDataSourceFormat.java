@@ -26,7 +26,7 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
     public CsvDataSourceFormat(){};
 
     public CsvDataSourceFormat(InputStream inStream) throws Exception{
-        InputStreamReader inputStreamReader = new InputStreamReader(inStream, Charset.forName("UTF-8"));
+        InputStreamReader inputStreamReader = new InputStreamReader(inStream, StandardCharsets.UTF_8);
         BufferedReader br = new BufferedReader(inputStreamReader);
 
         String content = br.lines().collect(Collectors.joining("\n"));
@@ -34,6 +34,8 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
         br.close();
         inputStreamReader.close();
 
+        // ensure that both parsing as JSON array and JSON object data fails. If one succeeds,
+        // then the data is not CSV, but JSON -> throw exception
         try {
             new JSONArray(content);
         } catch (JSONException ex) {

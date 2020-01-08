@@ -676,7 +676,7 @@ public class SchemaTest {
 
     @Test
     public void testInferTypesComplexSchema() throws Exception{
-        Table table = new Table(new File ("data/employee_data.csv"), getTestDataDirectory());
+        Table table = Table.fromSource(new File ("data/employee_data.csv"), getTestDataDirectory());
 
         String schemaObjStr = table.inferSchema().getJson();
         Schema schema = Schema.fromJson (schemaObjStr, true);
@@ -710,7 +710,7 @@ public class SchemaTest {
     public void test2Issue20() throws Exception {
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/" +
                 "master/src/test/resources/fixtures/data/simple_data.csv");
-        Table table = Table.fromJson(url);
+        Table table = Table.fromSource(url);
 
         Schema schema = table.inferSchema();
         String json = schema.getJson();

@@ -6,9 +6,7 @@ import io.frictionlessdata.tableschema.beans.EmployeeBean;
 import io.frictionlessdata.tableschema.beans.GrossDomesticProductBean;
 import io.frictionlessdata.tableschema.beans.NumbersBean;
 import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
-import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.field.DateField;
-import io.frictionlessdata.tableschema.iterator.BeanIterator;
 import io.frictionlessdata.tableschema.schema.BeanSchema;
 import io.frictionlessdata.tableschema.schema.Schema;
 import org.junit.jupiter.api.Assertions;
@@ -21,7 +19,6 @@ import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,21 +45,21 @@ class TableBeanIteratorTest {
         File testDataDir = getTestDataDirectory();
         File file = new File("data/population.csv");
         validPopulationTable
-                = new Table(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
+                = Table.fromSource(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
         file = new File("data/population-null-values.csv");
         nullValuesPopulationTable
-                = new Table(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
+                = Table.fromSource(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
         file = new File("data/population-invalid.csv");
         invalidPopulationTable
-                = new Table(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
+                = Table.fromSource(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
 
         file = new File("data/employee_data.csv");
         employeeSchema = BeanSchema.infer(EmployeeBean.class);
-        employeeTable = new Table(file, testDataDir, employeeSchema, DataSourceFormat.getDefaultCsvFormat());
+        employeeTable = Table.fromSource(file, testDataDir, employeeSchema, DataSourceFormat.getDefaultCsvFormat());
 
         file = new File("data/gdp.csv");
         gdpSchema = BeanSchema.infer(GrossDomesticProductBean.class);
-        gdpTable = new Table(file, testDataDir, gdpSchema, DataSourceFormat.getDefaultCsvFormat());
+        gdpTable = Table.fromSource(file, testDataDir, gdpSchema, DataSourceFormat.getDefaultCsvFormat());
 
     }
 
@@ -129,7 +126,7 @@ class TableBeanIteratorTest {
         }
         File dataFile = new File("data/number_types.csv");
         Table numbersTable
-                = new Table(dataFile, getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
+                = Table.fromSource(dataFile, getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
         BeanIterator<NumbersBean> bit = new BeanIterator<>(numbersTable, NumbersBean.class);
 
         NumbersBean record = bit.next();

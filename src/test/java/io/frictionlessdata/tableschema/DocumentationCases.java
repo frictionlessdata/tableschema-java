@@ -2,10 +2,7 @@ package io.frictionlessdata.tableschema;
 
 import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
 import io.frictionlessdata.tableschema.field.*;
-import io.frictionlessdata.tableschema.iterator.TableIterator;
 import io.frictionlessdata.tableschema.schema.Schema;
-import org.apache.commons.csv.CSVFormat;
-import org.joda.time.DateTime;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +37,7 @@ class DocumentationCases {
         schema.addField(new IntegerField("id"));
         schema.addField(new StringField("title"));
         // Load the data from URL with the schema.
-        Table table = Table.fromJson(
+        Table table = Table.fromSource(
                 new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
                         "/src/test/resources/fixtures/data/simple_data.csv"),
                 schema, DataSourceFormat.getDefaultCsvFormat());
@@ -62,7 +59,7 @@ class DocumentationCases {
     void csvParsingWithoutSchema() throws Exception{
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
                 "/src/test/resources/fixtures/data/simple_data.csv");
-        Table table = Table.fromJson(url);
+        Table table = Table.fromSource(url);
 
         // Iterate through rows
         Iterator<Object[]> iter = table.iterator();
@@ -145,7 +142,7 @@ class DocumentationCases {
     void inferASchema() throws Exception{
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
                                 "/src/test/resources/fixtures/data/simple_data.csv");
-        Table table = Table.fromJson(url);
+        Table table = Table.fromSource(url);
 
         Schema schema = table.inferSchema();
         System.out.println(schema.getJson());
@@ -203,7 +200,7 @@ class DocumentationCases {
         // Load the data from URL with the schema.
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
                 "/src/test/resources/fixtures/data/employee_data.csv");
-        Table table = Table.fromJson(url, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(url, schema, DataSourceFormat.getDefaultCsvFormat());
 
         Iterator<Object[]> iter = table.iterator(false, false, true, false);
         while(iter.hasNext()){

@@ -138,6 +138,24 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
     /**
      * Write as CSV file, the `format` parameter decides on the CSV options. If it is
      * null, then the file will be written as RFC 4180 compliant CSV
+     * @param outputFile the File to write to
+     * @param format the CSV format to use
+     * @param sortedHeaders the header row names in the order in which data should be
+     *                      exported
+     */
+    @Override
+    public void writeCsv(File outputFile, CSVFormat format, String[] sortedHeaders) throws Exception {
+        CSVFormat locFormat = (null != format)
+                ? format
+                : DataSourceFormat.getDefaultCsvFormat();
+        try (Writer out = new BufferedWriter(new FileWriter(outputFile))) {
+            writeCsv(out, locFormat, sortedHeaders);
+        }
+    }
+
+    /**
+     * Write as CSV file, the `format` parameter decides on the CSV options. If it is
+     * null, then the file will be written as RFC 4180 compliant CSV
      * @param out the Writer to write to
      * @param format the CSV format to use
      * @param sortedHeaders the header row names in the order in which data should be
@@ -203,22 +221,5 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
         }
     }
 
-    /**
-     * Write as CSV file, the `format` parameter decides on the CSV options. If it is
-     * null, then the file will be written as RFC 4180 compliant CSV
-     * @param outputFile the File to write to
-     * @param format the CSV format to use
-     * @param sortedHeaders the header row names in the order in which data should be
-     *                      exported
-     */
-    @Override
-    public void writeCsv(File outputFile, CSVFormat format, String[] sortedHeaders) throws Exception {
-        CSVFormat locFormat = (null != format)
-                ? format
-                : DataSourceFormat.getDefaultCsvFormat();
-        try (Writer out = new BufferedWriter(new FileWriter(outputFile))) {
-            writeCsv(out, locFormat, sortedHeaders);
-        }
-    }
 
 }

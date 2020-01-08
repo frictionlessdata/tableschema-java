@@ -36,7 +36,7 @@ class FieldOptionsTest {
             schema = Schema.fromJson (fis, false);
         }
         File file = new File("data/employee_data_alternative_boolean.csv");
-        Table table = new Table(file, getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(file, getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
         Map<String, Object> options = new HashMap<>();
         options.put("trueValues", trueValues);
         options.put("falseValues", falseValues);
@@ -73,7 +73,7 @@ class FieldOptionsTest {
             schema = Schema.fromJson (fis, false);
         }
         File file = new File("data/employee_data_alternative_boolean.csv");
-        Table table = new Table(file, getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(file, getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
 
         assertThrows(InvalidCastException.class, () -> {
             table.read(true);

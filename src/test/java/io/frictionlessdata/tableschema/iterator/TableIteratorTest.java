@@ -32,13 +32,13 @@ class TableIteratorTest {
         File testDataDir = getTestDataDirectory();
         File file = new File("data/population.csv");
         validPopulationTable
-                = new Table(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
+                = Table.fromSource(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
         file = new File("data/population-null-values.csv");
         nullValuesPopulationTable
-                = new Table(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
+                = Table.fromSource(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
         file = new File("data/population-invalid.csv");
         invalidPopulationTable
-                = new Table(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
+                = Table.fromSource(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
 
     }
 
@@ -46,8 +46,8 @@ class TableIteratorTest {
     void hasNext() throws Exception {
         Assertions.assertTrue(validPopulationTable.iterator().hasNext());
         Assertions.assertTrue(validPopulationTable.iterator(true, true, true, false).hasNext());
-        Assertions.assertFalse(new Table("").iterator(true, true, true, false).hasNext());
-        Assertions.assertFalse(new Table("").iterator().hasNext());
+        Assertions.assertFalse(Table.fromSource("").iterator(true, true, true, false).hasNext());
+        Assertions.assertFalse(Table.fromSource("").iterator().hasNext());
     }
 
     @Test
@@ -106,7 +106,7 @@ class TableIteratorTest {
 
         //set a schema to guarantee the ordering of properties
         Schema schema = Schema.fromJson(new File(getTestDataDirectory(), "/schema/population_schema_alternate.json"), true);
-        Table table = Table.fromJson(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
 
         // Expected data.
         List<String[]> expectedData = this.getExpectedAlternatePopulationData();
@@ -153,7 +153,7 @@ class TableIteratorTest {
 
         //set a schema to guarantee the ordering of properties
         Schema schema = Schema.fromJson(new File(getTestDataDirectory(), "/schema/population_schema_alternate.json"), true);
-        Table table = Table.fromJson(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
 
         // Expected data.
         List<String[]> expectedData = this.getExpectedAlternatePopulationData();
@@ -201,7 +201,7 @@ class TableIteratorTest {
 
         //set a schema to guarantee the ordering of properties
         Schema schema = Schema.fromJson(new File(getTestDataDirectory(), "/schema/population_schema_alternate.json"), true);
-        Table table = Table.fromJson(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
 
         // Expected data.
         List<String[]> expectedData = this.getExpectedAlternatePopulationData();

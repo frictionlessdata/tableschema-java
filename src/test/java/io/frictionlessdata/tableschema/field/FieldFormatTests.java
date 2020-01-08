@@ -24,7 +24,6 @@ class FieldFormatTests {
         Assert.assertEquals("false", val);
     }
 
-
     @Test
     @DisplayName("format boolean values with non-default true/false values")
     void formatBooleanField2() {
@@ -61,5 +60,23 @@ class FieldFormatTests {
         assertThrows(TypeInferringException.class, () -> field.parseValue("false", null, null));
         Boolean val = field.parseValue("declined", null, null); // false
         Assertions.assertFalse(val);
+    }
+
+
+
+    @Test
+    @DisplayName("format geopoint values via default settings")
+    void formatGeopointField() {
+        GeopointField field = new GeopointField("gpf");
+        String val = field.formatValue(new double[]{123.45, 56.789}, null, null);
+        Assert.assertEquals("123.45,56.789", val);
+        val = field.formatValue(new double[]{123.45, 56.789}, Field.FIELD_FORMAT_DEFAULT, null);
+        Assert.assertEquals("123.45,56.789", val);
+        val = field.formatValue(new double[]{123.45, 56.789}, Field.FIELD_FORMAT_ARRAY, null);
+        Assert.assertEquals("[123.45,56.789]", val);
+        val = field.formatValue(new double[]{123.45, 56.789}, Field.FIELD_FORMAT_OBJECT, null);
+        Assert.assertEquals("{\"lat\": 123.45, \"lon\":56.789}", val);
+        val = field.formatValue(new double[]{123.45, 56.789}, "invalid", null);
+        Assert.assertNull(val);
     }
 }
