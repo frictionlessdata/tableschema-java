@@ -87,7 +87,7 @@ public class TableCreationTest {
         Path path = Paths.get(sourceFileUrl.toURI());
         String csvContent = new String(Files.readAllBytes(path));
         
-        Table table = new Table(csvContent, null, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromJson(csvContent, null, DataSourceFormat.getDefaultCsvFormat());
         
         Assert.assertEquals(3, table.read().size());
         // must not throw an exception
@@ -122,7 +122,7 @@ public class TableCreationTest {
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
 
         Schema schema = Schema.fromJson (f, true);
-        Table table = new Table(populationTestJson.toString(), schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromJson(populationTestJson.toString(), schema, DataSourceFormat.getDefaultCsvFormat());
         Assert.assertEquals(3, table.read().size());
         Schema expectedSchema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
@@ -146,7 +146,7 @@ public class TableCreationTest {
         // get path of test CSV file
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java" +
                 "/master/src/test/resources/fixtures/data/simple_data.csv");
-        Table table = new Table(url);
+        Table table = Table.fromJson(url);
         
         Assert.assertEquals(3, table.read().size());
         // must not throw an exception
@@ -161,11 +161,11 @@ public class TableCreationTest {
                 "/tableschema-java/master/src/test/resources/fixtures/data/population.csv");
         URL schemaUrl = new URL("https://raw.githubusercontent.com/frictionlessdata" +
                 "/tableschema-java/master/src/test/resources/fixtures/schema/population_schema.json");
-        Table table = new Table(tableUrl, schemaUrl);
+        Table table = Table.fromJson(tableUrl, schemaUrl);
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema testSchema = Schema.fromJson (schemaFile, true);
-        Table testTable = new Table(populationTestJson.toString(), testSchema, DataSourceFormat.getDefaultCsvFormat());
+        Table testTable = Table.fromJson(populationTestJson.toString(), testSchema, DataSourceFormat.getDefaultCsvFormat());
 
         Assert.assertEquals(testTable, table);
     }
@@ -186,7 +186,7 @@ public class TableCreationTest {
             schema = Schema.fromJson (fis, false);
         }
 
-        Table table = new Table(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromJson(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
 
         Assert.assertEquals(3, table.read().size());
         List<Object[]> actualData = table.read();
@@ -238,7 +238,7 @@ public class TableCreationTest {
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema testSchema = Schema.fromJson (schemaFile, true);
-        Table testTable = new Table(populationTestJson.toString(), testSchema, DataSourceFormat.getDefaultCsvFormat());
+        Table testTable = Table.fromJson(populationTestJson.toString(), testSchema, DataSourceFormat.getDefaultCsvFormat());
         Assert.assertEquals(testTable, table);
         try {
             bis.close();

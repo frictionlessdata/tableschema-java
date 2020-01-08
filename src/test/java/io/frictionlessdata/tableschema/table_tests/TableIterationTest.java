@@ -167,7 +167,7 @@ public class TableIterationTest {
             schema = Schema.fromJson (fis, false);
         }
 
-        Table table = new Table(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromJson(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
 
         Assert.assertEquals(3, table.read().size());
         List<Object[]> actualData = table.read(true);

@@ -32,6 +32,12 @@ public class Table{
     private Map<String, Object> fieldOptions;
 
     /**
+     * Constructor for an empty Table
+     */
+    public Table() {
+    }
+
+    /**
      * Constructor using either a CSV or JSON array-containing string.
      * @param dataSource the CSV or JSON content for the Table
      */
@@ -66,28 +72,33 @@ public class Table{
         }
     }
 
-    public Table(String dataSource, Schema schema, CSVFormat format) {
-        this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
-        this.schema = schema;
+    public static Table fromJson (String dataSource, Schema schema, CSVFormat format) {
+        Table table = new Table();
+        table.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
+        table.schema = schema;
         if (null != format) {
-            setCsvFormat(format);
+            table.setCsvFormat(format);
         }
+        return table;
     }
 
-    public Table(URL dataSource) throws IOException {
-        this.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource.openStream());
+    public static Table fromJson (URL dataSource) throws IOException {
+        Table table = new Table();
+        table.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource.openStream());
+        return table;
     }
 
-    public Table(URL dataSource, Schema schema, CSVFormat format) throws IOException {
-        this(dataSource);
-        this.schema = schema;
-        if (null != format) {
-            setCsvFormat(format);
-        }
+    public static Table fromJson (URL dataSource, URL schema) throws Exception{
+        return fromJson(dataSource, Schema.fromJson(schema, true), null);
     }
-    
-    public Table(URL dataSource, URL schema) throws Exception{
-        this(dataSource, Schema.fromJson(schema, true), null);
+
+    public static Table fromJson (URL dataSource, Schema schema, CSVFormat format) throws IOException {
+        Table table = fromJson(dataSource);
+        table.schema = schema;
+        if (null != format) {
+            table.setCsvFormat(format);
+        }
+        return table;
     }
 
     public Iterator<Object[]> iterator() throws Exception{

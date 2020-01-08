@@ -40,8 +40,9 @@ class DocumentationCases {
         schema.addField(new IntegerField("id"));
         schema.addField(new StringField("title"));
         // Load the data from URL with the schema.
-        Table table = new Table(
-                new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/data/simple_data.csv"),
+        Table table = Table.fromJson(
+                new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
+                        "/src/test/resources/fixtures/data/simple_data.csv"),
                 schema, DataSourceFormat.getDefaultCsvFormat());
 
         List<Object[]> allData = table.read();
@@ -61,7 +62,7 @@ class DocumentationCases {
     void csvParsingWithoutSchema() throws Exception{
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
                 "/src/test/resources/fixtures/data/simple_data.csv");
-        Table table = new Table(url);
+        Table table = Table.fromJson(url);
 
         // Iterate through rows
         Iterator<Object[]> iter = table.iterator();
@@ -144,7 +145,7 @@ class DocumentationCases {
     void inferASchema() throws Exception{
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
                                 "/src/test/resources/fixtures/data/simple_data.csv");
-        Table table = new Table(url);
+        Table table = Table.fromJson(url);
 
         Schema schema = table.inferSchema();
         System.out.println(schema.getJson());
@@ -202,7 +203,7 @@ class DocumentationCases {
         // Load the data from URL with the schema.
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
                 "/src/test/resources/fixtures/data/employee_data.csv");
-        Table table = new Table(url, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromJson(url, schema, DataSourceFormat.getDefaultCsvFormat());
 
         Iterator<Object[]> iter = table.iterator(false, false, true, false);
         while(iter.hasNext()){

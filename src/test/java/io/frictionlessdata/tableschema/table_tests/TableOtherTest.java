@@ -86,7 +86,7 @@ public class TableOtherTest {
     public void testReadFromValidJSONArrayWithSchema() throws Exception{
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema schema = Schema.fromJson (schemaFile, true);
-        Table table = new Table(populationTestJson.toString(), schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromJson(populationTestJson.toString(), schema, DataSourceFormat.getDefaultCsvFormat());
 
         Assert.assertEquals(3, table.read().size());
         Schema expectedSchema = Schema.fromJson (populationSchema.toString(), true);

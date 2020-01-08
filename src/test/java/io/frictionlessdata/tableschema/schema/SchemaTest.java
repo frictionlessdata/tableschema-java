@@ -710,7 +710,7 @@ public class SchemaTest {
     public void test2Issue20() throws Exception {
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/" +
                 "master/src/test/resources/fixtures/data/simple_data.csv");
-        Table table = new Table(url);
+        Table table = Table.fromJson(url);
 
         Schema schema = table.inferSchema();
         String json = schema.getJson();

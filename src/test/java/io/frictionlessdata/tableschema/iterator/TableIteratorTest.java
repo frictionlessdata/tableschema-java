@@ -106,7 +106,7 @@ class TableIteratorTest {
 
         //set a schema to guarantee the ordering of properties
         Schema schema = Schema.fromJson(new File(getTestDataDirectory(), "/schema/population_schema_alternate.json"), true);
-        Table table = new Table(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromJson(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
 
         // Expected data.
         List<String[]> expectedData = this.getExpectedAlternatePopulationData();
@@ -153,7 +153,7 @@ class TableIteratorTest {
 
         //set a schema to guarantee the ordering of properties
         Schema schema = Schema.fromJson(new File(getTestDataDirectory(), "/schema/population_schema_alternate.json"), true);
-        Table table = new Table(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromJson(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
 
         // Expected data.
         List<String[]> expectedData = this.getExpectedAlternatePopulationData();
@@ -201,7 +201,7 @@ class TableIteratorTest {
 
         //set a schema to guarantee the ordering of properties
         Schema schema = Schema.fromJson(new File(getTestDataDirectory(), "/schema/population_schema_alternate.json"), true);
-        Table table = new Table(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromJson(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
 
         // Expected data.
         List<String[]> expectedData = this.getExpectedAlternatePopulationData();
