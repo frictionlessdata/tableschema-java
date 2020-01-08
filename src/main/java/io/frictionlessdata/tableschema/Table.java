@@ -307,7 +307,7 @@ public class Table{
     public Table setCsvFormat(CSVFormat format) {
         this.format = format;
         if ((null != dataSourceFormat) && (dataSourceFormat instanceof CsvDataSourceFormat)) {
-            ((CsvDataSourceFormat) dataSourceFormat).format(format);
+            ((CsvDataSourceFormat) dataSourceFormat).setFormat(format);
         }
         return this;
     }

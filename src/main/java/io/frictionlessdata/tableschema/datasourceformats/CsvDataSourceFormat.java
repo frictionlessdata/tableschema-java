@@ -23,8 +23,6 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
 
     private CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
 
-    public CsvDataSourceFormat(){};
-
     public CsvDataSourceFormat(InputStream inStream) throws Exception{
         InputStreamReader inputStreamReader = new InputStreamReader(inStream, StandardCharsets.UTF_8);
         BufferedReader br = new BufferedReader(inputStreamReader);
@@ -62,12 +60,12 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
     }
 
 
-    public CsvDataSourceFormat format(CSVFormat format) {
+    public CsvDataSourceFormat setFormat(CSVFormat format) {
         this.format = format;
         return this;
     }
 
-    public CSVFormat format() {
+    public CSVFormat getFormat() {
         return format;
     }
 

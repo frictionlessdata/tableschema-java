@@ -105,6 +105,16 @@ public class DataSourceFormatsTest {
 
 
     @Test
+    public void testUrlCreationCsv() throws Exception {
+        DataSourceFormat ds = new CsvDataSourceFormat(new URL ("https://raw.githubusercontent.com/frictionlessdata" +
+                "/tableschema-java/master/src/test/resources/fixtures/data/population.csv"));
+        Assert.assertNotNull(ds);
+        List<String[]> data = ds.data();
+        Assert.assertEquals(3, data.size());
+    }
+
+
+    @Test
     public void testSafePathInputStreamCreationCsv() throws Exception {
         DataSourceFormat ds;
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.csv");
