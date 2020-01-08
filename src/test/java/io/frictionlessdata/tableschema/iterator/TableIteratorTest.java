@@ -1,5 +1,6 @@
-package io.frictionlessdata.tableschema;
+package io.frictionlessdata.tableschema.iterator;
 
+import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.schema.Schema;

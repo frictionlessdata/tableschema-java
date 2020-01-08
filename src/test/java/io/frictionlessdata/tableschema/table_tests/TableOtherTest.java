@@ -95,6 +95,38 @@ public class TableOtherTest {
         Assert.assertEquals(expectedTable, table);
     }
 
+
+    /*
+    The schema contains an additional column not present in the data. Since JSON objects
+    will simply drop entries with null values, this can happen, but the Schema should still
+    be considered valid.
+     */
+    @Test
+    public void testReadFromValidJSONArrayWithExtendedSchema() throws Exception{
+        File schemaFile = new File(getTestDataDirectory(), "schema/population_schema_additional_field.json");
+        Schema schema = Schema.fromJson (schemaFile, true);
+        Table table = new Table(new File("data/population.json")
+                , getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
+        List<Object[]> data = table.read();
+        Assert.assertEquals(3, data.size());
+        for (int i = 0; i < data.size(); i++) {
+            Object[] row = data.get(i);
+            JSONObject expectedObj = populationTestJson.getJSONObject(i);
+            Assert.assertEquals(4, row.length);
+            for (int j = 0; j < row.length; j++) {
+                if (j == 0) {
+                    Assert.assertEquals(expectedObj.getString("city"), row[j]);
+                } else if (j == 1) {
+                    Assert.assertNull(row[j]);
+                } else if (j == 2) {
+                    Assert.assertEquals(expectedObj.get("year").toString(), row[j].toString());
+                } else if (j == 3) {
+                    Assert.assertEquals(expectedObj.getBigInteger("population"), row[j]);
+                }
+            }
+        }
+    }
+
     @Test
     public void testInferTypesIntAndDates() throws Exception{
         Table table = new Table(new File ("dates_data.csv"), getTestDataDirectory());
@@ -199,17 +231,6 @@ public class TableOtherTest {
         table.validate();
     }
 
-    // schema doesn't fit data -> expect exception
-    @Test
-    public void loadTableWithMismatchingSchema2() throws Exception {
-        File testDataDir = getTestDataDirectory();
-        File file = new File("data/population.json");
-        Schema schema = Schema.fromJson(new File(testDataDir, "schema/employee_schema.json"), true);
-
-        Table table = new Table(file, testDataDir, schema, DataSourceFormat.getDefaultCsvFormat());
-        exception.expect(TableValidationException.class);
-        table.read();
-    }
 
     @Test
     public void testReadUncastData() throws Exception{

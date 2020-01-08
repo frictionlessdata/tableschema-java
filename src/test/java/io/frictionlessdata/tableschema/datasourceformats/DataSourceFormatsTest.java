@@ -1,8 +1,6 @@
-package io.frictionlessdata.tableschema;
+package io.frictionlessdata.tableschema.datasourceformats;
 
-import io.frictionlessdata.tableschema.datasourceformats.CsvDataSourceFormat;
-import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
-import io.frictionlessdata.tableschema.datasourceformats.JsonArrayDataSourceFormat;
+import io.frictionlessdata.tableschema.TestHelper;
 import org.apache.commons.csv.CSVFormat;
 import org.json.JSONException;
 import org.junit.Assert;
@@ -21,26 +19,10 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DataSourceTest {
+public class DataSourceFormatsTest {
     @Rule
     public final ExpectedException exception = ExpectedException.none();
-    private String populationJson = "[" +
-            "{" +
-            "\"city\": \"london\"," +
-            "\"year\": 2017," +
-            "\"population\": 8780000" +
-            "}," +
-            "{" +
-            "\"city\": \"paris\"," +
-            "\"year\": 2017," +
-            "\"population\": 2240000" +
-            "}," +
-            "{" +
-            "\"city\": \"rome\"," +
-            "\"year\": 2017," +
-            "\"population\": 2860000" +
-            "}" +
-            "]";
+
 
     private String populationCsv = "city,year,population\n" +
             "london,2017,8780000\n" +
@@ -49,20 +31,6 @@ public class DataSourceTest {
     private final String[] populationHeaders = new String[]{
             "city", "year", "population"
     };
-
-
-    @Test
-    public void testCreateJsonArrayDataSource() throws Exception{
-        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(populationJson);
-        Assert.assertTrue(ds instanceof JsonArrayDataSourceFormat);
-    }
-
-    @Test
-    public void testJsonArrayDataSourceHeaders() throws Exception{
-        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(populationJson);
-        String[] headers = ds.getHeaders();
-        Assert.assertArrayEquals(populationHeaders, headers);
-    }
 
     @Test
     public void createCsvDataSource() throws Exception{
@@ -90,7 +58,7 @@ public class DataSourceTest {
 
     @Test
     public void testUnsafePath1() throws Exception {
-       URL u = DataSourceTest.class.getResource("/fixtures/dates_data.csv");
+       URL u = DataSourceFormatsTest.class.getResource("/fixtures/dates_data.csv");
        Path path = Paths.get(u.toURI());
        Path testPath = path.getParent();
        String maliciousPathName = "/etc/passwd";
@@ -104,7 +72,7 @@ public class DataSourceTest {
 
     @Test
     public void testUnsafePath2() throws Exception {
-        URL u = DataSourceTest.class.getResource("/fixtures/dates_data.csv");
+        URL u = DataSourceFormatsTest.class.getResource("/fixtures/dates_data.csv");
         Path path = Paths.get(u.toURI());
         Path testPath = path.getParent();
         String maliciousPathName = "/etc/";
@@ -118,7 +86,7 @@ public class DataSourceTest {
 
     @Test
     public void testSafePath() throws Exception {
-        URL u = DataSourceTest.class.getResource("/fixtures/dates_data.csv");
+        URL u = DataSourceFormatsTest.class.getResource("/fixtures/dates_data.csv");
         Path path = Paths.get(u.toURI());
         Path testPath = path.getParent().getParent();
         String maliciousPathName = "fixtures/dates_data.csv";
@@ -135,11 +103,6 @@ public class DataSourceTest {
         Assert.assertNotNull(ds);
     }
 
-    @Test
-    public void testSafePathCreationJson() throws Exception {
-        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(new File ("simple_geojson.json"), TestHelper.getTestDataDirectory());
-        Assert.assertNotNull(ds);
-    }
 
     @Test
     public void testSafePathInputStreamCreationCsv() throws Exception {
@@ -178,29 +141,6 @@ public class DataSourceTest {
 
 
     @Test
-    public void testSafePathInputStreamCreationJson() throws Exception {
-        DataSourceFormat ds;
-        File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.json");
-        try (FileInputStream is = new FileInputStream(inFile)) {
-            ds = new JsonArrayDataSourceFormat(is);
-            Assert.assertArrayEquals(populationHeaders, ds.getHeaders());
-        }
-        Assert.assertNotNull(ds);
-    }
-
-    @Test
-    public void testWrongInputStreamCreationJson() throws Exception {
-        DataSourceFormat ds;
-        File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.csv");
-        exception.expect(JSONException.class);
-        try (FileInputStream is = new FileInputStream(inFile)) {
-            ds = new JsonArrayDataSourceFormat(is);
-            Assert.assertArrayEquals(populationHeaders, ds.getHeaders());
-        }
-        Assert.assertNotNull(ds);
-    }
-
-    @Test
     public void testWrongInputStreamCreationCsv() throws Exception {
         DataSourceFormat ds;
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.json");
@@ -208,12 +148,6 @@ public class DataSourceTest {
         try (FileInputStream is = new FileInputStream(inFile)) {
             ds = new CsvDataSourceFormat(is);
         }
-        Assert.assertNotNull(ds);
-    }
-
-    @Test
-    public void testSafeStreamCreationJson() throws Exception {
-        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(new File ("data/population.json"), TestHelper.getTestDataDirectory());
         Assert.assertNotNull(ds);
     }
 
@@ -241,26 +175,6 @@ public class DataSourceTest {
     }
 
 
-    @Test
-    public void writeJsonToFile() throws Exception{
-        String content = null;
-        String popCsv;
-
-        File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.json");
-        popCsv = new String(Files.readAllBytes(inFile.toPath()));
-        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(popCsv);
-
-        File tempFile = Files.createTempFile("tableschema-", ".json").toFile();
-        ds.write(tempFile);
-        try (FileReader fr = new FileReader(tempFile)) {
-            try (BufferedReader rdr = new BufferedReader(fr)) {
-                content = rdr.lines().collect(Collectors.joining("\n"));
-            }
-        }
-        // evade the CRLF mess by nuking all CR chars
-        Assert.assertEquals(content.replaceAll("[\\r\\n ]", ""), popCsv.replaceAll("[\\r\\n ]", ""));
-    }
-
     private static boolean runningOnWindowsOperatingSystem() {
         String os = System.getProperty("os.name");
         return (os.toLowerCase().contains("windows"));
@@ -273,7 +187,7 @@ public class DataSourceTest {
     private static String getFileContents(String fileName) {
         try {
             // Create file-URL of source file:
-            URL sourceFileUrl = DataSourceTest.class.getResource(fileName);
+            URL sourceFileUrl = DataSourceFormatsTest.class.getResource(fileName);
             // Get path of URL
             Path path = Paths.get(sourceFileUrl.toURI());
             return new String(Files.readAllBytes(path));

@@ -297,7 +297,11 @@ public class Table{
         boolean equals = false;
         try {
             equals = Arrays.equals(table.getHeaders(), ((Table) o).getHeaders());
-            equals = equals & table.inferSchema(10).equals(((Table) o).inferSchema(10));
+            if ((this.schema != null) && (table.schema != null)) {
+                equals = equals & this.schema.equals(table.schema);
+            } else {
+                equals = equals & table.inferSchema(10).equals(((Table) o).inferSchema(10));
+            }
             List<Object[]> data = table.read();
             List<Object[]> oData = ((Table) o).read();
             equals = equals & data.size() == oData.size();

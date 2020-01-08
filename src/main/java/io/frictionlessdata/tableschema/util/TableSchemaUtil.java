@@ -16,6 +16,11 @@ public class TableSchemaUtil {
                     mapping.put(i, j);
                 }
             }
+            // declared header not found in actual data - can happen with JSON Arrays
+            // of JSON objects as they will not have keys for null values
+            if (!mapping.containsKey(i)) {
+                mapping.put(i, null);
+            }
         }
         return mapping;
     }

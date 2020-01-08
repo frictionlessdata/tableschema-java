@@ -1,6 +1,7 @@
-package io.frictionlessdata.tableschema;
+package io.frictionlessdata.tableschema.iterator;
 
 import com.google.common.util.concurrent.AtomicDouble;
+import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.beans.EmployeeBean;
 import io.frictionlessdata.tableschema.beans.GrossDomesticProductBean;
 import io.frictionlessdata.tableschema.beans.NumbersBean;
@@ -86,7 +87,6 @@ class TableBeanIteratorTest {
         Assertions.assertEquals(45, info.get("pin"));
         Assertions.assertEquals(83.23, info.get("rate"));
         Assertions.assertEquals(90, info.get("ssn"));
-        //Assertions.assertEquals("{\"pin\":45,\"rate\":83.23,\"ssn\":90}", frank.getInfo().toString());
     }
 
     @Test

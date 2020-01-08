@@ -1,5 +1,7 @@
-package io.frictionlessdata.tableschema;
+package io.frictionlessdata.tableschema.schema;
 
+import io.frictionlessdata.tableschema.Table;
+import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.beans.EmployeeBean;
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
@@ -21,8 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.frictionlessdata.tableschema.schema.BeanSchema;
-import io.frictionlessdata.tableschema.schema.Schema;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;

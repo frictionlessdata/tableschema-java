@@ -1,4 +1,4 @@
-package io.frictionlessdata.tableschema;
+package io.frictionlessdata.tableschema.field;
 
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import java.time.Duration;

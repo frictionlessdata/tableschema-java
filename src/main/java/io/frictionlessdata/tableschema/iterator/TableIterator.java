@@ -67,21 +67,31 @@ public class TableIterator<T> implements Iterator<T> {
     @Override
     public T next() {
         String[] row = this.wrappedIterator.next();
-
+        int rowLength = row.length;
+        if (null != this.schema) {
+            rowLength = (row.length > this.schema.getFields().size())
+                    ? row.length
+                    : this.schema.getFields().size();
+        }
         Map<String, Object> keyedRow = new HashMap<>();
         Object[] extendedRow;
-        Object[] castRow = new Object[row.length];
+        Object[] castRow = new Object[rowLength];
 
         // If there's a schema, attempt to cast the row.
         if(this.schema != null){
-            for(int i=0; i<row.length; i++){
+            for(int i = 0; i < rowLength; i++){
                 Field field = this.schema.getFields().get(i);
-                String rawVal = row[mapping.get(i)];
-                Object val = field.castValue(rawVal, true, fieldOptions);
-
-                if(!extended && keyed){
+                Integer key = mapping.get(i);
+                Object val = null;
+                // null keys can happen for JSON arrays of JSON objects because
+                // null values will lead to missing entries
+                if (null != key) {
+                    String rawVal = row[mapping.get(i)];
+                    val = field.castValue(rawVal, true, fieldOptions);
+                }
+                if (!extended && keyed) {
                     keyedRow.put(this.headers[i], val);
-                }else{
+                } else {
                     castRow[i] = val;
                 }
             }
