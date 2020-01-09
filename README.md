@@ -264,27 +264,28 @@ System.out.println(schema.isValid());
 ### Single Key
 ```java
 Schema schema = new Schema();
-        
-Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+
+Field idField = new IntegerField("id");
 schema.addField(idField);
 
-Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+Field nameField = new StringField("name");
 schema.addField(nameField);
 
 schema.setPrimaryKey("id");
+String primaryKey = schema.getPrimaryKey();
 ```
 
 ### Composite Key
 ```java
 Schema schema = new Schema();
-        
-Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+
+Field idField = new IntegerField("id");
 schema.addField(idField);
 
-Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+Field nameField = new StringField("name");
 schema.addField(nameField);
 
-Field surnameField = new Field("surname", Field.FIELD_TYPE_STRING);
+Field surnameField = new StringField("surname");
 schema.addField(surnameField);
 
 schema.setPrimaryKey(new String[]{"name", "surname"});
