@@ -22,22 +22,22 @@ CSV free-form, ie. without a Schema).
 
 
 ```java
-// Let's start by defining and building the schema of a table with an `id`- and a `title` column:
+// Let's start by defining and building the schema of a table that contains data about employees:
 Schema schema = new Schema();
 
 schema.addField(new IntegerField("id"));
 schema.addField(new StringField("title"));
-        // Load the data from URL with the schema.
-Table table = new Table(
-            new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/data/simple_data.csv"),
-            schema);
+// Load the data from URL with the schema.
+Table table = Table.fromSource(
+    new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
+            "/src/test/resources/fixtures/data/simple_data.csv"),
+    schema, DataSourceFormat.getDefaultCsvFormat());
 
 List<Object[]> allData = table.read();
 
 // [1, foo]
 // [2, bar]
 // [3, baz]
-
 ```
 
 ### Parse a CSV without a Schema
@@ -46,8 +46,8 @@ Cast [data](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/
 
 ```java
 URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
-	              "/src/test/resources/fixtures/data/simple_data.csv");
-Table table = new Table(url);
+                "/src/test/resources/fixtures/data/simple_data.csv");
+Table table = Table.fromSource(url);
 
 // Iterate through rows
 Iterator<Object[]> iter = table.iterator();
@@ -62,7 +62,6 @@ while(iter.hasNext()){
 
 // Read the entire CSV and output it as a List:
 List<Object[]> allData = table.read();
-
 ```
 
 ### Write a Table Into a File
