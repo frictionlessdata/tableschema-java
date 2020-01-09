@@ -24,8 +24,6 @@ public class TableIterator<T> implements Iterator<T> {
     Map<Integer, Integer> mapping = null;
     int index = 0;
 
-    TableIterator() {    }
-
     public TableIterator(Table table) throws Exception{
         this(table, false, false, true, false);
     }
