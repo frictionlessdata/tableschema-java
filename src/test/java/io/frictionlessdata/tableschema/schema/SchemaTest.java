@@ -225,32 +225,6 @@ public class SchemaTest {
         assertEquals(nameField, foundNameField);
     }
 
-    /*
-    @Test
-    public void testAddInvalidField(){
-        Field idField = new IntegerField("id");
-        Field invalidField = new Field("title", "invalid");
-        Field geopointField = new GeoPointField("coordinates");
-        
-        Schema schema = new Schema(); // strict=false by default
-        
-        // Add a valid field.
-        schema.addField(idField);
-        
-        // Add an invalid field.
-        // Won't be ignored because strict=false by default but error will be saved in error list.
-        schema.addField(invalidField);
-        
-        // Add an invalid field.
-        // Won't be ignored because strict=false by default but error will be saved in error list.
-        schema.addField(geopointField);
-        
-        Assert.assertEquals(3, schema.getFields().size());
-        Assert.assertEquals(2, schema.getErrors().size());
-        Assert.assertNotNull(schema.getField("title"));
-        Assert.assertNotNull(schema.getField("id"));
-        Assert.assertNotNull(schema.getField("coordinates"));
-    }*/
 
     @Test
     public void hasField(){
@@ -705,7 +679,6 @@ public class SchemaTest {
         Assert.assertNotNull(expectedschema);
     }
 
-
     @Test
     public void test2Issue20() throws Exception {
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/" +
@@ -716,6 +689,19 @@ public class SchemaTest {
         String json = schema.getJson();
         Schema newSchema = Schema.fromJson(json, true);
         Assert.assertTrue(newSchema.isValid());
+    }
+
+
+    @Test
+    public void testIssue14() throws Exception {
+        Schema schema = Schema.fromJson (new File(getTestDataDirectory()
+                , "schema/employee_full_schema.json"), true);
+        Assert.assertNotNull(schema);
+
+        File f = new File("data/employee_full.csv");
+        Table table = Table.fromSource(f, getTestDataDirectory(), schema, null);
+        List<Object[]> data = table.read();
+        Assert.assertEquals(3, data.size());
     }
 
     // Create schema from a provided Bean class and compare with
