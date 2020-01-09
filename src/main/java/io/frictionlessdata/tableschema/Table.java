@@ -192,9 +192,6 @@ public class Table{
     }
 
     String[] getDeclaredHeaders() {
-        if (null == schema)
-            return null;
-
         return schema
                 .getFields()
                 .stream()
