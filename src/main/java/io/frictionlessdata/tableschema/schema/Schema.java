@@ -423,7 +423,16 @@ public class Schema {
     }
     
     public <Any> Any getPrimaryKey(){
-        return (Any)this.primaryKey;
+        if (primaryKey instanceof String)
+            return (Any)primaryKey;
+        if (primaryKey instanceof JSONArray) {
+            final List<String> retVal = new ArrayList<>();
+            for (Object k : ((JSONArray) primaryKey)) {
+                retVal.add((String)k);
+            }
+            return (Any)retVal.toArray(new String[retVal.size()]);
+        };
+        throw new TableSchemaException("Unknown PrimaryKey type: "+primaryKey.getClass());
     }
 
     public List<String> getPrimaryKeyParts() {

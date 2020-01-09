@@ -3,6 +3,7 @@ package io.frictionlessdata.tableschema;
 import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.schema.Schema;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,16 +32,16 @@ class DocumentationCases {
     @Test
     @DisplayName("Parsing a CSV using a Schema")
     void csvParsingWithSchema() throws Exception{
-        // Let's start by defining and building the schema of a table that contains data on employees:
+        // Let's start by defining and building the schema of a table that contains data about employees:
         Schema schema = new Schema();
 
         schema.addField(new IntegerField("id"));
         schema.addField(new StringField("title"));
         // Load the data from URL with the schema.
         Table table = Table.fromSource(
-                new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
-                        "/src/test/resources/fixtures/data/simple_data.csv"),
-                schema, DataSourceFormat.getDefaultCsvFormat());
+            new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
+                    "/src/test/resources/fixtures/data/simple_data.csv"),
+            schema, DataSourceFormat.getDefaultCsvFormat());
 
         List<Object[]> allData = table.read();
 
@@ -217,6 +218,53 @@ class DocumentationCases {
             Duration contractLength = (Duration)row[5];
             Map info = (Map)row[6];
         }
+    }
+
+    @Test
+    @DisplayName("Validate a Schema")
+    void validateSchema() throws Exception{
+        JSONObject schemaJsonObj = new JSONObject();
+        Field nameField = new IntegerField("id");
+        schemaJsonObj.put("fields", new JSONArray());
+        schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
+
+        Schema schema = Schema.fromJson(schemaJsonObj.toString(), true);
+
+        System.out.println(schema.isValid());
+        // true
+    }
+
+    @Test
+    @DisplayName("Setting a Primary Key - Single Key")
+    void settingPrimaryKey() throws Exception{
+        Schema schema = new Schema();
+
+        Field idField = new IntegerField("id");
+        schema.addField(idField);
+
+        Field nameField = new StringField("name");
+        schema.addField(nameField);
+
+        schema.setPrimaryKey("id");
+        String primaryKey = schema.getPrimaryKey();
+    }
+
+    @Test
+    @DisplayName("Setting a Primary Key - Composite Key")
+    void settingPrimaryKey2() throws Exception{
+        Schema schema = new Schema();
+
+        Field idField = new IntegerField("id");
+        schema.addField(idField);
+
+        Field nameField = new StringField("name");
+        schema.addField(nameField);
+
+        Field surnameField = new StringField("surname");
+        schema.addField(surnameField);
+
+        schema.setPrimaryKey(new String[]{"name", "surname"});
+        String[] compositeKey = schema.getPrimaryKey();
     }
 }
 

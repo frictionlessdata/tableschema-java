@@ -183,9 +183,9 @@ public class SchemaTest {
         File source = getResourceFile("/fixtures/primarykey/simple_schema_with_valid_ck.json");
         Schema schemaWithValidCK = Schema.fromJson(source, true);
         
-        JSONArray compositePrimaryKey = schemaWithValidCK.getPrimaryKey();
-        assertEquals("name", compositePrimaryKey.getString(0));
-        assertEquals("surname", compositePrimaryKey.getString(1));
+        String[] compositePrimaryKey = schemaWithValidCK.getPrimaryKey();
+        assertEquals("name", compositePrimaryKey[0]);
+        assertEquals("surname", compositePrimaryKey[1]);
         
     }
     
@@ -550,10 +550,10 @@ public class SchemaTest {
         schema.addField(surnameField);
 
         schema.setPrimaryKey(new String[]{"name", "surname"});
-        JSONArray compositeKey = schema.getPrimaryKey();
+        String[] compositeKey = schema.getPrimaryKey();
         
-        assertEquals("name", compositeKey.getString(0));
-        assertEquals("surname", compositeKey.getString(1));
+        assertEquals("name", compositeKey[0]);
+        assertEquals("surname", compositeKey[1]);
     }
     
     @Test
