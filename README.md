@@ -250,24 +250,14 @@ To make sure a schema complies with [Table Schema specifications](https://specs.
 
 ```java
 JSONObject schemaJsonObj = new JSONObject();
-Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
+Field nameField = new IntegerField("id");
 schemaJsonObj.put("fields", new JSONArray());
 schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
 
-Schema schema = new Schema(schemaJsonObj);
+Schema schema = Schema.fromJson(schemaJsonObj.toString(), true);
 
-boolean isValid = schema.validate();
-System.out.println(isValid);
-
+System.out.println(schema.isValid());
 // true
-
-Field invalidField = new Field("coordinates", "invalid");
-schemaJsonObj.getJSONArray("fields").put(invalidField.getJson());
-
-isValid = schema.validate();
-System.out.println(isValid);
-
-// false
 ```
 
 ## Setting Primary Key
