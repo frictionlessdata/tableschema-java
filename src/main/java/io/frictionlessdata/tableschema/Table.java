@@ -191,7 +191,7 @@ public class Table{
         return this.dataSourceFormat.getHeaders();
     }
 
-    String[] getDeclaredHeaders() {
+    private String[] getDeclaredHeaders() {
         return schema
                 .getFields()
                 .stream()
