@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
  * Interface for a source of tabular data.
  */
 public interface DataSourceFormat {
+    public static final String UTF16_BOM = "\uFEFF";
+    public static final String UTF8_BOM = "\u00ef\u00bb\u00bf";
     /**
      * Returns an Iterator that returns String arrays containing
      * one row of data each.
@@ -120,6 +122,11 @@ public interface DataSourceFormat {
         try (Reader fr = new InputStreamReader(input)) {
             try (BufferedReader rdr = new BufferedReader(fr)) {
                 content = rdr.lines().collect(Collectors.joining("\n"));
+            }
+            if( content.startsWith(UTF16_BOM)) {
+                content = content.substring(1);
+            } else if( content.startsWith(UTF8_BOM)) {
+                content = content.substring(3);
             }
         } catch (IOException ex) {
             throw ex;

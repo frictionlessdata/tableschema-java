@@ -5,6 +5,7 @@ import io.frictionlessdata.tableschema.exception.TableValidationException;
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
+import org.apache.commons.csv.CSVFormat;
 import org.json.JSONArray;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -330,4 +331,16 @@ public class TableCreationTest {
         table.validate();
     }
 
+
+    @Test
+    public void testReadFileWithBOM() throws Exception{
+        File testDataDir = getTestDataDirectory();
+        // get path of test CSV file
+        File file = new File("data/simple_data_bom2.tsv");
+        Table table = Table.fromSource(file, testDataDir);
+        table.setCsvFormat(CSVFormat.TDF.withRecordSeparator("\n").withHeader(new String[0]));
+        Assert.assertEquals(3, table.read().size());
+        // must not throw an exception
+        table.validate();
+    }
 }
