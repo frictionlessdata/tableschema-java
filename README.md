@@ -22,22 +22,22 @@ CSV free-form, ie. without a Schema).
 
 
 ```java
-// Let's start by defining and building the schema of a table with an `id`- and a `title` column:
+// Let's start by defining and building the schema of a table that contains data about employees:
 Schema schema = new Schema();
 
 schema.addField(new IntegerField("id"));
 schema.addField(new StringField("title"));
-        // Load the data from URL with the schema.
-Table table = new Table(
-            new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/data/simple_data.csv"),
-            schema);
+// Load the data from URL with the schema.
+Table table = Table.fromSource(
+    new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
+            "/src/test/resources/fixtures/data/simple_data.csv"),
+    schema, DataSourceFormat.getDefaultCsvFormat());
 
 List<Object[]> allData = table.read();
 
 // [1, foo]
 // [2, bar]
 // [3, baz]
-
 ```
 
 ### Parse a CSV without a Schema
@@ -46,8 +46,8 @@ Cast [data](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/
 
 ```java
 URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
-	              "/src/test/resources/fixtures/data/simple_data.csv");
-Table table = new Table(url);
+                "/src/test/resources/fixtures/data/simple_data.csv");
+Table table = Table.fromSource(url);
 
 // Iterate through rows
 Iterator<Object[]> iter = table.iterator();
@@ -62,7 +62,6 @@ while(iter.hasNext()){
 
 // Read the entire CSV and output it as a List:
 List<Object[]> allData = table.read();
-
 ```
 
 ### Write a Table Into a File
@@ -71,7 +70,7 @@ You can write a `Table` into a CSV file:
 
 ```java
 URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv");
-Table table = new Table(url);
+Table table = Table.fromSource(url);
 table.write("/path/to/write/table.csv");
 ```
 
@@ -145,7 +144,7 @@ If you don't have a schema for a CSV and don't want to manually define one then 
 ```java
 URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
                                 "/src/test/resources/fixtures/data/simple_data.csv");
-Table table = new Table(url);
+Table table = Table.fromSource(url);
 
 Schema schema = table.inferSchema();
 System.out.println(schema.getJson());
@@ -202,45 +201,47 @@ If you have a schema, you can input it as parameter when creating the `Table` in
 // Let's start by defining and building the schema of a table that contains data on employees:
 Schema schema = new Schema();
 
-Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+Field idField = new IntegerField("id");
 schema.addField(idField);
 
-Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+Field nameField = new StringField("name");
 schema.addField(nameField);
 
-Field dobField = new Field("dateOfBirth", Field.FIELD_TYPE_DATE); 
+Field dobField = new DateField("dateOfBirth");
 schema.addField(dobField);
 
-Field isAdminField = new Field("isAdmin", Field.FIELD_TYPE_BOOLEAN);
+Field isAdminField = new BooleanField("isAdmin");
 schema.addField(isAdminField);
 
-Field addressCoordinatesField = new Field("addressCoordinates", Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT);
+Field addressCoordinatesField = new GeopointField("addressCoordinates");
+addressCoordinatesField.setFormat(Field.FIELD_FORMAT_OBJECT);
 schema.addField(addressCoordinatesField);
 
-Field contractLengthField = new Field("contractLength", Field.FIELD_TYPE_DURATION);
+Field contractLengthField = new DurationField("contractLength");
 schema.addField(contractLengthField);
 
-Field infoField = new Field("info", Field.FIELD_TYPE_OBJECT);
+Field infoField = new ObjectField("info");
 schema.addField(infoField);
 
 // Load the data from URL with the schema.
-URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/employee_data.csv");
-Table table = new Table(url, schema);
+URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
+        "/src/test/resources/fixtures/data/employee_data.csv");
+Table table = Table.fromSource(url, schema, DataSourceFormat.getDefaultCsvFormat());
 
-TableIterator<Object[]> iter = table.iterator();
+Iterator<Object[]> iter = table.iterator(false, false, true, false);
 while(iter.hasNext()){
 
     // The fetched array will contain row values that have been cast into their
     // appropriate types as per field definitions in the schema.
     Object[] row = iter.next();
 
-    int id = (int)row[0];
+    BigInteger id = (BigInteger)row[0];
     String name = (String)row[1];
-    DateTime dob = (DateTime)row[2];
+    LocalDate dob = (LocalDate)row[2];
     boolean isAdmin = (boolean)row[3];
-    int[] addressCoordinates = (int[])row[4];
+    double[] addressCoordinates = (double[])row[4];
     Duration contractLength = (Duration)row[5];
-    JSONObject info = (JSONObject)row[6];
+    Map info = (Map)row[6];
 }
 ```
 
@@ -249,51 +250,42 @@ To make sure a schema complies with [Table Schema specifications](https://specs.
 
 ```java
 JSONObject schemaJsonObj = new JSONObject();
-Field nameField = new Field("id", Field.FIELD_TYPE_INTEGER);
+Field nameField = new IntegerField("id");
 schemaJsonObj.put("fields", new JSONArray());
 schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
 
-Schema schema = new Schema(schemaJsonObj);
+Schema schema = Schema.fromJson(schemaJsonObj.toString(), true);
 
-boolean isValid = schema.validate();
-System.out.println(isValid);
-
+System.out.println(schema.isValid());
 // true
-
-Field invalidField = new Field("coordinates", "invalid");
-schemaJsonObj.getJSONArray("fields").put(invalidField.getJson());
-
-isValid = schema.validate();
-System.out.println(isValid);
-
-// false
 ```
 
 ## Setting Primary Key
 ### Single Key
 ```java
 Schema schema = new Schema();
-        
-Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+
+Field idField = new IntegerField("id");
 schema.addField(idField);
 
-Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+Field nameField = new StringField("name");
 schema.addField(nameField);
 
 schema.setPrimaryKey("id");
+String primaryKey = schema.getPrimaryKey();
 ```
 
 ### Composite Key
 ```java
 Schema schema = new Schema();
-        
-Field idField = new Field("id", Field.FIELD_TYPE_INTEGER);
+
+Field idField = new IntegerField("id");
 schema.addField(idField);
 
-Field nameField = new Field("name", Field.FIELD_TYPE_STRING);
+Field nameField = new StringField("name");
 schema.addField(nameField);
 
-Field surnameField = new Field("surname", Field.FIELD_TYPE_STRING);
+Field surnameField = new StringField("surname");
 schema.addField(surnameField);
 
 schema.setPrimaryKey(new String[]{"name", "surname"});

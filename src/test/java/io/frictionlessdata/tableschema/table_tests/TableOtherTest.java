@@ -366,4 +366,16 @@ public class TableOtherTest {
         CSVFormat testFmt = employeeTable.getCsvFormat();
         Assert.assertEquals(expectedFmt, testFmt);
     }
+
+    @Test
+    public void testSetSchema() throws Exception {
+        File testDataDir = getTestDataDirectory();
+        File file = new File("data/employee_data.csv");
+        Table table = Table.fromSource(file, testDataDir);
+
+        Schema schema = Schema.fromJson(new File(testDataDir, "schema/employee_schema.json"), true);
+
+        table.setSchema(schema);
+        table.read(true);
+    }
 }

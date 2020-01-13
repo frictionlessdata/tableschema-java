@@ -21,7 +21,8 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * This class represents a CSV table
+ * This class represents a CSV table with optional CSV specification via a CSVFormat and optional provable assurances
+ * towards format integrity via a Table Schema.
  * 
  */
 public class Table{
@@ -31,13 +32,16 @@ public class Table{
     private Map<String, Object> fieldOptions;
 
     /**
-     * Constructor for an empty Table
+     * Constructor for an empty Table. It contains neither data nor is it controlled by a Schema
      */
     public Table() { }
 
     /**
      * Constructor for a Table from String array input data and optionally
      * a Schema. Data is parsed into a DataSourceFormat object
+     * @param data a {@link java.util.Collection} holding rows of data encoded as String-arrays
+     * @param headers the column header names for writing out as CSV/JSON
+     * @param schema Table Schema to control the format of the data. Can be null.
      */
     public Table(Collection<String[]> data, String[] headers, Schema schema) {
         this.dataSourceFormat = new StringArrayDataSourceFormat(data, headers);
@@ -94,7 +98,7 @@ public class Table{
     }
 
     /**
-     * Construct Table using either a CSV or JSON array-containing string  and without either a Schema or a CSVFormat.
+     * Create Table using either a CSV or JSON array-containing string  and without either a Schema or a CSVFormat.
      * @param dataSource the CSV or JSON content for the Table
      */
     public static Table fromSource(String dataSource) {
@@ -103,7 +107,12 @@ public class Table{
         return table;
     }
 
-
+    /**
+     * Create Table using either a CSV or JSON array-containing string and with  a Schema and a CSVFormat.
+     * @param dataSource the CSV or JSON content for the Table
+     * @param schema table schema
+     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data
+     */
     public static Table fromSource(String dataSource, Schema schema, CSVFormat format) {
         Table table = new Table();
         table.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
@@ -114,16 +123,24 @@ public class Table{
         return table;
     }
 
+    /**
+     * Create Table from a URL containing either CSV or JSON and without either a Schema or a CSVFormat.
+     * @param dataSource the URL for the CSV or JSON content
+     * @throws IOException if reading throws an Exception
+     */
     public static Table fromSource(URL dataSource) throws IOException {
         Table table = new Table();
         table.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource.openStream());
         return table;
     }
 
-    public static Table fromSource(URL dataSource, URL schema) throws Exception{
-        return fromSource(dataSource, Schema.fromJson(schema, true), null);
-    }
-
+    /**
+     * Create Table from a URL containing either CSV or JSON and with  a Schema and a CSVFormat.
+     * @param dataSource the URL for the CSV or JSON content
+     * @param schema table schema
+     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data
+     * @throws IOException if reading throws an Exception
+     */
     public static Table fromSource(URL dataSource, Schema schema, CSVFormat format) throws IOException {
         Table table = fromSource(dataSource);
         table.schema = schema;
@@ -176,7 +193,8 @@ public class Table{
      * the data if no Schema has been set. In the case where we don't have a Schema, the order
      * is only well-defined for Tables read from CSV.
      *
-     * If the input source is a JSON array of JSON objects, the order of columns is arbitrary:
+     * If the input source is a JSON array of JSON objects, the order of columns is arbitrary, as JSON objects do
+     * not preserve key order:
      *
      * "An object is an unordered set of name/value pairs"
      * (https://www.json.org/json-en.html)
@@ -191,10 +209,7 @@ public class Table{
         return this.dataSourceFormat.getHeaders();
     }
 
-    String[] getDeclaredHeaders() {
-        if (null == schema)
-            return null;
-
+    private String[] getDeclaredHeaders() {
         return schema
                 .getFields()
                 .stream()
@@ -312,8 +327,9 @@ public class Table{
         return this;
     }
 
-    public void setFieldOptions(Map<String, Object> options) {
+    public Table setFieldOptions(Map<String, Object> options) {
         this.fieldOptions = options;
+        return this;
     }
 
     public Map<String, Object> getFieldOptions() {
@@ -337,10 +353,11 @@ public class Table{
      * then the data will be validated against the new Schema.
      * @param schema the Schema to set
      */
-    public void setSchema(Schema schema) {
+    public Table setSchema(Schema schema) {
         this.schema = schema;
         if (null != dataSourceFormat)
             validate();
+        return this;
     }
 
     /**
@@ -356,10 +373,11 @@ public class Table{
      * then the data will be validated against the Schema.
      * @param fmt the DataSourceFormat to set
      */
-    public void setDataSourceFormat(DataSourceFormat fmt) {
+    public Table setDataSourceFormat(DataSourceFormat fmt) {
         this.dataSourceFormat = fmt;
         if (null != schema)
             validate();
+        return this;
     }
 
     @Override
