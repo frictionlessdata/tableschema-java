@@ -344,4 +344,32 @@ public class TableCreationTest {
         table.validate();
     }
 
+    // Ensure that a JSON array file with different ordering of properties between the
+    // object records can be read into a consistent String array with the help of
+    // a Schema.
+    @Test
+    public void testReadFromValidJSONFileWithDifferingOrderingWithValidSchema() throws Exception{
+        // get path of test CSV file
+        URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/data/population_alternate.json");
+        Path path = Paths.get(sourceFileUrl.toURI());
+        String csvContent = new String(Files.readAllBytes(path));
+
+        File f = new File(getTestDataDirectory(), "schema/population_schema.json");
+        Schema schema = null;
+        try (FileInputStream fis = new FileInputStream(f)) {
+            schema = Schema.fromJson (fis, false);
+        }
+
+        Table table = Table.fromSource(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
+
+        List<Object[]> actualData = table.read(false);
+        for (int i = 0; i < actualData.size(); i++) {
+            Object[] actualRow = actualData.get(i);
+            Object[] testRow = populationTestData[i];
+            Assert.assertArrayEquals(testRow, actualRow);
+        }
+        // must not throw an exception
+        table.validate();
+    }
+
 }

@@ -14,10 +14,19 @@ import java.util.stream.Collectors;
  *
  */
 public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
-
+/*
     public JsonArrayDataSourceFormat(String dataSource){
         super(dataSource);
     }
+
+    */
+
+    public JsonArrayDataSourceFormat(String dataSource){
+        super();
+        dataSource = DataSourceFormat.trimBOM(dataSource);
+        this.dataSource = new JSONArray(dataSource);
+    }
+
 
     public JsonArrayDataSourceFormat (InputStream inStream) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(inStream, StandardCharsets.UTF_8);

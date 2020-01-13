@@ -115,8 +115,8 @@ public class Table{
      */
     public static Table fromSource(String dataSource, Schema schema, CSVFormat format) {
         Table table = new Table();
-        table.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
         table.schema = schema;
+        table.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
         if (null != format) {
             table.setCsvFormat(format);
         }
