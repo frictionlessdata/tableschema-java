@@ -120,10 +120,26 @@ public class Table{
         return table;
     }
 
-    public static Table fromSource(URL dataSource, URL schema) throws Exception{
-        return fromSource(dataSource, Schema.fromJson(schema, true), null);
+
+    /**
+     * Create Table from a URL containing either CSV or JSON and with  a Schema and a CSVFormat.
+     * @param dataSource the URL for the CSV or JSON content
+     * @param schemaUrl the URL for the table schema
+     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data
+     * @throws IOException if reading throws an Exception
+     */
+    public static Table fromSource(URL dataSource, URL schemaUrl, CSVFormat format) throws Exception {
+        Schema schema = Schema.fromJson(schemaUrl, true);
+        return fromSource(dataSource, schema, format);
     }
 
+    /**
+     * Create Table from a URL containing either CSV or JSON and with  a Schema and a CSVFormat.
+     * @param dataSource the URL for the CSV or JSON content
+     * @param schema table schema
+     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data
+     * @throws IOException if reading throws an Exception
+     */
     public static Table fromSource(URL dataSource, Schema schema, CSVFormat format) throws IOException {
         Table table = fromSource(dataSource);
         table.schema = schema;

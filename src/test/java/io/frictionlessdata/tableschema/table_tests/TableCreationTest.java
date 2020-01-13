@@ -197,7 +197,7 @@ public class TableCreationTest {
                 "/tableschema-java/master/src/test/resources/fixtures/data/population.csv");
         URL schemaUrl = new URL("https://raw.githubusercontent.com/frictionlessdata" +
                 "/tableschema-java/master/src/test/resources/fixtures/schema/population_schema.json");
-        Table table = Table.fromSource(tableUrl, schemaUrl);
+        Table table = Table.fromSource(tableUrl, schemaUrl, null);
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema testSchema = Schema.fromJson (schemaFile, true);

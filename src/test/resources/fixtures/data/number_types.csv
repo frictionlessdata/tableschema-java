@@ -1,2 +1,2 @@
-id, byteVal, shortVal, intVal, longClassVal, longVal, floatVal, doubleVal, floatClassVal,doubleClassVal,bigIntVal, bigDecimalVal, atomicIntegerVal, atomicLongVal, atomicDoubleVal
-23143245, 126, 234, 234534, 908347392304952, 893479850249, 3245.1233, 3.452345523452345E11, 2345662346.2345234, 345673474373473473734734.234, 23459734123456676123981234, 3542352304245234542345345423453.02345234, 2345123, 234597341234502345, 3453254.34
+id; byteVal; shortVal; intVal; longClassVal; longVal; floatVal; doubleVal;floatClassVal;doubleClassVal; bigIntVal; bigDecimalVal; atomicIntegerVal; atomicLongVal; atomicDoubleVal
+23143245;126;234;234534;9,08347E+14;8,9348E+11;32451233;3,45235E+26;;;2,34597E+25;3,54235E+38;2345123;2,34597E+17;345325434
