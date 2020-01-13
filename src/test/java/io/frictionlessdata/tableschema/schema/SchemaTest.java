@@ -183,9 +183,9 @@ public class SchemaTest {
         File source = getResourceFile("/fixtures/primarykey/simple_schema_with_valid_ck.json");
         Schema schemaWithValidCK = Schema.fromJson(source, true);
         
-        JSONArray compositePrimaryKey = schemaWithValidCK.getPrimaryKey();
-        assertEquals("name", compositePrimaryKey.getString(0));
-        assertEquals("surname", compositePrimaryKey.getString(1));
+        String[] compositePrimaryKey = schemaWithValidCK.getPrimaryKey();
+        assertEquals("name", compositePrimaryKey[0]);
+        assertEquals("surname", compositePrimaryKey[1]);
         
     }
     
@@ -225,32 +225,6 @@ public class SchemaTest {
         assertEquals(nameField, foundNameField);
     }
 
-    /*
-    @Test
-    public void testAddInvalidField(){
-        Field idField = new IntegerField("id");
-        Field invalidField = new Field("title", "invalid");
-        Field geopointField = new GeoPointField("coordinates");
-        
-        Schema schema = new Schema(); // strict=false by default
-        
-        // Add a valid field.
-        schema.addField(idField);
-        
-        // Add an invalid field.
-        // Won't be ignored because strict=false by default but error will be saved in error list.
-        schema.addField(invalidField);
-        
-        // Add an invalid field.
-        // Won't be ignored because strict=false by default but error will be saved in error list.
-        schema.addField(geopointField);
-        
-        Assert.assertEquals(3, schema.getFields().size());
-        Assert.assertEquals(2, schema.getErrors().size());
-        Assert.assertNotNull(schema.getField("title"));
-        Assert.assertNotNull(schema.getField("id"));
-        Assert.assertNotNull(schema.getField("coordinates"));
-    }*/
 
     @Test
     public void hasField(){
@@ -550,10 +524,10 @@ public class SchemaTest {
         schema.addField(surnameField);
 
         schema.setPrimaryKey(new String[]{"name", "surname"});
-        JSONArray compositeKey = schema.getPrimaryKey();
+        String[] compositeKey = schema.getPrimaryKey();
         
-        assertEquals("name", compositeKey.getString(0));
-        assertEquals("surname", compositeKey.getString(1));
+        assertEquals("name", compositeKey[0]);
+        assertEquals("surname", compositeKey[1]);
     }
     
     @Test
@@ -705,7 +679,6 @@ public class SchemaTest {
         Assert.assertNotNull(expectedschema);
     }
 
-
     @Test
     public void test2Issue20() throws Exception {
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/" +
@@ -716,6 +689,19 @@ public class SchemaTest {
         String json = schema.getJson();
         Schema newSchema = Schema.fromJson(json, true);
         Assert.assertTrue(newSchema.isValid());
+    }
+
+
+    @Test
+    public void testIssue14() throws Exception {
+        Schema schema = Schema.fromJson (new File(getTestDataDirectory()
+                , "schema/employee_full_schema.json"), true);
+        Assert.assertNotNull(schema);
+
+        File f = new File("data/employee_full.csv");
+        Table table = Table.fromSource(f, getTestDataDirectory(), schema, null);
+        List<Object[]> data = table.read();
+        Assert.assertEquals(3, data.size());
     }
 
     // Create schema from a provided Bean class and compare with
