@@ -343,4 +343,5 @@ public class TableCreationTest {
         // must not throw an exception
         table.validate();
     }
+
 }
