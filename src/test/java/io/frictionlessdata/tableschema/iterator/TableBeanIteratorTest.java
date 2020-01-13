@@ -68,7 +68,7 @@ class TableBeanIteratorTest {
     @DisplayName("Test deserialization of EmployeeBean")
     void testBeanDeserialization() throws Exception {
         List<EmployeeBean> employees = new ArrayList<>();
-        BeanIterator<EmployeeBean> bit = new BeanIterator<>(employeeTable, EmployeeBean.class);
+        BeanIterator<EmployeeBean> bit = new BeanIterator<>(employeeTable, EmployeeBean.class, false);
         while (bit.hasNext()) {
             EmployeeBean employee = bit.next();
             employees.add(employee);

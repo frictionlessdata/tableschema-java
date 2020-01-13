@@ -22,6 +22,25 @@ class TableIteratorTest {
     private static Table nullValuesPopulationTable = null;
     private static Table invalidPopulationTable = null;
 
+    private static final String jsonData = "[" +
+            "{" +
+            "\"city\": \"london\"," +
+            "\"year\": 2017," +
+            "\"population\": 8780000" +
+            "}," +
+            "{" +
+            "\"city\": \"paris\"," +
+            "\"year\": 2017," +
+            "\"population\": 2240000" +
+            "}," +
+            "{" +
+            "\"city\": \"rome\"," +
+            "\"year\": 2017," +
+            "\"population\": 2860000" +
+            "}" +
+            "]";
+
+
     @BeforeEach
     void setUp() throws Exception {
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
@@ -85,24 +104,6 @@ class TableIteratorTest {
 
     @Test
     void testStringArrayIterateDataFromJSONFormatAlternateSchema() throws Exception{
-        String jsonData = "[" +
-                "{" +
-                "\"city\": \"london\"," +
-                "\"year\": 2017," +
-                "\"population\": 8780000" +
-                "}," +
-                "{" +
-                "\"city\": \"paris\"," +
-                "\"year\": 2017," +
-                "\"population\": 2240000" +
-                "}," +
-                "{" +
-                "\"city\": \"rome\"," +
-                "\"year\": 2017," +
-                "\"population\": 2860000" +
-                "}" +
-                "]";
-
 
         //set a schema to guarantee the ordering of properties
         Schema schema = Schema.fromJson(new File(getTestDataDirectory(), "/schema/population_schema_alternate.json"), true);
@@ -130,26 +131,38 @@ class TableIteratorTest {
         }
     }
 
+
+    @Test
+    void testStringArrayIterateDataFromJSONFormatAlternateSchemaNoRelations() throws Exception{
+
+        //set a schema to guarantee the ordering of properties
+        Schema schema = Schema.fromJson(new File(getTestDataDirectory(), "/schema/population_schema_alternate.json"), true);
+        Table table = Table.fromSource(jsonData, schema, DataSourceFormat.getDefaultCsvFormat());
+
+        // Expected data.
+        List<String[]> expectedData = this.getExpectedAlternatePopulationData();
+
+        // Get Iterator.
+        Iterator<String[]> iter = table.stringArrayIterator(false);
+        int expectedDataIndex = 0;
+
+        // Assert data.
+        while(iter.hasNext()){
+            String[] record = iter.next();
+            String year = record[0];
+            String city = record[1];
+            String population = record[2];
+
+            Assertions.assertEquals(expectedData.get(expectedDataIndex)[0], year);
+            Assertions.assertEquals(expectedData.get(expectedDataIndex)[1], city);
+            Assertions.assertEquals(expectedData.get(expectedDataIndex)[2], population);
+
+            expectedDataIndex++;
+        }
+    }
+
     @Test
     void testStringObjectArrayIterateDataFromJSONFormatAlternateSchema() throws Exception{
-        String jsonData = "[" +
-                "{" +
-                "\"city\": \"london\"," +
-                "\"year\": 2017," +
-                "\"population\": 8780000" +
-                "}," +
-                "{" +
-                "\"city\": \"paris\"," +
-                "\"year\": 2017," +
-                "\"population\": 2240000" +
-                "}," +
-                "{" +
-                "\"city\": \"rome\"," +
-                "\"year\": 2017," +
-                "\"population\": 2860000" +
-                "}" +
-                "]";
-
 
         //set a schema to guarantee the ordering of properties
         Schema schema = Schema.fromJson(new File(getTestDataDirectory(), "/schema/population_schema_alternate.json"), true);
@@ -180,24 +193,6 @@ class TableIteratorTest {
 
     @Test
     void testStringObjectMapIterateDataFromJSONFormatAlternateSchema() throws Exception{
-        String jsonData = "[" +
-                "{" +
-                "\"city\": \"london\"," +
-                "\"year\": 2017," +
-                "\"population\": 8780000" +
-                "}," +
-                "{" +
-                "\"city\": \"paris\"," +
-                "\"year\": 2017," +
-                "\"population\": 2240000" +
-                "}," +
-                "{" +
-                "\"city\": \"rome\"," +
-                "\"year\": 2017," +
-                "\"population\": 2860000" +
-                "}" +
-                "]";
-
 
         //set a schema to guarantee the ordering of properties
         Schema schema = Schema.fromJson(new File(getTestDataDirectory(), "/schema/population_schema_alternate.json"), true);
