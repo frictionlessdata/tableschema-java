@@ -123,7 +123,7 @@ public class TableIterator<T> implements Iterator<T> {
                 return (T)keyedRow;
 
             }else{
-                return (T)plainRow;
+                return (T)row;
             }
         }
     }
