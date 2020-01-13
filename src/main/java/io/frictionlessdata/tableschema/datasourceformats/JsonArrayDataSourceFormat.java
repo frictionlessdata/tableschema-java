@@ -24,6 +24,7 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
         BufferedReader br = new BufferedReader(inputStreamReader);
 
         String content = br.lines().collect(Collectors.joining("\n"));
+        content = DataSourceFormat.trimBOM(content);
         br.close();
         inputStreamReader.close();
         this.dataSource = new JSONArray(content);

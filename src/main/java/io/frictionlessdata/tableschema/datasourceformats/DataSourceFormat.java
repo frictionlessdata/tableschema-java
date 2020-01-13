@@ -123,16 +123,23 @@ public interface DataSourceFormat {
             try (BufferedReader rdr = new BufferedReader(fr)) {
                 content = rdr.lines().collect(Collectors.joining("\n"));
             }
-            if( content.startsWith(UTF16_BOM)) {
-                content = content.substring(1);
-            } else if( content.startsWith(UTF8_BOM)) {
-                content = content.substring(3);
-            }
+            content = trimBOM(content);
         } catch (IOException ex) {
             throw ex;
         }
 
         return createDataSourceFormat(content);
+    }
+
+    static String trimBOM(String input) {
+        if (null == input)
+            return null;
+        if( input.startsWith(UTF16_BOM)) {
+            input = input.substring(1);
+        } else if( input.startsWith(UTF8_BOM)) {
+            input = input.substring(3);
+        }
+        return input;
     }
 
     //https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html

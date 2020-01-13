@@ -28,6 +28,7 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
         BufferedReader br = new BufferedReader(inputStreamReader);
 
         String content = br.lines().collect(Collectors.joining("\n"));
+        content = DataSourceFormat.trimBOM(content);
         this.dataSource = content;
         br.close();
         inputStreamReader.close();
