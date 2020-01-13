@@ -21,7 +21,6 @@ public class SimpleTableIterator extends TableIterator<String[]> {
     public String[] next() {
         String[] row = this.wrappedIterator.next();
         if (null != schema) {
-            List<String> schemaHeaders = schema.getFieldNames();
             String[] newRow = new String[row.length];
             for (int i = 0; i < row.length; i++) {
                 newRow[mapping.get(i)] = row[i];

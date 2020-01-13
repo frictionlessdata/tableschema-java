@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema.table_tests;
 
 import io.frictionlessdata.tableschema.Table;
-import io.frictionlessdata.tableschema.datasourceformats.JsonArrayDataSourceFormat;
+import io.frictionlessdata.tableschema.datasourceformat.JsonArrayDataSourceFormat;
 import io.frictionlessdata.tableschema.schema.Schema;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

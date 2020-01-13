@@ -1,4 +1,4 @@
-package io.frictionlessdata.tableschema.datasourceformats;
+package io.frictionlessdata.tableschema.datasourceformat;
 
 import com.google.common.collect.Iterators;
 import io.frictionlessdata.tableschema.util.TableSchemaUtil;

@@ -1,6 +1,6 @@
 package io.frictionlessdata.tableschema;
 
-import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
+import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.schema.Schema;
 import org.json.JSONArray;

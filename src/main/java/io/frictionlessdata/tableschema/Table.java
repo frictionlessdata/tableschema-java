@@ -1,11 +1,11 @@
 package io.frictionlessdata.tableschema;
 
-import io.frictionlessdata.tableschema.datasourceformats.StringArrayDataSourceFormat;
+import io.frictionlessdata.tableschema.datasourceformat.StringArrayDataSourceFormat;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import io.frictionlessdata.tableschema.exception.TableValidationException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
-import io.frictionlessdata.tableschema.datasourceformats.CsvDataSourceFormat;
-import io.frictionlessdata.tableschema.datasourceformats.DataSourceFormat;
+import io.frictionlessdata.tableschema.datasourceformat.CsvDataSourceFormat;
+import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 
 import java.io.*;

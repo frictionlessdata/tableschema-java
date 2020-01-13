@@ -1,7 +1,7 @@
 /*
  *
  */
-package io.frictionlessdata.tableschema.datasourceformats;
+package io.frictionlessdata.tableschema.datasourceformat;
 
 import org.apache.commons.csv.CSVFormat;
 import org.json.JSONArray;

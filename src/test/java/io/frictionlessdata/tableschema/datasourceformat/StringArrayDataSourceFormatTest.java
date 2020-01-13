@@ -1,4 +1,4 @@
-package io.frictionlessdata.tableschema.datasourceformats;
+package io.frictionlessdata.tableschema.datasourceformat;
 
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import org.junit.jupiter.api.Assertions;
