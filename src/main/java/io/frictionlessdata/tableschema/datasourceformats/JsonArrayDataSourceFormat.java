@@ -43,7 +43,7 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
     @Override
     public void write(File outputFile) throws Exception {
         try (Writer out = new BufferedWriter(new FileWriter(outputFile))) {
-            out.write((String)dataSource);
+            out.write(((JSONArray)dataSource).toString());
         } catch (Exception e) {
             throw e;
         }
