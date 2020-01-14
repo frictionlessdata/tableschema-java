@@ -59,7 +59,7 @@ class LocalFileReferenceTest {
     @DisplayName("Loading a Schema from URL")
     void fileReferenceParsingFromUrl() throws Exception{
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/" +
-                "master/src/test/resources/fixtures/simple_schema.json");
+                "master/src/test/resources/fixtures/schema/simple_schema.json");
 
         URLFileReference lft = new URLFileReference(url);
         InputStream is = lft.getInputStream();

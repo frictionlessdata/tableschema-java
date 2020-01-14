@@ -118,7 +118,7 @@ public class SchemaTest {
     @Test
     public void testCreateSchemaFromValidSchemaUrl() throws Exception{
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/" +
-                "master/src/test/resources/fixtures/simple_schema.json");
+                "master/src/test/resources/fixtures/schema/simple_schema.json");
         
         Schema validSchema = Schema.fromJson(url, true);
         Assert.assertTrue(validSchema.isValid());
