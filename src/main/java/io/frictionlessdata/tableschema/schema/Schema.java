@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import io.frictionlessdata.tableschema.io.FileReference;
-import io.frictionlessdata.tableschema.io.LocalFilesReference;
+import io.frictionlessdata.tableschema.io.LocalFileReference;
 import io.frictionlessdata.tableschema.io.URLFileReference;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
@@ -121,7 +121,7 @@ public class Schema {
      * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
     public static Schema fromJson (File schemaFile, boolean strict) throws Exception {
-        FileReference reference = new LocalFilesReference(schemaFile);
+        FileReference reference = new LocalFileReference(schemaFile);
         Schema schema = fromJson (reference.getInputStream(), strict);
         schema.reference = reference;
         reference.close();
