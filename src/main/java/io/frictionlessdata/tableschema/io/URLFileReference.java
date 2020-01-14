@@ -33,6 +33,7 @@ public class URLFileReference implements FileReference<URL> {
 
     @Override
     public void close() throws IOException {
-        is.close();
+        if (null != is)
+            is.close();
     }
 }

@@ -56,7 +56,8 @@ public class LocalFileReference implements FileReference<File> {
     }
 
     public void close() throws IOException {
-        is.close();
+        if (null != is)
+            is.close();
     }
 
     /**
