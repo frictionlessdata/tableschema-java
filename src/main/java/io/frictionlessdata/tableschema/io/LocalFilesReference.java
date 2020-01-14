@@ -22,6 +22,11 @@ public class LocalFilesReference implements FileReference<File> {
         return inputFile.getAbsolutePath();
     }
 
+    @Override
+    public String getFileName(){
+        return inputFile.getName();
+    }
+
     public void close() throws IOException {
         is.close();
     }

@@ -9,5 +9,7 @@ public interface FileReference<T> {
 
     String getLocator();
 
+    String getFileName();
+
     void close() throws IOException;
 }

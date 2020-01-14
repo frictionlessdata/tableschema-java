@@ -24,6 +24,13 @@ public class URLFileReference implements FileReference<URL> {
         return inputFile.toExternalForm();
     }
 
+
+    @Override
+    public String getFileName(){
+        String[] pathParts = inputFile.getFile().split("/");
+        return pathParts[pathParts.length-1];
+    }
+
     @Override
     public void close() throws IOException {
         is.close();
