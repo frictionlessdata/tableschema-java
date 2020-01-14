@@ -99,6 +99,19 @@ public class Schema {
     }
 
     /**
+     * Read, create, and validate a table schema from a FileReference.
+     *
+     * @param reference the File or URL to read schema JSON data from
+     * @param strict whether to enforce strict validation
+     * @throws Exception thrown if reading from the stream or parsing throws an exception
+     */
+    public static Schema fromJson (FileReference reference, boolean strict) throws Exception {
+        Schema schema = fromJson (reference.getInputStream(), strict);
+        reference.close();
+        return schema;
+    }
+
+    /**
      * Read, create, and validate a table schema from a local {@link java.io.File}.
      *
      * @param schemaFile the File to read schema JSON data from
@@ -122,8 +135,6 @@ public class Schema {
     public  static Schema fromJson (String schemaJson, boolean strict) throws IOException {
         return fromJson (new ByteArrayInputStream(schemaJson.getBytes()), strict);
     }
-
-
     
     /**
      * Infer the data types and return the generated schema.
