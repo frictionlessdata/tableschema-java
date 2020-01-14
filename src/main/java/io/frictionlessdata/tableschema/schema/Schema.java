@@ -94,6 +94,7 @@ public class Schema {
     public static Schema fromJson(URL schemaUrl, boolean strict) throws Exception{
         FileReference reference = new URLFileReference(schemaUrl);
         Schema schema = fromJson (reference.getInputStream(), strict);
+        schema.reference = reference;
         reference.close();
         return schema;
     }
@@ -107,6 +108,7 @@ public class Schema {
      */
     public static Schema fromJson (FileReference reference, boolean strict) throws Exception {
         Schema schema = fromJson (reference.getInputStream(), strict);
+        schema.reference = reference;
         reference.close();
         return schema;
     }
@@ -121,6 +123,7 @@ public class Schema {
     public static Schema fromJson (File schemaFile, boolean strict) throws Exception {
         FileReference reference = new LocalFilesReference(schemaFile);
         Schema schema = fromJson (reference.getInputStream(), strict);
+        schema.reference = reference;
         reference.close();
         return schema;
     }
