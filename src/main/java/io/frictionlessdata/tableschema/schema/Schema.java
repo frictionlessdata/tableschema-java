@@ -10,6 +10,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import io.frictionlessdata.tableschema.io.FileReference;
+import io.frictionlessdata.tableschema.io.LocalFilesReference;
+import io.frictionlessdata.tableschema.io.URLFileReference;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONArray;
@@ -33,6 +36,8 @@ public class Schema {
     
     private boolean strictValidation = false;
     private List<Exception> errors = new ArrayList();
+
+    FileReference reference;
 
     /**
      * Create an empty table schema without strict validation
@@ -87,7 +92,10 @@ public class Schema {
      * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
     public static Schema fromJson(URL schemaUrl, boolean strict) throws Exception{
-        return fromJson (schemaUrl.openStream(), strict);
+        FileReference reference = new URLFileReference(schemaUrl);
+        Schema schema = fromJson (reference.getInputStream(), strict);
+        reference.close();
+        return schema;
     }
 
     /**
@@ -98,7 +106,10 @@ public class Schema {
      * @throws Exception thrown if reading from the stream or parsing throws an exception
      */
     public static Schema fromJson (File schemaFile, boolean strict) throws Exception {
-        return fromJson (new FileInputStream(schemaFile), strict);
+        FileReference reference = new LocalFilesReference(schemaFile);
+        Schema schema = fromJson (reference.getInputStream(), strict);
+        reference.close();
+        return schema;
     }
 
     /**
@@ -380,6 +391,10 @@ public class Schema {
         return !this.getFields().isEmpty();
     }
 
+
+    public FileReference getReference() {
+        return reference;
+    }
     /**
      * Set single primary key with the option of validation.
      * @param key
