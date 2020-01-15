@@ -75,7 +75,7 @@ class FieldFormatTests {
         val = field.formatValue(new double[]{123.45, 56.789}, Field.FIELD_FORMAT_ARRAY, null);
         Assert.assertEquals("[123.45,56.789]", val);
         val = field.formatValue(new double[]{123.45, 56.789}, Field.FIELD_FORMAT_OBJECT, null);
-        Assert.assertEquals("{\"lat\": 123.45, \"lon\":56.789}", val);
+        Assert.assertEquals("{\"lon\": 123.45, \"lat\":56.789}", val);
         val = field.formatValue(new double[]{123.45, 56.789}, "invalid", null);
         Assert.assertNull(val);
     }

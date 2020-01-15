@@ -92,7 +92,7 @@ public class GeopointField extends Field<double[]> {
         }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_ARRAY)){
             return "["+value[0]+","+value[1]+"]";
         } else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_OBJECT)){
-            return "{\"lat\": "+value[0]+", \"lon\":"+value[1]+"}";
+            return "{\"lon\": "+value[0]+", \"lat\":"+value[1]+"}";
         }
         return null;
     }

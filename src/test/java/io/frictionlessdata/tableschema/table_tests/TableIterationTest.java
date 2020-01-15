@@ -1,10 +1,12 @@
 package io.frictionlessdata.tableschema.table_tests;
 
+import com.google.common.base.Strings;
 import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,6 +14,8 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.math.BigInteger;
 import java.net.URL;
 import java.nio.file.Files;
@@ -20,6 +24,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
@@ -115,7 +120,7 @@ public class TableIterationTest {
     }
 
     @Test
-    public void testReadCastData() throws Exception{
+    public void testReadCastDataWithSchema() throws Exception{
         File testDataDir = getTestDataDirectory();
 
         // Let's start by defining and building the schema:
@@ -145,6 +150,114 @@ public class TableIterationTest {
             for(int i=0; i<row.length; i++){
                 Assert.assertEquals(expectedTypes[i], row[i].getClass());
             }
+        }
+    }
+
+
+    @Test
+    public void testReadExtendedDataWithSchema() throws Exception{
+        File testDataDir = getTestDataDirectory();
+        Schema employeeTableSchema = getEmployeeTableSchema();
+
+        File file = new File("data/employee_data.csv");
+        Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, null);
+
+        Iterator iter = employeeTable.iterator(false, true, false, false);
+
+        String referenceContent =
+                String.join("", Files.readAllLines(new File(testDataDir, "data/employee_data_string.json").toPath()));
+        JSONArray referenceArr = new JSONArray(referenceContent);
+
+        int i = 0;
+        while(iter.hasNext()){
+            Object[] row = (Object[])iter.next();
+            JSONObject reference = referenceArr.getJSONObject(i);
+
+            Assert.assertEquals(3, row.length);
+            Assert.assertEquals(i, row[0]);
+
+            String[] keys = (String[])row[1];
+            for (int j = 0; j < keys.length; j++) {
+                String key = keys[j];
+                Object val = ((Object[])row[2])[j];
+                if (val instanceof Boolean) {
+                    Assert.assertEquals(reference.getString(key).equals("T"), val);
+                } else if (val instanceof double[]){
+                    JSONObject objVal = new JSONObject(reference.getString(key));
+                    Assert.assertEquals(objVal.getDouble("lon"), ((double[])val)[0], 0.05);
+                } else if (val instanceof Duration) {
+                    Duration testDur = Duration.parse(reference.getString(key));
+                    Assert.assertEquals(testDur, ((Duration)val));
+                } else if (val instanceof Map) {
+                    JSONObject objVal = new JSONObject(reference.getString(key));
+                    for (Object k : ((Map)val).keySet()) {
+                        Object v = ((Map)val).get(k);
+                        Assert.assertEquals(objVal.get((String)k), v);
+                    }
+                } else {
+                    Assert.assertEquals(reference.getString(key), val.toString());
+                }
+            }
+            i++;
+        }
+    }
+
+    @Test
+    public void testReadKeyedDataWithoutSchema() throws Exception{
+        File testDataDir = getTestDataDirectory();
+
+        File file = new File("data/employee_data.csv");
+        Table employeeTable = Table.fromSource(file, testDataDir);
+
+        Iterator iter = employeeTable.iterator(true, false, false, false);
+
+        String referenceContent =
+                String.join("", Files.readAllLines(new File(testDataDir, "data/employee_data_string.json").toPath()));
+        JSONArray referenceArr = new JSONArray(referenceContent);
+
+        int i = 0;
+        while(iter.hasNext()){
+            Map<String, Object> row = (Map<String, Object>)iter.next();
+            JSONObject reference = referenceArr.getJSONObject(i);
+
+            Assert.assertEquals(7, row.size());
+
+            for(String key : row.keySet()){
+                Object val = row.get(key);
+                Assert.assertEquals(reference.getString(key), val);
+            }
+            i++;
+        }
+    }
+
+    @Test
+    public void testReadExtendedDataWithoutSchema() throws Exception{
+        File testDataDir = getTestDataDirectory();
+
+        File file = new File("data/employee_data.csv");
+        Table employeeTable = Table.fromSource(file, testDataDir);
+
+        Iterator iter = employeeTable.iterator(false, true, false, false);
+
+        String referenceContent =
+                String.join("", Files.readAllLines(new File(testDataDir, "data/employee_data_string.json").toPath()));
+        JSONArray referenceArr = new JSONArray(referenceContent);
+
+        int i = 0;
+        while(iter.hasNext()){
+            Object[] row = (Object[])iter.next();
+            JSONObject reference = referenceArr.getJSONObject(i);
+
+            Assert.assertEquals(3, row.length);
+            Assert.assertEquals(i, row[0]);
+
+            String[] keys = (String[])row[1];
+            for (int j = 0; j < keys.length; j++) {
+                String key = keys[j];
+                String val = ((String[])row[2])[j];
+                Assert.assertEquals(reference.getString(key), val);
+            }
+            i++;
         }
     }
 

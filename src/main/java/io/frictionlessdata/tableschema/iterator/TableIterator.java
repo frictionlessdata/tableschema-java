@@ -67,9 +67,7 @@ public class TableIterator<T> implements Iterator<T> {
         String[] row = this.wrappedIterator.next();
         int rowLength = row.length;
         if (null != this.schema) {
-            rowLength = (row.length > this.schema.getFields().size())
-                    ? row.length
-                    : this.schema.getFields().size();
+            rowLength = Math.max(row.length, this.schema.getFields().size());
         }
         Map<String, Object> keyedRow = new HashMap<>();
         Object[] extendedRow;
@@ -90,7 +88,7 @@ public class TableIterator<T> implements Iterator<T> {
                 }
                 if (!extended && keyed) {
                     keyedRow.put(this.headers[i], val);
-                } else if (cast){
+                } else if (cast || extended){
                     castRow[i] = val;
                 } else {
                     plainRow[i] = val;
