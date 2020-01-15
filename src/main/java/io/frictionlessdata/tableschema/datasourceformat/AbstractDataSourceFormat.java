@@ -207,7 +207,7 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
         }
     }
 
-    private static void writeData(List<String[]> data, Map<Integer, Integer> mapping, CSVPrinter csvPrinter) {
+    static void writeData(List<String[]> data, Map<Integer, Integer> mapping, CSVPrinter csvPrinter) {
         try {
             for (String[] record : data) {
                 String[] sortedRec = new String[record.length];

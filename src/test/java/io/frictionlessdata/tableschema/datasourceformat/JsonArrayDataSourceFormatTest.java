@@ -6,10 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.stream.Collectors;
 
@@ -18,6 +15,23 @@ class JsonArrayDataSourceFormatTest {
             "{" +
             "\"city\": \"london\"," +
             "\"year\": 2017," +
+            "\"population\": 8780000" +
+            "}," +
+            "{" +
+            "\"city\": \"paris\"," +
+            "\"year\": 2017," +
+            "\"population\": 2240000" +
+            "}," +
+            "{" +
+            "\"city\": \"rome\"," +
+            "\"year\": 2017," +
+            "\"population\": 2860000" +
+            "}" +
+            "]";
+
+    private String populationJsonMissingEntry = "[" +
+            "{" +
+            "\"city\": \"london\"," +
             "\"population\": 8780000" +
             "}," +
             "{" +
@@ -60,6 +74,18 @@ class JsonArrayDataSourceFormatTest {
         Assertions.assertNotNull(ds);
     }
 
+    @Test
+    @DisplayName("Validate creating and writing a JsonArrayDataSourceFormat from JSON with null entries")
+    void testCreateAndWriteJsonArrayDataSourceWithMissingEntries() throws Exception {
+        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(populationJsonMissingEntry);
+
+        File tempFile = Files.createTempFile("tableschema-", ".json").toFile();
+        try (FileWriter wr = new FileWriter(tempFile);
+                BufferedWriter bwr = new BufferedWriter(wr)) {
+            ds.writeCsv(bwr, null, populationHeaders);
+        }
+        System.out.println(tempFile.getAbsolutePath());
+    }
 
     @Test
     @DisplayName("Validate creating a JsonArrayDataSourceFormat from InputStream containing JSON")
