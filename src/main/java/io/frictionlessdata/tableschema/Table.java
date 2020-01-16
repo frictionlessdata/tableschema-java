@@ -180,11 +180,11 @@ public class Table{
     }
 
     public Iterator<Map<String, Object>> keyedIterator() throws Exception{
-        return new TableIterator<Map<String, Object>>(this, true, false, true, false);
+        return new TableIterator<>(this, true, false, true, false);
     }
 
     public Iterator<Map<String, Object>> keyedIterator(boolean extended, boolean cast, boolean relations) throws Exception{
-        return new TableIterator<Map<String, Object>>(this, true, extended, cast, relations);
+        return new TableIterator<>(this, true, extended, cast, relations);
     }
 
     public Map<Integer, Integer> getSchemaHeaderMapping() {
@@ -259,7 +259,7 @@ public class Table{
             String[] headers = null;
             if (null != schema) {
                 List<String> fieldNames = schema.getFieldNames();
-                headers = fieldNames.toArray(new String[fieldNames.size()]);
+                headers = fieldNames.toArray(new String[0]);
             } else {
                 headers = dataSourceFormat.getHeaders();
             }
@@ -319,18 +319,26 @@ public class Table{
     public Schema inferSchema() throws TypeInferringException{
         return inferSchema(-1);
     }
-    
+
     public Schema inferSchema(int rowLimit) throws TypeInferringException{
         try{
-            List<Object[]> data = read();
-            String[] headers = getHeaders();
-            schema = Schema.infer(data, headers, rowLimit);
-            return schema;
-            
+            return inferSchema(getHeaders(),rowLimit);
         }catch(Exception e){
             throw new TypeInferringException(e);
         }
     }
+
+    public Schema inferSchema(String[] headers, int rowLimit) throws TypeInferringException{
+        try{
+            List<Object[]> data = read();
+            schema = Schema.infer(data, headers, rowLimit);
+            return schema;
+
+        }catch(Exception e){
+            throw new TypeInferringException(e);
+        }
+    }
+
 
     public Table setCsvFormat(CSVFormat format) {
         this.format = format;
