@@ -319,18 +319,26 @@ public class Table{
     public Schema inferSchema() throws TypeInferringException{
         return inferSchema(-1);
     }
-    
+
     public Schema inferSchema(int rowLimit) throws TypeInferringException{
         try{
-            List<Object[]> data = read();
-            String[] headers = getHeaders();
-            schema = Schema.infer(data, headers, rowLimit);
-            return schema;
-            
+            return inferSchema(getHeaders(),rowLimit);
         }catch(Exception e){
             throw new TypeInferringException(e);
         }
     }
+
+    public Schema inferSchema(String[] headers, int rowLimit) throws TypeInferringException{
+        try{
+            List<Object[]> data = read();
+            schema = Schema.infer(data, headers, rowLimit);
+            return schema;
+
+        }catch(Exception e){
+            throw new TypeInferringException(e);
+        }
+    }
+
 
     public Table setCsvFormat(CSVFormat format) {
         this.format = format;
