@@ -1,5 +1,7 @@
 package io.frictionlessdata.tableschema.table_tests;
 
+import io.frictionlessdata.tableschema.TestHelper;
+import io.frictionlessdata.tableschema.datasourceformat.CsvDataSourceFormat;
 import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
 import io.frictionlessdata.tableschema.exception.TableValidationException;
 import io.frictionlessdata.tableschema.schema.Schema;
@@ -17,9 +19,11 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
@@ -92,6 +96,39 @@ public class TableOtherTest {
         Table expectedTable = Table.fromSource(new File("data/population.csv")
                 , getTestDataDirectory(), expectedSchema, DataSourceFormat.getDefaultCsvFormat());
         Assert.assertEquals(expectedTable, table);
+    }
+
+
+    @Test
+    public void testCsvDataSourceFormatToJson() throws Exception{
+        File schemaFile = new File(getTestDataDirectory(), "schema/employee_schema.json");
+        Schema schema = Schema.fromJson (schemaFile, true);
+        File inFile = new File("data/employee_data.csv");
+
+        Table table = Table.fromSource(inFile, getTestDataDirectory(), schema, null);
+        String s = table.asJson();
+
+        File referenceFile = new File(getTestDataDirectory(), "data/employee_data.json");
+        String referenceContent = String.join("", Files.readAllLines(referenceFile.toPath()));
+        JSONArray reference = new JSONArray(referenceContent);
+        JSONArray actual = new JSONArray(s);
+        Assert.assertEquals(reference.toString(), actual.toString());
+    }
+
+    @Test
+    public void testJsonDataSourceFormatToJson() throws Exception{
+        File schemaFile = new File(getTestDataDirectory(), "schema/employee_schema.json");
+        Schema schema = Schema.fromJson (schemaFile, true);
+        File inFile = new File("data/employee_data.json");
+
+        Table table = Table.fromSource(inFile, getTestDataDirectory(), schema, null);
+        String s = table.asJson();
+
+        File referenceFile = new File(getTestDataDirectory(), "data/employee_data.json");
+        String referenceContent = String.join("", Files.readAllLines(referenceFile.toPath()));
+        JSONArray reference = new JSONArray(referenceContent);
+        JSONArray actual = new JSONArray(s);
+        Assert.assertEquals(reference.toString(), actual.toString());
     }
 
 

@@ -76,7 +76,7 @@ public class NumberField extends Field<Number> {
     }
 
     @Override
-    public String formatValue(Number value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public String formatValueAsString(Number value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return value.toString();
     }
 

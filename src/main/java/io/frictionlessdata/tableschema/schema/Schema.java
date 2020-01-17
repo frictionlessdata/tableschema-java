@@ -34,7 +34,7 @@ public class Schema {
     private Object primaryKey = null;
     private List<ForeignKey> foreignKeys = new ArrayList();
     
-    private boolean strictValidation = false;
+    private boolean strictValidation = true;
     private List<Exception> errors = new ArrayList();
 
     FileReference reference;

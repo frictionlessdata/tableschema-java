@@ -1,10 +1,13 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
 import io.frictionlessdata.tableschema.TestHelper;
+import io.frictionlessdata.tableschema.schema.Schema;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.rules.ExpectedException;
 
 import java.io.BufferedReader;
@@ -18,6 +21,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
+
 public class DataSourceFormatsTest {
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -30,6 +35,24 @@ public class DataSourceFormatsTest {
     private final String[] populationHeaders = new String[]{
             "city", "year", "population"
     };
+
+    private final static String populationjson = "[\n" +
+            "  {\n" +
+            "    \"city\": \"london\",\n" +
+            "    \"year\": \"2017\",\n" +
+            "    \"population\": 8780000\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"city\": \"paris\",\n" +
+            "    \"year\": \"2017\",\n" +
+            "    \"population\": 2240000\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"city\": \"rome\",\n" +
+            "    \"year\": \"2017\",\n" +
+            "    \"population\": 2860000\n" +
+            "  }\n" +
+            "]";
 
     @Test
     public void createCsvDataSource() throws Exception{
@@ -132,6 +155,23 @@ public class DataSourceFormatsTest {
     }
 
     @Test
+    public void testInputFileCreationCsv() throws Exception {
+        DataSourceFormat ds;
+        File basePath = new File(TestHelper.getTestDataDirectory(),"data");
+        File inFile = new File("population.csv");
+        ds = new CsvDataSourceFormat(inFile,basePath);
+        List<String[]> data = ds.data();
+        Assert.assertNotNull(data);
+        byte[] bytes = Files.readAllBytes(new File(TestHelper.getTestDataDirectory(), "data/population.csv").toPath());
+        String[] content = new String(bytes).split("[\n\r]+");
+        for (int i = 1; i < content.length; i++) {
+            String[] testArr = content[i].split(",");
+            Assert.assertArrayEquals(testArr, data.get(i-1));
+        }
+        Assert.assertNotNull(ds);
+    }
+
+    @Test
     public void testZipInputFileCreationCsv() throws Exception {
         DataSourceFormat ds;
         File basePath = new File(TestHelper.getTestDataDirectory(),"data/population.zip");
@@ -147,7 +187,6 @@ public class DataSourceFormatsTest {
         }
         Assert.assertNotNull(ds);
     }
-
 
     @Test
     public void testWrongInputStreamCreationCsv() throws Exception {

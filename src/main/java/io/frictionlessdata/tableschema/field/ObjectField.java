@@ -31,7 +31,7 @@ public class ObjectField extends Field<Map<String, Object>> {
 
 
     @Override
-    public String formatValue(Map<String, Object> value, String format, Map<String, Object> options)
+    public String formatValueAsString(Map<String, Object> value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
         JSONObject obj = new JSONObject(value);
         return obj.toString();

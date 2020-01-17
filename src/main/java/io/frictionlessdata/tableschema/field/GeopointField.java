@@ -9,6 +9,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URI;
+import java.time.Year;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 public class GeopointField extends Field<double[]> {
@@ -86,13 +89,28 @@ public class GeopointField extends Field<double[]> {
     }
 
     @Override
-    public String formatValue(double[] value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public String formatValueAsString(double[] value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         if ((null == format) || (format.equalsIgnoreCase(Field.FIELD_FORMAT_DEFAULT))){
             return value[0]+","+value[1];
         }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_ARRAY)){
             return "["+value[0]+","+value[1]+"]";
         } else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_OBJECT)){
             return "{\"lon\": "+value[0]+", \"lat\":"+value[1]+"}";
+        }
+        return null;
+    }
+
+    @Override
+    public Object formatValueForJson(double[] value) throws InvalidCastException, ConstraintsException {
+        if ((null == format) || (format.equalsIgnoreCase(Field.FIELD_FORMAT_DEFAULT))){
+            return value[0]+","+value[1];
+        }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_ARRAY)){
+            return value;
+        } else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_OBJECT)){
+            Map<String, Double> map = new LinkedHashMap<>();
+            map.put("lon", value[0]);
+            map.put("lat", value[1]);
+            return map;
         }
         return null;
     }

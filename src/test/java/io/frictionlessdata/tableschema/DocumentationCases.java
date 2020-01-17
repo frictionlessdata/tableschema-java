@@ -107,7 +107,8 @@ class DocumentationCases {
     @Test
     @DisplayName("Build a Schema from JSON")
     void buildASchema2() throws Exception{
-        Schema schema = new Schema(); // By default strict=false validation
+        // By default strict=true validation
+        Schema schema = new Schema(false);
 
         JSONObject nameFieldJsonObject = new JSONObject();
         nameFieldJsonObject.put("name", "name");

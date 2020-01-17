@@ -15,12 +15,6 @@ import java.util.stream.Collectors;
  *
  */
 public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
-/*
-    public JsonArrayDataSourceFormat(String dataSource){
-        super(dataSource);
-    }
-
-    */
 
     public JsonArrayDataSourceFormat(String dataSource){
         super();
@@ -114,12 +108,8 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
     @Override
     CSVParser getCSVParser() throws Exception{
         String dataSourceString;
-        if (dataSource instanceof String){
-            dataSourceString = (String)dataSource;
-
-        } else if(dataSource instanceof JSONArray){
+        if(dataSource instanceof JSONArray){
             dataSourceString = dataSource.toString();
-
         } else{
             throw new Exception("Data source is of invalid type.");
         }

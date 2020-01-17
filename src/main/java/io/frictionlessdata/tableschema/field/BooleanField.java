@@ -60,7 +60,7 @@ public class BooleanField extends Field<Boolean> {
     }
 
     @Override
-    public String formatValue(Boolean value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public String formatValueAsString(Boolean value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         String trueValue = trueValues.get(0);
         String falseValue = falseValues.get(0);
         if (null != options) {
@@ -73,7 +73,6 @@ public class BooleanField extends Field<Boolean> {
         }
         return (value) ? trueValue : falseValue;
     }
-
 
     @Override
     public String parseFormat(String value, Map<String, Object> options) {

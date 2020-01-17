@@ -48,7 +48,7 @@ public class DateField extends Field<LocalDate> {
     }
 
     @Override
-    public String formatValue(LocalDate value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public String formatValueAsString(LocalDate value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 

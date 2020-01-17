@@ -47,7 +47,7 @@ public class TimeField extends Field<DateTime> {
     }
 
     @Override
-    public String formatValue(DateTime value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public String formatValueAsString(DateTime value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return value.toString(DateTimeFormat.forPattern("HH:mm:ss"));
     }
 

@@ -1,8 +1,13 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
+import io.frictionlessdata.tableschema.field.Field;
+import io.frictionlessdata.tableschema.schema.Schema;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.util.*;
@@ -33,7 +38,6 @@ public class StringArrayDataSourceFormat extends AbstractDataSourceFormat {
     public List<String[]> data() throws Exception{
         return new ArrayList<>((Collection<String[]>)dataSource);
     }
-
 
     @Override
     public String[] getHeaders() throws Exception{
