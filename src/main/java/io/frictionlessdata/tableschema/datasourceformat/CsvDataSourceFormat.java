@@ -1,8 +1,11 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
+import io.frictionlessdata.tableschema.field.Field;
+import io.frictionlessdata.tableschema.schema.Schema;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,6 +13,10 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -113,6 +120,30 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
         CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
         super.writeCsv(outputFile, format, this.headers);
     }
+
+    @Override
+    public String asJson(Schema schema) {
+        try {
+            JSONArray arr = new JSONArray();
+            CSVParser parser = getCSVParser();
+            List<CSVRecord> records = parser.getRecords();
+            List<Field> fields = schema.getFields();
+            for (CSVRecord rec : records) {
+                JSONObject obj = new JSONObject();
+                int i = 0;
+                for (Field field : fields) {
+                    String s = rec.get(field.getName());
+                    obj.put(field.getName(), field.parseValue(s, null, null));
+                    i++;
+                }
+                arr.put(obj);
+            }
+            return arr.toString(2);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
 
     @Override
     public boolean hasReliableHeaders() {

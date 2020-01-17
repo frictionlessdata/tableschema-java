@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
+import io.frictionlessdata.tableschema.schema.Schema;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -15,12 +16,6 @@ import java.util.stream.Collectors;
  *
  */
 public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
-/*
-    public JsonArrayDataSourceFormat(String dataSource){
-        super(dataSource);
-    }
-
-    */
 
     public JsonArrayDataSourceFormat(String dataSource){
         super();
@@ -95,6 +90,12 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
             throw e;
         }
     }
+
+    @Override
+    public String asJson(Schema schema) {
+        return dataSource.toString();
+    }
+
 
     @Override
     public boolean hasReliableHeaders() {

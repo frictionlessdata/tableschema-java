@@ -549,7 +549,7 @@ public class SchemaTest {
     
     @Test
     public void testInvalidCompositePrimaryKeyWithoutStrictValidation() throws PrimaryKeyException{
-        Schema schema = new Schema();
+        Schema schema = new Schema(false);
 
         Field idField = new IntegerField("id");
         schema.addField(idField);

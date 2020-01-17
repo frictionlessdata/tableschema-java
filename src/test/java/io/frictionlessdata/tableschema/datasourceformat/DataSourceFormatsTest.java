@@ -1,10 +1,13 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
 import io.frictionlessdata.tableschema.TestHelper;
+import io.frictionlessdata.tableschema.schema.Schema;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.rules.ExpectedException;
 
 import java.io.BufferedReader;
@@ -18,6 +21,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
+
 public class DataSourceFormatsTest {
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -30,6 +35,24 @@ public class DataSourceFormatsTest {
     private final String[] populationHeaders = new String[]{
             "city", "year", "population"
     };
+
+    private final static String populationjson = "[\n" +
+            "  {\n" +
+            "    \"city\": \"london\",\n" +
+            "    \"year\": \"2017\",\n" +
+            "    \"population\": 8780000\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"city\": \"paris\",\n" +
+            "    \"year\": \"2017\",\n" +
+            "    \"population\": 2240000\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"city\": \"rome\",\n" +
+            "    \"year\": \"2017\",\n" +
+            "    \"population\": 2860000\n" +
+            "  }\n" +
+            "]";
 
     @Test
     public void createCsvDataSource() throws Exception{
@@ -158,6 +181,18 @@ public class DataSourceFormatsTest {
             ds = new CsvDataSourceFormat(is);
         }
         Assert.assertNotNull(ds);
+    }
+
+
+    @Test
+    public void testToJson() throws Exception{
+        File basePath = new File(TestHelper.getTestDataDirectory(),"data/population.zip");
+        File inFile = new File("population.csv");
+        DataSourceFormat ds = new CsvDataSourceFormat(inFile,basePath);
+        File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
+        Schema schema = Schema.fromJson (schemaFile, true);
+        String s = ds.asJson(schema);
+        Assert.assertEquals(populationjson, s);
     }
 
     @Test

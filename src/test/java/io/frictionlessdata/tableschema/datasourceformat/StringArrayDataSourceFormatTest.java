@@ -1,6 +1,9 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
+import io.frictionlessdata.tableschema.schema.Schema;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
+
 class StringArrayDataSourceFormatTest {
     private static List<String[]> populationArr;
 
@@ -21,6 +26,24 @@ class StringArrayDataSourceFormatTest {
             "london,2017,8780000\n" +
             "paris,2017,2240000\n" +
             "rome,2017,2860000";
+
+    private final static String populationjson = "[\n" +
+            "  {\n" +
+            "    \"city\": \"london\",\n" +
+            "    \"year\": \"2017\",\n" +
+            "    \"population\": 8780000\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"city\": \"paris\",\n" +
+            "    \"year\": \"2017\",\n" +
+            "    \"population\": 2240000\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"city\": \"rome\",\n" +
+            "    \"year\": \"2017\",\n" +
+            "    \"population\": 2860000\n" +
+            "  }\n" +
+            "]";
 
     private final static String[] populationHeaders = new String[]{
             "city", "year", "population"
@@ -39,12 +62,21 @@ class StringArrayDataSourceFormatTest {
 
     @Test
     @DisplayName("Test StringArrayDataSourceFormat creation and data reading")
-    void testCreateJsonArrayDataSource() throws Exception{
+    void testReadStringArrayDataSourceFormat() throws Exception{
         DataSourceFormat ds = new StringArrayDataSourceFormat(populationArr, populationHeaders);
         List<String[]> data = ds.data();
         Assertions.assertEquals(populationArr, data);
     }
 
+    @Test
+    @DisplayName("Test get content as JSON")
+    void testToJson() throws Exception{
+        File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
+        Schema schema = Schema.fromJson (schemaFile, true);
+        DataSourceFormat ds = new StringArrayDataSourceFormat(populationArr, populationHeaders);
+        String s = ds.asJson(schema);
+        Assertions.assertEquals(populationjson, s);
+    }
 
     @Test
     @DisplayName("Test writing data as CSV")
