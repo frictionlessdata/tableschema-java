@@ -16,6 +16,8 @@ import io.frictionlessdata.tableschema.iterator.TableIterator;
 import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.util.TableSchemaUtil;
 import org.apache.commons.csv.CSVFormat;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.net.URL;
 import java.util.*;
@@ -252,6 +254,26 @@ public class Table{
     public List<Object[]> read() throws Exception{
         boolean cast = (null != schema);
         return read(cast);
+    }
+    public String asJson() {
+        try {
+            JSONArray arr = new JSONArray();
+            List<Object[]> records = read();
+            Schema schema = (null != this.schema) ? this.schema : this.inferSchema();
+            for (Object[] rec : records) {
+                JSONObject obj = new JSONObject();
+                int i = 0;
+                for (Field field : schema.getFields()) {
+                    Object s = rec[i];
+                    obj.put(field.getName(), field.formatValueForJson(s));
+                    i++;
+                }
+                arr.put(obj);
+            }
+            return arr.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public void writeCsv(Writer out, CSVFormat format) {

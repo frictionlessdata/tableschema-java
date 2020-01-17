@@ -49,7 +49,7 @@ public class DatetimeField extends Field<ZonedDateTime> {
     }
 
     @Override
-    public String formatValue(ZonedDateTime value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public String formatValueAsString(ZonedDateTime value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
     }
 

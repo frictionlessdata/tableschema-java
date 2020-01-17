@@ -40,28 +40,6 @@ public class StringArrayDataSourceFormat extends AbstractDataSourceFormat {
     }
 
     @Override
-    public String asJson(Schema schema) {
-        try {
-            JSONArray arr = new JSONArray();
-            Collection<String[]> records = (Collection<String[]>)dataSource;
-            List<Field> fields = schema.getFields();
-            for (String[] rec : records) {
-                JSONObject obj = new JSONObject();
-                int i = 0;
-                for (Field field : fields) {
-                    String s = rec[i];
-                    obj.put(field.getName(), field.parseValue(s, null, null));
-                    i++;
-                }
-                arr.put(obj);
-            }
-            return arr.toString(2);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    @Override
     public String[] getHeaders() throws Exception{
         return headers;
     }

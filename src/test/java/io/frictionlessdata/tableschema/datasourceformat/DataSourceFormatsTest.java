@@ -155,6 +155,23 @@ public class DataSourceFormatsTest {
     }
 
     @Test
+    public void testInputFileCreationCsv() throws Exception {
+        DataSourceFormat ds;
+        File basePath = new File(TestHelper.getTestDataDirectory(),"data");
+        File inFile = new File("population.csv");
+        ds = new CsvDataSourceFormat(inFile,basePath);
+        List<String[]> data = ds.data();
+        Assert.assertNotNull(data);
+        byte[] bytes = Files.readAllBytes(new File(TestHelper.getTestDataDirectory(), "data/population.csv").toPath());
+        String[] content = new String(bytes).split("[\n\r]+");
+        for (int i = 1; i < content.length; i++) {
+            String[] testArr = content[i].split(",");
+            Assert.assertArrayEquals(testArr, data.get(i-1));
+        }
+        Assert.assertNotNull(ds);
+    }
+
+    @Test
     public void testZipInputFileCreationCsv() throws Exception {
         DataSourceFormat ds;
         File basePath = new File(TestHelper.getTestDataDirectory(),"data/population.zip");
@@ -171,7 +188,6 @@ public class DataSourceFormatsTest {
         Assert.assertNotNull(ds);
     }
 
-
     @Test
     public void testWrongInputStreamCreationCsv() throws Exception {
         DataSourceFormat ds;
@@ -181,18 +197,6 @@ public class DataSourceFormatsTest {
             ds = new CsvDataSourceFormat(is);
         }
         Assert.assertNotNull(ds);
-    }
-
-
-    @Test
-    public void testToJson() throws Exception{
-        File basePath = new File(TestHelper.getTestDataDirectory(),"data/population.zip");
-        File inFile = new File("population.csv");
-        DataSourceFormat ds = new CsvDataSourceFormat(inFile,basePath);
-        File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
-        Schema schema = Schema.fromJson (schemaFile, true);
-        String s = ds.asJson(schema);
-        Assert.assertEquals(populationjson, s);
     }
 
     @Test

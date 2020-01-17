@@ -53,7 +53,7 @@ public class GeojsonField extends Field<JSONObject> {
     }
 
     @Override
-    public String formatValue(JSONObject value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public String formatValueAsString(JSONObject value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return value.toString();
     }
 

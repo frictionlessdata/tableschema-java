@@ -4,7 +4,7 @@
     "dateOfBirth": "1976-01-13",
     "id": "1",
     "isAdmin": "T",
-    "addressCoordinates": "{\"lon\": 90, \"lat\": 45}",
+    "addressCoordinates": "{\"lon\": 90.123, \"lat\": 45}",
     "contractLength": "P2DT3H4M",
     "info": "{\"ssn\": 90, \"pin\": 45, \"rate\": 83.23}"
   },
@@ -13,7 +13,7 @@
     "dateOfBirth": "1992-02-14",
     "id": "2",
     "isAdmin": "F",
-    "addressCoordinates": "{\"lon\": 90, \"lat\": 45}",
+    "addressCoordinates": "{\"lon\": 90, \"lat\": 45.223}",
     "contractLength": "PT15M",
     "info": "{\"ssn\": 90, \"pin\": 45, \"rate\": 83.23}"
   },

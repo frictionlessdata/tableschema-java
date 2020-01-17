@@ -179,8 +179,12 @@ public abstract class Field<T> {
     public abstract T parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException;
 
-    public abstract String formatValue(T value, String format, Map<String, Object> options)
+    public abstract String formatValueAsString(T value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException;
+
+    public Object formatValueForJson(T value) throws InvalidCastException, ConstraintsException {
+        return value;
+    }
 
     /**
      * Given a value, try to parse the format. Some Field types don't have variant

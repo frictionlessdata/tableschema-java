@@ -29,7 +29,7 @@ public class AnyField extends Field<Object> {
     }
 
     @Override
-    public String formatValue(Object value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public String formatValueAsString(Object value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return value.toString();
     }
 

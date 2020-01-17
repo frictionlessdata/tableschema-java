@@ -3,7 +3,6 @@
  */
 package io.frictionlessdata.tableschema.datasourceformat;
 
-import io.frictionlessdata.tableschema.schema.Schema;
 import org.apache.commons.csv.CSVFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,8 +47,6 @@ public interface DataSourceFormat {
      * @throws Exception thrown if write operation fails
      */
     void write(File outputFile) throws Exception;
-
-    String asJson(Schema schema) ;
 
     /**
      * Write as CSV file, the `format` parameter decides on the CSV options. If it is

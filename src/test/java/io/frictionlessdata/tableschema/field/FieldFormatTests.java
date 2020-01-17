@@ -18,9 +18,9 @@ class FieldFormatTests {
     @DisplayName("format boolean values via default settings")
     void formatBooleanField() {
         BooleanField field = new BooleanField("bf");
-        String val = field.formatValue(true, null, null);
+        String val = field.formatValueAsString(true, null, null);
         Assert.assertEquals("true", val);
-        val = field.formatValue(false, null, null);
+        val = field.formatValueAsString(false, null, null);
         Assert.assertEquals("false", val);
     }
 
@@ -32,9 +32,9 @@ class FieldFormatTests {
         options.put("falseValues", Arrays.asList("njet", "nein", "non"));
 
         BooleanField field = new BooleanField("bf");
-        String val = field.formatValue(true, null, options);
+        String val = field.formatValueAsString(true, null, options);
         Assert.assertEquals("da", val);
-        val = field.formatValue(false, null, options);
+        val = field.formatValueAsString(false, null, options);
         Assert.assertEquals("njet", val);
     }
 
@@ -68,15 +68,15 @@ class FieldFormatTests {
     @DisplayName("format geopoint values via default settings")
     void formatGeopointField() {
         GeopointField field = new GeopointField("gpf");
-        String val = field.formatValue(new double[]{123.45, 56.789}, null, null);
+        String val = field.formatValueAsString(new double[]{123.45, 56.789}, null, null);
         Assert.assertEquals("123.45,56.789", val);
-        val = field.formatValue(new double[]{123.45, 56.789}, Field.FIELD_FORMAT_DEFAULT, null);
+        val = field.formatValueAsString(new double[]{123.45, 56.789}, Field.FIELD_FORMAT_DEFAULT, null);
         Assert.assertEquals("123.45,56.789", val);
-        val = field.formatValue(new double[]{123.45, 56.789}, Field.FIELD_FORMAT_ARRAY, null);
+        val = field.formatValueAsString(new double[]{123.45, 56.789}, Field.FIELD_FORMAT_ARRAY, null);
         Assert.assertEquals("[123.45,56.789]", val);
-        val = field.formatValue(new double[]{123.45, 56.789}, Field.FIELD_FORMAT_OBJECT, null);
+        val = field.formatValueAsString(new double[]{123.45, 56.789}, Field.FIELD_FORMAT_OBJECT, null);
         Assert.assertEquals("{\"lon\": 123.45, \"lat\":56.789}", val);
-        val = field.formatValue(new double[]{123.45, 56.789}, "invalid", null);
+        val = field.formatValueAsString(new double[]{123.45, 56.789}, "invalid", null);
         Assert.assertNull(val);
     }
 }

@@ -76,9 +76,9 @@ class TableBeanIteratorTest {
         Assertions.assertEquals(3, employees.size());
         EmployeeBean frank = employees.get(1);
         Assertions.assertEquals("Frank McKrank", frank.getName());
-        Assertions.assertEquals("1992-02-14", new DateField("date").formatValue(frank.getDateOfBirth(), null, null));
+        Assertions.assertEquals("1992-02-14", new DateField("date").formatValueAsString(frank.getDateOfBirth(), null, null));
         Assertions.assertFalse(frank.getAdmin());
-        Assertions.assertEquals("(90.0, 45.0, NaN)", frank.getAddressCoordinates().toString());
+        Assertions.assertEquals("(90.0, 45.223, NaN)", frank.getAddressCoordinates().toString());
         Assertions.assertEquals("PT15M", frank.getContractLength().toString());
         Map info = frank.getInfo();
         Assertions.assertEquals(45, info.get("pin"));

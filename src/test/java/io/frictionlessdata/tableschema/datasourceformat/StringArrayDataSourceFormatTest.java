@@ -69,16 +69,6 @@ class StringArrayDataSourceFormatTest {
     }
 
     @Test
-    @DisplayName("Test get content as JSON")
-    void testToJson() throws Exception{
-        File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
-        Schema schema = Schema.fromJson (schemaFile, true);
-        DataSourceFormat ds = new StringArrayDataSourceFormat(populationArr, populationHeaders);
-        String s = ds.asJson(schema);
-        Assertions.assertEquals(populationjson, s);
-    }
-
-    @Test
     @DisplayName("Test writing data as CSV")
     void writeCsvToFile() throws Exception{
         String content = null;
