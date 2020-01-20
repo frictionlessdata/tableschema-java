@@ -25,7 +25,6 @@ public class NumberField extends Field<Number> {
     private static final String NUMBER_DEFAULT_DECIMAL_CHAR = ".";
     private static final String NUMBER_DEFAULT_GROUP_CHAR = "";
 
-    private static final String REGEX_FLOAT = "([+-]?\\d*\\.?\\d*)";
     private static final String REGEX_INTEGER = "[+-]?\\d+";
     private static final String REGEX_BARE_NUMBER = "((^\\D*)|(\\D*$))";
 
@@ -97,6 +96,8 @@ public class NumberField extends Field<Number> {
 
     @Override
     public String formatValueAsString(Number value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        if (null == value)
+            return null;
         if (value instanceof Double) {
             Double locVal = (Double)value;
             if (locVal.equals(Double.NaN)) {
@@ -120,7 +121,7 @@ public class NumberField extends Field<Number> {
                 return formatNumber(numberFormat.format(locVal), options);
             }
         }else if (value instanceof BigInteger) {
-            return formatNumber(((BigInteger)value).toString(), options);
+            return formatNumber(value.toString(), options);
         } else if (value instanceof BigDecimal) {
             return formatNumber(((BigDecimal)value).toPlainString(), options);
         }
@@ -153,7 +154,7 @@ public class NumberField extends Field<Number> {
         return input.substring(0, pos);
     }
 
-    static String insertThousandsGroupSeparator(String input, String groupSeparator) {
+    private static String insertThousandsGroupSeparator(String input, String groupSeparator) {
         int length = input.length();
         if (length < 3)
             return input;
