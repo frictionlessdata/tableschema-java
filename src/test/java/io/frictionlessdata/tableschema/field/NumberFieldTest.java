@@ -36,6 +36,15 @@ class NumberFieldTest {
     }
 
     @Test
+    @DisplayName("format float values via non-default settings")
+    void formatNumberField4() {
+        NumberField field = new NumberField("test");
+        String val = field.formatValueAsString(123.678f, null, germanOptions);
+        // value is not exact due to floating point
+        Assert.assertEquals("123,6780014038086" , val);
+    }
+
+    @Test
     @DisplayName("format number values with barNumbers allowed")
     void formatNumberField3() {
         NumberField field = new NumberField("test");
@@ -44,7 +53,7 @@ class NumberFieldTest {
     }
 
     @Test
-    @DisplayName("format NAN/INF number values")
+    @DisplayName("format NAN/INF double values")
     void formatNumberFieldNan() {
         NumberField field = new NumberField("test");
         String val = field.formatValueAsString(Double.NaN, null, null);
@@ -53,5 +62,26 @@ class NumberFieldTest {
         Assert.assertEquals("INF", val);
         val = field.formatValueAsString(Double.NEGATIVE_INFINITY, null, null);
         Assert.assertEquals("-INF", val);
+    }
+
+
+    @Test
+    @DisplayName("format NAN/INF float values")
+    void formatNumberFieldNan2() {
+        NumberField field = new NumberField("test");
+        String val = field.formatValueAsString(Float.NaN, null, null);
+        Assert.assertEquals("NAN", val);
+        val = field.formatValueAsString(Float.POSITIVE_INFINITY, null, null);
+        Assert.assertEquals("INF", val);
+        val = field.formatValueAsString(Float.NEGATIVE_INFINITY, null, null);
+        Assert.assertEquals("-INF", val);
+    }
+
+    @Test
+    @DisplayName("format null value")
+    void formatNumberField6() {
+        NumberField field = new NumberField("test");
+        String val = field.formatValueAsString(null, null, null);
+        Assert.assertNull( val);
     }
 }
