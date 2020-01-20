@@ -62,8 +62,6 @@ class FieldFormatTests {
         Assertions.assertFalse(val);
     }
 
-
-
     @Test
     @DisplayName("format geopoint values via default settings")
     void formatGeopointField() {
