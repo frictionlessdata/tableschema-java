@@ -156,7 +156,7 @@ public class NumberField extends Field<Number> {
 
     private static String insertThousandsGroupSeparator(String input, String groupSeparator) {
         int length = input.length();
-        if (length <= 3)
+        if (length < 3)
             return input;
         String locString = input.substring(0, length -3);
         String remainder = input.replace(locString, "");
