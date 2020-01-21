@@ -2,12 +2,10 @@ package io.frictionlessdata.tableschema.beans;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import org.json.JSONObject;
 import org.locationtech.jts.geom.Coordinate;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.Map;
 
 @JsonPropertyOrder({

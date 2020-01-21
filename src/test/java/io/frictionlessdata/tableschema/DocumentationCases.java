@@ -3,8 +3,6 @@ package io.frictionlessdata.tableschema;
 import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.schema.Schema;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +15,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test cases that mirror the code examples in the documentation to ensure
@@ -40,7 +42,7 @@ class DocumentationCases {
         // Load the data from URL with the schema.
         Table table = Table.fromSource(
             new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
-                    "/src/test/resources/fixtures/data/simple_data.csv"),
+                "/src/test/resources/fixtures/data/simple_data.csv"),
             schema, DataSourceFormat.getDefaultCsvFormat());
 
         List<Object[]> allData = table.read();
@@ -48,6 +50,13 @@ class DocumentationCases {
         // [1, foo]
         // [2, bar]
         // [3, baz]
+
+        assertEquals(allData.get(0)[0], BigInteger.valueOf(1));
+        assertEquals(allData.get(0)[1], "foo");
+        assertEquals(allData.get(1)[0], BigInteger.valueOf(2));
+        assertEquals(allData.get(1)[1], "bar");
+        assertEquals(allData.get(2)[0], BigInteger.valueOf(3));
+        assertEquals(allData.get(2)[1], "baz");
     }
 
     /**
@@ -59,7 +68,7 @@ class DocumentationCases {
     @DisplayName("Parse a CSV without a Schema")
     void csvParsingWithoutSchema() throws Exception{
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
-                "/src/test/resources/fixtures/data/simple_data.csv");
+            "/src/test/resources/fixtures/data/simple_data.csv");
         Table table = Table.fromSource(url);
 
         // Iterate through rows
@@ -75,6 +84,13 @@ class DocumentationCases {
 
         // Read the entire CSV and output it as a List:
         List<Object[]> allData = table.read();
+
+        assertEquals(allData.get(0)[0], "1");
+        assertEquals(allData.get(0)[1], "foo");
+        assertEquals(allData.get(1)[0], "2");
+        assertEquals(allData.get(1)[1], "bar");
+        assertEquals(allData.get(2)[0], "3");
+        assertEquals(allData.get(2)[1], "baz");
     }
 
     /**
@@ -102,6 +118,11 @@ class DocumentationCases {
         ]}
          */
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = schema.getJson().replaceAll("[\\n\\t ]", "");
+        Object jsonObject = objectMapper.readValue(json, Object.class);
+        String expectedString = objectMapper.writeValueAsString(jsonObject);
+        assertEquals(json, expectedString);
     }
 
     @Test
@@ -110,24 +131,20 @@ class DocumentationCases {
         // By default strict=true validation
         Schema schema = new Schema(false);
 
-        JSONObject nameFieldJsonObject = new JSONObject();
-        nameFieldJsonObject.put("name", "name");
-        nameFieldJsonObject.put("type", Field.FIELD_TYPE_STRING);
-        schema.addField(nameFieldJsonObject.toString());
+        String nameFieldJson = "{\"name\":\"name\",\"type\":\""
+            + Field.FIELD_TYPE_STRING + "\"}";
+        schema.addField(nameFieldJson);
 
         // Because strict=false, an invalid Field definition will be included.
         // The error will be logged/tracked in the error list schema.getErrors().
-        JSONObject invalidFieldJsonObject = new JSONObject();
-        invalidFieldJsonObject.put("name", "id");
-        invalidFieldJsonObject.put("type", Field.FIELD_TYPE_INTEGER);
-        invalidFieldJsonObject.put("format", "invalid");
-        schema.addField(invalidFieldJsonObject.toString());
+        String invalidFieldJson = "{\"name\":\"id\",\"type\":\""
+            + Field.FIELD_TYPE_INTEGER + "\",\"format\": \"invalid\"}";
+        schema.addField(invalidFieldJson);
 
-        JSONObject coordinatesFieldJsonObject = new JSONObject();
-        coordinatesFieldJsonObject.put("name", "coordinates");
-        coordinatesFieldJsonObject.put("type", Field.FIELD_TYPE_GEOPOINT);
-        coordinatesFieldJsonObject.put("format", Field.FIELD_FORMAT_ARRAY);
-        schema.addField(coordinatesFieldJsonObject.toString());
+        String coordinatesFieldJson = "{\"name\":\"coordinates\",\"type\":\""
+            + Field.FIELD_TYPE_GEOPOINT + "\",\"format\":\""
+            + Field.FIELD_FORMAT_ARRAY + "\"}";
+        schema.addField(coordinatesFieldJson);
 
         System.out.println(schema.getJson());
         /*
@@ -137,13 +154,19 @@ class DocumentationCases {
             {"name":"coordinates","format":"array","type":"geopoint"}
         ]}
         */
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = schema.getJson().replaceAll("[\\n\\t ]", "");
+        Object jsonObject = objectMapper.readValue(json, Object.class);
+        String expectedString = objectMapper.writeValueAsString(jsonObject);
+        assertEquals(json, expectedString);
     }
 
     @Test
     @DisplayName("Infer a Schema")
     void inferASchema() throws Exception{
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
-                                "/src/test/resources/fixtures/data/simple_data.csv");
+            "/src/test/resources/fixtures/data/simple_data.csv");
         Table table = Table.fromSource(url);
 
         Schema schema = table.inferSchema();
@@ -155,6 +178,12 @@ class DocumentationCases {
             {"name":"title","format":"","description":"","title":"","type":"string","constraints":{}}
         ]}
          */
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = schema.getJson().replaceAll("[\\n\\t ]", "");
+        Object jsonObject = objectMapper.readValue(json, Object.class);
+        String expectedString = objectMapper.writeValueAsString(jsonObject);
+        assertEquals(json, expectedString);
     }
 
     @Test
@@ -169,6 +198,7 @@ class DocumentationCases {
         schema.addField(coordinatesField);
 
         schema.writeJson(new File("schema.json"));
+        // TODO: Add assert statement here
     }
 
     @Test
@@ -201,7 +231,7 @@ class DocumentationCases {
 
         // Load the data from URL with the schema.
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
-                "/src/test/resources/fixtures/data/employee_data.csv");
+            "/src/test/resources/fixtures/data/employee_data.csv");
         Table table = Table.fromSource(url, schema, DataSourceFormat.getDefaultCsvFormat());
 
         Iterator<Object[]> iter = table.iterator(false, false, true, false);
@@ -219,20 +249,21 @@ class DocumentationCases {
             Duration contractLength = (Duration)row[5];
             Map info = (Map)row[6];
         }
+
+        // TODO: Add assert statement here
     }
 
     @Test
     @DisplayName("Validate a Schema")
-    void validateSchema() throws Exception{
-        JSONObject schemaJsonObj = new JSONObject();
-        Field nameField = new IntegerField("id");
-        schemaJsonObj.put("fields", new JSONArray());
-        schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
-
-        Schema schema = Schema.fromJson(schemaJsonObj.toString(), true);
+    void validateSchema() throws Exception {
+        String schemaJson = "{\"fields\":[{\"name\":\"id\",\"type\":\""
+            + Field.FIELD_TYPE_INTEGER + "\"}]}";
+        Schema schema = Schema.fromJson(schemaJson, true);
 
         System.out.println(schema.isValid());
         // true
+
+        assertTrue(schema.isValid());
     }
 
     @Test
@@ -248,6 +279,8 @@ class DocumentationCases {
 
         schema.setPrimaryKey("id");
         String primaryKey = schema.getPrimaryKey();
+
+        assertEquals("id", primaryKey);
     }
 
     @Test
@@ -266,6 +299,8 @@ class DocumentationCases {
 
         schema.setPrimaryKey(new String[]{"name", "surname"});
         String[] compositeKey = schema.getPrimaryKey();
+
+        assertEquals("name", compositeKey[0]);
+        assertEquals("surname", compositeKey[1]);
     }
 }
-
