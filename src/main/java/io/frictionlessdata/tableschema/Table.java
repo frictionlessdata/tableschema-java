@@ -276,19 +276,35 @@ public class Table{
         }
     }
 
-    public void writeCsv(Writer out, CSVFormat format) {
-        try {
-            String[] headers = null;
-            if (null != schema) {
-                List<String> fieldNames = schema.getFieldNames();
-                headers = fieldNames.toArray(new String[0]);
-            } else {
-                headers = dataSourceFormat.getHeaders();
+    public void write(Writer out, DataSourceFormat.Format dataFormat) {
+        try  {
+            if (dataFormat.equals(DataSourceFormat.Format.FORMAT_CSV)) {
+                try {
+                    String[] headers = null;
+                    if (null != schema) {
+                        List<String> fieldNames = schema.getFieldNames();
+                        headers = fieldNames.toArray(new String[0]);
+                    } else {
+                        headers = dataSourceFormat.getHeaders();
+                    }
+                    dataSourceFormat.writeCsv(out, this.format, headers);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            } else if (dataFormat.equals(DataSourceFormat.Format.FORMAT_JSON)) {
+                String content = this.asJson();
+                out.write(content);
             }
-            dataSourceFormat.writeCsv(out, format, headers);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    public void writeCsv(Writer out, CSVFormat format) {
+        CSVFormat oldFormat = this.format;
+        this.format = format;
+        write(out, DataSourceFormat.Format.FORMAT_CSV);
+        this.format = oldFormat;
     }
 
     public void writeCsv(File outputFile, CSVFormat format) throws Exception{

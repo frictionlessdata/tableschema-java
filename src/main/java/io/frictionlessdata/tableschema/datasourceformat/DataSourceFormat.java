@@ -10,8 +10,10 @@ import org.json.JSONException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -169,5 +171,35 @@ public interface DataSourceFormat {
         }
 
         return resolvedPath;
+    }
+
+    enum Format {
+        FORMAT_CSV("csv"),
+        FORMAT_JSON("json");
+
+        private static final Map<String, Format> lookup = new HashMap<>();
+        private final String label;
+
+        Format(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public static Format byName(String label) {
+            return lookup.get(label);
+        }
+
+        /*
+            Populate lookup dict at load time
+         */
+
+        static {
+            for (Format env : Format.values()) {
+                lookup.put(env.getLabel(), env);
+            }
+        }
     }
 }
