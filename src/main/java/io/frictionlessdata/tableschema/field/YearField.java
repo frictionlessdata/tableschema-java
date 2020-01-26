@@ -12,8 +12,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class YearField extends Field<Year> {
+
     // yyyy
     private static final String REGEX_YEAR = "([0-9]{4})";
+    private Pattern pattern = Pattern.compile(REGEX_YEAR);
 
     YearField() {
         super();
@@ -30,7 +32,10 @@ public class YearField extends Field<Year> {
 
     @Override
     public Year parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        Pattern pattern = Pattern.compile(REGEX_YEAR);
+        if(value.length()<5){
+            throw new TypeInferringException();
+        }
+
         Matcher matcher = pattern.matcher(value);
 
         if(matcher.matches()){

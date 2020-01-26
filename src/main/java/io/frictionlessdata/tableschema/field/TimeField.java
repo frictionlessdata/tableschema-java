@@ -17,6 +17,8 @@ public class TimeField extends Field<DateTime> {
     // An ISO8601 time string e.g. HH:mm:ss
     private static final String REGEX_TIME = "(2[0-3]|[01]?[0-9]):?([0-5]?[0-9]):?([0-5]?[0-9])";
 
+    private Pattern pattern = Pattern.compile(REGEX_TIME);
+
     TimeField() {
         super();
     }
@@ -32,7 +34,6 @@ public class TimeField extends Field<DateTime> {
 
     @Override
     public DateTime parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        Pattern pattern = Pattern.compile(REGEX_TIME);
         Matcher matcher = pattern.matcher(value);
 
         if(matcher.matches()){

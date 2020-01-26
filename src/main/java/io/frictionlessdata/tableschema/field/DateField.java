@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 public class DateField extends Field<LocalDate> {
     // ISO8601 format yyyy-MM-dd
     private static final String REGEX_DATE = "([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|0[1-9]|[1-2][0-9])";
+    private Pattern pattern = Pattern.compile(REGEX_DATE);
 
     DateField() {
         super();
@@ -33,7 +34,6 @@ public class DateField extends Field<LocalDate> {
     public LocalDate parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
 
-        Pattern pattern = Pattern.compile(REGEX_DATE);
         Matcher matcher = pattern.matcher(value);
 
         if(matcher.matches()){

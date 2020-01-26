@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.field;
 
+import com.google.common.reflect.TypeToken;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
@@ -8,6 +9,7 @@ import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.reflect.ParameterizedType;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
@@ -23,6 +25,20 @@ import java.util.regex.Pattern;
  */
 
 public abstract class Field<T> {
+
+    private Class entityBeanType;
+
+    public Class getEntityBeanType() {
+        return entityBeanType;
+    }
+
+    public TypeToken<T> genericType = new TypeToken<T>(getClass()) {};
+
+    public TypeToken<T> getMyType() {
+        return new TypeToken<T>(getClass()) {};
+      }
+
+
     public static final String FIELD_TYPE_STRING = "string";
     public static final String FIELD_TYPE_INTEGER = "integer";
     public static final String FIELD_TYPE_NUMBER = "number";
@@ -113,13 +129,24 @@ public abstract class Field<T> {
     /**
      * Constructor for our reflection-based instantiation only
      */
-    Field(){    }
+    @SuppressWarnings("unchecked")
+    Field(){
+        this.entityBeanType = ((Class) ((ParameterizedType) getClass()
+                .getGenericSuperclass()).getActualTypeArguments()[0]);
 
+    }
+
+    @SuppressWarnings("unchecked")
     Field(String name, String type){
         this.name = name;
         this.type = type;
+
+        this.entityBeanType = ((Class) ((ParameterizedType) getClass()
+                .getGenericSuperclass()).getActualTypeArguments()[0]);
+
     }
 
+    @SuppressWarnings("unchecked")
     public Field(
             String name,
             String type,
@@ -137,6 +164,10 @@ public abstract class Field<T> {
         this.description = description;
         this.constraints = constraints;
         this.options = options;
+
+        this.entityBeanType = ((Class) ((ParameterizedType) getClass()
+                .getGenericSuperclass()).getActualTypeArguments()[0]);
+
     }
 
     public static Field fromJson (String json) {
