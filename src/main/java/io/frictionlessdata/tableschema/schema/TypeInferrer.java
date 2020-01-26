@@ -125,8 +125,11 @@ public class TypeInferrer {
         for(int i = 0; i <= rowLimit; i++){
             Object[] row = data.get(i);
             
-            for(int j = 0; j < row.length; j++){
-                this.findType(headers[j], row[j].toString());
+            for(int j = 0; j < headers.length; j++){
+                String datum = row[j].toString();
+                if(!datum.isEmpty()) {
+                    this.findType(headers[j], datum);
+                }
             }
         }
         
