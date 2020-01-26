@@ -48,9 +48,9 @@ public class TypeInferrer {
         new String[]{Field.FIELD_TYPE_DATE, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
         new String[]{Field.FIELD_TYPE_TIME, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
         new String[]{Field.FIELD_TYPE_DATETIME, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+            new String[]{Field.FIELD_TYPE_BOOLEAN, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
         new String[]{Field.FIELD_TYPE_INTEGER, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
         new String[]{Field.FIELD_TYPE_NUMBER, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_BOOLEAN, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
         new String[]{Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_DEFAULT},
         new String[]{Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_TOPOJSON},
         new String[]{Field.FIELD_TYPE_OBJECT, Field.FIELD_FORMAT_DEFAULT},
