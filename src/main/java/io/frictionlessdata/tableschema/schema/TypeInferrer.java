@@ -1,5 +1,7 @@
 package io.frictionlessdata.tableschema.schema;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
 
 import java.util.Arrays;
@@ -22,7 +24,8 @@ import java.util.TreeMap;
  * At the end, the best score so far is returned.
  */
 public class TypeInferrer {
-    
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     /**
      * We are using reflection to go through the cast methods
      * so we want to make this a Singleton to avoid instanciating
@@ -119,7 +122,7 @@ public class TypeInferrer {
             fieldArray.put(fieldObj);
         }
 
-        // Find the type for each column data for each row.
+        logger.info("Find the type for each column data for each row.");
         // This uses method invokation via reflection in a foor loop that iterates
         // for each possible type/format combo. Insprect the findType method for implementation.
         for(int i = 0; i <= rowLimit; i++){
@@ -132,8 +135,8 @@ public class TypeInferrer {
                 }
             }
         }
-        
-        // We are done inferring types.
+
+        logger.info("We are done inferring types.");
         // Now for each field we figure out which type was the most inferred and settle for that type
         // as the final type for the field.
         for(int j=0; j < fieldArray.length(); j++){
@@ -141,7 +144,12 @@ public class TypeInferrer {
             HashMap<String, Integer> typeInferralCountMap = (HashMap<String, Integer>)this.getTypeInferralMap().get(fieldName);
             TreeMap<String, Integer> typeInferralCountMapSortedByCount = sortMapByValue(typeInferralCountMap); 
            
-            if(!typeInferralCountMapSortedByCount.isEmpty()){
+            if(typeInferralCountMapSortedByCount.isEmpty()) {
+                logger.info(String.format("No type could be inferred for %s, try increasing the limit. Defaulting to String", fieldName));
+                fieldArray.getJSONObject(j).put(Field.JSON_KEY_TYPE, Field.FIELD_TYPE_STRING);
+                fieldArray.getJSONObject(j).put(Field.JSON_KEY_FORMAT, Field.FIELD_FORMAT_DEFAULT);
+            }
+            else{
                 String inferredType = typeInferralCountMapSortedByCount.firstEntry().getKey();
                 fieldArray.getJSONObject(j).put(Field.JSON_KEY_TYPE, inferredType);
                 fieldArray.getJSONObject(j).put(Field.JSON_KEY_FORMAT, formatMap.get(headers[j]));
@@ -162,17 +170,19 @@ public class TypeInferrer {
     private void findType(String header, String datum){
         // Go through all the field types and call their parsing method to find
         // the first that won't throw
+        logger.debug("finding type for:" + datum);
         for(String[] typeInferralDefinition: TYPE_INFERRAL_ORDER_LIST){
             try{
                 // Keep invoking the type casting methods until one doesn't throw an exception
                 String dataType = typeInferralDefinition[0];
-
+                logger.debug("attempting to cast as:" + typeInferralDefinition[0]);
                 Field field = Field.forType(dataType, dataType);
                 String format = formatMap.get(header);
                 if (null == format) {
                     format = field.parseFormat(datum, null);
                 }
                 field.parseValue(datum, format, null);
+                logger.debug(String.format("%s casted as %s ", datum, typeInferralDefinition[0]));
                 this.formatMap.put(header, format);
                 // If no exception is thrown, in means that a type has been inferred.
                 // Let's keep track of it in the inferral map.
