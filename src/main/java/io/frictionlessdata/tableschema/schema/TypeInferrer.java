@@ -39,16 +39,20 @@ public class TypeInferrer {
     // The order in which the types will be attempted to be inferred.
     // Once a type is successfully inferred, we do not bother with the remaining types.
     private static final List<String[]> TYPE_INFERRAL_ORDER_LIST = new ArrayList<>(Arrays.asList(
-        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_DEFAULT},
-        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_ARRAY},
-        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT},
-        new String[]{Field.FIELD_TYPE_DURATION, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_BOOLEAN, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+
+        new String[]{Field.FIELD_TYPE_DATETIME, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
         new String[]{Field.FIELD_TYPE_YEAR, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
         new String[]{Field.FIELD_TYPE_YEARMONTH, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
         new String[]{Field.FIELD_TYPE_DATE, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
         new String[]{Field.FIELD_TYPE_TIME, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_DATETIME, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-            new String[]{Field.FIELD_TYPE_BOOLEAN, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+        new String[]{Field.FIELD_TYPE_DURATION, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
+
+
+        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_DEFAULT},
+        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_ARRAY},
+        new String[]{Field.FIELD_TYPE_GEOPOINT, Field.FIELD_FORMAT_OBJECT},
+
         new String[]{Field.FIELD_TYPE_INTEGER, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
         new String[]{Field.FIELD_TYPE_NUMBER, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
         new String[]{Field.FIELD_TYPE_GEOJSON, Field.FIELD_FORMAT_DEFAULT},
