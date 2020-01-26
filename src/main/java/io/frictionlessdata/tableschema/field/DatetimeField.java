@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
 
 public class DatetimeField extends Field<ZonedDateTime> {
 
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd['T'][' ']HH:mm:ss[.SSS]['Z']");
+
     DatetimeField() {
         super();
     }
@@ -33,7 +35,6 @@ public class DatetimeField extends Field<ZonedDateTime> {
     public ZonedDateTime parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd['T'][' ']HH:mm:ss[.SSS]['Z']");
             return LocalDateTime.parse(value, formatter).atZone(ZoneId.of("UTC"));
         }catch (Exception e){
             throw new TypeInferringException("DateTime field not in ISO 8601 format yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
