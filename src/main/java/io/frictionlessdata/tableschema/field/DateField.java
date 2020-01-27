@@ -4,6 +4,7 @@ import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
 
+import javax.swing.text.DateFormatter;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -13,9 +14,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DateField extends Field<LocalDate> {
-    // ISO8601 format yyyy-MM-dd
-    private static final String REGEX_DATE = "([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|0[1-9]|[1-2][0-9])";
-    private Pattern pattern = Pattern.compile(REGEX_DATE);
+
+    private static String patternFormat = "yyyy-MM-dd";
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern(patternFormat);
 
     DateField() {
         super();
@@ -34,22 +35,22 @@ public class DateField extends Field<LocalDate> {
     public LocalDate parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
 
-        Matcher matcher = pattern.matcher(value);
+        if(value.length()>patternFormat.length() || value.length() < "y-M-d".length()){
+            throw new TypeInferringException();
+        }
 
-        if(matcher.matches()){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+       try{
             TemporalAccessor dt = formatter.parse(value);
-
             return LocalDate.from(dt);
-
-        }else{
+        }
+       catch (Exception e){
             throw new TypeInferringException();
         }
     }
 
     @Override
     public String formatValueAsString(LocalDate value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        return value.format(DateTimeFormatter.ofPattern(patternFormat));
     }
 
 
