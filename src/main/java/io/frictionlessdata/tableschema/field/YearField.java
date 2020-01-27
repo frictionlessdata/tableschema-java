@@ -32,7 +32,7 @@ public class YearField extends Field<Year> {
 
     @Override
     public Year parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        if(value.length()<5){
+        if(value.length()>4){
             throw new TypeInferringException();
         }
 
