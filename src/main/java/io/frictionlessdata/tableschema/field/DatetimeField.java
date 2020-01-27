@@ -6,13 +6,10 @@ import io.frictionlessdata.tableschema.exception.TypeInferringException;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class DatetimeField extends Field<ZonedDateTime> {
 
@@ -35,7 +32,8 @@ public class DatetimeField extends Field<ZonedDateTime> {
     public ZonedDateTime parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
         try {
-            return LocalDateTime.parse(value, formatter).atZone(ZoneId.of("UTC"));
+            LocalDateTime parsedDateTime = LocalDateTime.parse(value, formatter);
+            return parsedDateTime.atZone(ZoneOffset.UTC);
         }catch (Exception e){
             throw new TypeInferringException("DateTime field not in ISO 8601 format yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         }
