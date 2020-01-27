@@ -11,6 +11,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Map;
 
 public class DateField extends Field<LocalDate> {
+    // ISO8601 format yyyy-MM-dd
 
     private static String patternFormat = "yyyy-MM-dd";
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern(patternFormat);
