@@ -100,6 +100,12 @@ public interface DataSourceFormat {
      * @return DataSource created from input File
      */
     static DataSourceFormat createDataSourceFormat(File input, File workDir) throws IOException {
+        String content = getFileContents(input.getPath(), workDir);
+        return createDataSourceFormat(content);
+    }
+
+
+    /*static DataSourceFormat createDataSourceFormat(File input, File workDir) throws IOException {
         InputStream is;
         String content;
         if (workDir.getAbsolutePath().toLowerCase().endsWith(".zip")) {
@@ -118,8 +124,8 @@ public interface DataSourceFormat {
             throw new TableSchemaException(ex);
         }
         return createDataSourceFormat(content);
-    }
-
+    }*/
+/*
     static InputStream getZipFileInputStream(Path inFilePath, String fileName) throws IOException {
         // Read in memory the file inside the zip.
         ZipFile zipFile = new ZipFile(inFilePath.toFile());
@@ -132,7 +138,7 @@ public interface DataSourceFormat {
 
         return zipFile.getInputStream(entry);
     }
-
+*/
     /**
      * Take a ZipFile and look for the `filename` entry. If it is not on the top-level,
      * look for directories and go into them (but only one level deep) and look again
@@ -141,7 +147,7 @@ public interface DataSourceFormat {
      * @param fileName name of the entry we are looking for
      * @return ZipEntry if found, null otherwise
      */
-    static ZipEntry findZipEntry(ZipFile zipFile, String fileName) {
+    /*static ZipEntry findZipEntry(ZipFile zipFile, String fileName) {
         ZipEntry entry = zipFile.getEntry(fileName);
         if (null != entry)
             return entry;
@@ -157,6 +163,43 @@ public interface DataSourceFormat {
             }
         }
         return null;
+    }
+*/
+
+    static String getFileContents(String path, File workDir) throws IOException {
+        String lines;
+        if (workDir.getName().endsWith(".zip")) {
+            //have to exchange the backslashes on Windows, as
+            //zip paths are forward slashed.
+            if (File.separator.equals("\\"))
+                path = path.replaceAll("\\\\", "/");
+            ZipFile zipFile = new ZipFile(workDir.getAbsolutePath());
+            ZipEntry entry = zipFile.getEntry(path);
+            InputStream stream = zipFile.getInputStream(entry);
+            try (BufferedReader rdr = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+                lines = rdr
+                        .lines()
+                        .collect(Collectors.joining("\n"));
+            }
+
+        } else {
+            // The path value can either be a relative path or a full path.
+            // If it's a relative path then build the full path by using the working directory.
+            // Caution: here, we cannot simply use provided paths, we have to check
+            // they are neither absolute path or relative parent paths (../)
+            // see:
+            //    - https://github.com/frictionlessdata/tableschema-java/issues/29
+            //    - https://frictionlessdata.io/specs/data-resource/#url-or-path
+            Path resolvedPath = DataSourceFormat.toSecure(new File(path).toPath(), workDir.toPath());
+
+            // Read the file.
+            try (BufferedReader rdr = new BufferedReader(new FileReader(resolvedPath.toFile()))) {
+                lines = rdr
+                        .lines()
+                        .collect(Collectors.joining("\n"));
+            }
+        }
+        return lines;
     }
 
     static CSVFormat getDefaultCsvFormat() {

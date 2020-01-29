@@ -19,7 +19,7 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
 
     private CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
 
-    public CsvDataSourceFormat(InputStream inStream) throws Exception{
+    CsvDataSourceFormat(InputStream inStream) throws Exception{
         try (InputStreamReader is = new InputStreamReader(inStream, StandardCharsets.UTF_8);
                 BufferedReader br = new BufferedReader(is)) {
             String content = br.lines().collect(Collectors.joining("\n"));
@@ -40,11 +40,11 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
         }
     }
 
-    public CsvDataSourceFormat(URL dataSource){
+    CsvDataSourceFormat(URL dataSource){
         super(dataSource);
     }
     
-    public CsvDataSourceFormat(File dataSource, File workDir){
+    CsvDataSourceFormat(File dataSource, File workDir){
         super(dataSource, workDir);
     }
 

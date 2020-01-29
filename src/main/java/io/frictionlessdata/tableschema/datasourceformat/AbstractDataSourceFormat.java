@@ -84,40 +84,7 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
     }
 
     String getFileContents(String path) throws IOException {
-        String lines;
-        if (workDir.getName().endsWith(".zip")) {
-            //have to exchange the backslashes on Windows, as
-            //zip paths are forward slashed.
-            if (File.separator.equals("\\"))
-                path = path.replaceAll("\\\\", "/");
-            ZipFile zipFile = new ZipFile(workDir.getAbsolutePath());
-            ZipEntry entry = zipFile.getEntry(path);
-            InputStream stream = zipFile.getInputStream(entry);
-            try (BufferedReader rdr = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-                lines = rdr
-                        .lines()
-                        .collect(Collectors.joining("\n"));
-            }
-
-        } else {
-            // The path value can either be a relative path or a full path.
-            // If it's a relative path then build the full path by using the working directory.
-            // Caution: here, we cannot simply use provided paths, we have to check
-            // they are neither absolute path or relative parent paths (../)
-            // see:
-            //    - https://github.com/frictionlessdata/tableschema-java/issues/29
-            //    - https://frictionlessdata.io/specs/data-resource/#url-or-path
-            Path inPath = ((File)dataSource).toPath();
-            Path resolvedPath = DataSourceFormat.toSecure(inPath, workDir.toPath());
-
-            // Read the file.
-            try (BufferedReader rdr = new BufferedReader(new FileReader(resolvedPath.toFile()))) {
-                lines = rdr
-                        .lines()
-                        .collect(Collectors.joining("\n"));
-            }
-        }
-        return lines;
+        return DataSourceFormat.getFileContents(path, workDir);
     }
 
     /**

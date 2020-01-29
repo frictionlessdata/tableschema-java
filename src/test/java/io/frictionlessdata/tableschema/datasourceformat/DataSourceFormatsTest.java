@@ -189,6 +189,23 @@ public class DataSourceFormatsTest {
     }
 
     @Test
+    public void testZipInputFileCreationCsv2() throws Exception {
+        DataSourceFormat ds;
+        File basePath = new File(TestHelper.getTestDataDirectory(),"data/population.zip");
+        File inFile = new File("population.csv");
+        ds = DataSourceFormat.createDataSourceFormat(inFile,basePath);
+        List<String[]> data = ds.data();
+        Assert.assertNotNull(data);
+        byte[] bytes = Files.readAllBytes(new File(TestHelper.getTestDataDirectory(), "data/population.csv").toPath());
+        String[] content = new String(bytes).split("[\n\r]+");
+        for (int i = 1; i < content.length; i++) {
+            String[] testArr = content[i].split(",");
+            Assert.assertArrayEquals(testArr, data.get(i-1));
+        }
+        Assert.assertNotNull(ds);
+    }
+
+    @Test
     public void testWrongInputStreamCreationCsv() throws Exception {
         DataSourceFormat ds;
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.json");
