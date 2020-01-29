@@ -3,18 +3,19 @@
  */
 package io.frictionlessdata.tableschema.datasourceformat;
 
+import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import org.apache.commons.csv.CSVFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Interface for a source of tabular data.
@@ -99,10 +100,63 @@ public interface DataSourceFormat {
      * @return DataSource created from input File
      */
     static DataSourceFormat createDataSourceFormat(File input, File workDir) throws IOException {
-        Path resolvedPath = DataSourceFormat.toSecure(input.toPath(), workDir.toPath());
-        try (InputStream is = new FileInputStream(resolvedPath.toFile())) { // Read the file.
-            return createDataSourceFormat(is);
+        InputStream is;
+        String content;
+        if (workDir.getAbsolutePath().toLowerCase().endsWith(".zip")) {
+            is = getZipFileInputStream(workDir.toPath(), input.getName());
+        } else {
+            Path resolvedPath = DataSourceFormat.toSecure(input.toPath(), workDir.toPath());
+            is = new FileInputStream(resolvedPath.toFile());
         }
+        try (BufferedReader rdr = new BufferedReader(
+                new InputStreamReader(is, StandardCharsets.UTF_8))) {
+            List<String> lines = rdr
+                    .lines()
+                    .collect(Collectors.toList());
+            content = String.join("\n", lines);
+        }  catch (Exception ex) {
+            throw new TableSchemaException(ex);
+        }
+        return createDataSourceFormat(content);
+    }
+
+    static InputStream getZipFileInputStream(Path inFilePath, String fileName) throws IOException {
+        // Read in memory the file inside the zip.
+        ZipFile zipFile = new ZipFile(inFilePath.toFile());
+        ZipEntry entry = findZipEntry(zipFile, fileName);
+
+        // Throw exception if expected datapackage.json file not found.
+        if(entry == null){
+            throw new TableSchemaException("The zip file does not contain the expected file: " + fileName);
+        }
+
+        return zipFile.getInputStream(entry);
+    }
+
+    /**
+     * Take a ZipFile and look for the `filename` entry. If it is not on the top-level,
+     * look for directories and go into them (but only one level deep) and look again
+     * for the `filename` entry
+     * @param zipFile the ZipFile to use for looking for the `filename` entry
+     * @param fileName name of the entry we are looking for
+     * @return ZipEntry if found, null otherwise
+     */
+    static ZipEntry findZipEntry(ZipFile zipFile, String fileName) {
+        ZipEntry entry = zipFile.getEntry(fileName);
+        if (null != entry)
+            return entry;
+        else {
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry zipEntry = entries.nextElement();
+                if (zipEntry.isDirectory()) {
+                    entry = zipFile.getEntry(zipEntry.getName()+fileName);
+                    if (null != entry)
+                        return entry;
+                }
+            }
+        }
+        return null;
     }
 
     static CSVFormat getDefaultCsvFormat() {
@@ -159,7 +213,6 @@ public interface DataSourceFormat {
         if (testPath.toFile().isDirectory()){
             throw new IllegalArgumentException("Input path cannot be a directory");
         }
-        //Path canonicalPath = testPath.toRealPath(null);
         final Path resolvedPath = referencePath.resolve(testPath).normalize();
         if (!Files.exists(resolvedPath))
             throw new FileNotFoundException("File "+resolvedPath.toString()+" does not exist");
