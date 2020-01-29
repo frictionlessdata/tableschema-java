@@ -1,7 +1,6 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
 import io.frictionlessdata.tableschema.TestHelper;
-import org.json.JSONException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -104,7 +103,7 @@ class JsonArrayDataSourceFormatTest {
             "an exception")
     void testWrongInputStreamCreationJson() throws Exception {
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.csv");
-        Assertions.assertThrows(JSONException.class, () -> {
+        Assertions.assertThrows(Exception.class, () -> {
             try (FileInputStream is = new FileInputStream(inFile)) {
                 DataSourceFormat ds = new JsonArrayDataSourceFormat(is);
                 Assertions.assertArrayEquals(populationHeaders, ds.getHeaders());
