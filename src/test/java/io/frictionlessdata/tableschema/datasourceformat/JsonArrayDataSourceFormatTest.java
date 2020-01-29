@@ -83,7 +83,21 @@ class JsonArrayDataSourceFormatTest {
                 BufferedWriter bwr = new BufferedWriter(wr)) {
             ds.writeCsv(bwr, null, populationHeaders);
         }
-        System.out.println(tempFile.getAbsolutePath());
+    }
+
+    @Test
+    @DisplayName("Validate creating and writing a JsonArrayDataSourceFormat from JSON without headers " +
+            "raises an exception")
+    void testCreateAndWriteJsonArrayDataSourceWithoutHeaders() throws Exception {
+        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(populationJsonMissingEntry);
+
+        File tempFile = Files.createTempFile("tableschema-", ".json").toFile();
+        Assertions.assertThrows(Exception.class, () -> {
+        try (FileWriter wr = new FileWriter(tempFile);
+             BufferedWriter bwr = new BufferedWriter(wr)) {
+            ds.writeCsv(bwr, null, null);
+        }
+        });
     }
 
     @Test

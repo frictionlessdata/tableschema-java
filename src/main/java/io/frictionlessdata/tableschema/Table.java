@@ -11,6 +11,7 @@ import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import java.io.*;
 
 import io.frictionlessdata.tableschema.field.Field;
+import io.frictionlessdata.tableschema.iterator.BeanIterator;
 import io.frictionlessdata.tableschema.iterator.SimpleTableIterator;
 import io.frictionlessdata.tableschema.iterator.TableIterator;
 import io.frictionlessdata.tableschema.schema.Schema;
@@ -23,9 +24,25 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * This class represents a CSV table with optional CSV specification via a CSVFormat and optional provable assurances
- * towards format integrity via a Table Schema.
- * 
+ * This class represents a CSV or JSON-array encoded  table with optional CSV specification
+ * via a {@link org.apache.commons.csv.CSVFormat} and optional provable assurances towards format integrity via a Table
+ * {@link io.frictionlessdata.tableschema.schema.Schema}.
+ *
+ * This class makes a semantic difference between constructors and the overloaded factory method {@link #fromSource}.
+ * constructors are intended for capturing new data, while the `fromSource()` method is intended for reading existing
+ * CSV or JSON data.
+ *
+ * Reading data from a Table instance is done via a {@link io.frictionlessdata.tableschema.iterator.TableIterator},
+ * which can be configured to return table rows as:
+ *
+ * - String arrays,
+ * - as Object arrays (parameter `cast` = true),
+ * - as a Map&lt;key,val&gt; where key is the header name, and val is the data (parameter `keyed` = true),
+ * - or in an "extended" form (parameter `extended` = true) that returns an Object array where the first entry is the
+ *      row number, the second is a String array holding the headers, and the third is an Object array holding
+ *      the row data.
+ *
+ *  Roughly implemented after https://github.com/frictionlessdata/tableschema-py/blob/master/tableschema/table.py
  */
 public class Table{
     private DataSourceFormat dataSourceFormat = null;
@@ -171,6 +188,10 @@ public class Table{
 
     public Iterator<Object[]> iterator(boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
        return new TableIterator<>(this, keyed, extended, cast, relations);
+    }
+
+    public BeanIterator iterator(Class<?> beanType, boolean relations) throws Exception{
+        return new BeanIterator(this,  beanType, relations);
     }
 
     public Iterator<String[]> stringArrayIterator() throws Exception{
@@ -351,7 +372,6 @@ public class Table{
                 throw new TableValidationException("Found undeclared column: "+col);
             }
         }
-
     }
     
     public Schema inferSchema() throws TypeInferringException{

@@ -1,11 +1,16 @@
 package io.frictionlessdata.tableschema.schema;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.util.concurrent.AtomicDouble;
 import io.frictionlessdata.tableschema.field.*;
+import io.frictionlessdata.tableschema.iterator.BeanIterator;
 import org.geotools.geometry.DirectPosition2D;
 import org.json.JSONObject;
 import org.locationtech.jts.geom.Coordinate;
@@ -16,7 +21,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class BeanSchema extends Schema{
+public class BeanSchema extends Schema {
+
+    Map<String, AnnotatedField> fieldMap;
 
     private CsvSchema csvSchema;
 
@@ -25,7 +32,7 @@ public class BeanSchema extends Schema{
     }
 
 
-    public static Schema infer(Class beanClass) throws NoSuchFieldException, JsonMappingException {
+    public static BeanSchema infer(Class beanClass) throws NoSuchFieldException {
         List<Field> fields = new ArrayList<>();
         CsvMapper mapper = new CsvMapper();
         mapper.setVisibility(mapper.getSerializationConfig()
@@ -40,7 +47,7 @@ public class BeanSchema extends Schema{
             CsvSchema.ColumnType type = next.getType();
             Field field = null;
             java.lang.reflect.Field declaredField = beanClass.getDeclaredField(fieldNames.get(name));
-            java.lang.Class declaredClass = declaredField.getType();
+            Class declaredClass = declaredField.getType();
             switch (type) {
                 case ARRAY:
                     field = new ArrayField(name);
@@ -103,15 +110,43 @@ public class BeanSchema extends Schema{
             fields.add(field);
         }
         BeanSchema bs = new BeanSchema(fields, true);
+        bs.setFieldMap(createFieldMap(beanClass));
         bs.csvSchema = csvSchema;
         return bs;
+    }
+
+    static Map<String, AnnotatedField> createFieldMap(Class type) {
+        CsvMapper mapper = new CsvMapper();
+        mapper.setVisibility(mapper.getSerializationConfig()
+                .getDefaultVisibilityChecker()
+                .withFieldVisibility(JsonAutoDetect.Visibility.ANY));
+        Map<String, AnnotatedField> fields = new LinkedHashMap<>();
+        //Map<String, String> fieldNames = ReflectionUtils.getFieldNameMapping(mapper, type);
+        JavaType jType = mapper.constructType(type);
+        BeanDescription desc = mapper.getSerializationConfig()
+                .introspect(jType);
+        List<BeanPropertyDefinition> properties = desc.findProperties();
+        for (BeanPropertyDefinition def : properties) {
+            AnnotatedField field = def.getField();
+            String declaredName = def.getName();
+            fields.put(declaredName, field);
+        }
+        return fields;
     }
 
     public CsvSchema getCsvSchema() {
         return csvSchema;
     }
 
-    public void setCsvSchema(CsvSchema csvSchema) {
-        this.csvSchema = csvSchema;
+    public Map<String, AnnotatedField> getFieldMap() {
+        return fieldMap;
+    }
+
+    public void setFieldMap(Map<String, AnnotatedField> fieldMap) {
+        this.fieldMap = fieldMap;
+    }
+
+    public AnnotatedField getAnnotatedField(String name) {
+        return fieldMap.get(name);
     }
 }

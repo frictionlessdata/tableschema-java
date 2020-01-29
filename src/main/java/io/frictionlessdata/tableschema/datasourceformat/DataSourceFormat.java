@@ -94,8 +94,8 @@ public interface DataSourceFormat {
     }
 
     /**
-     * Factory method to instantiate either a JsonArrayDataSource or a
-     * CsvDataSource based on input format
+     * Factory method to instantiate either a {@link JsonArrayDataSourceFormat} or a
+     * {@link CsvDataSourceFormat} based on input format
      * @return DataSource created from input File
      */
     static DataSourceFormat createDataSourceFormat(File input, File workDir) throws IOException {
@@ -105,7 +105,7 @@ public interface DataSourceFormat {
         }
     }
 
-    public static CSVFormat getDefaultCsvFormat() {
+    static CSVFormat getDefaultCsvFormat() {
         return CSVFormat.RFC4180
                 .withHeader()
                 .withIgnoreSurroundingSpaces(true)
@@ -113,8 +113,8 @@ public interface DataSourceFormat {
     }
 
     /**
-     * Factory method to instantiate either a JsonArrayDataSource or a
-     * CsvDataSource based on input format
+     * Factory method to instantiate either a {@link JsonArrayDataSourceFormat} or a
+     * {@link CsvDataSourceFormat}  based on input format
      * @return DataSource created from input String
      */
     static DataSourceFormat createDataSourceFormat(InputStream input) throws IOException {

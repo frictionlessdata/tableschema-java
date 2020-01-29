@@ -90,7 +90,8 @@ class TableBeanIteratorTest {
     @DisplayName("Test deserialization of big floats (GrossDomesticProductBean)")
     void testBeanDeserialization2() throws Exception {
         List<GrossDomesticProductBean> records = new ArrayList<>();
-        BeanIterator<GrossDomesticProductBean> bit = new BeanIterator<>(gdpTable, GrossDomesticProductBean.class);
+        BeanIterator<GrossDomesticProductBean> bit
+                = new BeanIterator<>(gdpTable, GrossDomesticProductBean.class, false);
 
         while (bit.hasNext()) {
             GrossDomesticProductBean record = bit.next();
@@ -127,7 +128,7 @@ class TableBeanIteratorTest {
         File dataFile = new File("data/number_types.csv");
         Table numbersTable
                 = Table.fromSource(dataFile, getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
-        BeanIterator<NumbersBean> bit = new BeanIterator<>(numbersTable, NumbersBean.class);
+        BeanIterator<NumbersBean> bit = numbersTable.iterator(NumbersBean.class, false);
 
         NumbersBean record = bit.next();
         Assertions.assertEquals(bn, record);

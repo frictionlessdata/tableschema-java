@@ -24,7 +24,6 @@ public class StringArrayDataSourceFormat extends AbstractDataSourceFormat {
         this.headers = headers;
     }
 
-
     CSVParser getCSVParser() {
         throw new TableSchemaException("Not implemented for StringArrayDataSourceFormat");
     };
@@ -52,10 +51,6 @@ public class StringArrayDataSourceFormat extends AbstractDataSourceFormat {
 
     @Override
     public boolean hasReliableHeaders() {
-        try {
-            return this.getHeaders() != null;
-        } catch (Exception ex) {
-            return false;
-        }
+        return headers != null;
     }
 }

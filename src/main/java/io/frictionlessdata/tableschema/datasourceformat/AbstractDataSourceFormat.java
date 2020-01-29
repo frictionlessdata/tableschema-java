@@ -60,23 +60,8 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
 
     @Override
     public List<String[]> data() throws Exception{
-        // This is pretty much what happens when we call this.parser.getRecords()...
-        Iterator<CSVRecord> iter = this.getCSVParser().iterator();
         List<String[]> data = new ArrayList<>();
-
-        while(iter.hasNext()){
-            CSVRecord record = iter.next();
-            Iterator<String> colIter = record.iterator();
-
-            //...except that we want list of String[] rather than list of CSVRecord.
-            List<String> cols = new ArrayList<>();
-            while(colIter.hasNext()){
-                cols.add(colIter.next());
-            }
-
-            data.add(cols.toArray(new String[0]));
-        }
-
+        iterator().forEachRemaining(data::add);
         return data;
     }
 
@@ -163,11 +148,11 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
      */
     @Override
     public void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders) {
-        if (null == sortedHeaders) {
-            writeCsv(out, format);
-            return;
-        }
         try {
+            if (null == sortedHeaders) {
+                writeCsv(out, format, getHeaders());
+                return;
+            }
             CSVFormat locFormat = (null != format)
                     ? format
                     : DataSourceFormat.getDefaultCsvFormat();
@@ -184,7 +169,7 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
             throw new RuntimeException(ex);
         }
     }
-
+/*
     void writeCsv(Writer out, CSVFormat format) {
         try {
             CSVFormat locFormat = (null != format)
@@ -206,7 +191,7 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
             throw new RuntimeException(ex);
         }
     }
-
+*/
     static void writeData(List<String[]> data, Map<Integer, Integer> mapping, CSVPrinter csvPrinter) {
         try {
             for (String[] record : data) {
