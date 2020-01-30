@@ -68,19 +68,21 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
 
     @Override
     public String[] getHeaders() throws Exception{
-        // Get a copy of the header map that iterates in column order.
-        // The map keys are column names. The map values are 0-based indices.
-        Map<String, Integer> headerMap = this.getCSVParser().getHeaderMap();
+        if (null == headers) {
+            // Get a copy of the header map that iterates in column order.
+            // The map keys are column names. The map values are 0-based indices.
+            Map<String, Integer> headerMap = this.getCSVParser().getHeaderMap();
 
-        // Generate list of keys
-        List<String> headerVals = new ArrayList<>();
+            // Generate list of keys
+            List<String> headerVals = new ArrayList<>();
 
-        headerMap.entrySet().forEach((pair) -> {
-            headerVals.add((String)pair.getKey());
-        });
+            headerMap.entrySet().forEach((pair) -> {
+                headerVals.add(pair.getKey());
+            });
 
-        // Return string array of keys.
-        return headerVals.toArray(new String[0]);
+            headers = headerVals.toArray(new String[0]);
+        }
+        return headers;
     }
 
     String getFileContents(String path) throws IOException {
@@ -136,29 +138,7 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
             throw new RuntimeException(ex);
         }
     }
-/*
-    void writeCsv(Writer out, CSVFormat format) {
-        try {
-            CSVFormat locFormat = (null != format)
-                    ? format
-                    : DataSourceFormat.getDefaultCsvFormat();
 
-            String[] headers = getHeaders();
-            locFormat = locFormat.withHeader(headers);
-            CSVPrinter csvPrinter = new CSVPrinter(out, locFormat);
-
-            Map<Integer, Integer> mapping = new HashMap<>();
-            for (int i = 0; i < headers.length; i++) {
-                mapping.put(i, i);
-            }
-            writeData(data(), mapping, csvPrinter);
-            csvPrinter.close();
-
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-*/
     static void writeData(List<String[]> data, Map<Integer, Integer> mapping, CSVPrinter csvPrinter) {
         try {
             for (String[] record : data) {
@@ -172,6 +152,4 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
             throw new RuntimeException(ex);
         }
     }
-
-
 }

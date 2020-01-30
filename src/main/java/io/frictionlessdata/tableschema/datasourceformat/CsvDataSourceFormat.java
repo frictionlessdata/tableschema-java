@@ -19,6 +19,12 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
 
     private CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
 
+    /**
+     * Constructor from a Stream. In contrast to lazy-loading File- or URL-based constructors, this one
+     * reads all the data at construction time.
+     * @param inStream the stream to read from
+     * @throws Exception if an IOException occurs
+     */
     CsvDataSourceFormat(InputStream inStream) throws Exception{
         try (InputStreamReader is = new InputStreamReader(inStream, StandardCharsets.UTF_8);
                 BufferedReader br = new BufferedReader(is)) {
@@ -52,14 +58,15 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
         super(dataSource);
     }
 
-
     public CsvDataSourceFormat setFormat(CSVFormat format) {
         this.format = format;
         return this;
     }
 
     public CSVFormat getFormat() {
-        return format;
+        return (this.format != null)
+                ? this.format
+                : DataSourceFormat.getDefaultCsvFormat();
     }
 
     /**
@@ -74,9 +81,7 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
      */
     @Override
     CSVParser getCSVParser() throws Exception{
-        CSVFormat format = (this.format != null)
-                ? this.format
-                : DataSourceFormat.getDefaultCsvFormat();
+        CSVFormat format = getFormat();
 
         if (dataSource instanceof String){
             return CSVParser.parse((String)dataSource, format);
