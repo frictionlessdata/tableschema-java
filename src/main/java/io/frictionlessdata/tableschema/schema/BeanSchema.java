@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.google.common.util.concurrent.AtomicDouble;
 import io.frictionlessdata.tableschema.field.*;
 import org.geotools.geometry.DirectPosition2D;
 import org.json.JSONObject;
@@ -68,7 +69,12 @@ public class BeanSchema extends Schema {
                             || (declaredClass.equals(byte.class))
                             || (declaredClass.equals(BigInteger.class))
                             || (declaredClass.equals(AtomicInteger.class))
-                            || (declaredClass.equals(AtomicLong.class))) {
+                            || (declaredClass.equals(AtomicLong.class))
+                            || (declaredClass.equals(float.class))
+                            || (declaredClass.equals(Float.class))
+                            || (declaredClass.equals(double.class))
+                            || (declaredClass.equals(Double.class))
+                            || (declaredClass.equals(AtomicDouble.class))) {
                         field = new IntegerField(name);
                     } else {
                         field = new NumberField(name);
