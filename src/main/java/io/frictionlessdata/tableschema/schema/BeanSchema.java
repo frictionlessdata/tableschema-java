@@ -69,12 +69,7 @@ public class BeanSchema extends Schema {
                             || (declaredClass.equals(byte.class))
                             || (declaredClass.equals(BigInteger.class))
                             || (declaredClass.equals(AtomicInteger.class))
-                            || (declaredClass.equals(AtomicLong.class))
-                            || (declaredClass.equals(float.class))
-                            || (declaredClass.equals(Float.class))
-                            || (declaredClass.equals(double.class))
-                            || (declaredClass.equals(Double.class))
-                            || (declaredClass.equals(AtomicDouble.class))) {
+                            || (declaredClass.equals(AtomicLong.class))) {
                         field = new IntegerField(name);
                     } else {
                         field = new NumberField(name);
