@@ -59,8 +59,9 @@ public class BeanIterator<T> extends TableIterator<T> {
             retVal = type.newInstance();
 
             for (int i = 0; i < row.length; i++) {
-                Field field = schema.getFields().get(i);
-                AnnotatedField aF = ((BeanSchema) schema).getAnnotatedField(field.getName());
+                String fieldName = headers[i];
+                Field field = schema.getField(fieldName);
+                AnnotatedField aF = ((BeanSchema) schema).getAnnotatedField(fieldName);
                 // we may have a field that can have different formats
                 // but the Schema doesn't know about the true format
                 if (field.getFormat().equals(Field.FIELD_FORMAT_DEFAULT)) {

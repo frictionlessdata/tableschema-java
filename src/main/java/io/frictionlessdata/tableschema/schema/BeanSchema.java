@@ -3,14 +3,11 @@ package io.frictionlessdata.tableschema.schema;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.google.common.util.concurrent.AtomicDouble;
 import io.frictionlessdata.tableschema.field.*;
-import io.frictionlessdata.tableschema.iterator.BeanIterator;
 import org.geotools.geometry.DirectPosition2D;
 import org.json.JSONObject;
 import org.locationtech.jts.geom.Coordinate;
@@ -23,14 +20,16 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class BeanSchema extends Schema {
 
-    Map<String, AnnotatedField> fieldMap;
+    Map<String, Field> fieldMap;
+
+    Map<String, AnnotatedField> annotatedFieldMap;
 
     private CsvSchema csvSchema;
 
     private BeanSchema(List<Field> fields, boolean strict) {
         super(fields, strict);
+        fieldMap = createFieldMap(fields);
     }
-
 
     public static BeanSchema infer(Class beanClass) throws NoSuchFieldException {
         List<Field> fields = new ArrayList<>();
@@ -110,12 +109,22 @@ public class BeanSchema extends Schema {
             fields.add(field);
         }
         BeanSchema bs = new BeanSchema(fields, true);
-        bs.setFieldMap(createFieldMap(beanClass));
+        bs.setAnnotatedFieldMap(createAnnotatedFieldMap(beanClass));
         bs.csvSchema = csvSchema;
         return bs;
     }
 
-    static Map<String, AnnotatedField> createFieldMap(Class type) {
+    public Field getField(String name) {
+        return fieldMap.get(name);
+    }
+
+    static Map<String, Field> createFieldMap(Collection<Field> fields) {
+        Map<String, Field> fieldMap = new HashMap<>();
+        fields.forEach((f) -> fieldMap.put(f.getName(), f));
+        return fieldMap;
+    }
+
+    static Map<String, AnnotatedField> createAnnotatedFieldMap(Class type) {
         CsvMapper mapper = new CsvMapper();
         mapper.setVisibility(mapper.getSerializationConfig()
                 .getDefaultVisibilityChecker()
@@ -138,15 +147,15 @@ public class BeanSchema extends Schema {
         return csvSchema;
     }
 
-    public Map<String, AnnotatedField> getFieldMap() {
-        return fieldMap;
+    public Map<String, AnnotatedField> getFAnnotatedFieldMap() {
+        return annotatedFieldMap;
     }
 
-    public void setFieldMap(Map<String, AnnotatedField> fieldMap) {
-        this.fieldMap = fieldMap;
+    void setAnnotatedFieldMap(Map<String, AnnotatedField> fieldMap) {
+        this.annotatedFieldMap = fieldMap;
     }
 
     public AnnotatedField getAnnotatedField(String name) {
-        return fieldMap.get(name);
+        return annotatedFieldMap.get(name);
     }
 }
