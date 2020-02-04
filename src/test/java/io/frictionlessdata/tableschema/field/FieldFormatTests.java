@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,5 +77,23 @@ class FieldFormatTests {
         Assert.assertEquals("{\"lon\": 123.45, \"lat\":56.789}", val);
         val = field.formatValueAsString(new double[]{123.45, 56.789}, "invalid", null);
         Assert.assertNull(val);
+    }
+
+
+    @Test
+    @DisplayName("parse time values")
+    void parseTimeField() {
+        TimeField field = (TimeField)TimeField.fromJson("{'name': 'name', 'type': 'time'}");
+
+        // expect exception
+        assertThrows(TypeInferringException.class, () -> field.parseValue("false", null, null));
+        LocalTime val = field.parseValue("14:23:07", null, null); // false
+
+        Assertions.assertEquals(14, val.getHour());
+        Assertions.assertEquals(23, val.getMinute());
+        Assertions.assertEquals(7, val.getSecond());
+
+        String s = field.formatValueAsString(val, null, null);
+        Assertions.assertEquals("14:23:07", s);
     }
 }

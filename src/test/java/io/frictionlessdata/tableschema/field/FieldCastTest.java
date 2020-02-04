@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import javax.ejb.Local;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
@@ -277,11 +278,11 @@ class FieldCastTest {
     @Test
     void testFieldCastTime() throws Exception{
         TimeField field = new TimeField("test");
-        DateTime val = field.castValue("14:22:33");
+        LocalTime val = field.castValue("14:22:33");
 
-        Assertions.assertEquals(14, val.getHourOfDay());
-        Assertions.assertEquals(22, val.getMinuteOfHour());
-        Assertions.assertEquals(33, val.getSecondOfMinute());
+        Assertions.assertEquals(14, val.getHour());
+        Assertions.assertEquals(22, val.getMinute());
+        Assertions.assertEquals(33, val.getSecond());
     }
 
     @Test

@@ -332,7 +332,7 @@ public class SchemaTest {
         assertEquals(1, obj.get("one"));
         assertThat(castRow[4], instanceOf(Object[].class));
         assertThat(castRow[5], instanceOf(LocalDate.class));
-        assertThat(castRow[6], instanceOf(DateTime.class));
+        assertThat(castRow[6], instanceOf(LocalTime.class));
         assertThat(castRow[7], instanceOf(ZonedDateTime.class));
         assertThat(castRow[8], instanceOf(Year.class));
         assertThat(castRow[9], instanceOf(YearMonth.class));
