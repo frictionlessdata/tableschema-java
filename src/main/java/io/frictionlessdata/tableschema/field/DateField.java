@@ -32,16 +32,11 @@ public class DateField extends Field<LocalDate> {
     @Override
     public LocalDate parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
-
-        if(value.length()>patternFormat.length() || value.length() < "y-M-d".length()){
-            throw new TypeInferringException();
-        }
-
-       try{
+        try{
             TemporalAccessor dt = formatter.parse(value);
             return LocalDate.from(dt);
         }
-       catch (Exception e){
+        catch (Exception e){
             throw new TypeInferringException();
         }
     }

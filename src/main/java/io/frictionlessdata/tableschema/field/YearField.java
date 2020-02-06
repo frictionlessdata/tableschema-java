@@ -3,7 +3,6 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
-import org.json.JSONObject;
 
 import java.net.URI;
 import java.time.Year;
@@ -32,16 +31,10 @@ public class YearField extends Field<Year> {
 
     @Override
     public Year parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        if(value.length()>4){
-            throw new TypeInferringException();
-        }
-
         Matcher matcher = pattern.matcher(value);
-
         if(matcher.matches()){
             return Year.parse(value);
-
-        }else{
+        } else{
             throw new TypeInferringException();
         }
     }
