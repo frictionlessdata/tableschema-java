@@ -1,7 +1,6 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
 import io.frictionlessdata.tableschema.TestHelper;
-import org.json.JSONException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -84,7 +83,21 @@ class JsonArrayDataSourceFormatTest {
                 BufferedWriter bwr = new BufferedWriter(wr)) {
             ds.writeCsv(bwr, null, populationHeaders);
         }
-        System.out.println(tempFile.getAbsolutePath());
+    }
+
+    @Test
+    @DisplayName("Validate creating and writing a JsonArrayDataSourceFormat from JSON without headers " +
+            "raises an exception")
+    void testCreateAndWriteJsonArrayDataSourceWithoutHeaders() throws Exception {
+        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(populationJsonMissingEntry);
+
+        File tempFile = Files.createTempFile("tableschema-", ".json").toFile();
+        Assertions.assertThrows(Exception.class, () -> {
+        try (FileWriter wr = new FileWriter(tempFile);
+             BufferedWriter bwr = new BufferedWriter(wr)) {
+            ds.writeCsv(bwr, null, null);
+        }
+        });
     }
 
     @Test
@@ -104,7 +117,7 @@ class JsonArrayDataSourceFormatTest {
             "an exception")
     void testWrongInputStreamCreationJson() throws Exception {
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.csv");
-        Assertions.assertThrows(JSONException.class, () -> {
+        Assertions.assertThrows(Exception.class, () -> {
             try (FileInputStream is = new FileInputStream(inFile)) {
                 DataSourceFormat ds = new JsonArrayDataSourceFormat(is);
                 Assertions.assertArrayEquals(populationHeaders, ds.getHeaders());

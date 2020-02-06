@@ -64,8 +64,10 @@ public class StringField extends Field<String> {
      */
     @Override
     public String parseFormat(String value, Map<String, Object> options) {
-        Matcher uuidMatcher = PATTERN_UUID.matcher(value);
+        if (null == value)
+            return FIELD_FORMAT_DEFAULT;
 
+        Matcher uuidMatcher = PATTERN_UUID.matcher(value);
         if (uuidMatcher.matches()) {
             return FIELD_FORMAT_UUID;
         } else if (EmailValidator.getInstance().isValid(value)) {
@@ -81,7 +83,7 @@ public class StringField extends Field<String> {
             }
             return FIELD_FORMAT_URI;
         } catch (URISyntaxException ex) {
-            return "default";
+            return FIELD_FORMAT_DEFAULT;
         }
     }
 }

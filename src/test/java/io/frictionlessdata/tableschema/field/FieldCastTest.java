@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import javax.ejb.Local;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
@@ -24,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  *
- * 
+ *
  */
 class FieldCastTest {
 
@@ -36,7 +37,7 @@ class FieldCastTest {
         Assertions.assertEquals(0.00012, val[0]);
         Assertions.assertEquals(21, val[1]);
     }
-    
+
     @Test
     void testFieldCastGeopointArray() throws Exception{
         GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_ARRAY, "title", "description", null, null, null);
@@ -44,32 +45,33 @@ class FieldCastTest {
         Assertions.assertEquals(45, val[0]);
         Assertions.assertEquals(32.54, val[1]);
     }
-    
+
     @Test
     void testFieldCastGeopointObject() throws Exception{
         GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_OBJECT, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
         double[] val = field.castValue("{\"lon\": 67.123, \"lat\": 19}");
         Assertions.assertEquals(67.123, val[0]);
-        Assertions.assertEquals(19, val[1]);   
+        Assertions.assertEquals(19, val[1]);
     }
-    
+
     @Test
     void testFieldCastInteger() throws Exception{
         IntegerField field = new IntegerField("test");
         BigInteger val = field.castValue("123");
         Assertions.assertEquals(123, val.intValue());
     }
-    
+
     @Test
     void testFieldCastDuration() throws Exception{
         DurationField field = new DurationField("test");
         Duration val = field.castValue("P2DT3H4M");
-        Assertions.assertEquals(183840, val.getSeconds()); 
+        Assertions.assertEquals(183840, val.getSeconds());
     }
-    
+
     @Test
     void testFieldCastValidGeojson() throws Exception{
         GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+        // TODO: remove org.json stuff only after a refactoring GeojsonField class
         JSONObject val = field.castValue("{\n" +
             "    \"type\": \"Feature\",\n" +
             "    \"properties\": {\n" +
@@ -82,13 +84,13 @@ class FieldCastTest {
             "        \"coordinates\": [-104.99404, 39.75621]\n" +
             "    }\n" +
             "}");
-        
+
         Assertions.assertEquals("Feature", val.getString("type"));
         Assertions.assertEquals("Baseball Stadium", val.getJSONObject("properties").getString("amenity"));
         Assertions.assertEquals(-104.99404, val.getJSONObject("geometry").getJSONArray("coordinates").get(0));
         Assertions.assertEquals(39.75621, val.getJSONObject("geometry").getJSONArray("coordinates").get(1));
     }
-    
+
     @Test
     void testFieldCastInvalidGeojson() throws Exception{
         GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
@@ -108,7 +110,7 @@ class FieldCastTest {
         });
 
     }
-    
+
     @Test
     void testFieldCastValidTopojson() throws Exception{
         GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
@@ -130,13 +132,13 @@ class FieldCastTest {
             "    [[3058, 5901], [0, -2], [-2, 1], [-1, 3], [-2, 3], [0, 3], [1, 1], [1, -3], [2, -5], [1, -1]]\n" +
             "  ]\n" +
             "}");
-        
+
         Assertions.assertEquals("Topology", val.getString("type"));
         Assertions.assertEquals(0.036003600360036005, val.getJSONObject("transform").getJSONArray("scale").get(0));
         Assertions.assertEquals(0.017361589674592462, val.getJSONObject("transform").getJSONArray("scale").get(1));
-        Assertions.assertEquals(-180, val.getJSONObject("transform").getJSONArray("translate").get(0));  
-        Assertions.assertEquals(-89.99892578124998, val.getJSONObject("transform").getJSONArray("translate").get(1)); 
-        
+        Assertions.assertEquals(-180, val.getJSONObject("transform").getJSONArray("translate").get(0));
+        Assertions.assertEquals(-89.99892578124998, val.getJSONObject("transform").getJSONArray("translate").get(1));
+
         /*
         // Another Geosjon to test
         JSONObject val2 = field.castValue("{ \"type\": \"GeometryCollection\",\n" +
@@ -149,17 +151,17 @@ class FieldCastTest {
             "    }\n" +
             " ]\n" +
             "}");
-        
+
         Assertions.assertEquals("GeometryCollection", val.getString("type"));
         Assertions.assertEquals("Point", val.getJSONArray("geometries").getJSONObject(0).getString("type"));
         Assertions.assertEquals("LineString", val.getJSONArray("geometries").getJSONObject(1).getString("type"));
         */
     }
-    
+
     @Test
     void testFieldCastInvalidTopojson() throws Exception{
         GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
-        
+
         // This is an invalid Topojson, it's a Geojson:
         assertThrows(InvalidCastException.class, () -> {
             field.castValue("{ \"type\": \"GeometryCollection\",\n" +
@@ -230,24 +232,24 @@ class FieldCastTest {
     void testFieldCastObject() throws Exception{
         ObjectField field = new ObjectField("test");
         JSONObject val = new JSONObject(field.castValue("{\"one\": 1, \"two\": 2, \"three\": 3}"));
-        Assertions.assertEquals(3, val.length()); 
-        Assertions.assertEquals(1, val.getInt("one")); 
-        Assertions.assertEquals(2, val.getInt("two")); 
-        Assertions.assertEquals(3, val.getInt("three")); 
+        Assertions.assertEquals(3, val.length());
+        Assertions.assertEquals(1, val.getInt("one"));
+        Assertions.assertEquals(2, val.getInt("two"));
+        Assertions.assertEquals(3, val.getInt("three"));
     }
-    
+
     @Test
     void testFieldCastArray() throws Exception{
         ArrayField field = new ArrayField("test");
         Object[] val = field.castValue("[1,2,3,4]");
-        
+
         Assertions.assertEquals(4, val.length);
         Assertions.assertEquals(1, val[0]);
         Assertions.assertEquals(2, val[1]);
         Assertions.assertEquals(3, val[2]);
         Assertions.assertEquals(4, val[3]);
     }
-    
+
     @Test
     void testFieldCastDateTime() throws Exception{
         DatetimeField field = new DatetimeField("test");
@@ -262,48 +264,48 @@ class FieldCastTest {
         Assertions.assertEquals(123000000, val.getNano());
         Assertions.assertEquals("2008-08-30T01:45:36.123Z", val.toString());
     }
-    
+
     @Test
     void testFieldCastDate() throws Exception{
         DateField field = new DateField("test");
         LocalDate val = field.castValue("2008-08-30");
-        
+
         Assertions.assertEquals(2008, val.getYear());
         Assertions.assertEquals(8, val.getMonthValue());
         Assertions.assertEquals(30, val.getDayOfMonth());
     }
-    
+
     @Test
     void testFieldCastTime() throws Exception{
         TimeField field = new TimeField("test");
-        DateTime val = field.castValue("14:22:33");
-        
-        Assertions.assertEquals(14, val.getHourOfDay());
-        Assertions.assertEquals(22, val.getMinuteOfHour());
-        Assertions.assertEquals(33, val.getSecondOfMinute());
+        LocalTime val = field.castValue("14:22:33");
+
+        Assertions.assertEquals(14, val.getHour());
+        Assertions.assertEquals(22, val.getMinute());
+        Assertions.assertEquals(33, val.getSecond());
     }
-    
+
     @Test
     void testFieldCastYear() throws Exception{
         YearField field = new YearField("test");
         Year val = field.castValue("2008");
         Assertions.assertEquals(2008, val.getValue());
     }
-    
+
     @Test
     void testFieldCastYearmonth() throws Exception{
         YearmonthField field = new YearmonthField("test");
         YearMonth val = field.castValue("2008-08");
-        
+
         Assertions.assertEquals(2008, val.getYear());
         Assertions.assertEquals(8, val.getMonthValue());
     }
-    
+
     @Test
     void testFieldCastNumber() throws Exception{
         IntegerField intField = new IntegerField("intNum");
         NumberField floatField = new NumberField("floatNum");
-        
+
         BigInteger intValPositive1 = intField.castValue("123");
         Assertions.assertEquals(123, intValPositive1.intValue());
 
@@ -312,7 +314,7 @@ class FieldCastTest {
 
         BigInteger intValNegative = intField.castValue("-765");
         Assertions.assertEquals(-765, intValNegative.intValue());
-             
+
         Number floatValPositive1 = floatField.castValue("123.9902");
         Assertions.assertEquals(123.9902, floatValPositive1.floatValue(), 0.01);
 
@@ -321,13 +323,13 @@ class FieldCastTest {
 
         Number floatValNegative = floatField.castValue("-765.929");
         Assertions.assertEquals(-765.929, floatValNegative.floatValue(), 0.01);
-        
+
     }
-    
+
     @Test
     void testFieldCastBoolean() throws Exception{
         BooleanField field = new BooleanField("test");
-        
+
         Assertions.assertFalse(field.castValue("f"));
         Assertions.assertFalse(field.castValue("F"));
         Assertions.assertFalse(field.castValue("False"));
@@ -350,12 +352,12 @@ class FieldCastTest {
         Assertions.assertTrue(field.castValue("y"));
         Assertions.assertTrue(field.castValue("Y"));
     }
-    
+
     @Test
     void testFieldCastString() throws Exception{
         StringField field = new StringField("test");
         String val = field.castValue("John Doe");
-        
+
         Assertions.assertEquals("John Doe", val);
     }
 

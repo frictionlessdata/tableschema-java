@@ -3,13 +3,9 @@ package io.frictionlessdata.tableschema.beans;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.util.concurrent.AtomicDouble;
-import org.json.JSONObject;
-import org.locationtech.jts.geom.Coordinate;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.Duration;
-import java.time.LocalDate;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -37,9 +33,10 @@ public class NumbersBean {
 
  private double doubleVal;
 
- private float floatClassVal;
+ private Float floatClassVal;
 
- private double doubleClassVal;
+ @JsonProperty("doubleClassVal")
+ private Double doubleClassVal;
 
  private BigInteger bigIntVal;
 

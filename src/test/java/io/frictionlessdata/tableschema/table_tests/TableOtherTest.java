@@ -9,8 +9,6 @@ import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import io.frictionlessdata.tableschema.field.*;
 import org.apache.commons.csv.CSVFormat;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,59 +23,61 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
 
 public class TableOtherTest {
 
-    private static JSONArray populationTestJson =  new JSONArray("[" +
-             "{" +
-             "\"city\": \"london\"," +
-             "\"year\": 2017," +
-             "\"population\": 8780000" +
-             "}," +
-             "{" +
-             "\"city\": \"paris\"," +
-             "\"year\": 2017," +
-             "\"population\": 2240000" +
-             "}," +
-             "{" +
-             "\"city\": \"rome\"," +
-             "\"year\": 2017," +
-             "\"population\": 2860000" +
-             "}" +
-             "]");
+    private static final String populationTestJson =  "[" +
+        "{" +
+        "\"city\": \"london\"," +
+        "\"year\": 2017," +
+        "\"population\": 8780000" +
+        "}," +
+        "{" +
+        "\"city\": \"paris\"," +
+        "\"year\": 2017," +
+        "\"population\": 2240000" +
+        "}," +
+        "{" +
+        "\"city\": \"rome\"," +
+        "\"year\": 2017," +
+        "\"population\": 2860000" +
+        "}" +
+        "]";
 
-    private static JSONObject populationSchema = new JSONObject("{\n" +
-            "  \"fields\": [\n" +
-            "    {\n" +
-            "      \"name\": \"city\",\n" +
-            "      \"format\": \"default\",\n" +
-            "      \"description\": \"The city.\",\n" +
-            "      \"type\": \"string\",\n" +
-            "      \"title\": \"city\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"name\": \"year\",\n" +
-            "      \"description\": \"The year.\",\n" +
-            "      \"type\": \"year\",\n" +
-            "      \"title\": \"year\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"name\": \"population\",\n" +
-            "      \"description\": \"The population.\",\n" +
-            "      \"type\": \"integer\",\n" +
-            "      \"title\": \"population\"\n" +
-            "    }\n" +
-            "  ]\n" +
-            "}\n");
+    private static final String populationSchema = "{\n" +
+        "  \"fields\": [\n" +
+        "    {\n" +
+        "      \"name\": \"city\",\n" +
+        "      \"format\": \"default\",\n" +
+        "      \"description\": \"The city.\",\n" +
+        "      \"type\": \"string\",\n" +
+        "      \"title\": \"city\"\n" +
+        "    },\n" +
+        "    {\n" +
+        "      \"name\": \"year\",\n" +
+        "      \"description\": \"The year.\",\n" +
+        "      \"type\": \"year\",\n" +
+        "      \"title\": \"year\"\n" +
+        "    },\n" +
+        "    {\n" +
+        "      \"name\": \"population\",\n" +
+        "      \"description\": \"The population.\",\n" +
+        "      \"type\": \"integer\",\n" +
+        "      \"title\": \"population\"\n" +
+        "    }\n" +
+        "  ]\n" +
+        "}\n";
 
     private static Object[][] populationTestData = new Object[][]
-            {
-                new Object[]{"london",2017,8780000},
-                new Object[]{"paris",2017,2240000},
-                new Object[]{"rome",2017,2860000}
-            };
+        {
+            new Object[]{"london",2017,8780000},
+            new Object[]{"paris",2017,2240000},
+            new Object[]{"rome",2017,2860000}
+        };
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -89,12 +89,12 @@ public class TableOtherTest {
     public void testReadFromValidJSONArrayWithSchema() throws Exception{
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema schema = Schema.fromJson (schemaFile, true);
-        Table table = Table.fromSource(populationTestJson.toString(), schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(populationTestJson, schema, DataSourceFormat.getDefaultCsvFormat());
 
         Assert.assertEquals(3, table.read().size());
-        Schema expectedSchema = Schema.fromJson (populationSchema.toString(), true);
+        Schema expectedSchema = Schema.fromJson(populationSchema, true);
         Table expectedTable = Table.fromSource(new File("data/population.csv")
-                , getTestDataDirectory(), expectedSchema, DataSourceFormat.getDefaultCsvFormat());
+            , getTestDataDirectory(), expectedSchema, DataSourceFormat.getDefaultCsvFormat());
         Assert.assertEquals(expectedTable, table);
     }
 
@@ -110,9 +110,11 @@ public class TableOtherTest {
 
         File referenceFile = new File(getTestDataDirectory(), "data/employee_data.json");
         String referenceContent = String.join("", Files.readAllLines(referenceFile.toPath()));
-        JSONArray reference = new JSONArray(referenceContent);
-        JSONArray actual = new JSONArray(s);
-        Assert.assertEquals(reference.toString(), actual.toString());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode reference = objectMapper.readTree(referenceContent);
+        JsonNode actual = objectMapper.readTree(s);
+        Assert.assertEquals(reference.textValue(), actual.textValue());
     }
 
     @Test
@@ -126,9 +128,10 @@ public class TableOtherTest {
 
         File referenceFile = new File(getTestDataDirectory(), "data/employee_data.json");
         String referenceContent = String.join("", Files.readAllLines(referenceFile.toPath()));
-        JSONArray reference = new JSONArray(referenceContent);
-        JSONArray actual = new JSONArray(s);
-        Assert.assertEquals(reference.toString(), actual.toString());
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode reference = objectMapper.readTree(referenceContent);
+        JsonNode actual = objectMapper.readTree(s);
+        Assert.assertEquals(reference.textValue(), actual.textValue());
     }
 
 
@@ -142,22 +145,25 @@ public class TableOtherTest {
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema_additional_field.json");
         Schema schema = Schema.fromJson (schemaFile, true);
         Table table = Table.fromSource(new File("data/population.json")
-                , getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
+            , getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
         List<Object[]> data = table.read();
         Assert.assertEquals(3, data.size());
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode populationTest = objectMapper.readTree(populationTestJson);
+
         for (int i = 0; i < data.size(); i++) {
             Object[] row = data.get(i);
+            JsonNode expectedObj = populationTest.get(i);
             Assert.assertEquals(4, row.length);
-            JSONObject expectedObj = populationTestJson.getJSONObject(i);
             for (int j = 0; j < row.length; j++) {
                 if (j == 0) {
-                    Assert.assertEquals(expectedObj.getString("city"), row[j]);
+                    Assert.assertEquals(expectedObj.get("city").asText(), row[j]);
                 } else if (j == 1) {
                     Assert.assertNull(row[j]);
                 } else if (j == 2) {
                     Assert.assertEquals(expectedObj.get("year").toString(), row[j].toString());
                 } else if (j == 3) {
-                    Assert.assertEquals(expectedObj.getBigInteger("population"), row[j]);
+                    Assert.assertEquals(expectedObj.get("population").bigIntegerValue(), row[j]);
                 }
             }
         }
@@ -166,13 +172,14 @@ public class TableOtherTest {
     @Test
     public void testInferTypesIntAndDates() throws Exception{
         Table table = Table.fromSource(new File ("dates_data.csv"), getTestDataDirectory());
-        
-        JSONObject schema = new JSONObject(table.inferSchema().getJson());
-        JSONArray schemaFiles = schema.getJSONArray("fields");
-        
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode schema = objectMapper.readTree(table.inferSchema().getJson());
+        JsonNode schemaFiles = schema.get("fields");
+
         // The field names are the same as the name of the type we are expecting to be inferred.
-        for(int i=0; i<schemaFiles.length(); i++){
-            Assert.assertEquals(schemaFiles.getJSONObject(i).get("name"), schemaFiles.getJSONObject(i).get("type"));
+        for(int i=0; i< schemaFiles.size(); i++) {
+            JsonNode node = schemaFiles.get(i);
+            Assert.assertEquals(node.get("name").asText(), node.get("type").asText());
         }
     }
     //TODO not sure how the test should correctly regard 1 as integer and as boolean at another time
@@ -182,12 +189,12 @@ public class TableOtherTest {
         Table table = new Table(new File ("int_bool_geopoint_data.csv"), getTestDataDirectory());
         //String sourceFileAbsPath = TableOtherTest.class.getResource("/fixtures/int_bool_geopoint_data.csv").getPath();
         //Table table = new Table(sourceFileAbsPath);
-        
+
         // Infer
         Schema schema = table.inferSchema();
-        
+
         Iterator<Field> iter = schema.getFields().iterator();
-        
+
         // The field names are the same as the name of the type we are expecting to be inferred.
         // So if type is set then in means that inferral worked.
         while(iter.hasNext()){
@@ -224,11 +231,11 @@ public class TableOtherTest {
         File testDataDir = getTestDataDirectory();
         // Let's start by defining and building the schema:
         Schema employeeTableSchema = getEmployeeTableSchema();
-        
+
         // Fetch the data and apply the schema
         File file = new File("data/employee_data.csv");
         Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, DataSourceFormat.getDefaultCsvFormat());
-        
+
         Iterator<Map<String, Object>> iter = employeeTable.keyedIterator(false, false, false);
 
         while(iter.hasNext()){
@@ -250,7 +257,7 @@ public class TableOtherTest {
         // get path of test CSV file
         File file = new File("data/simple_data.csv");
         Table table = Table.fromSource(file, testDataDir);
-        
+
         Assert.assertEquals("[id, title]", Arrays.toString(table.getHeaders()));
     }
 
@@ -273,7 +280,7 @@ public class TableOtherTest {
         File testDataDir = getTestDataDirectory();
         File file = new File("data/simple_data.csv");
         Table table = Table.fromSource(file, testDataDir);
-        
+
         Assert.assertEquals(3, table.read().size());
         Assert.assertEquals("1", table.read().get(0)[0]);
         Assert.assertEquals("foo", table.read().get(0)[1]);
@@ -285,11 +292,11 @@ public class TableOtherTest {
 
         // Let's start by defining and building the schema:
         Schema employeeTableSchema = getEmployeeTableSchema();
-        
+
         // Fetch the data and apply the schema
         File file = new File("data/employee_data.csv");
         Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, DataSourceFormat.getDefaultCsvFormat());
-        
+
         // We will iterate the rows and these are the values classes we expect:
         Class[] expectedTypes = new Class[]{
             BigInteger.class,
@@ -300,19 +307,19 @@ public class TableOtherTest {
             Duration.class,
             HashMap.class
         };
-        
+
         List<Object[]> data = employeeTable.read(true);
         Iterator<Object[]> iter = data.iterator();
-        
+
         while(iter.hasNext()){
             Object[] row = iter.next();
-            
+
             for(int i=0; i<row.length; i++){
                 Assert.assertEquals(expectedTypes[i], row[i].getClass());
             }
         }
     }
-    
+
     @Test
     public void saveTable() throws Exception{
         String createdFileName = "test_data_table.csv";
@@ -320,13 +327,13 @@ public class TableOtherTest {
         File testDataDir = getTestDataDirectory();
         File file = new File("data/simple_data.csv");
         Table loadedTable = Table.fromSource(file, testDataDir);
-        
+
         loadedTable.writeCsv(new File (createdFileDir, createdFileName), CSVFormat.RFC4180);
-        
+
         Table readTable = Table.fromSource(new File(createdFileName), createdFileDir);
         Assert.assertEquals("id", readTable.getHeaders()[0]);
         Assert.assertEquals("title", readTable.getHeaders()[1]);
-        Assert.assertEquals(3, readTable.read().size());   
+        Assert.assertEquals(3, readTable.read().size());
     }
 
     @Test
@@ -374,7 +381,7 @@ public class TableOtherTest {
         schema.addField(isAdminField);
 
         Field addressCoordinatesField
-                = new GeopointField("addressCoordinates", Field.FIELD_FORMAT_OBJECT, null, null, null, null, null);
+            = new GeopointField("addressCoordinates", Field.FIELD_FORMAT_OBJECT, null, null, null, null, null);
         schema.addField(addressCoordinatesField);
 
         Field contractLengthField = new DurationField("contractLength");

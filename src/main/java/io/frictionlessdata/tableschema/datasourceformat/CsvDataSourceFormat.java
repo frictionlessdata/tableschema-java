@@ -19,43 +19,44 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
 
     private CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
 
-    public CsvDataSourceFormat(InputStream inStream) throws Exception{
-        InputStreamReader inputStreamReader = new InputStreamReader(inStream, StandardCharsets.UTF_8);
-        BufferedReader br = new BufferedReader(inputStreamReader);
+    /**
+     * Constructor from a Stream. In contrast to lazy-loading File- or URL-based constructors, this one
+     * reads all the data at construction time.
+     * @param inStream the stream to read from
+     * @throws Exception if an IOException occurs
+     */
+    CsvDataSourceFormat(InputStream inStream) throws Exception{
+        try (InputStreamReader is = new InputStreamReader(inStream, StandardCharsets.UTF_8);
+                BufferedReader br = new BufferedReader(is)) {
+            String content = br.lines().collect(Collectors.joining("\n"));
+            this.dataSource = DataSourceFormat.trimBOM(content);
 
-        String content = br.lines().collect(Collectors.joining("\n"));
-        content = DataSourceFormat.trimBOM(content);
-        this.dataSource = content;
-        br.close();
-        inputStreamReader.close();
-
-        // ensure that both parsing as JSON array and JSON object data fails. If one succeeds,
-        // then the data is not CSV, but JSON -> throw exception
-        try {
-            new JSONArray(content);
-        } catch (JSONException ex) {
+            // ensure that both parsing as JSON array and JSON object data fails. If one succeeds,
+            // then the data is not CSV, but JSON -> throw exception
             try {
-                new JSONObject(content);
-            } catch (JSONException ex2) {
-                return;
+                new JSONArray((String)this.dataSource);
+            } catch (JSONException ex) {
+                try {
+                    new JSONObject((String)this.dataSource);
+                } catch (JSONException ex2) {
+                    return;
+                }
             }
+            throw new IllegalArgumentException("Input seems to be in JSON format");
         }
-
-        throw new IllegalArgumentException("Input seems to be in JSON format");
     }
 
-    public CsvDataSourceFormat(URL dataSource){
+    CsvDataSourceFormat(URL dataSource){
         super(dataSource);
     }
     
-    public CsvDataSourceFormat(File dataSource, File workDir){
+    CsvDataSourceFormat(File dataSource, File workDir){
         super(dataSource, workDir);
     }
-    
+
     CsvDataSourceFormat(String dataSource){
         super(dataSource);
     }
-
 
     public CsvDataSourceFormat setFormat(CSVFormat format) {
         this.format = format;
@@ -63,7 +64,9 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
     }
 
     public CSVFormat getFormat() {
-        return format;
+        return (this.format != null)
+                ? this.format
+                : DataSourceFormat.getDefaultCsvFormat();
     }
 
     /**
@@ -78,14 +81,11 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
      */
     @Override
     CSVParser getCSVParser() throws Exception{
-        CSVFormat format = (this.format != null)
-                ? this.format
-                : DataSourceFormat.getDefaultCsvFormat();
-        if(dataSource instanceof String){
-            Reader sr = new StringReader((String)dataSource);
-            return CSVParser.parse(sr, format);
+        CSVFormat format = getFormat();
 
-        }else if(dataSource instanceof File){
+        if (dataSource instanceof String){
+            return CSVParser.parse((String)dataSource, format);
+        } else if(dataSource instanceof File){
             // The path value can either be a relative path or a full path.
             // If it's a relative path then build the full path by using the working directory.
             // Caution: here, we cannot simply use provided paths, we have to check

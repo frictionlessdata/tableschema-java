@@ -16,13 +16,16 @@ public class TableIterator<T> implements Iterator<T> {
     String[] headers = null;
     Schema schema = null;
     Iterator<String[]> wrappedIterator = null;
-    boolean keyed;
-    boolean extended;
-    boolean cast;
-    boolean relations;
+    boolean keyed = false;
+    boolean extended = false;
+    boolean cast = true;
+    boolean relations = false;
     Map<String, Object> fieldOptions;
     Map<Integer, Integer> mapping = null;
     int index = 0;
+
+
+    TableIterator() {}
 
     public TableIterator(Table table) throws Exception{
         this(table, false, false, true, false);

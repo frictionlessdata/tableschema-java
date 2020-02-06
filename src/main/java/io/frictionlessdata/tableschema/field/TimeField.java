@@ -3,21 +3,17 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.json.JSONObject;
 
 import java.net.URI;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TimeField extends Field<DateTime> {
+public class TimeField extends Field<LocalTime> {
     // An ISO8601 time string e.g. HH:mm:ss
     private static final String REGEX_TIME = "(2[0-3]|[01]?[0-9]):?([0-5]?[0-9]):?([0-5]?[0-9])";
-
-    private Pattern pattern = Pattern.compile(REGEX_TIME);
 
     TimeField() {
         super();
@@ -33,14 +29,16 @@ public class TimeField extends Field<DateTime> {
     }
 
     @Override
-    public DateTime parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public LocalTime parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        Pattern pattern = Pattern.compile(REGEX_TIME);
         Matcher matcher = pattern.matcher(value);
 
         if(matcher.matches()){
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("HH:mm:ss");
-            DateTime dt = formatter.parseDateTime(value);
+            LocalTime lt = LocalTime.parse(value);
+            //DateTimeFormatter formatter = DateTimeFormat.forPattern("HH:mm:ss");
+            //DateTime dt = formatter.parseDateTime(value);
 
-            return dt;
+            return lt;
 
         }else{
             throw new TypeInferringException();
@@ -48,8 +46,9 @@ public class TimeField extends Field<DateTime> {
     }
 
     @Override
-    public String formatValueAsString(DateTime value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return value.toString(DateTimeFormat.forPattern("HH:mm:ss"));
+    public String formatValueAsString(LocalTime value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        return value.format(DateTimeFormatter.ISO_LOCAL_TIME);
+        //return value.toString(DateTimeFormat.forPattern("HH:mm:ss"));
     }
 
     @Override

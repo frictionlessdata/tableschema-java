@@ -60,79 +60,33 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
 
     @Override
     public List<String[]> data() throws Exception{
-        // This is pretty much what happens when we call this.parser.getRecords()...
-        Iterator<CSVRecord> iter = this.getCSVParser().iterator();
         List<String[]> data = new ArrayList<>();
-
-        while(iter.hasNext()){
-            CSVRecord record = iter.next();
-            Iterator<String> colIter = record.iterator();
-
-            //...except that we want list of String[] rather than list of CSVRecord.
-            List<String> cols = new ArrayList<>();
-            while(colIter.hasNext()){
-                cols.add(colIter.next());
-            }
-
-            data.add(cols.toArray(new String[0]));
-        }
-
+        iterator().forEachRemaining(data::add);
         return data;
     }
 
 
     @Override
     public String[] getHeaders() throws Exception{
-        // Get a copy of the header map that iterates in column order.
-        // The map keys are column names. The map values are 0-based indices.
-        Map<String, Integer> headerMap = this.getCSVParser().getHeaderMap();
+        if (null == headers) {
+            // Get a copy of the header map that iterates in column order.
+            // The map keys are column names. The map values are 0-based indices.
+            Map<String, Integer> headerMap = this.getCSVParser().getHeaderMap();
 
-        // Generate list of keys
-        List<String> headerVals = new ArrayList<>();
+            // Generate list of keys
+            List<String> headerVals = new ArrayList<>();
 
-        headerMap.entrySet().forEach((pair) -> {
-            headerVals.add((String)pair.getKey());
-        });
+            headerMap.entrySet().forEach((pair) -> {
+                headerVals.add(pair.getKey());
+            });
 
-        // Return string array of keys.
-        return headerVals.toArray(new String[0]);
+            headers = headerVals.toArray(new String[0]);
+        }
+        return headers;
     }
 
     String getFileContents(String path) throws IOException {
-        String lines;
-        if (workDir.getName().endsWith(".zip")) {
-            //have to exchange the backslashes on Windows, as
-            //zip paths are forward slashed.
-            if (File.separator.equals("\\"))
-                path = path.replaceAll("\\\\", "/");
-            ZipFile zipFile = new ZipFile(workDir.getAbsolutePath());
-            ZipEntry entry = zipFile.getEntry(path);
-            InputStream stream = zipFile.getInputStream(entry);
-            try (BufferedReader rdr = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-                lines = rdr
-                        .lines()
-                        .collect(Collectors.joining("\n"));
-            }
-
-        } else {
-            // The path value can either be a relative path or a full path.
-            // If it's a relative path then build the full path by using the working directory.
-            // Caution: here, we cannot simply use provided paths, we have to check
-            // they are neither absolute path or relative parent paths (../)
-            // see:
-            //    - https://github.com/frictionlessdata/tableschema-java/issues/29
-            //    - https://frictionlessdata.io/specs/data-resource/#url-or-path
-            Path inPath = ((File)dataSource).toPath();
-            Path resolvedPath = DataSourceFormat.toSecure(inPath, workDir.toPath());
-
-            // Read the file.
-            try (BufferedReader rdr = new BufferedReader(new FileReader(resolvedPath.toFile()))) {
-                lines = rdr
-                        .lines()
-                        .collect(Collectors.joining("\n"));
-            }
-        }
-        return lines;
+        return DataSourceFormat.getFileContents(path, workDir);
     }
 
     /**
@@ -163,11 +117,11 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
      */
     @Override
     public void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders) {
-        if (null == sortedHeaders) {
-            writeCsv(out, format);
-            return;
-        }
         try {
+            if (null == sortedHeaders) {
+                writeCsv(out, format, getHeaders());
+                return;
+            }
             CSVFormat locFormat = (null != format)
                     ? format
                     : DataSourceFormat.getDefaultCsvFormat();
@@ -180,28 +134,6 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
                     = TableSchemaUtil.createSchemaHeaderMapping(headers, sortedHeaders);
             writeData(data(), mapping, csvPrinter);
             csvPrinter.close();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    void writeCsv(Writer out, CSVFormat format) {
-        try {
-            CSVFormat locFormat = (null != format)
-                    ? format
-                    : DataSourceFormat.getDefaultCsvFormat();
-
-            String[] headers = getHeaders();
-            locFormat = locFormat.withHeader(headers);
-            CSVPrinter csvPrinter = new CSVPrinter(out, locFormat);
-
-            Map<Integer, Integer> mapping = new HashMap<>();
-            for (int i = 0; i < headers.length; i++) {
-                mapping.put(i, i);
-            }
-            writeData(data(), mapping, csvPrinter);
-            csvPrinter.close();
-
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -220,6 +152,4 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
             throw new RuntimeException(ex);
         }
     }
-
-
 }

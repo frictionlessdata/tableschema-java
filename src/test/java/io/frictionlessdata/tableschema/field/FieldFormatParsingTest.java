@@ -94,6 +94,14 @@ class FieldFormatParsingTest {
     }
 
     @Test
+    @DisplayName("String Field returns default format for null")
+    void testFieldParseFormatFromString2() throws Exception{
+        StringField field = new StringField("test");
+        String format = field.parseFormat(null, null);
+        Assertions.assertEquals(Field.FIELD_FORMAT_DEFAULT, format);
+    }
+
+    @Test
     @DisplayName("String Field returns UUID format")
     void testFieldParseUUIDFormatFromString() throws Exception{
         StringField field = new StringField("test");
