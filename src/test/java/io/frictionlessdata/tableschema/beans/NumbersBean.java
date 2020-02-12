@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.beans;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.util.concurrent.AtomicDouble;
 
@@ -32,9 +33,10 @@ public class NumbersBean {
 
  private double doubleVal;
 
- private float floatClassVal;
+ private Float floatClassVal;
 
- private double doubleClassVal;
+ @JsonProperty("doubleClassVal")
+ private Double doubleClassVal;
 
  private BigInteger bigIntVal;
 

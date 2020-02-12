@@ -57,7 +57,6 @@ public class BeanIterator<T> extends TableIterator<T> {
 
         try {
             retVal = type.newInstance();
-
             for (int i = 0; i < row.length; i++) {
                 String fieldName = headers[i];
                 Field field = schema.getField(fieldName);
@@ -71,6 +70,8 @@ public class BeanIterator<T> extends TableIterator<T> {
                     field.setFormat(fieldFormat);
                 }
                 Object val = field.castValue(row[i], true, fieldOptions);
+                if (null == val)
+                    continue;
                 Class annotatedFieldClass = aF.getRawType();
                 aF.fixAccess(true);
                 if (Number.class.isAssignableFrom(annotatedFieldClass)) {
