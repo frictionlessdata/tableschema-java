@@ -316,9 +316,24 @@ public class TableCreationTest {
         table.validate();
     }
 
-
     @Test
     public void testReadFileWithBOM() throws Exception{
+        File testDataDir = getTestDataDirectory();
+        // get path of test CSV file
+        File file = new File("data/simple_data_bom2.tsv");
+        Table table = Table.fromSource(file, testDataDir);
+        table.setCsvFormat(CSVFormat.TDF.withRecordSeparator("\n").withHeader());
+        File f = new File(getTestDataDirectory(), "schema/simple_data_schema.json");
+        Schema schema = null;
+        try (FileInputStream fis = new FileInputStream(f)) {
+            schema = Schema.fromJson (fis, false);
+        }
+        // must not throw an exception
+        table.setSchema(schema);
+    }
+
+    @Test
+    public void testReadFileWithBomAndSchema() throws Exception{
         File testDataDir = getTestDataDirectory();
         // get path of test CSV file
         File file = new File("data/simple_data_bom2.tsv");
