@@ -60,6 +60,9 @@ public class BeanIterator<T> extends TableIterator<T> {
             for (int i = 0; i < row.length; i++) {
                 String fieldName = headers[i];
                 Field field = schema.getField(fieldName);
+                if (null == field) {
+                    continue;
+                }
                 AnnotatedField aF = ((BeanSchema) schema).getAnnotatedField(fieldName);
                 // we may have a field that can have different formats
                 // but the Schema doesn't know about the true format
