@@ -98,6 +98,8 @@ public class BeanSchema extends Schema {
                             field = new ObjectField(name);
                         else if (declaredClass.equals(Map.class))
                             field = new ObjectField(name);
+                        else if (declaredClass.equals(UUID.class))
+                            field = new StringField(name);
                     }
                 }
                 break;
