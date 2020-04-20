@@ -48,8 +48,14 @@ public class BeanSchema extends Schema {
             String name = next.getName();
             CsvSchema.ColumnType type = next.getType();
             Field field = null;
-            java.lang.reflect.Field declaredField = beanClass.getDeclaredField(fieldNames.get(name));
-            Class declaredClass = declaredField.getType();
+            Class declaredClass = null;
+            String fieldMethodName = fieldNames.get(name);
+            try {
+                java.lang.reflect.Field declaredField = beanClass.getDeclaredField(fieldMethodName);
+                declaredClass = declaredField.getType();
+            } catch (NoSuchFieldException ex) {
+                continue;
+            }
             switch (type) {
                 case ARRAY:
                     field = new ArrayField(name);
