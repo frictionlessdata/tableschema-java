@@ -271,10 +271,10 @@
         </dependency>
         <!-- JSON Schema Validator -->
         <dependency>
-			<groupId>com.networknt</groupId>
-			<artifactId>json-schema-validator</artifactId>
-			<version>1.0.38</version>
-		</dependency>
+        	<groupId>com.networknt</groupId>
+        	<artifactId>json-schema-validator</artifactId>
+        	<version>1.0.38</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
 		<dependency>
             <groupId>joda-time</groupId>
