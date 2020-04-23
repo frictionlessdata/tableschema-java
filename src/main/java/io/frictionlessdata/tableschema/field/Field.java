@@ -296,15 +296,11 @@ public abstract class Field<T> {
                     violatedConstraints.put(CONSTRAINT_KEY_MIN_LENGTH, minLength);
                 }
                 
-            }else if (value instanceof JsonNode && !((JsonNode)value).isArray()){
+            }else if (value instanceof JsonNode){
                 if(((JsonNode)value).size() < minLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MIN_LENGTH, minLength);
                 }
                  
-            }else if (value instanceof ArrayNode){
-                if(((ArrayNode)value).size() < minLength){
-                    violatedConstraints.put(CONSTRAINT_KEY_MIN_LENGTH, minLength);
-                }                
             }
         }
         
