@@ -36,3 +36,4 @@ hs_err_pid*
 
 
 /bin/
+/schema.json
