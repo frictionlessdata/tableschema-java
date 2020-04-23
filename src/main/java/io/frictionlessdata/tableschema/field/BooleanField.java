@@ -80,18 +80,5 @@ public class BooleanField extends Field<Boolean> {
 
     public static Field fromJson (String json) {
     	return Field.fromJson(json);
-    	//return JsonUtil.getInstance().deserialize(json, BooleanField.class);
-    	/*
-        BooleanField field = (BooleanField)Field.fromJson(json);
-        JSONObject fieldDef = new JSONObject(json);
-        JSONArray trueValues = fieldDef.has("trueValues") ? fieldDef.getJSONArray("trueValues") : null;
-        if (null != trueValues) {
-            field.trueValues = trueValues.toList().stream().map(Object::toString).collect(Collectors.toList());
-        }
-        JSONArray falseValues = fieldDef.has("falseValues") ? fieldDef.getJSONArray("falseValues") : null;
-        if (null != falseValues) {
-            field.falseValues = falseValues.toList().stream().map(Object::toString).collect(Collectors.toList());
-        }
-        return field;*/
     }
 }
