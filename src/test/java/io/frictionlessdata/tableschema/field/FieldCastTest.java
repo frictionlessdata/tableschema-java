@@ -6,10 +6,11 @@ import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import org.joda.time.DateTime;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import javax.ejb.Local;
 import java.io.File;
@@ -71,8 +72,7 @@ class FieldCastTest {
     @Test
     void testFieldCastValidGeojson() throws Exception{
         GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
-        // TODO: remove org.json stuff only after a refactoring GeojsonField class
-        JSONObject val = field.castValue("{\n" +
+        JsonNode val = field.castValue("{\n" +
             "    \"type\": \"Feature\",\n" +
             "    \"properties\": {\n" +
             "        \"name\": \"Coors Field\",\n" +
@@ -85,10 +85,10 @@ class FieldCastTest {
             "    }\n" +
             "}");
 
-        Assertions.assertEquals("Feature", val.getString("type"));
-        Assertions.assertEquals("Baseball Stadium", val.getJSONObject("properties").getString("amenity"));
-        Assertions.assertEquals(-104.99404, val.getJSONObject("geometry").getJSONArray("coordinates").get(0));
-        Assertions.assertEquals(39.75621, val.getJSONObject("geometry").getJSONArray("coordinates").get(1));
+        Assertions.assertEquals("Feature", val.get("type").asText());
+        Assertions.assertEquals("Baseball Stadium", val.get("properties").get("amenity").asText());
+        Assertions.assertEquals(-104.99404, val.get("geometry").get("coordinates").get(0).asDouble());
+        Assertions.assertEquals(39.75621, val.get("geometry").get("coordinates").get(1).asDouble());
     }
 
     @Test
@@ -115,7 +115,7 @@ class FieldCastTest {
     void testFieldCastValidTopojson() throws Exception{
         GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
 
-        JSONObject val = field.castValue("{\n" +
+        JsonNode val = field.castValue("{\n" +
             "  \"type\": \"Topology\",\n" +
             "  \"transform\": {\n" +
             "    \"scale\": [0.036003600360036005, 0.017361589674592462],\n" +
@@ -133,11 +133,11 @@ class FieldCastTest {
             "  ]\n" +
             "}");
 
-        Assertions.assertEquals("Topology", val.getString("type"));
-        Assertions.assertEquals(0.036003600360036005, val.getJSONObject("transform").getJSONArray("scale").get(0));
-        Assertions.assertEquals(0.017361589674592462, val.getJSONObject("transform").getJSONArray("scale").get(1));
-        Assertions.assertEquals(-180, val.getJSONObject("transform").getJSONArray("translate").get(0));
-        Assertions.assertEquals(-89.99892578124998, val.getJSONObject("transform").getJSONArray("translate").get(1));
+        Assertions.assertEquals("Topology", val.get("type").asText());
+        Assertions.assertEquals(0.036003600360036005, val.get("transform").get("scale").get(0).asDouble());
+        Assertions.assertEquals(0.017361589674592462, val.get("transform").get("scale").get(1).asDouble());
+        Assertions.assertEquals(-180, val.get("transform").get("translate").get(0).asDouble());
+        Assertions.assertEquals(-89.99892578124998, val.get("transform").get("translate").get(1).asDouble());
 
         /*
         // Another Geosjon to test
@@ -231,11 +231,11 @@ class FieldCastTest {
     @Test
     void testFieldCastObject() throws Exception{
         ObjectField field = new ObjectField("test");
-        JSONObject val = new JSONObject(field.castValue("{\"one\": 1, \"two\": 2, \"three\": 3}"));
-        Assertions.assertEquals(3, val.length());
-        Assertions.assertEquals(1, val.getInt("one"));
-        Assertions.assertEquals(2, val.getInt("two"));
-        Assertions.assertEquals(3, val.getInt("three"));
+        Map<String, Object> val = field.castValue("{\"one\": 1, \"two\": 2, \"three\": 3}");
+        Assertions.assertEquals(3, val.size());
+        Assertions.assertEquals(1, val.get("one"));
+        Assertions.assertEquals(2, val.get("two"));
+        Assertions.assertEquals(3, val.get("three"));
     }
 
     @Test

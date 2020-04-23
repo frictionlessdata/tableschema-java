@@ -2,22 +2,21 @@ package io.frictionlessdata.tableschema.field;
 
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.schema.JsonSchema;
 import io.frictionlessdata.tableschema.schema.TypeInferrer;
+import io.frictionlessdata.tableschema.util.JsonUtil;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.ValidationException;
-import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import io.frictionlessdata.tableschema.exception.ValidationException;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 
-public class GeojsonField extends Field<JSONObject> {
-    private Schema geoJsonSchema = null;
-    private Schema topoJsonSchema = null;
+public class GeojsonField extends Field<JsonNode> {
+    private JsonSchema geoJsonSchema = null;
+    private JsonSchema topoJsonSchema = null;
 
     GeojsonField(){
         super();
@@ -33,7 +32,7 @@ public class GeojsonField extends Field<JSONObject> {
     }
 
     @Override
-    public JSONObject parseValue(String value, String format, Map<String, Object> options) {
+    public JsonNode parseValue(String value, String format, Map<String, Object> options) {
         try{
             if(format.equalsIgnoreCase(FIELD_FORMAT_DEFAULT)){
                 validateGeoJsonSchema(value);
@@ -45,15 +44,15 @@ public class GeojsonField extends Field<JSONObject> {
                 throw new TypeInferringException("Unknown format type");
             }
 
-        }catch(ValidationException | JSONException ve){
+        }catch(ValidationException ve){
             // Not a valid GeoJSON or TopoJSON or Not a valid JSON.
             throw new TypeInferringException(ve);
         }
-        return new JSONObject(value);
+        return JsonUtil.getInstance().readValue(value);
     }
 
     @Override
-    public String formatValueAsString(JSONObject value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public String formatValueAsString(JsonNode value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return value.toString();
     }
 
@@ -66,15 +65,14 @@ public class GeojsonField extends Field<JSONObject> {
      * @param json String-encoded JSON object
      * @throws ValidationException if validation fails
      */
-    private void validateGeoJsonSchema(String json) throws ValidationException{
+    private void validateGeoJsonSchema(String json) throws ValidationException {
         if(this.geoJsonSchema == null){
             // FIXME: Maybe this infering against geojson scheme is too much.
             // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
             InputStream geoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/geojson.json");
-            JSONObject rawGeoJsonSchema = new JSONObject(new JSONTokener(geoJsonSchemaInputStream));
-            geoJsonSchema = SchemaLoader.load(rawGeoJsonSchema);
+            geoJsonSchema = JsonSchema.fromJson(geoJsonSchemaInputStream, true);
         }
-        geoJsonSchema.validate(new JSONObject(json));
+        geoJsonSchema.validate(json);
     }
 
 
@@ -85,31 +83,14 @@ public class GeojsonField extends Field<JSONObject> {
      * call it when it is actually required after trying all other type inferral.
      * @param json String-encoded JSON object
      */
-    private void validateTopoJsonSchema(String json){
+    private void validateTopoJsonSchema(String json) throws ValidationException {
         if(topoJsonSchema == null){
             // FIXME: Maybe this infering against topojson scheme is too much.
             // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema
             InputStream topoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/topojson.json");
-            JSONObject rawTopoJsonSchema = new JSONObject(new JSONTokener(topoJsonSchemaInputStream));
-            topoJsonSchema = SchemaLoader.load(rawTopoJsonSchema);
+            topoJsonSchema = JsonSchema.fromJson(topoJsonSchemaInputStream, true);
         }
-        topoJsonSchema.validate(new JSONObject(json));
-    }
-
-    private Schema getGeoJsonSchema(){
-        return this.geoJsonSchema;
-    }
-
-    private void setGeoJsonSchema(Schema geoJsonSchema){
-        this.geoJsonSchema = geoJsonSchema;
-    }
-
-    private Schema getTopoJsonSchema(){
-        return this.topoJsonSchema;
-    }
-
-    private void setTopoJsonSchema(Schema topoJsonSchema){
-        this.topoJsonSchema = topoJsonSchema;
+        topoJsonSchema.validate(json);
     }
 
     /*

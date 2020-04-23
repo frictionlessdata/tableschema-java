@@ -2,7 +2,6 @@ package io.frictionlessdata.tableschema.io;
 
 import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.schema.Schema;
-import org.everit.json.schema.ValidationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

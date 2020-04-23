@@ -1,7 +1,11 @@
 package io.frictionlessdata.tableschema.fk;
 
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
-import org.json.JSONArray;
+import io.frictionlessdata.tableschema.util.JsonUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,11 +31,11 @@ public class ReferenceTest {
     @Test
     public void testValidArrayFieldsReference() throws ForeignKeyException{
         // TODO: change this test after we remove org.json from Reference validator
-        JSONArray fields = new JSONArray();
-        fields.put("field1");
-        fields.put("field2");
+        List<String> fields = new ArrayList<>();
+        fields.add("field1");
+        fields.add("field2");
 
-        Reference ref = new Reference("resource", fields);
+        Reference ref = new Reference("resource", JsonUtil.getInstance().createArrayNode(fields));
 
         // Validation set to strict=true and no exception has been thrown.
         // Test passes.

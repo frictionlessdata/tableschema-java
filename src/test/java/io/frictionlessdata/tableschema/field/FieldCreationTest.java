@@ -325,8 +325,8 @@ class FieldCreationTest {
                 "\"type\":\"anon\",\"title\":\"\"}";
         Field testField = Field.fromJson(testJson);
         Assertions.assertTrue(testField instanceof AnyField);
-        Assertions.assertEquals(testField.getName(), "anon");
-        Assertions.assertEquals(testField.getType(), "any");
+        Assertions.assertEquals("anon", testField.getName());
+        Assertions.assertEquals("any", testField.getType());
     }
 
 

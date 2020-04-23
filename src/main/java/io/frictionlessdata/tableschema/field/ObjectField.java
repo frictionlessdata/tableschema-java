@@ -2,10 +2,13 @@ package io.frictionlessdata.tableschema.field;
 
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
-import org.json.JSONObject;
+import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import java.net.URI;
 import java.util.Map;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class ObjectField extends Field<Map<String, Object>> {
 
@@ -25,16 +28,14 @@ public class ObjectField extends Field<Map<String, Object>> {
     @Override
     public Map<String, Object> parseValue(String value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
-        JSONObject obj = new JSONObject(value);
-        return obj.toMap();
+        return JsonUtil.getInstance().deserialize(value, new TypeReference<Map<String, Object>>(){});
     }
 
 
     @Override
     public String formatValueAsString(Map<String, Object> value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
-        JSONObject obj = new JSONObject(value);
-        return obj.toString();
+        return JsonUtil.getInstance().serialize(value);
     }
 
 

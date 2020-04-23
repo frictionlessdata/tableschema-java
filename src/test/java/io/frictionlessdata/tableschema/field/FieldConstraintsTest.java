@@ -1,6 +1,8 @@
 package io.frictionlessdata.tableschema.field;
 
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
+import io.frictionlessdata.tableschema.util.JsonUtil;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,13 +12,13 @@ import java.util.Map;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-// TODO: remove org.json stuff only after a refactoring on the classes tested here
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class FieldConstraintsTest {
 
@@ -114,33 +116,34 @@ public class FieldConstraintsTest {
         constraints.put(Field.CONSTRAINT_KEY_MAX_LENGTH, 5);
 
         ObjectField field = new ObjectField("test", null, null, null, null, constraints, null);
+        
+        Map<String, Object> obj = new HashMap<>();
 
-        JSONObject obj = new JSONObject();
-        violatedConstraints = field.checkConstraintViolations(obj);
+        violatedConstraints = field.checkConstraintViolations(createJsonNode(obj));
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MIN_LENGTH));
 
         obj.put("one", 1);
-        violatedConstraints = field.checkConstraintViolations(obj);
+        violatedConstraints = field.checkConstraintViolations(createJsonNode(obj));
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MIN_LENGTH));
 
         obj.put("two", 2);
-        violatedConstraints = field.checkConstraintViolations(obj);
+        violatedConstraints = field.checkConstraintViolations(createJsonNode(obj));
         Assert.assertTrue(violatedConstraints.isEmpty());
 
         obj.put("three", 3);
-        violatedConstraints = field.checkConstraintViolations(obj);
+        violatedConstraints = field.checkConstraintViolations(createJsonNode(obj));
         Assert.assertTrue(violatedConstraints.isEmpty());
 
         obj.put("four", 4);
-        violatedConstraints = field.checkConstraintViolations(obj);
+        violatedConstraints = field.checkConstraintViolations(createJsonNode(obj));
         Assert.assertTrue(violatedConstraints.isEmpty());
 
         obj.put("five", 5);
-        violatedConstraints = field.checkConstraintViolations(obj);
+        violatedConstraints = field.checkConstraintViolations(createJsonNode(obj));
         Assert.assertTrue(violatedConstraints.isEmpty());
 
         obj.put("six", 6);
-        violatedConstraints = field.checkConstraintViolations(obj);
+        violatedConstraints = field.checkConstraintViolations(createJsonNode(obj));
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAX_LENGTH));
 
     }
@@ -155,32 +158,32 @@ public class FieldConstraintsTest {
 
         ArrayField field = new ArrayField("test", Field.FIELD_FORMAT_DEFAULT, "title", null, null, constraints, null);
 
-        JSONArray arr = new JSONArray();
-        violatedConstraints = field.checkConstraintViolations(arr);
+        List<Integer> obj = new ArrayList<>();
+        violatedConstraints = field.checkConstraintViolations(createJsonNode(obj));
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MIN_LENGTH));
 
-        arr.put(1);
-        violatedConstraints = field.checkConstraintViolations(arr);
+        obj.add(1);
+        violatedConstraints = field.checkConstraintViolations(createJsonNode(obj));
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MIN_LENGTH));
 
-        arr.put(2);
-        violatedConstraints = field.checkConstraintViolations(arr);
+        obj.add(2);
+        violatedConstraints = field.checkConstraintViolations(createJsonNode(obj));
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        arr.put(3);
-        violatedConstraints = field.checkConstraintViolations(arr);
+        obj.add(3);
+        violatedConstraints = field.checkConstraintViolations(createJsonNode(obj));
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        arr.put(4);
-        violatedConstraints = field.checkConstraintViolations(arr);
+        obj.add(4);
+        violatedConstraints = field.checkConstraintViolations(createJsonNode(obj));
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        arr.put(5);
-        violatedConstraints = field.checkConstraintViolations(arr);
+        obj.add(5);
+        violatedConstraints = field.checkConstraintViolations(createJsonNode(obj));
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        arr.put(6);
-        violatedConstraints = field.checkConstraintViolations(arr);
+        obj.add(6);
+        violatedConstraints = field.checkConstraintViolations(createJsonNode(obj));
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAX_LENGTH));
     }
 
@@ -547,21 +550,15 @@ public class FieldConstraintsTest {
         Map<String, Object> violatedConstraints = null;
 
         Map<String, Object> constraints = new HashMap();
-        List<JSONObject> enumObjs = new ArrayList();
+        List<JsonNode> enumObjs = new ArrayList();
 
-        JSONObject obj1 = new JSONObject();
-        obj1.put("one", 1);
+        JsonNode obj1 = JsonUtil.getInstance().createNode("{\"one\": 1}");
         enumObjs.add(obj1);
 
-        JSONObject obj2 = new JSONObject();
-        obj2.put("one", 1);
-        obj2.put("two", 2);
+        JsonNode obj2 = JsonUtil.getInstance().createNode("{\"one\": 1, \"two\": 2}");
         enumObjs.add(obj2);
 
-        JSONObject obj3 = new JSONObject();
-        obj3.put("one", 1);
-        obj3.put("two", 2);
-        obj3.put("four", 4);
+        JsonNode obj3 = JsonUtil.getInstance().createNode("{\"one\": 1, \"two\": 2, \"four\": 4}");
         enumObjs.add(obj3);
 
         constraints.put(Field.CONSTRAINT_KEY_ENUM, enumObjs);
@@ -576,11 +573,7 @@ public class FieldConstraintsTest {
         violatedConstraints = field.checkConstraintViolations(obj3);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        JSONObject obj4 = new JSONObject();
-        obj4.put("one", 1);
-        obj4.put("two", 2);
-        obj4.put("three", 3);
-        obj4.put("four", 4);
+        JsonNode obj4 = JsonUtil.getInstance().createNode("{\"one\": 1, \"two\": 2, \"three\": 3, \"four\": 4}");
         violatedConstraints = field.checkConstraintViolations(obj4);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_ENUM));
     }
@@ -590,15 +583,12 @@ public class FieldConstraintsTest {
         Map<String, Object> violatedConstraints = null;
 
         Map<String, Object> constraints = new HashMap();
-        List<JSONArray> enumArrs = new ArrayList();
+        List<JsonNode> enumArrs = new ArrayList();
 
-        JSONArray arr1 = new JSONArray();
-        arr1.put("one");
+        ArrayNode arr1 = JsonUtil.getInstance().createArrayNode("[\"one\"]");
         enumArrs.add(arr1);
 
-        JSONArray arr2 = new JSONArray();
-        arr2.put("one");
-        arr2.put(new Float(2.6));
+        ArrayNode arr2 = JsonUtil.getInstance().createArrayNode("[\"one\", \"2.6\"]");
         enumArrs.add(arr2);
 
         constraints.put(Field.CONSTRAINT_KEY_ENUM, enumArrs);
@@ -610,10 +600,7 @@ public class FieldConstraintsTest {
         violatedConstraints = field.checkConstraintViolations(arr2);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        JSONArray arr3 = new JSONArray();
-        arr3.put("one");
-        arr3.put(new Float(2.6));
-        arr3.put("3");
+        ArrayNode arr3 = JsonUtil.getInstance().createArrayNode("[\"one\", \"2.6\", \"3\"]");
         violatedConstraints = field.checkConstraintViolations(arr3);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_ENUM));
 
@@ -673,5 +660,9 @@ public class FieldConstraintsTest {
         DateTime datetime3 = formatter.parseDateTime("2003-01-15T13:44:33.000Z");
         violatedConstraints = field.checkConstraintViolations(datetime3);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_ENUM));
+    }
+    
+    private JsonNode createJsonNode(Object obj) {
+    	return JsonUtil.getInstance().createNode(obj);
     }
 }

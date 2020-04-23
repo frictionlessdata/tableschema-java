@@ -4,9 +4,9 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
+import io.frictionlessdata.tableschema.util.JsonUtil;
+
 import org.apache.commons.csv.CSVFormat;
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -87,9 +87,9 @@ public interface DataSourceFormat {
         String content = trimBOM(input);
         try {
             // JSON array generation only to see if an exception is thrown -> probably CSV data
-            new JSONArray(content);
+            JsonUtil.getInstance().createArrayNode(content);
             return new JsonArrayDataSourceFormat(content);
-        } catch (JSONException ex) {
+        } catch (Exception ex) {
             // JSON parsing failed, treat it as a CSV
             return new CsvDataSourceFormat(content);
         }

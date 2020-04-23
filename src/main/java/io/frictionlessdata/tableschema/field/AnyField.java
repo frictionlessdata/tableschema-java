@@ -2,7 +2,6 @@ package io.frictionlessdata.tableschema.field;
 
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
-import org.json.JSONObject;
 
 import java.net.URI;
 import java.util.Map;

@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Map;
 
 import io.frictionlessdata.tableschema.field.Field;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeMap;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 
 /**
@@ -98,8 +100,8 @@ public class TypeInferrer {
         }
 
 
-        // The JSON Array that will define the fields in the schema JSON Object.
-        JSONArray fieldArray = new JSONArray();
+        // The array that will define the fields in the schema JSON Object.
+        List<Map<String,Object>> fieldArray = new ArrayList<>();
         
         // Init the type inferral map and init the schema objects
         for (String header : headers) {
@@ -107,16 +109,16 @@ public class TypeInferrer {
             this.getTypeInferralMap().put(header, new HashMap());
             
             // Init the schema objects
-            JSONObject fieldObj = new JSONObject();
+            Map<String, Object> fieldObj = new HashMap<>();
             fieldObj.put(Field.JSON_KEY_NAME, header);
             fieldObj.put(Field.JSON_KEY_TITLE, ""); // This will stay blank.
             fieldObj.put(Field.JSON_KEY_DESCRIPTION, ""); // This will stay blank.
-            fieldObj.put(Field.JSON_KEY_CONSTRAINTS, new JSONObject()); // This will stay blank.
+            fieldObj.put(Field.JSON_KEY_CONSTRAINTS, new HashMap<>()); // This will stay blank.
             fieldObj.put(Field.JSON_KEY_FORMAT, ""); // This will bet set post inferral.
             fieldObj.put(Field.JSON_KEY_TYPE, ""); // This will bet set post inferral.
-            
+
             // Wrap it all in an array.
-            fieldArray.put(fieldObj);
+            fieldArray.add(fieldObj);
         }
 
         // Find the type for each column data for each row.
@@ -133,15 +135,15 @@ public class TypeInferrer {
         // We are done inferring types.
         // Now for each field we figure out which type was the most inferred and settle for that type
         // as the final type for the field.
-        for(int j=0; j < fieldArray.length(); j++){
-            String fieldName = fieldArray.getJSONObject(j).getString(Field.JSON_KEY_NAME);
+        for(int j=0; j < fieldArray.size(); j++){
+            String fieldName = fieldArray.get(j).get(Field.JSON_KEY_NAME).toString();
             HashMap<String, Integer> typeInferralCountMap = (HashMap<String, Integer>)this.getTypeInferralMap().get(fieldName);
             TreeMap<String, Integer> typeInferralCountMapSortedByCount = sortMapByValue(typeInferralCountMap); 
            
             if(!typeInferralCountMapSortedByCount.isEmpty()){
                 String inferredType = typeInferralCountMapSortedByCount.firstEntry().getKey();
-                fieldArray.getJSONObject(j).put(Field.JSON_KEY_TYPE, inferredType);
-                fieldArray.getJSONObject(j).put(Field.JSON_KEY_FORMAT, formatMap.get(headers[j]));
+                fieldArray.get(j).put(Field.JSON_KEY_TYPE, inferredType);
+                fieldArray.get(j).put(Field.JSON_KEY_FORMAT, formatMap.get(headers[j]));
             }
         }
         
@@ -150,10 +152,10 @@ public class TypeInferrer {
         this.formatMap.clear();
 
         // Now that the types have been inferred and set, we build and return the schema object.
-        JSONObject schemaJsonObject = new JSONObject();
+        Map<String, Object> schemaJsonObject = new HashMap<>();
         schemaJsonObject.put(Schema.JSON_KEY_FIELDS, fieldArray);
         
-        return schemaJsonObject.toString();
+        return JsonUtil.getInstance().serialize(schemaJsonObject);
     }
     
     private void findType(String header, String datum){

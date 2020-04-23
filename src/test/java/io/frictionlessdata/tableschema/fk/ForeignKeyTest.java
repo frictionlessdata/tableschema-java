@@ -3,10 +3,15 @@ package io.frictionlessdata.tableschema.fk;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
-// TODO: Reference and ForeignKey validators check for JSONArray instances
-// Not much we can do here, regarding org.json, until we do a refactoring in those classes
-import org.json.JSONArray;
+import io.frictionlessdata.tableschema.util.JsonUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 
 public class ForeignKeyTest {
@@ -73,12 +78,12 @@ public class ForeignKeyTest {
 
     @Test
     public void testFkFieldsIsStringAndRefFieldsIsArray() throws ForeignKeyException{
-        JSONArray refFields = new JSONArray();
-        refFields.put("field1");
-        refFields.put("field2");
-        refFields.put("field3");
+        List<String> refFields = new ArrayList<>();
+        refFields.add("field1");
+        refFields.add("field2");
+        refFields.add("field3");
 
-        Reference ref = new Reference("aResource", refFields, true);
+        Reference ref = new Reference("aResource", JsonUtil.getInstance().createArrayNode(refFields), true);
 
         exception.expectMessage("The reference's fields property must be a string if the outer fields is a string.");
         ForeignKey fk = new ForeignKey("aStringField", ref, true);
@@ -88,29 +93,29 @@ public class ForeignKeyTest {
     public void testFkFieldsIsArrayAndRefFieldsIsString() throws ForeignKeyException{
         Reference ref = new Reference("aResource", "aStringField", true);
 
-        JSONArray fkFields = new JSONArray();
-        fkFields.put("field1");
-        fkFields.put("field2");
-        fkFields.put("field3");
+        List<String> fkFields = new ArrayList<>();
+        fkFields.add("field1");
+        fkFields.add("field2");
+        fkFields.add("field3");
 
         exception.expectMessage("The reference's fields property must be an array if the outer fields is an array.");
-        ForeignKey fk = new ForeignKey(fkFields, ref, true);
+        ForeignKey fk = new ForeignKey(JsonUtil.getInstance().createArrayNode(fkFields), ref, true);
     }
 
     @Test
     public void testFkAndRefFieldsDifferentSizeArray() throws ForeignKeyException{
-        JSONArray refFields = new JSONArray();
-        refFields.put("refField1");
-        refFields.put("refField2");
-        refFields.put("refField3");
+    	List<String> refFields = new ArrayList<>();
+        refFields.add("refField1");
+        refFields.add("refField2");
+        refFields.add("refField3");
 
-        Reference ref = new Reference("aResource", refFields, true);
+        Reference ref = new Reference("aResource", JsonUtil.getInstance().createArrayNode(refFields), true);
 
-        JSONArray fkFields = new JSONArray();
-        fkFields.put("field1");
-        fkFields.put("field2");
+        List<String> fkFields = new ArrayList<>();
+        fkFields.add("field1");
+        fkFields.add("field2");
 
         exception.expectMessage("The reference's fields property must be an array of the same length as that of the outer fields' array.");
-        ForeignKey fk = new ForeignKey(fkFields, ref, true);
+        ForeignKey fk = new ForeignKey(JsonUtil.getInstance().createArrayNode(fkFields), ref, true);
     }
 }

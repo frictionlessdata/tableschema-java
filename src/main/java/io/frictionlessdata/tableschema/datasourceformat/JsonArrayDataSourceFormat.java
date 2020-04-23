@@ -1,15 +1,40 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
+import io.frictionlessdata.tableschema.util.JsonUtil;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
-import org.json.CDL;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.module.SimpleSerializers;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ser.BeanSerializerFactory;
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import com.fasterxml.jackson.databind.ser.SerializerFactory;
+import com.fasterxml.jackson.databind.ser.Serializers;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema.Builder;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -19,14 +44,14 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
 
     public JsonArrayDataSourceFormat(String json){
         super();
-        this.dataSource = new JSONArray(DataSourceFormat.trimBOM(json));
+        this.dataSource = JsonUtil.getInstance().createArrayNode(DataSourceFormat.trimBOM(json));
     }
 
     public JsonArrayDataSourceFormat (InputStream inStream) throws IOException {
         try (InputStreamReader inputStreamReader = new InputStreamReader(inStream, StandardCharsets.UTF_8);
         BufferedReader br = new BufferedReader(inputStreamReader)) {
             String content = br.lines().collect(Collectors.joining("\n"));
-            this.dataSource = new JSONArray(DataSourceFormat.trimBOM(content));
+            this.dataSource = JsonUtil.getInstance().createArrayNode(DataSourceFormat.trimBOM(content));
         }
     }
 
@@ -50,9 +75,9 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
 
             locFormat = locFormat.withHeader(sortedHeaders);
             CSVPrinter csvPrinter = new CSVPrinter(out, locFormat);
-            JSONArray data = (JSONArray)this.dataSource;
+            ArrayNode data = (ArrayNode)this.dataSource;
             for (Object record : data) {
-                JSONObject obj = (JSONObject) record;
+                JsonNode obj = (JsonNode) record;
                 writeDataRow(obj, sortedHeaders, csvPrinter);
             }
             csvPrinter.close();
@@ -61,7 +86,7 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
         }
     }
 
-    private static void writeDataRow(JSONObject data, String[] sortedHeaders, CSVPrinter csvPrinter) {
+    private static void writeDataRow(JsonNode data, String[] sortedHeaders, CSVPrinter csvPrinter) {
         try {
             int recordLength = sortedHeaders.length;
             String[] sortedRec = new String[recordLength];
@@ -100,8 +125,50 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
     @Override
     CSVParser getCSVParser() throws Exception {
         String dataCsv = null;
-        if(dataSource instanceof JSONArray){
-            dataCsv = CDL.toString((JSONArray)dataSource);
+        if(dataSource instanceof ArrayNode){
+
+        	ByteArrayOutputStream output = new ByteArrayOutputStream();
+        	
+        	Builder csvSchemaBuilder = CsvSchema.builder();
+        	JsonNode firstObject = ((ArrayNode)dataSource).elements().next();
+        	Map<String, JsonNode> fields = new HashMap<>();
+        	firstObject.fields().forEachRemaining(f->{
+        		fields.put(f.getKey(), f.getValue());
+        		csvSchemaBuilder.addColumn(f.getKey());
+        	});
+        	
+        	try {
+        		int i = 0;
+        		for (String key : fields.keySet()) {
+        			i++;
+        			output.write(key.getBytes());
+        			if (i < fields.size()) {
+        				output.write(",".getBytes());
+        			} else {
+        				output.write("\n".getBytes());
+        			}
+				}
+			} catch (IOException e) {
+				throw new TableSchemaException(e);
+			}
+        	
+        	CsvSchema csvSchema = csvSchemaBuilder.build();
+        	CsvMapper csvMapper = getCsvMapper();
+        	ObjectWriter objectWriter = csvMapper.writerFor(Map.class).with(csvSchema);
+        	
+        	((ArrayNode) dataSource).elements().forEachRemaining(n->{
+        		Map<String, Object> row = new HashMap<>();
+        		n.fields().forEachRemaining(f->{
+        			row.put(f.getKey(), f.getValue());
+        		});
+        		try {
+        			objectWriter.writeValue(output, row);
+				} catch (IOException e) {
+					throw new TableSchemaException(e);
+				}
+        	});
+
+            dataCsv = output.toString();
         } else{
             throw new TableSchemaException("Data source is of invalid type.");
         }
@@ -109,4 +176,28 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
         // Get the parser.
         return CSVParser.parse(sr, DataSourceFormat.getDefaultCsvFormat());
     }
+
+	private CsvMapper getCsvMapper() {
+		return CsvMapper.builder()
+				.addModule(complexObjectSerializationModule())
+				.build();
+	}
+	
+	private Module complexObjectSerializationModule() {
+		SimpleModule module = new SimpleModule();
+		module.setSerializers(new SimpleSerializers());
+		module.addSerializer(ObjectNode.class, mapSerializer());
+		return module;
+	}
+
+	private JsonSerializer<ObjectNode> mapSerializer() {
+		return new JsonSerializer<ObjectNode>() {
+
+			@Override
+			public void serialize(ObjectNode value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+				gen.writeString(value.toString());
+			}
+			
+		};
+	}
 }

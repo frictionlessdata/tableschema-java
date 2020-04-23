@@ -3,10 +3,19 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
+import io.frictionlessdata.tableschema.util.JsonUtil;
+
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -22,6 +31,28 @@ import java.util.regex.Pattern;
  *
  */
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(value = Include.NON_EMPTY)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = AnyField.class, 
+	include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = StringField.class, name = Field.FIELD_TYPE_STRING),
+    @JsonSubTypes.Type(value = IntegerField.class, name = Field.FIELD_TYPE_INTEGER),
+    @JsonSubTypes.Type(value = NumberField.class, name = Field.FIELD_TYPE_NUMBER),
+    @JsonSubTypes.Type(value = BooleanField.class, name = Field.FIELD_TYPE_BOOLEAN),
+    @JsonSubTypes.Type(value = ObjectField.class, name = Field.FIELD_TYPE_OBJECT),
+    @JsonSubTypes.Type(value = ArrayField.class, name = Field.FIELD_TYPE_ARRAY),
+    @JsonSubTypes.Type(value = DateField.class, name = Field.FIELD_TYPE_DATE),
+    @JsonSubTypes.Type(value = TimeField.class, name = Field.FIELD_TYPE_TIME),
+    @JsonSubTypes.Type(value = DatetimeField.class, name = Field.FIELD_TYPE_DATETIME),
+    @JsonSubTypes.Type(value = YearField.class, name = Field.FIELD_TYPE_YEAR),
+    @JsonSubTypes.Type(value = YearmonthField.class, name = Field.FIELD_TYPE_YEARMONTH),
+    @JsonSubTypes.Type(value = DurationField.class, name = Field.FIELD_TYPE_DURATION),
+    @JsonSubTypes.Type(value = GeopointField.class, name = Field.FIELD_TYPE_GEOPOINT),
+    @JsonSubTypes.Type(value = GeojsonField.class, name = Field.FIELD_TYPE_GEOJSON),
+    @JsonSubTypes.Type(value = AnyField.class, name = Field.FIELD_TYPE_ANY)
+    }
+)
 public abstract class Field<T> {
     public static final String FIELD_TYPE_STRING = "string";
     public static final String FIELD_TYPE_INTEGER = "integer";
@@ -38,6 +69,24 @@ public abstract class Field<T> {
     public static final String FIELD_TYPE_GEOPOINT = "geopoint";
     public static final String FIELD_TYPE_GEOJSON = "geojson";
     public static final String FIELD_TYPE_ANY = "any";
+    
+    private List<String> wellKnownFieldTypes = Arrays.asList(
+    	FIELD_TYPE_STRING,
+    	FIELD_TYPE_INTEGER,
+		FIELD_TYPE_NUMBER,
+		FIELD_TYPE_BOOLEAN,
+		FIELD_TYPE_OBJECT,
+		FIELD_TYPE_ARRAY,
+		FIELD_TYPE_DATE,
+		FIELD_TYPE_TIME,
+		FIELD_TYPE_DATETIME,
+		FIELD_TYPE_YEAR,
+		FIELD_TYPE_YEARMONTH,
+		FIELD_TYPE_DURATION,
+		FIELD_TYPE_GEOPOINT,
+		FIELD_TYPE_GEOJSON,
+		FIELD_TYPE_ANY
+    );
     
     public static final String FIELD_FORMAT_DEFAULT = "default";
     public static final String FIELD_FORMAT_ARRAY = "array";
@@ -89,12 +138,12 @@ public abstract class Field<T> {
     /**
      * A human readable label or title for the field
      */
-    private String title = "";
+    private String title = null;
 
     /**
      * A description for this field e.g. "The recipient of the funds"
      */
-    private String description = "";
+    private String description = null;
 
     /**
      * A richer, "semantic", description of the "type" of data in a given column MAY be
@@ -140,39 +189,7 @@ public abstract class Field<T> {
     }
 
     public static Field fromJson (String json) {
-        JSONObject fieldDef = new JSONObject(json);
-        String type = fieldDef.has(JSON_KEY_TYPE) ? fieldDef.getString(JSON_KEY_TYPE) : "string";
-        String name = fieldDef.has(JSON_KEY_NAME) ? fieldDef.getString(JSON_KEY_NAME).trim() : null;
-
-        Field field = forType(type, name);
-
-        String format = fieldDef.has(JSON_KEY_FORMAT) ? fieldDef.getString(JSON_KEY_FORMAT) : null;
-        field.format = (!StringUtils.isEmpty(format)) ? format.trim() : FIELD_FORMAT_DEFAULT;
-
-        String title = fieldDef.has(JSON_KEY_TITLE) ? fieldDef.getString(JSON_KEY_TITLE) : null;
-        field.title = (!StringUtils.isEmpty(title)) ? title.trim() : null;
-
-        String description = fieldDef.has(JSON_KEY_DESCRIPTION) ? fieldDef.getString(JSON_KEY_DESCRIPTION) : null;
-        field.description = (!StringUtils.isEmpty(description)) ? description.trim() : null;
-
-        String rdf = fieldDef.has(JSON_KEY_RDFTYPE) ? fieldDef.getString(JSON_KEY_RDFTYPE) : null;
-        try {
-            field.rdfType = (!StringUtils.isEmpty(rdf))
-                    ? new URI(rdf.trim())
-                    : null;
-        } catch (URISyntaxException ex){
-            throw new TableSchemaException(ex);
-        }
-
-        Map constraints = null;
-        if (fieldDef.has(JSON_KEY_CONSTRAINTS))
-            constraints = fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap();
-        if ((null != constraints) && (!constraints.isEmpty())) {
-            field.constraints = fieldDef.has(JSON_KEY_CONSTRAINTS)
-                    ? fieldDef.getJSONObject(JSON_KEY_CONSTRAINTS).toMap()
-                    : null;
-        }
-        return field;
+        return JsonUtil.getInstance().deserialize(json, Field.class);
     }
 
 
@@ -279,13 +296,13 @@ public abstract class Field<T> {
                     violatedConstraints.put(CONSTRAINT_KEY_MIN_LENGTH, minLength);
                 }
                 
-            }else if (value instanceof JSONObject){
-                if(((JSONObject)value).length() < minLength){
+            }else if (value instanceof JsonNode && !((JsonNode)value).isArray()){
+                if(((JsonNode)value).size() < minLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MIN_LENGTH, minLength);
                 }
                  
-            }else if (value instanceof JSONArray){
-                if(((JSONArray)value).length() < minLength){
+            }else if (value instanceof ArrayNode){
+                if(((ArrayNode)value).size() < minLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MIN_LENGTH, minLength);
                 }                
             }
@@ -300,13 +317,13 @@ public abstract class Field<T> {
                     violatedConstraints.put(CONSTRAINT_KEY_MAX_LENGTH, maxLength);
                 }
                 
-            }else if (value instanceof JSONObject){
-                if(((JSONObject)value).length() > maxLength){
+            }else if (value instanceof JsonNode){
+                if(((JsonNode)value).size() > maxLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MAX_LENGTH, maxLength);
                 }
                  
-            }else if (value instanceof JSONArray){
-                if(((JSONArray)value).length() > maxLength){
+            }else if (value instanceof ArrayNode){
+                if(((ArrayNode)value).size() > maxLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MAX_LENGTH, maxLength);
                 }                
             }  
@@ -400,23 +417,12 @@ public abstract class Field<T> {
                     }
                 }
                 
-            }else if(value instanceof JSONObject){
-                List<JSONObject> jsonObjList = (List<JSONObject>)this.constraints.get(CONSTRAINT_KEY_ENUM);
+            }else if(value instanceof JsonNode){
+                List<JsonNode> jsonObjList = (List<JsonNode>)this.constraints.get(CONSTRAINT_KEY_ENUM);
                 
-                Iterator<JSONObject> iter = jsonObjList.iterator();
+                Iterator<JsonNode> iter = jsonObjList.iterator();
                 while(iter.hasNext()){
-                    if(iter.next().similar((JSONObject)value)){
-                        violatesEnumConstraint = false;
-                        break;
-                    }
-                }
-                
-            }else if(value instanceof JSONArray){
-                List<JSONArray> jsonArrList = (List<JSONArray>)this.constraints.get(CONSTRAINT_KEY_ENUM); 
-                
-                Iterator<JSONArray> iter = jsonArrList.iterator();
-                while(iter.hasNext()){
-                    if(iter.next().similar((JSONArray)value)){
+                    if(iter.next().equals((JsonNode)value)){
                         violatesEnumConstraint = false;
                         break;
                     }
@@ -491,34 +497,13 @@ public abstract class Field<T> {
      * Get the JSON representation of the Field.
      * @return String-serialized JSON Object containing the properties of this field
      */
+    @JsonIgnore
     public String getJson(){
-        //FIXME: Maybe we should use JSON serializer like Gson?
-        JSONObject json = new JSONObject();
-
-        if (!StringUtils.isEmpty(name)) {
-            json.put(JSON_KEY_NAME, name);
-        }
-        if (!StringUtils.isEmpty(type)) {
-            json.put(JSON_KEY_TYPE, type);
-        }
-        if (!StringUtils.isEmpty(format)) {
-            json.put(JSON_KEY_FORMAT, format);
-        }
-        if (!StringUtils.isEmpty(title)) {
-            json.put(JSON_KEY_TITLE, title);
-        }
-
-        if (!StringUtils.isEmpty(description)) {
-            json.put(JSON_KEY_DESCRIPTION, description);
-        }
-        if ((null != constraints) && (!constraints.isEmpty()))
-            json.put(JSON_KEY_CONSTRAINTS, this.constraints);
-        
-        return json.toString();
+        return JsonUtil.getInstance().serialize(this);
     }
 
 
-
+    @JsonIgnore
     public String getCastMethodName() {
         return "cast" + (this.type.substring(0, 1).toUpperCase() + this.type.substring(1));
     }
@@ -528,10 +513,12 @@ public abstract class Field<T> {
     }
     
     public String getType(){
-        return this.type;
+    	if(Objects.nonNull(this.type) && !isWellKnownType(this.type)) {
+    		return FIELD_TYPE_ANY;
+    	} else return this.type;
     }
-    
-    public String getFormat(){
+
+	public String getFormat(){
         return this.format;
     }
 
@@ -589,6 +576,11 @@ public abstract class Field<T> {
         }
         return Objects.equals(constraints, other.constraints);
     }
+    
+
+    private boolean isWellKnownType(String typeName) {
+		return wellKnownFieldTypes.contains(typeName);
+	}
 
     @Override
     public boolean equals(Object o) {

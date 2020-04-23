@@ -3,16 +3,16 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
-import org.everit.json.schema.ValidationException;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import java.net.URI;
 import java.time.Year;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class GeopointField extends Field<double[]> {
 
@@ -50,11 +50,11 @@ public class GeopointField extends Field<double[]> {
             }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_ARRAY)){
 
                 // This will throw an exception if the value is not an array.
-                JSONArray jsonArray = new JSONArray(value);
+                ArrayNode jsonArray = JsonUtil.getInstance().createArrayNode(value);
 
-                if (jsonArray.length() == 2){
-                    double lon = jsonArray.getDouble(0);
-                    double lat = jsonArray.getDouble(1);
+                if (jsonArray.size() == 2){
+                    double lon = jsonArray.get(0).asDouble();
+                    double lat = jsonArray.get(1).asDouble();
 
                     // No exception? It's a valid geopoint object.
                     return new double[]{lon, lat};
@@ -66,11 +66,11 @@ public class GeopointField extends Field<double[]> {
             }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_OBJECT)){
 
                 // This will throw an exception if the value is not an object.
-                JSONObject jsonObj = new JSONObject(value);
+                JsonNode jsonObj = JsonUtil.getInstance().createNode(value);
 
-                if (jsonObj.length() == 2 && jsonObj.has("lon") && jsonObj.has("lat")){
-                    double lon = jsonObj.getDouble("lon");
-                    double lat = jsonObj.getDouble("lat");
+                if (jsonObj.size() == 2 && jsonObj.has("lon") && jsonObj.has("lat")){
+                    double lon = jsonObj.get("lon").asDouble();
+                    double lat = jsonObj.get("lat").asDouble();
 
                     // No exception? It's a valid geopoint object.
                     return new double[]{lon, lat};
@@ -118,15 +118,14 @@ public class GeopointField extends Field<double[]> {
     @Override
     public String parseFormat(String value, Map<String, Object> options) {
         try {
-            new JSONObject(value);
-            return FIELD_FORMAT_OBJECT;
-        } catch (JSONException ex) {
-            try {
-                new JSONArray(value);
-                return FIELD_FORMAT_ARRAY;
-            } catch (JSONException ex2) {
-                return FIELD_FORMAT_DEFAULT;
+            JsonNode node = JsonUtil.getInstance().createNode(value);
+            if(node.isArray()) {
+            	return FIELD_FORMAT_ARRAY;
+            } else {
+            	return FIELD_FORMAT_OBJECT;
             }
+        } catch (Exception ex) {
+        	return FIELD_FORMAT_DEFAULT;
         }
     }
 

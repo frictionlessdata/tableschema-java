@@ -1,11 +1,10 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
+import io.frictionlessdata.tableschema.util.JsonUtil;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.*;
 import java.net.URL;
@@ -31,16 +30,12 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
             String content = br.lines().collect(Collectors.joining("\n"));
             this.dataSource = DataSourceFormat.trimBOM(content);
 
-            // ensure that both parsing as JSON array and JSON object data fails. If one succeeds,
+            // ensure that both parsing as json fails. If it succeeds,
             // then the data is not CSV, but JSON -> throw exception
             try {
-                new JSONArray((String)this.dataSource);
-            } catch (JSONException ex) {
-                try {
-                    new JSONObject((String)this.dataSource);
-                } catch (JSONException ex2) {
-                    return;
-                }
+                JsonUtil.getInstance().readValue((String)this.dataSource);
+            } catch (Exception ex) {
+                return;
             }
             throw new IllegalArgumentException("Input seems to be in JSON format");
         }
