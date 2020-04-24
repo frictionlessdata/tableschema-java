@@ -113,7 +113,6 @@ public class TypeInferrer {
             fieldObj.put(Field.JSON_KEY_NAME, header);
             fieldObj.put(Field.JSON_KEY_TITLE, ""); // This will stay blank.
             fieldObj.put(Field.JSON_KEY_DESCRIPTION, ""); // This will stay blank.
-            fieldObj.put(Field.JSON_KEY_CONSTRAINTS, new HashMap<>()); // This will stay blank.
             fieldObj.put(Field.JSON_KEY_FORMAT, ""); // This will bet set post inferral.
             fieldObj.put(Field.JSON_KEY_TYPE, ""); // This will bet set post inferral.
 
