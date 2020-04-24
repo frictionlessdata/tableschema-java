@@ -468,25 +468,10 @@ public abstract class Field<T> {
     }
 
     public static Field forType(String type, String name) {
-        Field field = null;
-        Class<?> clazz = null;
-        try {
-            String className =
-                    "io.frictionlessdata.tableschema.field."
-                            + type.substring(0, 1).toUpperCase() + type.substring(1)
-                            + "Field";
-            clazz = Class.forName(className);
-            field = (Field)clazz.newInstance();
-            field.name = name;
-            field.type = type;
-        } catch (InstantiationException | IllegalAccessException ex) {
-            throw new RuntimeException(ex);
-            // didn't find a field definition, just return as
-            // AnyField
-        } catch (ClassNotFoundException ex) {
-            field = new AnyField(name);
-        }
-        return field;
+        Map<String, Object> fieldMap = new HashMap<>();
+        fieldMap.put(JSON_KEY_TYPE, type);
+        fieldMap.put(JSON_KEY_NAME, name);
+        return JsonUtil.getInstance().convertValue(fieldMap, Field.class);
     }
 
     /**
