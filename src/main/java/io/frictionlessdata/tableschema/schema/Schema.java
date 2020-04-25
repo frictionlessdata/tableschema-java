@@ -292,36 +292,6 @@ public class Schema {
     @JsonIgnore
     public String getJson(){
     	return JsonUtil.getInstance().serialize(this);
-    	/*
-        //FIXME: Maybe we should use JSON serializer like Gson?
-        JSONObject schemaJson = new JSONObject();
-        
-        // Fields
-        if(this.fields != null && this.fields.size() > 0){
-            schemaJson.put(JSON_KEY_FIELDS, new JSONArray());
-            this.fields.forEach((field) -> {
-                if (null != field) {
-                    schemaJson.getJSONArray(JSON_KEY_FIELDS).put(new JSONObject(field.getJson()));
-                }
-            });
-        }
-        
-        // Primary Key
-        if(this.primaryKey != null){
-            schemaJson.put(JSON_KEY_PRIMARY_KEY, this.primaryKey);
-        }
-        
-        //Foreign Keys
-        if(this.foreignKeys != null && this.foreignKeys.size() > 0){
-            schemaJson.put(JSON_KEY_FOREIGN_KEYS, new JSONArray());
-
-            this.foreignKeys.forEach((fk) -> {
-                schemaJson.getJSONArray(JSON_KEY_FOREIGN_KEYS).put(new JSONObject(fk.getJson()));
-            });            
-        }
-        
-        return schemaJson.toString(JSON_INDENT_FACTOR);
-        */
     }
 
     public Object[] castRow(String[] row) throws InvalidCastException{
