@@ -6,12 +6,17 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
-import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.JsonParsingException;
+import io.frictionlessdata.tableschema.exception.JsonSerializingException;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
 
 public final class JsonUtil {
@@ -20,8 +25,10 @@ public final class JsonUtil {
 	private ObjectMapper mapper;
 	
 	private JsonUtil() {
-		this.mapper = new ObjectMapper();
-		mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+		this.mapper = JsonMapper.builder()
+			.enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS)
+			.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES)
+			.build();
 	}
 	
 	public static JsonUtil getInstance() {
@@ -31,15 +38,19 @@ public final class JsonUtil {
 		return instance;
 	}
 	
-	public JsonNode createNode() {
+	public ObjectNode createNode() {
 		return mapper.createObjectNode();
+	}
+	
+	public TextNode createTextNode(String value) {
+		return new TextNode(value);
 	}
 	
 	public JsonNode createNode(String content) {
 		try {
 			return mapper.readTree(content);
 		} catch (JsonProcessingException e) {
-			throw new InvalidCastException(e);
+			throw new JsonSerializingException(e);
 		}
 	}
 	
@@ -47,15 +58,19 @@ public final class JsonUtil {
 		try {
 			return mapper.readTree(mapper.writeValueAsString(content));
 		} catch (JsonProcessingException e) {
-			throw new InvalidCastException(e);
+			throw new JsonSerializingException(e);
 		}
+	}
+	
+	public ArrayNode createArrayNode() {
+		return mapper.createArrayNode();
 	}
 	
 	public ArrayNode createArrayNode(String content) {
 		try {
 			return (ArrayNode)mapper.readTree(content);
 		} catch (JsonProcessingException e) {
-			throw new TableSchemaException(e);
+			throw new JsonParsingException(e);
 		}
 	}
 	
@@ -79,7 +94,7 @@ public final class JsonUtil {
 		try {
 			return mapper.readValue(sanitize(value), clazz);
 		} catch (JsonProcessingException e) {
-			throw new InvalidCastException(e);
+			throw new JsonParsingException(e);
 		}
 	}
 	
@@ -87,7 +102,7 @@ public final class JsonUtil {
 		try {
 			return mapper.readValue(sanitize(value), typeRef);
 		} catch (JsonProcessingException e) {
-			throw new InvalidCastException(e);
+			throw new JsonParsingException(e);
 		}
 	}
 	
@@ -95,7 +110,7 @@ public final class JsonUtil {
 		try {
 			return mapper.readTree(sanitize(value));
 		} catch (JsonProcessingException e) {
-			throw new TableSchemaException(e);
+			throw new JsonParsingException(e);
 		}
 	}
 	
@@ -103,7 +118,7 @@ public final class JsonUtil {
 		try {
 			return mapper.readTree(value);
 		} catch (IOException e) {
-			throw new TableSchemaException(e);
+			throw new JsonParsingException(e);
 		}
 	}
 	
