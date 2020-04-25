@@ -37,7 +37,11 @@ public class JsonSchema {
 	}
 	
 	public Set<ValidationMessage> validate(String json) {
-		Set<ValidationMessage> errors = jsonSchema.validate(JsonUtil.getInstance().readValue(json));
+		return validate(JsonUtil.getInstance().readValue(json));
+	}
+	
+	public Set<ValidationMessage> validate(JsonNode json) {
+		Set<ValidationMessage> errors = jsonSchema.validate(json);
 		if (errors.isEmpty()) {
 			return Collections.EMPTY_SET;
 		} else {
