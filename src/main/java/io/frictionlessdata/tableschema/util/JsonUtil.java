@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -17,7 +18,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 import io.frictionlessdata.tableschema.exception.JsonParsingException;
 import io.frictionlessdata.tableschema.exception.JsonSerializingException;
-import io.frictionlessdata.tableschema.exception.TableSchemaException;
 
 public final class JsonUtil {
 
@@ -50,13 +50,18 @@ public final class JsonUtil {
 		try {
 			return mapper.readTree(content);
 		} catch (JsonProcessingException e) {
-			throw new JsonSerializingException(e);
+			throw new JsonParsingException(e);
 		}
 	}
 	
 	public JsonNode createNode(Object content) {
 		try {
-			return mapper.readTree(mapper.writeValueAsString(content));
+			String json = mapper.writeValueAsString(content);
+			try {
+				return mapper.readTree(json);
+			} catch (JsonMappingException e) {
+				throw new JsonParsingException(e);
+			} 
 		} catch (JsonProcessingException e) {
 			throw new JsonSerializingException(e);
 		}
@@ -75,18 +80,14 @@ public final class JsonUtil {
 	}
 	
 	public ArrayNode createArrayNode(Object content) {
-		try {
-			return (ArrayNode)mapper.readTree(mapper.writeValueAsString(content));
-		} catch (JsonProcessingException e) {
-			throw new TableSchemaException(e);
-		}
+		return (ArrayNode) createNode(content);
 	}
 	
 	public String serialize(Object value) {
 		try {
 			return mapper.writeValueAsString(value);
 		} catch (JsonProcessingException e) {
-			throw new TableSchemaException(e);
+			throw new JsonSerializingException(e);
 		}
 	}
 	
