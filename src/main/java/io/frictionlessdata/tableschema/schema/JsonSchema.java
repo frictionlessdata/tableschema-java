@@ -4,6 +4,9 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion.VersionFlag;
@@ -13,6 +16,8 @@ import io.frictionlessdata.tableschema.exception.ValidationException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
 public class JsonSchema {
+	
+	private static final Logger log = LoggerFactory.getLogger(JsonSchema.class);
 	
 	private final boolean strictValidation;
 	private final JsonSchemaFactory factory;
@@ -45,9 +50,12 @@ public class JsonSchema {
 		if (errors.isEmpty()) {
 			return Collections.EMPTY_SET;
 		} else {
+			String msg = String.format("validation failed: %s", errors);
 			if (this.strictValidation) {
+				log.warn(msg);
 				throw new ValidationException(this, errors);
 			} else {
+				log.info(msg);
 				return errors;
 			}
 		}
