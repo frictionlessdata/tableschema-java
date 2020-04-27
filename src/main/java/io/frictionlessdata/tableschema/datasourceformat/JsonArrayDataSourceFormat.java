@@ -78,8 +78,13 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
             String[] sortedRec = new String[recordLength];
             for (int i = 0; i < recordLength; i++) {
                 String key = sortedHeaders[i];
-                if (data.has(key))
-                    sortedRec[i] = data.get(key).toString();
+                if (data.has(key)) {
+                	if (data.get(key).isTextual()) {
+                		sortedRec[i] = data.get(key).asText();
+                	} else {
+                        sortedRec[i] = data.get(key).toString();
+                    }
+                }
             }
             csvPrinter.printRecord(sortedRec);
         } catch (Exception ex) {
