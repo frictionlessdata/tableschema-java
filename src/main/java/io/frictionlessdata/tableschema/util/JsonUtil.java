@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -28,6 +29,7 @@ public final class JsonUtil {
 		this.mapper = JsonMapper.builder()
 			.enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS)
 			.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES)
+			.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
 			.build();
 	}
 	
