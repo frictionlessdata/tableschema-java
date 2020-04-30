@@ -161,8 +161,6 @@ public interface DataSourceFormat {
             try (BufferedReader rdr = new BufferedReader(fr)) {
                 content = rdr.lines().collect(Collectors.joining("\n"));
             }
-        } catch (IOException ex) {
-            throw ex;
         }
 
         return createDataSourceFormat(content);
