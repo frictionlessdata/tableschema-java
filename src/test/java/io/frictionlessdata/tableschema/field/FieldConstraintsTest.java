@@ -3,15 +3,13 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
-import java.time.Duration;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,7 +19,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class FieldConstraintsTest {
-    //TODO test needs to be switched to java.time* API, then weg can get rid of Joda-Time completely.
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
@@ -222,9 +219,9 @@ public class FieldConstraintsTest {
         final String DATE_STRING_MINIMUM = "2000-01-15";
         final String DATE_STRING_MAXIMUM = "2019-01-15";
 
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-        DateTime dateMin = formatter.parseDateTime(DATE_STRING_MINIMUM);
-        DateTime dateMax = formatter.parseDateTime(DATE_STRING_MAXIMUM);
+        DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate dateMin = LocalDate.parse(DATE_STRING_MINIMUM, formatter);
+        LocalDate dateMax = LocalDate.parse(DATE_STRING_MAXIMUM, formatter);
 
         Map<String, Object> constraints = new HashMap();
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, dateMin);
@@ -232,39 +229,39 @@ public class FieldConstraintsTest {
 
         DateField field = new DateField("test",  null, null, null, null, constraints, null);
 
-        DateTime datetime2017 = formatter.parseDateTime("2017-01-15");
+        LocalDate datetime2017 = LocalDate.parse("2017-01-15", formatter);
         violatedConstraints = field.checkConstraintViolations(datetime2017);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        DateTime dateEqualMin = formatter.parseDateTime(DATE_STRING_MINIMUM);
+        LocalDate dateEqualMin = LocalDate.parse(DATE_STRING_MINIMUM, formatter);
         violatedConstraints = field.checkConstraintViolations(dateEqualMin);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        DateTime dateEqualMax = formatter.parseDateTime(DATE_STRING_MAXIMUM);
+        LocalDate dateEqualMax = LocalDate.parse(DATE_STRING_MAXIMUM, formatter);
         violatedConstraints = field.checkConstraintViolations(dateEqualMax);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        DateTime dateLesserThanMinBy1Day = formatter.parseDateTime("2000-01-14");
+        LocalDate dateLesserThanMinBy1Day = LocalDate.parse("2000-01-14", formatter);
         violatedConstraints = field.checkConstraintViolations(dateLesserThanMinBy1Day);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
 
-        DateTime dateLesserThanMinBy1Month = formatter.parseDateTime("1999-12-15");
+        LocalDate dateLesserThanMinBy1Month = LocalDate.parse("1999-12-15", formatter);
         violatedConstraints = field.checkConstraintViolations(dateLesserThanMinBy1Month);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
 
-        DateTime dateLesserThanMinBy1Year = formatter.parseDateTime("1999-01-15");
+        LocalDate dateLesserThanMinBy1Year = LocalDate.parse("1999-01-15", formatter);
         violatedConstraints = field.checkConstraintViolations(dateLesserThanMinBy1Year);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
 
-        DateTime dateGreaterThanMaxBy1Day = formatter.parseDateTime("2019-01-16");
+        LocalDate dateGreaterThanMaxBy1Day = LocalDate.parse("2019-01-16", formatter);
         violatedConstraints = field.checkConstraintViolations(dateGreaterThanMaxBy1Day);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
 
-        DateTime dateGreaterThanMaxBy1Month = formatter.parseDateTime("2019-02-15");
+        LocalDate dateGreaterThanMaxBy1Month = LocalDate.parse("2019-02-15", formatter);
         violatedConstraints = field.checkConstraintViolations(dateGreaterThanMaxBy1Month);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
 
-        DateTime dateGreaterThanMaxBy1Year = formatter.parseDateTime("2020-01-15");
+        LocalDate dateGreaterThanMaxBy1Year = LocalDate.parse("2020-01-15", formatter);
         violatedConstraints = field.checkConstraintViolations(dateGreaterThanMaxBy1Year);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
     }
@@ -277,9 +274,9 @@ public class FieldConstraintsTest {
         final String TIME_STRING_MINIMUM = "11:05:12";
         final String TIME_STRING_MAXIMUM = "14:22:33";
 
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("HH:mm:ss");
-        DateTime timeMin = formatter.parseDateTime(TIME_STRING_MINIMUM);
-        DateTime timeMax = formatter.parseDateTime(TIME_STRING_MAXIMUM);
+        DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss");
+        LocalTime timeMin = LocalTime.parse(TIME_STRING_MINIMUM, formatter);
+        LocalTime timeMax = LocalTime.parse(TIME_STRING_MAXIMUM, formatter);
 
         Map<String, Object> constraints = new HashMap();
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, timeMin);
@@ -287,39 +284,39 @@ public class FieldConstraintsTest {
 
         TimeField field = new TimeField("test", null, null, null, null, constraints, null);
 
-        DateTime time = formatter.parseDateTime("13:00:05");
+        LocalTime time = LocalTime.parse("13:00:05", formatter);
         violatedConstraints = field.checkConstraintViolations(time);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        DateTime timeEqualMin = formatter.parseDateTime(TIME_STRING_MINIMUM);
+        LocalTime timeEqualMin = LocalTime.parse(TIME_STRING_MINIMUM, formatter);
         violatedConstraints = field.checkConstraintViolations(timeEqualMin);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        DateTime timeEqualMax = formatter.parseDateTime(TIME_STRING_MAXIMUM);
+        LocalTime timeEqualMax = LocalTime.parse(TIME_STRING_MAXIMUM, formatter);
         violatedConstraints = field.checkConstraintViolations(timeEqualMax);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        DateTime timeLesserThanMinBy1Sec = formatter.parseDateTime("11:05:11");
+        LocalTime timeLesserThanMinBy1Sec = LocalTime.parse("11:05:11", formatter);
         violatedConstraints = field.checkConstraintViolations(timeLesserThanMinBy1Sec);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
 
-        DateTime timeLesserThanMinBy1Min = formatter.parseDateTime("11:04:12");
+        LocalTime timeLesserThanMinBy1Min = LocalTime.parse("11:04:12", formatter);
         violatedConstraints = field.checkConstraintViolations(timeLesserThanMinBy1Min);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
 
-        DateTime timeLesserThanMinBy1Hour = formatter.parseDateTime("10:05:12");
+        LocalTime timeLesserThanMinBy1Hour = LocalTime.parse("10:05:12", formatter);
         violatedConstraints = field.checkConstraintViolations(timeLesserThanMinBy1Hour);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
 
-        DateTime timeGreaterThanMaxBy1Sec = formatter.parseDateTime("14:22:34");
+        LocalTime timeGreaterThanMaxBy1Sec = LocalTime.parse("14:22:34", formatter);
         violatedConstraints = field.checkConstraintViolations(timeGreaterThanMaxBy1Sec);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
 
-        DateTime timeGreaterThanMaxBy1Min = formatter.parseDateTime("14:23:33");
+        LocalTime timeGreaterThanMaxBy1Min = LocalTime.parse("14:23:33", formatter);
         violatedConstraints = field.checkConstraintViolations(timeGreaterThanMaxBy1Min);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
 
-        DateTime timeGreaterThanMaxBy1Hour = formatter.parseDateTime("15:22:33");
+        LocalTime timeGreaterThanMaxBy1Hour = LocalTime.parse("15:22:33", formatter);
         violatedConstraints = field.checkConstraintViolations(timeGreaterThanMaxBy1Hour);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
 
@@ -329,12 +326,12 @@ public class FieldConstraintsTest {
     public void testMinimumAndMaximumDatetime(){
         Map<String, Object> violatedConstraints = null;
 
-        final String DATETIME_STRING_MINIMUM = "2000-01-15T13:44:33.000Z";
-        final String DATETIME_STRING_MAXIMUM = "2019-01-15T13:44:33.000Z";
+        final String DATETIME_STRING_MINIMUM = "2000-01-15T13:44:33.000+0000";
+        final String DATETIME_STRING_MAXIMUM = "2019-01-15T13:44:33.000+0000";
 
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        DateTime datetimeMin = formatter.parseDateTime(DATETIME_STRING_MINIMUM);
-        DateTime datetimeMax = formatter.parseDateTime(DATETIME_STRING_MAXIMUM);
+        DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        ZonedDateTime datetimeMin = ZonedDateTime.parse(DATETIME_STRING_MINIMUM, formatter);
+        ZonedDateTime datetimeMax = ZonedDateTime.parse(DATETIME_STRING_MAXIMUM, formatter);
 
         Map<String, Object> constraints = new HashMap();
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, datetimeMin);
@@ -342,23 +339,23 @@ public class FieldConstraintsTest {
 
         Field field = new DatetimeField("test", null, null, null, null, constraints, null);
 
-        DateTime datetime2017 = formatter.parseDateTime("2017-01-15T13:44:33.000Z");
+        ZonedDateTime datetime2017 = ZonedDateTime.parse("2017-01-15T13:44:33.000+0000", formatter);
         violatedConstraints = field.checkConstraintViolations(datetime2017);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        DateTime datetimeEqualMin = formatter.parseDateTime(DATETIME_STRING_MINIMUM);
+        ZonedDateTime datetimeEqualMin = ZonedDateTime.parse(DATETIME_STRING_MINIMUM, formatter);
         violatedConstraints = field.checkConstraintViolations(datetimeEqualMin);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        DateTime datetimeEqualMax = formatter.parseDateTime(DATETIME_STRING_MAXIMUM);
+        ZonedDateTime datetimeEqualMax = ZonedDateTime.parse(DATETIME_STRING_MAXIMUM, formatter);
         violatedConstraints = field.checkConstraintViolations(datetimeEqualMax);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        DateTime datetimeLesserThanMinBy1Sec = formatter.parseDateTime("2000-01-15T13:44:32.000Z");
+        ZonedDateTime datetimeLesserThanMinBy1Sec = ZonedDateTime.parse("2000-01-15T13:44:32.000+0000", formatter);
         violatedConstraints = field.checkConstraintViolations(datetimeLesserThanMinBy1Sec);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
 
-        DateTime datetimeGreaterThanMaxBy1Day = formatter.parseDateTime("2019-01-16T13:44:33.000Z");
+        ZonedDateTime datetimeGreaterThanMaxBy1Day = ZonedDateTime.parse("2019-01-16T13:44:33.000+0000", formatter);
         violatedConstraints = field.checkConstraintViolations(datetimeGreaterThanMaxBy1Day);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
     }
@@ -394,9 +391,8 @@ public class FieldConstraintsTest {
         final String YEARMONTH_STRING_MINIMUM = "2000-02";
         final String YEARMONTH_STRING_MAXIMUM = "2009-02";
 
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM");
-        DateTime yearmonthMin = formatter.parseDateTime(YEARMONTH_STRING_MINIMUM);
-        DateTime yearmonthMax = formatter.parseDateTime(YEARMONTH_STRING_MAXIMUM);
+        YearMonth yearmonthMin = YearMonth.parse(YEARMONTH_STRING_MINIMUM);
+        YearMonth yearmonthMax = YearMonth.parse(YEARMONTH_STRING_MAXIMUM);
 
         Map<String, Object> constraints = new HashMap();
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, yearmonthMin);
@@ -404,32 +400,32 @@ public class FieldConstraintsTest {
 
         Field field = new YearmonthField("test", null, null, null, null, constraints, null);
 
-        DateTime yearmonth = formatter.parseDateTime("2005-05");
+        YearMonth yearmonth = YearMonth.parse("2005-05");
         violatedConstraints = field.checkConstraintViolations(yearmonth);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        DateTime yearmonthEqualMin = formatter.parseDateTime(YEARMONTH_STRING_MINIMUM);
+        YearMonth yearmonthEqualMin = YearMonth.parse(YEARMONTH_STRING_MINIMUM);
         violatedConstraints = field.checkConstraintViolations(yearmonthEqualMin);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        DateTime yearmonthEqualMax = formatter.parseDateTime(YEARMONTH_STRING_MAXIMUM);
+        YearMonth yearmonthEqualMax = YearMonth.parse(YEARMONTH_STRING_MAXIMUM);
         violatedConstraints = field.checkConstraintViolations(yearmonthEqualMax);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        DateTime yearmonthLesserThanMinBy1Month = formatter.parseDateTime("2000-01");
+        YearMonth yearmonthLesserThanMinBy1Month = YearMonth.parse("2000-01");
         violatedConstraints = field.checkConstraintViolations(yearmonthLesserThanMinBy1Month);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
 
-        DateTime yearmonthLesserThanMinBy1Year = formatter.parseDateTime("1999-02");
+        YearMonth yearmonthLesserThanMinBy1Year = YearMonth.parse("1999-02");
         violatedConstraints = field.checkConstraintViolations(yearmonthLesserThanMinBy1Year);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
 
-        DateTime datetimeGreaterThanMaxBy1Month = formatter.parseDateTime("2009-03");
-        violatedConstraints = field.checkConstraintViolations(datetimeGreaterThanMaxBy1Month);
+        YearMonth YearMonthGreaterThanMaxBy1Month = YearMonth.parse("2009-03");
+        violatedConstraints = field.checkConstraintViolations(YearMonthGreaterThanMaxBy1Month);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
 
-        DateTime datetimeGreaterThanMaxBy1Year = formatter.parseDateTime("2010-02");
-        violatedConstraints = field.checkConstraintViolations(datetimeGreaterThanMaxBy1Year);
+        YearMonth YearMonthGreaterThanMaxBy1Year = YearMonth.parse("2010-02");
+        violatedConstraints = field.checkConstraintViolations(YearMonthGreaterThanMaxBy1Year);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
 
     }
@@ -638,14 +634,14 @@ public class FieldConstraintsTest {
         Map<String, Object> violatedConstraints = null;
 
         Map<String, Object> constraints = new HashMap();
-        List<DateTime> enumDatetimes = new ArrayList();
+        List<ZonedDateTime> enumDatetimes = new ArrayList();
 
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        ZonedDateTime datetime1 = ZonedDateTime.parse("2000-01-15T13:44:33.000+0000", formatter);
 
-        DateTime datetime1 = formatter.parseDateTime("2000-01-15T13:44:33.000Z");
         enumDatetimes.add(datetime1);
 
-        DateTime datetime2 = formatter.parseDateTime("2019-01-15T13:44:33.000Z");
+        ZonedDateTime datetime2 = ZonedDateTime.parse("2019-01-15T13:44:33.000+0000", formatter);
         enumDatetimes.add(datetime2);
 
         constraints.put(Field.CONSTRAINT_KEY_ENUM, enumDatetimes);
@@ -657,7 +653,7 @@ public class FieldConstraintsTest {
         violatedConstraints = field.checkConstraintViolations(datetime2);
         Assert.assertTrue(violatedConstraints.isEmpty());
 
-        DateTime datetime3 = formatter.parseDateTime("2003-01-15T13:44:33.000Z");
+        ZonedDateTime datetime3 = ZonedDateTime.parse("2003-01-15T13:44:33.000+0000", formatter);
         violatedConstraints = field.checkConstraintViolations(datetime3);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_ENUM));
     }

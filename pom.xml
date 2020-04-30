@@ -23,7 +23,6 @@
         <apache-commons-lang3.version>3.6</apache-commons-lang3.version>
         <apache-commons-csv.version>1.5</apache-commons-csv.version>
         <jackson.version>2.10.3</jackson.version>
-        <joda-time.version>2.9.9</joda-time.version>
         <junit.version>5.4.2</junit.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
@@ -274,12 +273,6 @@
         	<groupId>com.networknt</groupId>
         	<artifactId>json-schema-validator</artifactId>
         	<version>${networknt-validator-version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
-		<dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>${joda-time.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
         <dependency>
