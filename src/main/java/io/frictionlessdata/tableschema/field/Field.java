@@ -1,25 +1,17 @@
 package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.exception.ConstraintsException;
-import io.frictionlessdata.tableschema.exception.InvalidCastException;
-import io.frictionlessdata.tableschema.exception.TableSchemaException;
-import io.frictionlessdata.tableschema.util.JsonUtil;
-
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import io.frictionlessdata.tableschema.exception.ConstraintsException;
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.util.JsonUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -341,9 +333,9 @@ public abstract class Field<T> {
                     violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minInt);
                 }
                 
-            }else if(value instanceof DateTime){
-                DateTime minDateTime = (DateTime)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
-                if(((DateTime)value).isBefore(minDateTime)){
+            }else if(value instanceof LocalDate){
+                LocalDate minDateTime = (LocalDate)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
+                if(((LocalDate)value).isBefore(minDateTime)){
                     violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minDateTime);
                 }
                 
@@ -364,10 +356,10 @@ public abstract class Field<T> {
                     violatedConstraints.put(CONSTRAINT_KEY_MAXIMUM, maxInt);
                 }
                 
-            }else if(value instanceof DateTime){
-                DateTime maxDateTime = (DateTime)this.constraints.get(CONSTRAINT_KEY_MAXIMUM);
+            }else if(value instanceof LocalDate){
+                LocalDate maxDateTime = (LocalDate)this.constraints.get(CONSTRAINT_KEY_MAXIMUM);
                 
-                if(((DateTime)value).isAfter(maxDateTime)){
+                if(((LocalDate)value).isAfter(maxDateTime)){
                     violatedConstraints.put(CONSTRAINT_KEY_MAXIMUM, maxDateTime);
                 }
                 
@@ -435,12 +427,12 @@ public abstract class Field<T> {
                     }
                 }
                 
-            }else if(value instanceof DateTime){
-                List<DateTime> dateTimeList = (List<DateTime>)this.constraints.get(CONSTRAINT_KEY_ENUM);
+            }else if(value instanceof LocalDate){
+                List<LocalDate> dateTimeList = (List<LocalDate>)this.constraints.get(CONSTRAINT_KEY_ENUM);
                 
-                Iterator<DateTime> iter = dateTimeList.iterator();
+                Iterator<LocalDate> iter = dateTimeList.iterator();
                 while(iter.hasNext()){
-                    if(iter.next().compareTo((DateTime)value) == 0){
+                    if(iter.next().compareTo((LocalDate)value) == 0){
                         violatesEnumConstraint = false;
                         break;
                     }

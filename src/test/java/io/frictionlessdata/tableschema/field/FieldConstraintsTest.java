@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class FieldConstraintsTest {
-
+    //TODO test needs to be switched to java.time* API, then weg can get rid of Joda-Time completely.
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
