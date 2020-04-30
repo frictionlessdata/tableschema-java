@@ -209,7 +209,7 @@
 		    <artifactId>jackson-databind</artifactId>
 		    <version>${jackson.version}</version>
 		</dependency>
-        
+
         <!-- https://mvnrepository.com/artifact/org.geotools/gt-opengis
         <dependency>
             <groupId>org.geotools</groupId>
