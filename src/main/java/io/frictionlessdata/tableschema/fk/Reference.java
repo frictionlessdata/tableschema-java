@@ -1,10 +1,18 @@
 package io.frictionlessdata.tableschema.fk;
 
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
+import io.frictionlessdata.tableschema.util.JsonUtil;
+
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 /**
  *
@@ -50,10 +58,10 @@ public class Reference {
     }
     
     public Reference(String json, boolean strict) throws ForeignKeyException{
-        JSONObject refJsonObject = new JSONObject(json);
+        JsonNode refJsonObject = JsonUtil.getInstance().createNode(json);
         if(refJsonObject.has(JSON_KEY_DATAPACKAGE)){
             try{
-                this.datapackage = new URL(refJsonObject.getString(JSON_KEY_DATAPACKAGE));
+                this.datapackage = new URL(refJsonObject.get(JSON_KEY_DATAPACKAGE).asText());
                 
             }catch(MalformedURLException mue){
                 // leave datapackage set to null;
@@ -62,11 +70,15 @@ public class Reference {
         }
         
         if(refJsonObject.has(JSON_KEY_RESOURCE)){
-            this.resource = refJsonObject.getString(JSON_KEY_RESOURCE);
+            this.resource = refJsonObject.get(JSON_KEY_RESOURCE).asText();
         }
         
         if(refJsonObject.has(JSON_KEY_FIELDS)){
-            this.fields = refJsonObject.get(JSON_KEY_FIELDS);   
+        	if(refJsonObject.get(JSON_KEY_FIELDS).isArray()) {
+        		this.fields = refJsonObject.get(JSON_KEY_FIELDS);
+        	} else {
+        		this.fields = refJsonObject.get(JSON_KEY_FIELDS).asText();
+        	}
         }
         
         if(strict){
@@ -98,27 +110,13 @@ public class Reference {
         if(this.resource == null || this.fields == null){
             throw new ForeignKeyException("A foreign key's reference must have the fields and resource properties.");
             
-        }else if(!(this.fields instanceof String) && !(this.fields instanceof JSONArray)){
+        }else if(!(this.fields instanceof String) && !(ArrayNode.class.isAssignableFrom(this.fields.getClass()))){
             throw new ForeignKeyException("The foreign key's reference fields property must be a string or an array.");
         }
     }
     
+    @JsonIgnore
     public String getJson(){
-        //FIXME: Maybe we should use JSON serializer like Gson?
-
-        JSONObject json = new JSONObject();
-        if(this.datapackage != null){
-            json.put(JSON_KEY_DATAPACKAGE, this.datapackage.toString());
-        }
-        
-        if(this.resource != null){
-            json.put(JSON_KEY_RESOURCE, this.resource);
-        }
-        
-        if(this.fields != null){
-            json.put(JSON_KEY_FIELDS, this.fields);
-        }
-
-        return json.toString();
+        return JsonUtil.getInstance().serialize(this);
     }
 }

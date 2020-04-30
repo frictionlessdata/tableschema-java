@@ -1,15 +1,16 @@
 package io.frictionlessdata.tableschema.iterator;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.util.concurrent.AtomicDouble;
 import io.frictionlessdata.tableschema.field.ObjectField;
 import io.frictionlessdata.tableschema.schema.BeanSchema;
+import io.frictionlessdata.tableschema.util.JsonUtil;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import io.frictionlessdata.tableschema.field.Field;
-import org.json.JSONObject;
 import org.locationtech.jts.geom.Coordinate;
 
 import java.math.BigDecimal;
@@ -57,10 +58,12 @@ public class BeanIterator<T> extends TableIterator<T> {
 
         try {
             retVal = type.newInstance();
-
             for (int i = 0; i < row.length; i++) {
                 String fieldName = headers[i];
                 Field field = schema.getField(fieldName);
+                if (null == field) {
+                    continue;
+                }
                 AnnotatedField aF = ((BeanSchema) schema).getAnnotatedField(fieldName);
                 // we may have a field that can have different formats
                 // but the Schema doesn't know about the true format
@@ -71,6 +74,8 @@ public class BeanIterator<T> extends TableIterator<T> {
                     field.setFormat(fieldFormat);
                 }
                 Object val = field.castValue(row[i], true, fieldOptions);
+                if (null == val)
+                    continue;
                 Class annotatedFieldClass = aF.getRawType();
                 aF.fixAccess(true);
                 if (Number.class.isAssignableFrom(annotatedFieldClass)) {
@@ -92,10 +97,11 @@ public class BeanIterator<T> extends TableIterator<T> {
                     Coordinate coordinate = new Coordinate(arr[0], arr[1]);
                     aF.setValue(retVal, coordinate);
                 } else if (field instanceof ObjectField){
-                    if (annotatedFieldClass.equals(JSONObject.class)) {
-                        aF.setValue(retVal, new JSONObject((String)val));
+                    if (annotatedFieldClass.equals(JsonNode.class)) {
+                        aF.setValue(retVal, JsonUtil.getInstance().readValue(val.toString()));
                     } else {
-                        aF.setValue(retVal, val);
+                    	// this conversion method may also be used for the other field types
+                        aF.setValue(retVal, JsonUtil.getInstance().convertValue(val, annotatedFieldClass));
                     }
                 } else {
                     aF.setValue(retVal, val);

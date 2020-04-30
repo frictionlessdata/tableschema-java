@@ -3,7 +3,6 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
-import org.json.JSONObject;
 
 import java.net.URI;
 import java.time.Duration;

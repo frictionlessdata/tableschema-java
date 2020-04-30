@@ -15,10 +15,9 @@ import io.frictionlessdata.tableschema.iterator.BeanIterator;
 import io.frictionlessdata.tableschema.iterator.SimpleTableIterator;
 import io.frictionlessdata.tableschema.iterator.TableIterator;
 import io.frictionlessdata.tableschema.schema.Schema;
+import io.frictionlessdata.tableschema.util.JsonUtil;
 import io.frictionlessdata.tableschema.util.TableSchemaUtil;
 import org.apache.commons.csv.CSVFormat;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.net.URL;
 import java.util.*;
@@ -278,20 +277,20 @@ public class Table{
     }
     public String asJson() {
         try {
-            JSONArray arr = new JSONArray();
+            List<Map<String, Object>> arr = new ArrayList<>();
             List<Object[]> records = read();
             Schema schema = (null != this.schema) ? this.schema : this.inferSchema();
             for (Object[] rec : records) {
-                JSONObject obj = new JSONObject();
+                Map<String, Object> obj = new HashMap<>();
                 int i = 0;
                 for (Field field : schema.getFields()) {
                     Object s = rec[i];
                     obj.put(field.getName(), field.formatValueForJson(s));
                     i++;
                 }
-                arr.put(obj);
+                arr.add(obj);
             }
-            return arr.toString();
+            return JsonUtil.getInstance().serialize(arr);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

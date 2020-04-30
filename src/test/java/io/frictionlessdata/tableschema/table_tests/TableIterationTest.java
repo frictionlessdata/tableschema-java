@@ -139,7 +139,7 @@ public class TableIterationTest {
             Object[] row = iter.next();
 
             for(int i=0; i<row.length; i++){
-                Assert.assertEquals(expectedTypes[i], row[i].getClass());
+                Assert.assertTrue(expectedTypes[i].isAssignableFrom(row[i].getClass()));
             }
         }
     }

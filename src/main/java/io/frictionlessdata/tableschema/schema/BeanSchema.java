@@ -3,6 +3,7 @@ package io.frictionlessdata.tableschema.schema;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -11,7 +12,6 @@ import com.google.common.util.concurrent.AtomicDouble;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import io.frictionlessdata.tableschema.field.*;
 import org.geotools.geometry.DirectPosition2D;
-import org.json.JSONObject;
 import org.locationtech.jts.geom.Coordinate;
 
 import java.math.BigDecimal;
@@ -48,8 +48,14 @@ public class BeanSchema extends Schema {
             String name = next.getName();
             CsvSchema.ColumnType type = next.getType();
             Field field = null;
-            java.lang.reflect.Field declaredField = beanClass.getDeclaredField(fieldNames.get(name));
-            Class declaredClass = declaredField.getType();
+            Class declaredClass = null;
+            String fieldMethodName = fieldNames.get(name);
+            try {
+                java.lang.reflect.Field declaredField = beanClass.getDeclaredField(fieldMethodName);
+                declaredClass = declaredField.getType();
+            } catch (NoSuchFieldException ex) {
+                continue;
+            }
             switch (type) {
                 case ARRAY:
                     field = new ArrayField(name);
@@ -88,10 +94,12 @@ public class BeanSchema extends Schema {
                         else if ((declaredClass.equals(Coordinate.class))
                                 || (declaredClass.equals(DirectPosition2D.class)))
                             field = new GeopointField(name);
-                        else if (declaredClass.equals(JSONObject.class))
+                        else if (declaredClass.equals(JsonNode.class))
                             field = new ObjectField(name);
                         else if (declaredClass.equals(Map.class))
                             field = new ObjectField(name);
+                        else if (declaredClass.equals(UUID.class))
+                            field = new StringField(name);
                     }
                 }
                 break;

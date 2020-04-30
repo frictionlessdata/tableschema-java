@@ -247,7 +247,7 @@ public class TableOtherTest {
             Assert.assertEquals(Boolean.class, row.get("isAdmin").getClass());
             Assert.assertEquals(double[].class, row.get("addressCoordinates").getClass());
             Assert.assertEquals(Duration.class, row.get("contractLength").getClass());
-            Assert.assertEquals(HashMap.class, row.get("info").getClass());
+            Assert.assertTrue(HashMap.class.isAssignableFrom(row.get("info").getClass()));
         }
     }
 
@@ -315,7 +315,7 @@ public class TableOtherTest {
             Object[] row = iter.next();
 
             for(int i=0; i<row.length; i++){
-                Assert.assertEquals(expectedTypes[i], row[i].getClass());
+            	Assert.assertTrue(expectedTypes[i].isAssignableFrom(row[i].getClass()));
             }
         }
     }

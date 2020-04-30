@@ -6,6 +6,7 @@ import io.frictionlessdata.tableschema.beans.EmployeeBean;
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.PrimaryKeyException;
+import io.frictionlessdata.tableschema.exception.ValidationException;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 import io.frictionlessdata.tableschema.fk.Reference;
@@ -22,13 +23,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.json.JSONArray;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-import org.everit.json.schema.ValidationException;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import org.joda.time.DateTime;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
@@ -332,7 +334,7 @@ public class SchemaTest {
         assertEquals(1, obj.get("one"));
         assertThat(castRow[4], instanceOf(Object[].class));
         assertThat(castRow[5], instanceOf(LocalDate.class));
-        assertThat(castRow[6], instanceOf(DateTime.class));
+        assertThat(castRow[6], instanceOf(LocalTime.class));
         assertThat(castRow[7], instanceOf(ZonedDateTime.class));
         assertThat(castRow[8], instanceOf(Year.class));
         assertThat(castRow[9], instanceOf(YearMonth.class));
@@ -623,14 +625,13 @@ public class SchemaTest {
         File source = getResourceFile("/fixtures/foreignkeys/schema_valid_fk_array.json");
         Schema schema = Schema.fromJson (source, true);
 
-        // TODO: change this test, after removal of org.json stuff from ForeignKey and Schema classes
-        JSONArray parsedFields = schema.getForeignKeys().get(0).getFields();
-        assertEquals("id", parsedFields.getString(0));
-        assertEquals("title", parsedFields.getString(1));
+        ArrayNode parsedFields = schema.getForeignKeys().get(0).getFields();
+        assertEquals("id", parsedFields.get(0).asText());
+        assertEquals("title", parsedFields.get(1).asText());
 
-        JSONArray refFields = schema.getForeignKeys().get(0).getReference().getFields();
-        assertEquals("fk_id", refFields.getString(0));
-        assertEquals("title_id", refFields.getString(1));
+        ArrayNode refFields = schema.getForeignKeys().get(0).getReference().getFields();
+        assertEquals("fk_id", refFields.get(0).asText());
+        assertEquals("title_id", refFields.get(1).asText());
     }
 
     @Test
@@ -640,7 +641,7 @@ public class SchemaTest {
 
         assertEquals("position_title", schema.getForeignKeys().get(0).getFields());
         assertEquals("positions", schema.getForeignKeys().get(0).getReference().getResource());
-        assertEquals("name", schema.getForeignKeys().get(0).getReference().getFields());
+        assertEquals("name", schema.getForeignKeys().get(0).getReference().getFields().toString());
     }
 
     @Test

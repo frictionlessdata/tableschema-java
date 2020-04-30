@@ -1,10 +1,15 @@
 package io.frictionlessdata.tableschema.fk;
 
-import io.frictionlessdata.tableschema.exception.ForeignKeyException;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+
+import io.frictionlessdata.tableschema.exception.ForeignKeyException;
+import io.frictionlessdata.tableschema.util.JsonUtil;
 
 /**
  * 
@@ -36,15 +41,19 @@ public class ForeignKey {
     }
     
     public ForeignKey(String json, boolean strict) throws ForeignKeyException{
-        JSONObject fkJsonObject= new JSONObject(json);
+        JsonNode fkJsonObject = JsonUtil.getInstance().readValue(json);
         this.strictValidation = strict;
         
         if(fkJsonObject.has(JSON_KEY_FIELDS)){
-            this.fields = fkJsonObject.get(JSON_KEY_FIELDS);
+        	if(fkJsonObject.get(JSON_KEY_FIELDS).isArray()) {
+        		this.fields = fkJsonObject.get(JSON_KEY_FIELDS);
+        	} else {
+        		this.fields = fkJsonObject.get(JSON_KEY_FIELDS).asText();
+        	}
         }
         
         if(fkJsonObject.has(JSON_KEY_REFERENCE)){
-            JSONObject refJsonObject = fkJsonObject.getJSONObject(JSON_KEY_REFERENCE);
+            JsonNode refJsonObject = fkJsonObject.get(JSON_KEY_REFERENCE);
             this.reference = new Reference(refJsonObject.toString(), strict);
         }
         
@@ -73,20 +82,20 @@ public class ForeignKey {
         if(this.fields == null || this.reference == null){
             fke = new ForeignKeyException("A foreign key must have the fields and reference properties.");
             
-        }else if(!(this.fields instanceof String) && !(this.fields instanceof JSONArray)){
+        }else if(!(this.fields instanceof String) && !(this.fields instanceof ArrayNode)){
             fke = new ForeignKeyException("The foreign key's fields property must be a string or an array.");
             
-        }else if(this.fields instanceof JSONArray && !(this.reference.getFields() instanceof JSONArray)){
+        }else if(this.fields instanceof ArrayNode && !(this.reference.getFields() instanceof ArrayNode)){
             fke = new ForeignKeyException("The reference's fields property must be an array if the outer fields is an array.");
             
         }else if(this.fields instanceof String && !(this.reference.getFields() instanceof String)){
             fke = new ForeignKeyException("The reference's fields property must be a string if the outer fields is a string.");
             
-        }else if(this.fields instanceof JSONArray && this.reference.getFields() instanceof JSONArray){
-            JSONArray fkFields = (JSONArray)this.fields;
-            JSONArray refFields = (JSONArray)this.reference.getFields();
+        }else if(this.fields instanceof ArrayNode && this.reference.getFields() instanceof ArrayNode){
+        	ArrayNode fkFields = (ArrayNode)this.fields;
+        	ArrayNode refFields = (ArrayNode)this.reference.getFields();
             
-            if(fkFields.length() != refFields.length()){
+            if(fkFields.size() != refFields.size()){
                 fke = new ForeignKeyException("The reference's fields property must be an array of the same length as that of the outer fields' array.");
             }
         }
@@ -101,19 +110,9 @@ public class ForeignKey {
 
     }
     
+    @JsonIgnore
     public String getJson(){
-        //FIXME: Maybe we should use JSON serializer like Gson?
-        JSONObject json = new JSONObject();
-        
-        if(this.fields != null){
-            json.put(JSON_KEY_FIELDS, this.fields);
-        }
-        
-        if(this.reference != null){
-            json.put(JSON_KEY_REFERENCE, new JSONObject(reference.getJson()));
-        }
-  
-        return json.toString();
+        return JsonUtil.getInstance().serialize(this);
     }
     
     public List<Exception> getErrors(){

@@ -1,35 +1,40 @@
 package io.frictionlessdata.tableschema.schema;
 
-import io.frictionlessdata.tableschema.exception.*;
-import io.frictionlessdata.tableschema.field.*;
-import io.frictionlessdata.tableschema.fk.ForeignKey;
-
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
+import io.frictionlessdata.tableschema.exception.*;
+import io.frictionlessdata.tableschema.field.Field;
+import io.frictionlessdata.tableschema.fk.ForeignKey;
 import io.frictionlessdata.tableschema.io.FileReference;
 import io.frictionlessdata.tableschema.io.LocalFileReference;
 import io.frictionlessdata.tableschema.io.URLFileReference;
-import org.everit.json.schema.ValidationException;
-import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import io.frictionlessdata.tableschema.util.JsonUtil;
 
 /**
  *
  * 
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(value = Include.NON_EMPTY)
 public class Schema {
     private static final int JSON_INDENT_FACTOR = 4;
     public static final String JSON_KEY_FIELDS = "fields";
     public static final String JSON_KEY_PRIMARY_KEY = "primaryKey";
     public static final String JSON_KEY_FOREIGN_KEYS = "foreignKeys";
     
-    private org.everit.json.schema.Schema tableJsonSchema = null;
+    private JsonSchema tableJsonSchema = null;
     private List<Field> fields = new ArrayList();
     private Object primaryKey = null;
     private List<ForeignKey> foreignKeys = new ArrayList();
@@ -37,6 +42,7 @@ public class Schema {
     private boolean strictValidation = true;
     private List<Exception> errors = new ArrayList();
 
+    @JsonIgnore
     FileReference reference;
 
     /**
@@ -179,60 +185,48 @@ public class Schema {
     }
     
     private void initFromSchemaJson(String json) throws PrimaryKeyException, ForeignKeyException{
-        JSONObject schemaObj = new JSONObject(json);
+        JsonNode schemaObj = JsonUtil.getInstance().readValue(json);
         // Set Fields
         if(schemaObj.has(JSON_KEY_FIELDS)){
-            for (Object obj : schemaObj.getJSONArray(JSON_KEY_FIELDS)) {
-                Field field = null;
-                if (obj instanceof JSONObject) {
-                    field = Field.fromJson(obj.toString());
-                } else if (obj instanceof String) {
-                    field = Field.fromJson((String) obj);
-                }
-                this.fields.add(field);
-            }  
+        	TypeReference<List<Field>> fieldsTypeRef = new TypeReference<List<Field>>() {};
+        	String fieldsJson = schemaObj.withArray(JSON_KEY_FIELDS).toString();
+            this.fields.addAll(JsonUtil.getInstance().deserialize(fieldsJson, fieldsTypeRef));
         }
         
         // Set Primary Key
         if(schemaObj.has(JSON_KEY_PRIMARY_KEY)){
-            
-            // If primary key is a composite key.
-            if(schemaObj.get(JSON_KEY_PRIMARY_KEY) instanceof JSONArray){
-                this.setPrimaryKey(schemaObj.getJSONArray(JSON_KEY_PRIMARY_KEY));
-            }else{
-                // Else if primary key is a single String key.
-                this.setPrimaryKey(schemaObj.getString(JSON_KEY_PRIMARY_KEY));
-            }
+        	if(schemaObj.get(JSON_KEY_PRIMARY_KEY).isArray()) {
+        		this.setPrimaryKey(schemaObj.withArray(JSON_KEY_PRIMARY_KEY));
+        	} else {
+        		this.setPrimaryKey(schemaObj.get(JSON_KEY_PRIMARY_KEY).asText());
+        	}
         }
         
         // Set Foreign Keys
         if(schemaObj.has(JSON_KEY_FOREIGN_KEYS)){
-
-            JSONArray fkJsonArray = schemaObj.getJSONArray(JSON_KEY_FOREIGN_KEYS);
-            for(int i=0; i<fkJsonArray.length(); i++){
-                
-                JSONObject fkJsonObj = fkJsonArray.getJSONObject(i);
-                ForeignKey fk = new ForeignKey(fkJsonObj.toString(), this.strictValidation);
+            JsonNode fkJsonArray = schemaObj.withArray(JSON_KEY_FOREIGN_KEYS);
+            fkJsonArray.forEach((f)->{
+                ForeignKey fk = new ForeignKey(f.toString(), this.strictValidation);
                 this.addForeignKey(fk);
                 
                 if(!this.strictValidation){
                     this.getErrors().addAll(fk.getErrors());
-                }     
-            }
+                } 
+            });
         }
     }
     
     private void initValidator(){
         // Init for validation
         InputStream tableSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/table-schema.json");
-        JSONObject rawTableJsonSchema = new JSONObject(new JSONTokener(tableSchemaInputStream));
-        this.tableJsonSchema = SchemaLoader.load(rawTableJsonSchema);
+        this.tableJsonSchema = JsonSchema.fromJson(tableSchemaInputStream, strictValidation);
     }
     
     /**
      * Check if schema is valid or not.
      * @return
      */
+    @JsonIgnore
     public boolean isValid(){
         try{
             validate();
@@ -242,14 +236,15 @@ public class Schema {
         }
     }
 
-    private void validate(String foundFieldName) throws ValidationException{
+    @SuppressWarnings("rawtypes")
+	private void validate(String foundFieldName) throws ValidationException{
         Field foundField = fields
                 .stream()
                 .filter((f) -> f.getName().equals(foundFieldName))
                 .findFirst()
                 .orElse(null);
         if (null == foundField) {
-            throw new ValidationException (tableJsonSchema, "Primary key field " + foundFieldName+" not found");
+            throw new ValidationException (String.format("%s: Primary key field %s not found", tableJsonSchema, foundFieldName));
         }
     }
 
@@ -261,14 +256,17 @@ public class Schema {
      * instantiated with the strict flag.
      * @throws ValidationException 
      */
+    @JsonIgnore
     private void validate() throws ValidationException{
         try{
-             this.tableJsonSchema.validate(new JSONObject(this.getJson()));
+        	String json = this.getJson();
+             this.tableJsonSchema.validate(json);
              if (null != foreignKeys) {
                  for (ForeignKey fk : foreignKeys) {
                      Object fields = fk.getFields();
-                     if (fields instanceof JSONArray) {
-                         List<Object> subFields = ((JSONArray) fields).toList();
+                     if (fields instanceof ArrayNode) {
+                         List<Object> subFields = new ArrayList<>();
+                         ((ArrayNode) fields).elements().forEachRemaining(f->subFields.add(f.asText()));
                          for (Object subField : subFields) {
                              validate((String) subField);
                          }
@@ -291,35 +289,9 @@ public class Schema {
         return this.errors;
     }
     
+    @JsonIgnore
     public String getJson(){
-        //FIXME: Maybe we should use JSON serializer like Gson?
-        JSONObject schemaJson = new JSONObject();
-        
-        // Fields
-        if(this.fields != null && this.fields.size() > 0){
-            schemaJson.put(JSON_KEY_FIELDS, new JSONArray());
-            this.fields.forEach((field) -> {
-                if (null != field) {
-                    schemaJson.getJSONArray(JSON_KEY_FIELDS).put(new JSONObject(field.getJson()));
-                }
-            });
-        }
-        
-        // Primary Key
-        if(this.primaryKey != null){
-            schemaJson.put(JSON_KEY_PRIMARY_KEY, this.primaryKey);
-        }
-        
-        //Foreign Keys
-        if(this.foreignKeys != null && this.foreignKeys.size() > 0){
-            schemaJson.put(JSON_KEY_FOREIGN_KEYS, new JSONArray());
-
-            this.foreignKeys.forEach((fk) -> {
-                schemaJson.getJSONArray(JSON_KEY_FOREIGN_KEYS).put(new JSONObject(fk.getJson()));
-            });            
-        }
-        
-        return schemaJson.toString(JSON_INDENT_FACTOR);
+    	return JsonUtil.getInstance().serialize(this);
     }
 
     public Object[] castRow(String[] row) throws InvalidCastException{
@@ -431,11 +403,7 @@ public class Schema {
     }
 
     public void setPrimaryKey(String[] keys) throws PrimaryKeyException{
-        JSONArray compositeKey = new JSONArray();
-        for (String key : keys) {
-            compositeKey.put(key);
-        }
-        setPrimaryKey(compositeKey);
+        setPrimaryKey(JsonUtil.getInstance().createArrayNode(keys));
     }
     
     /**
@@ -443,40 +411,45 @@ public class Schema {
      * @param compositeKey
      * @throws PrimaryKeyException 
      */
-    public void setPrimaryKey(JSONArray compositeKey) throws PrimaryKeyException{
-        List<Object> keys = compositeKey.toList();
-        for (Object key : keys) {
-            checkKey((String)key);
-        }
+    public void setPrimaryKey(ArrayNode compositeKey) throws PrimaryKeyException{
+        compositeKey.forEach(k->{
+        	checkKey(k.asText());
+        });
         this.primaryKey = compositeKey;
     }
-    
-    public <Any> Any getPrimaryKey(){
+
+    @SuppressWarnings("unchecked")
+	public <Any> Any getPrimaryKey(){
+    	if(Objects.isNull(primaryKey)) {
+    		return null;
+    	}
         if (primaryKey instanceof String)
             return (Any)primaryKey;
-        if (primaryKey instanceof JSONArray) {
-            final List<String> retVal = new ArrayList<>();
-            for (Object k : ((JSONArray) primaryKey)) {
-                retVal.add((String)k);
-            }
-            return (Any)retVal.toArray(new String[retVal.size()]);
+        if (primaryKey instanceof JsonNode) {
+        	JsonNode jsonNode = (JsonNode)primaryKey;
+        	if(jsonNode.isArray()) {
+        		final List<String> retVal = new ArrayList<>();
+        		jsonNode.forEach(k->retVal.add(k.asText()));
+                return (Any)retVal.toArray(new String[retVal.size()]);
+        	} else {
+        		return (Any)jsonNode.asText();
+        	}
         };
         throw new TableSchemaException("Unknown PrimaryKey type: "+primaryKey.getClass());
     }
 
+    @JsonIgnore
     public List<String> getPrimaryKeyParts() {
         if (primaryKey instanceof String)
             return Arrays.asList((String) primaryKey);
-        if (primaryKey instanceof JSONArray) {
+        if (primaryKey instanceof ArrayNode) {
             final List<String> retVal = new ArrayList<>();
-            for (Object k : ((JSONArray) primaryKey)) {
-                retVal.add((String)k);
-            }
+            ((ArrayNode)primaryKey).forEach(k->retVal.add(k.asText()));
             return retVal;
         }
         throw new TableSchemaException("Unknown PrimaryKey type: "+primaryKey.getClass());
     }
-    
+
     public List<ForeignKey> getForeignKeys(){
         return this.foreignKeys;
     }
