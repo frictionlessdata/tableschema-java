@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.field;
 
+import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +47,7 @@ class FieldFormatTests {
         BooleanField field = (BooleanField)BooleanField.fromJson("{'name': 'name', 'type': 'boolean', 'trueValues': ['agreed']}");
 
         // expect exception
-        assertThrows(TypeInferringException.class, () -> field.parseValue("true", null, null));
+        assertThrows(InvalidCastException.class, () -> field.parseValue("true", null, null));
         Boolean val = field.parseValue("agreed", null, null); // True
         Assertions.assertTrue(val);
     }
@@ -58,7 +59,7 @@ class FieldFormatTests {
         BooleanField field = (BooleanField)BooleanField.fromJson("{'name': 'name', 'type': 'boolean', 'falseValues': ['declined']}");
 
         // expect exception
-        assertThrows(TypeInferringException.class, () -> field.parseValue("false", null, null));
+        assertThrows(InvalidCastException.class, () -> field.parseValue("false", null, null));
         Boolean val = field.parseValue("declined", null, null); // false
         Assertions.assertFalse(val);
     }

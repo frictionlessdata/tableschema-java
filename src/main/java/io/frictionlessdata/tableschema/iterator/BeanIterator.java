@@ -43,7 +43,6 @@ public class BeanIterator<T> extends TableIterator<T> {
      */
     @Override
     void init(Table table) throws Exception{
-        fieldOptions = table.getFieldOptions();
         mapping = table.getSchemaHeaderMapping();
         headers = table.getHeaders();
         schema = BeanSchema.infer(type);
@@ -73,7 +72,7 @@ public class BeanIterator<T> extends TableIterator<T> {
                     String fieldFormat = field.parseFormat(row[i], null);
                     field.setFormat(fieldFormat);
                 }
-                Object val = field.castValue(row[i], true, fieldOptions);
+                Object val = field.castValue(row[i]);
                 if (null == val)
                     continue;
                 Class annotatedFieldClass = aF.getRawType();

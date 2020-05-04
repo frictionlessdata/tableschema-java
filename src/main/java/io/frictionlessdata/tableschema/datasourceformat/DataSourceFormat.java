@@ -49,7 +49,7 @@ public interface DataSourceFormat {
      * @param outputFile the File to write to
      * @throws Exception thrown if write operation fails
      */
-    void write(File outputFile) throws Exception;
+    //void write(File outputFile) throws Exception;
 
     /**
      * Write as CSV file, the `format` parameter decides on the CSV options. If it is
@@ -59,7 +59,7 @@ public interface DataSourceFormat {
      * @param sortedHeaders the header row names in the order in which data should be
      *                      exported
      */
-    void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders);
+    //void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders);
 
     /**
      * Write as CSV file, the `format` parameter decides on the CSV options. If it is
@@ -69,7 +69,7 @@ public interface DataSourceFormat {
      * @param sortedHeaders the header row names in the order in which data should be
      *                      exported
      */
-    void writeCsv(File outputFile, CSVFormat format, String[] sortedHeaders) throws Exception;
+    //void writeCsv(File outputFile, CSVFormat format, String[] sortedHeaders) throws Exception;
 
     /**
      * Signals whether extracted headers can be trusted (CSV with header row) or not

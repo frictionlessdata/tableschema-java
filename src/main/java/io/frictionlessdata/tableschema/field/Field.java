@@ -190,6 +190,10 @@ public abstract class Field<T> {
     public abstract String formatValueAsString(T value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException;
 
+    public String formatValueAsString(T value) throws InvalidCastException, ConstraintsException {
+        return formatValueAsString( value, format, options);
+    }
+
     public Object formatValueForJson(T value) throws InvalidCastException, ConstraintsException {
         return value;
     }
@@ -204,17 +208,6 @@ public abstract class Field<T> {
      */
     public abstract String parseFormat(String value, Map<String, Object> options);
 
-    /**
-     * Use the Field definition to cast a value into the Field type.
-     * Enforces constraints by default.
-     * @param value the value string to cast
-     * @return result of the cast operation
-     * @throws InvalidCastException if the content of `value` cannot be cast to the destination type
-     * @throws ConstraintsException thrown if `enforceConstraints` was set to `true`and constraints were violated
-     */
-    public T castValue(String value) throws InvalidCastException, ConstraintsException{
-        return castValue(value, true, null);
-    }
     
     /**
      * Use the Field definition to cast (=parse) a value into the Field type. Constraints enforcing
@@ -253,6 +246,19 @@ public abstract class Field<T> {
             }
         } 
     }
+
+    /**
+     * Use the Field definition to cast a value into the Field type.
+     * Enforces constraints by default.
+     * @param value the value string to cast
+     * @return result of the cast operation
+     * @throws InvalidCastException if the content of `value` cannot be cast to the destination type
+     * @throws ConstraintsException thrown if `enforceConstraints` was set to `true`and constraints were violated
+     */
+    public T castValue(String value) throws InvalidCastException, ConstraintsException{
+        return castValue(value, true, options);
+    }
+
     
     /**
      * Returns a Map with all the constraints that have been violated.

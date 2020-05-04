@@ -97,15 +97,15 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
      * @param sortedHeaders the header row names in the order in which data should be
      *                      exported
      */
-    @Override
-    public void writeCsv(File outputFile, CSVFormat format, String[] sortedHeaders) throws Exception {
+    //@Override
+    /*public void writeCsv(File outputFile, CSVFormat format, String[] sortedHeaders) throws Exception {
         CSVFormat locFormat = (null != format)
                 ? format
                 : DataSourceFormat.getDefaultCsvFormat();
         try (Writer out = new BufferedWriter(new FileWriter(outputFile))) {
             writeCsv(out, locFormat, sortedHeaders);
         }
-    }
+    }*/
 
     /**
      * Write as CSV file, the `format` parameter decides on the CSV options. If it is
@@ -115,8 +115,8 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
      * @param sortedHeaders the header row names in the order in which data should be
      *                      exported
      */
-    @Override
-    public void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders) {
+    //@Override
+    /*public void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders) {
         try {
             if (null == sortedHeaders) {
                 writeCsv(out, format, getHeaders());
@@ -152,4 +152,6 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
             throw new RuntimeException(ex);
         }
     }
+
+     */
 }

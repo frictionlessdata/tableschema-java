@@ -20,7 +20,6 @@ public class TableIterator<T> implements Iterator<T> {
     boolean extended = false;
     boolean cast = true;
     boolean relations = false;
-    Map<String, Object> fieldOptions;
     Map<Integer, Integer> mapping = null;
     int index = 0;
 
@@ -46,7 +45,6 @@ public class TableIterator<T> implements Iterator<T> {
     }
 
     void init(Table table) throws Exception{
-        this.fieldOptions = table.getFieldOptions();
         this.mapping = table.getSchemaHeaderMapping();
         this.headers = table.getHeaders();
         this.schema = table.getSchema();
@@ -87,14 +85,14 @@ public class TableIterator<T> implements Iterator<T> {
                 // null values will lead to missing entries
                 if (null != key) {
                     String rawVal = row[mapping.get(i)];
-                    val = field.castValue(rawVal, true, fieldOptions);
+                    val = field.castValue(rawVal);
                 }
                 if (!extended && keyed) {
                     keyedRow.put(this.headers[i], val);
                 } else if (cast || extended){
                     castRow[i] = val;
                 } else {
-                    plainRow[i] = val;
+                    plainRow[i] = field.formatValueAsString(val);
                 }
             }
 

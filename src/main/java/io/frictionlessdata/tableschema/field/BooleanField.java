@@ -10,8 +10,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BooleanField extends Field<Boolean> {
-    List<String> trueValues = Arrays.asList("true", "yes", "y", "t", "1");
-    List<String> falseValues = Arrays.asList("false", "no", "n", "f", "0");
+    List<String> trueValues = Arrays.asList("true", "True", "TRUE", "1");
+    List<String> falseValues = Arrays.asList("false", "False", "FALSE", "0");
 
 
     BooleanField() {
@@ -47,15 +47,20 @@ public class BooleanField extends Field<Boolean> {
             }
         }
 
-        if (trueValues.contains(value.toLowerCase())){
+        if (trueValues.contains(value)){
             return true;
 
-        }else if (falseValues.contains(value.toLowerCase())){
+        }else if (falseValues.contains(value)){
             return false;
 
         }else{
-            throw new TypeInferringException();
+            throw new InvalidCastException("Value "+value+" not in 'trueValues' or 'falseValues'");
         }
+    }
+
+    @Override
+    public String formatValueAsString(Boolean value) throws InvalidCastException, ConstraintsException {
+        return (value) ? trueValues.get(0) : falseValues.get(0);
     }
 
     @Override

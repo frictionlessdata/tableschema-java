@@ -72,7 +72,7 @@ class JsonArrayDataSourceFormatTest {
                 TestHelper.getTestDataDirectory());
         Assertions.assertNotNull(ds);
     }
-
+/*
     @Test
     @DisplayName("Validate creating and writing a JsonArrayDataSourceFormat from JSON with null entries")
     void testCreateAndWriteJsonArrayDataSourceWithMissingEntries() throws Exception {
@@ -99,7 +99,7 @@ class JsonArrayDataSourceFormatTest {
         }
         });
     }
-
+*/
     @Test
     @DisplayName("Validate creating a JsonArrayDataSourceFormat from InputStream containing JSON")
     void testSafePathInputStreamCreationJson() throws Exception {
@@ -125,7 +125,7 @@ class JsonArrayDataSourceFormatTest {
         });
     }
 
-
+/*
     @Test
     void writeJsonToFile() throws Exception{
         String content = null;
@@ -146,4 +146,6 @@ class JsonArrayDataSourceFormatTest {
         Assertions.assertEquals(content.replaceAll("[\\r\\n ]", ""),
                 popCsv.replaceAll("[\\r\\n ]", ""));
     }
+
+ */
 }

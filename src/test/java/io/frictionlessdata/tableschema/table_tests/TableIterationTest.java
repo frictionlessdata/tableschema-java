@@ -176,7 +176,7 @@ public class TableIterationTest {
                 String key = keys[j];
                 Object val = ((Object[])row[2])[j];
                 if (val instanceof Boolean) {
-                    Assert.assertEquals(reference.get(key).asText().equals("T"), val);
+                    Assert.assertEquals(reference.get(key).asText().equals("true"), val);
                 } else if (val instanceof double[]){
                     JsonNode objVal = objectMapper.readTree(reference.get(key).textValue());
                     double lon = objVal.get("lon").asDouble();

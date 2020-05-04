@@ -1,0 +1,49 @@
+{
+  "fields":[
+    {
+      "name":"id",
+      "format":"default",
+      "type":"integer"
+    },
+    {
+      "name":"name",
+      "format":"default",
+      "type":"string"
+    },
+    {
+      "name":"dateOfBirth",
+      "format":"default",
+      "type":"date"
+    },
+    {
+      "name":"isAdmin",
+      "format":"default",
+      "type":"boolean",
+      "trueValues": [
+        "TRUE",
+        "T",
+        "true"
+      ],
+      "falseValues": [
+        "FALSE",
+        "F",
+        "false"
+      ]
+    },
+    {
+      "name":"addressCoordinates",
+      "format":"object",
+      "type":"geopoint"
+    },
+    {
+      "name":"contractLength",
+      "format":"default",
+      "type":"duration"
+    },
+    {
+      "name":"info",
+      "format":"default",
+      "type":"object"
+    }
+  ]
+}

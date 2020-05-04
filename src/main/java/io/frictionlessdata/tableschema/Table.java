@@ -18,6 +18,7 @@ import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 import io.frictionlessdata.tableschema.util.TableSchemaUtil;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 
 import java.net.URL;
 import java.util.*;
@@ -47,7 +48,6 @@ public class Table{
     private DataSourceFormat dataSourceFormat = null;
     private Schema schema = null;
     private CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
-    private Map<String, Object> fieldOptions;
 
     /**
      * Constructor for an empty Table. It contains neither data nor is it controlled by a Schema
@@ -296,6 +296,62 @@ public class Table{
         }
     }
 
+    private void writeCSVData(Map<Integer, Integer> mapping, CSVPrinter csvPrinter) {
+        try {
+            this.iterator(false, false, false, false).forEachRemaining((record) -> {
+                String[] sortedRec = new String[record.length];
+                for (int i = 0; i < record.length; i++) {
+                    sortedRec[mapping.get(i)] = (String)record[i];
+                }
+                try {
+                    csvPrinter.printRecord(sortedRec);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    /**
+     * Write as CSV file, the `format` parameter decides on the CSV options. If it is
+     * null, then the file will be written as RFC 4180 compliant CSV
+     * @param out the Writer to write to
+     * @param format the CSV format to use
+     * @param sortedHeaders the header row names in the order in which data should be
+     *                      exported
+     */
+    //@Override
+    private void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders) {
+        try {
+            if (null == sortedHeaders) {
+                writeCsv(out, format, getHeaders());
+                return;
+            }
+            CSVFormat locFormat = (null != format)
+                    ? format
+                    : DataSourceFormat.getDefaultCsvFormat();
+
+            locFormat = locFormat.withHeader(sortedHeaders);
+            CSVPrinter csvPrinter = new CSVPrinter(out, locFormat);
+
+            String[] headers = getHeaders();
+            Map<Integer, Integer> mapping
+                    = TableSchemaUtil.createSchemaHeaderMapping(headers, sortedHeaders);
+            writeCSVData( mapping, csvPrinter);
+            csvPrinter.close();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    /**
+     * Write Table data to a provided {@link java.io.Writer} - the `dataFormat` parameter decides on the data format,
+     * either CSV or JSON.
+     * @param out the Writer to write to
+     * @param dataFormat the format to use, either CSV or JSON.
+     */
     public void write(Writer out, DataSourceFormat.Format dataFormat) {
         try  {
             if (dataFormat.equals(DataSourceFormat.Format.FORMAT_CSV)) {
@@ -307,7 +363,7 @@ public class Table{
                     } else {
                         headers = dataSourceFormat.getHeaders();
                     }
-                    dataSourceFormat.writeCsv(out, this.format, headers);
+                    writeCsv(out, this.format, headers);
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -320,13 +376,29 @@ public class Table{
         }
     }
 
+    /**
+     * Write Table data as CSV to a provided {@link java.io.Writer}, the `format` parameter decides on the CSV
+     * options. If it is null, then the data will be written in the CSV defined by the CSV format of the Table
+     *
+     * @param out the Writer to write to
+     * @param format the CSV format to use
+     */
     public void writeCsv(Writer out, CSVFormat format) {
         CSVFormat oldFormat = this.format;
-        this.format = format;
+        if (null != format) {
+            this.format = format;
+        }
         write(out, DataSourceFormat.Format.FORMAT_CSV);
         this.format = oldFormat;
     }
 
+    /**
+     * Write as CSV file, the `format` parameter decides on the CSV options. If it is null, then the data will
+     * be written in the CSV defined by the CSV format of the Table
+     *
+     * @param outputFile the File to write to
+     * @param format the CSV format to use
+     */
     public void writeCsv(File outputFile, CSVFormat format) throws Exception{
         try (FileWriter fw = new FileWriter(outputFile)) {
             writeCsv(fw, format);
@@ -405,15 +477,6 @@ public class Table{
         return this;
     }
 
-    public Table setFieldOptions(Map<String, Object> options) {
-        this.fieldOptions = options;
-        return this;
-    }
-
-    public Map<String, Object> getFieldOptions() {
-        return fieldOptions;
-    }
-
     public CSVFormat getCsvFormat() {
         return format;
     }
@@ -474,15 +537,17 @@ public class Table{
             List<Object[]> data = table.read();
             List<Object[]> oData = ((Table) o).read();
             equals = equals & data.size() == oData.size();
-            for (int i = 0; i <data.size(); i++) {
-                equals = equals & Arrays.equals(data.get(i), oData.get(i));
+            Iterator<Object[]> iterator = this.iterator(false, false, false, true);
+            Iterator<Object[]> oIter = ((Table) o).iterator(false, false, false, true);
+            while (iterator.hasNext()) {
+                Object[] arr = iterator.next();
+                Object[] oArr = oIter.next();
+                equals = equals & Arrays.equals(arr, oArr);
             }
-            if (equals)
-                return true;
+            return equals;
         } catch (Exception ex) {
             return false;
         }
-        return false;
     }
 
     @Override

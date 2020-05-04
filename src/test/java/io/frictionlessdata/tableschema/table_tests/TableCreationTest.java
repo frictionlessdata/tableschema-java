@@ -32,7 +32,7 @@ import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 public class TableCreationTest {
     private static String populationTestJson =  "[{\"city\":\"london\",\"year\":2017,\"population\":8780000},"
         + "{\"city\":\"paris\",\"year\":2017,\"population\":2240000},"
-        + "{\"city\":\"rome\",\"year\":2017,\"population\":28600}]";
+        + "{\"city\":\"rome\",\"year\":2017,\"population\":2860000}]";
 
     private static Object[][] populationTestData = new Object[][] {
         new Object[]{"london", Year.of(2017), new BigInteger("8780000")},
@@ -362,7 +362,7 @@ public class TableCreationTest {
 
         Table table = Table.fromSource(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
 
-        List<Object[]> actualData = table.read(false);
+        List<Object[]> actualData = table.read(true);
         for (int i = 0; i < actualData.size(); i++) {
             Object[] actualRow = actualData.get(i);
             Object[] testRow = populationTestData[i];

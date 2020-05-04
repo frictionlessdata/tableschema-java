@@ -57,21 +57,7 @@ public class SchemaTest {
         Schema validSchema = Schema.fromJson(schemaJson, true);
         Assert.assertTrue(validSchema.isValid());
     }
-    /*
-    @Test
-    public void testCreateSchemaFromInvalidSchemaJson() throws Exception {
-        JSONObject schemaJsonObj = new JSONObject();
 
-        schemaJsonObj.put("fields", new JSONArray());
-        Field nameField = new IntegerField("id");
-        Field invalidField = new Field("coordinates", "invalid");
-        schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
-        schemaJsonObj.getJSONArray("fields").put(invalidField.getJson());
-
-        exception.expect(ValidationException.class);
-        new Schema(schemaJsonObj.toString(), true);
-    }
-*/
 
     @Test
     public void testReadFromInValidSchemaFileWithStrictValidation() throws Exception{
@@ -79,24 +65,6 @@ public class SchemaTest {
         exception.expect(ValidationException.class);
         Schema.fromJson(f, true);
     }
-
-    /*
-    @Test
-    public void testCreateSchemaFromInvalidSchemaJsonWithoutStrictValidation() throws Exception{
-        JSONObject schemaJsonObj = new JSONObject();
-
-        schemaJsonObj.put("fields", new JSONArray());
-        Field nameField = new IntegerField("id");
-        Field invalidField = new Field("coordinates", "invalid");
-        schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
-        schemaJsonObj.getJSONArray("fields").put(invalidField.getJson());
-
-        Schema invalidSchema = new Schema(schemaJsonObj.toString(), false); // strict=false
-
-        Assert.assertEquals(Field.FIELD_TYPE_INTEGER, invalidSchema.getField("id").getType());
-        Assert.assertEquals("invalid", invalidSchema.getField("coordinates").getType());
-
-    }*/
 
     @Test
     public void testIsValid(){
@@ -306,7 +274,7 @@ public class SchemaTest {
         String[] row = new String[]{
             "John Doe", // String
             "25", // Integer
-            "T", // Boolean
+            "true", // Boolean
             "{\"one\": 1, \"two\": 2, \"three\": 3}", // Object
             "[1,2,3,4]", // Array
             "2008-08-30", // Date

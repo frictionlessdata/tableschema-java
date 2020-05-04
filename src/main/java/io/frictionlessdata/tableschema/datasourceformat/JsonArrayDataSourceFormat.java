@@ -50,8 +50,8 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
      * @param sortedHeaders the header row names in the order in which data should be
      *                      exported
      */
-    @Override
-    public void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders) {
+    //@Override
+    /*public void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders) {
         if (null == sortedHeaders) {
             throw new TableSchemaException("Json array-based tables must have externally set headers");
         }
@@ -101,6 +101,8 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
             throw e;
         }
     }
+
+     */
 
     @Override
     public boolean hasReliableHeaders() {

@@ -102,13 +102,13 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
             throw new TableSchemaException("Data source is of invalid type.");
         }
     }
-
+/*
     @Override
     public void write(File outputFile) throws Exception {
         CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
         super.writeCsv(outputFile, format, this.headers);
     }
-
+*/
     @Override
     public boolean hasReliableHeaders() {
         try {

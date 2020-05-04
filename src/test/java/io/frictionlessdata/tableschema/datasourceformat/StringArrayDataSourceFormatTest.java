@@ -66,6 +66,7 @@ class StringArrayDataSourceFormatTest {
         Assertions.assertEquals(populationArr, data);
     }
 
+    /*
     @Test
     @DisplayName("Test writing data as CSV")
     void writeCsvToFile() throws Exception{
@@ -84,7 +85,7 @@ class StringArrayDataSourceFormatTest {
         // evade the CRLF mess by nuking all CR chars
         Assertions.assertEquals(testStr.replaceAll("\\r", ""), content.replaceAll("\\r", ""));
     }
-
+*/
     @Test
     @DisplayName("Test method is unimplemented")
     void testGetCSVParserIsUnimplemented() throws Exception{

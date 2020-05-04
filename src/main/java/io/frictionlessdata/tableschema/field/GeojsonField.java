@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.field;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.schema.JsonSchema;
@@ -53,7 +54,7 @@ public class GeojsonField extends Field<JsonNode> {
 
     @Override
     public String formatValueAsString(JsonNode value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return value.toString();
+        return JsonUtil.getInstance().serialize(value);
     }
 
 
