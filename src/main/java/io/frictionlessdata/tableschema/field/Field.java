@@ -191,6 +191,8 @@ public abstract class Field<T> {
             throws InvalidCastException, ConstraintsException;
 
     public String formatValueAsString(T value) throws InvalidCastException, ConstraintsException {
+        if (null == value)
+            return null;
         return formatValueAsString( value, format, options);
     }
 
