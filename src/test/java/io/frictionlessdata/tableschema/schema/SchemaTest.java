@@ -636,7 +636,25 @@ public class SchemaTest {
 
 
     @Test
-    public void testSave() throws Exception{
+    public void testSaveDefaultBooleanValues() throws Exception{
+        File createdFile = folder.newFile("test_schema.json");
+
+        File f = new File(getTestDataDirectory(), "schema/employee_schema.json");
+        Schema createdSchema = Schema.fromJson(f, true);
+        createdSchema.writeJson(createdFile);
+
+        Schema readSchema = Schema.fromJson (createdFile, true);
+        assertEquals(createdSchema, readSchema);
+
+        assertEquals("true", readSchema.getField("isAdmin").formatValueAsString(true));
+        assertEquals("false", readSchema.getField("isAdmin").formatValueAsString(false));
+        assertEquals("true", createdSchema.getField("isAdmin").formatValueAsString(true));
+        assertEquals("false", createdSchema.getField("isAdmin").formatValueAsString(false));
+    }
+
+
+    @Test
+    public void testSaveAlternateBooleanValues() throws Exception{
         File createdFile = folder.newFile("test_schema.json");
 
         File f = new File(getTestDataDirectory(), "schema/employee_schema_boolean_alternative_values.json");
