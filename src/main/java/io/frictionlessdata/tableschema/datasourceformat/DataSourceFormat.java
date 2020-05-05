@@ -45,33 +45,6 @@ public interface DataSourceFormat {
     List<String[]> data() throws Exception;
 
     /**
-     * Write to native format
-     * @param outputFile the File to write to
-     * @throws Exception thrown if write operation fails
-     */
-    //void write(File outputFile) throws Exception;
-
-    /**
-     * Write as CSV file, the `format` parameter decides on the CSV options. If it is
-     * null, then the file will be written as RFC 4180 compliant CSV
-     * @param out the Writer to write to
-     * @param format the CSV format to use
-     * @param sortedHeaders the header row names in the order in which data should be
-     *                      exported
-     */
-    //void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders);
-
-    /**
-     * Write as CSV file, the `format` parameter decides on the CSV options. If it is
-     * null, then the file will be written as RFC 4180 compliant CSV
-     * @param outputFile the File to write to
-     * @param format the CSV format to use
-     * @param sortedHeaders the header row names in the order in which data should be
-     *                      exported
-     */
-    //void writeCsv(File outputFile, CSVFormat format, String[] sortedHeaders) throws Exception;
-
-    /**
      * Signals whether extracted headers can be trusted (CSV with header row) or not
      * (JSON array of JSON objects where null values are omitted).
      * @return true if extracted headers can be trusted, false otherwise

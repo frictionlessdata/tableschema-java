@@ -54,6 +54,8 @@ public class GeojsonField extends Field<JsonNode> {
 
     @Override
     public String formatValueAsString(JsonNode value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        if (null == value)
+            return null;
         return JsonUtil.getInstance().serialize(value);
     }
 

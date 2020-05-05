@@ -102,6 +102,8 @@ public class GeopointField extends Field<double[]> {
 
     @Override
     public Object formatValueForJson(double[] value) throws InvalidCastException, ConstraintsException {
+        if (null == value)
+            return null;
         if ((null == format) || (format.equalsIgnoreCase(Field.FIELD_FORMAT_DEFAULT))){
             return value[0]+","+value[1];
         }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_ARRAY)){

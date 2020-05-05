@@ -116,7 +116,7 @@ public class Table{
     }
 
     /**
-     * Create Table using either a CSV or JSON array-containing string  and without either a Schema or a CSVFormat.
+     * Create Table using either a CSV or JSON array-containing string and without either a Schema or a CSVFormat.
      * @param dataSource the CSV or JSON content for the Table
      */
     public static Table fromSource(String dataSource) {

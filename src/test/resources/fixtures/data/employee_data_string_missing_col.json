@@ -1,0 +1,28 @@
+[
+  {
+    "name": "John Doe",
+    "dateOfBirth": "1976-01-13",
+    "id": "1",
+    "isAdmin": "true",
+    "contractLength": "P2DT3H4M",
+    "info": "{\"ssn\": 90, \"pin\": 45, \"rate\": 83.23}"
+  },
+  {
+    "name": "Frank McKrank",
+    "dateOfBirth": "1992-02-14",
+    "id": "2",
+    "isAdmin": "false",
+    "addressCoordinates": "{\"lon\": 90, \"lat\": 45.223}",
+    "contractLength": "PT15M",
+    "info": "{\"ssn\": 90, \"pin\": 45, \"rate\": 83.23}"
+  },
+  {
+    "name": "Pencil Vester",
+    "dateOfBirth": "1983-03-16",
+    "id": "3",
+    "isAdmin": "false",
+    "addressCoordinates": "{\"lon\": 90, \"lat\": 45}",
+    "contractLength": "PT20.345S",
+    "info": "{\"ssn\": 90, \"pin\": 45, \"rate\": 83.23}"
+  }
+]

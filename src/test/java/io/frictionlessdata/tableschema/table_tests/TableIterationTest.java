@@ -24,69 +24,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
 public class TableIterationTest {
-/*     private static JSONArray populationTestJson =  new JSONArray("[" +
- *              "{" +
- *              "\"city\": \"london\"," +
- *              "\"year\": 2017," +
- *              "\"population\": 8780000" +
- *              "}," +
- *              "{" +
- *              "\"city\": \"paris\"," +
- *              "\"year\": 2017," +
- *              "\"population\": 2240000" +
- *              "}," +
- *              "{" +
- *              "\"city\": \"rome\"," +
- *              "\"year\": 2017," +
- *              "\"population\": 2860000" +
- *              "}" +
- *              "]");
- *
- *     private static Object[][] populationTestData = new Object[][]
- *             {
- *                 new Object[]{"london",2017,8780000},
- *                 new Object[]{"paris",2017,2240000},
- *                 new Object[]{"rome",2017,2860000}
- *             }; */
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-
-    //FIXME: Too slow.
-    /**
-    @Test
-    public void testInferTypesIntAndDates() throws Exception{
-        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/dates_data.csv").getPath();
-        Table table = new Table(sourceFileAbsPath);
-
-        JSONObject schema = table.inferSchema().getJson();
-        JSONArray schemaFiles = schema.getJSONArray("fields");
-
-        // The field names are the same as the name of the type we are expecting to be inferred.
-        for(int i=0; i<schemaFiles.length(); i++){
-            Assert.assertEquals(schemaFiles.getJSONObject(i).get("name"), schemaFiles.getJSONObject(i).get("type"));
-        }
-    }
-    **/
-
-    //FIXME: Too slow.
-    /**
-    @Test
-    public void testInferTypesIntBoolAndGeopoints() throws Exception{
-        String sourceFileAbsPath = TableTest.class.getResource("/fixtures/int_bool_geopoint_data.csv").getPath();
-        Table table = new Table(sourceFileAbsPath);
-
-        // Infer
-        Schema schema = table.inferSchema();
-
-        Iterator<Field> iter = schema.getFields().iterator();
-
-        // The field names are the same as the name of the type we are expecting to be inferred.
-        // So if type is set then in means that inferral worked.
-        while(iter.hasNext()){
-            Assert.assertEquals(iter.next().getName(), iter.next().getType());
-        }
-    }**/
 
 
     @Test
@@ -226,6 +166,46 @@ public class TableIterationTest {
             for(String key : row.keySet()){
                 Object val = row.get(key);
                 Assert.assertEquals(reference.get(key).textValue(), val);
+            }
+            i++;
+        }
+    }
+
+
+    @Test
+    public void testReadKeyedDataWithoutSchemaJson() throws Exception{
+        File testDataDir = getTestDataDirectory();
+
+        File file = new File("data/employee_data_string_missing_col.json");
+        Table employeeTable = Table.fromSource(file, testDataDir);
+
+        Iterator iter = employeeTable.iterator(true, false, false, false);
+
+        String referenceContent =
+                String.join("", Files.readAllLines(new File(testDataDir, "data/employee_data_string_missing_col.json").toPath()));
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode referenceArr = objectMapper.readTree(referenceContent);
+
+
+        Path tempDirPath = Files.createTempDirectory("datapackage-");
+        employeeTable.writeCsv(new File(tempDirPath.toFile(), "table.csv"), null);
+
+        int i = 0;
+
+        while(iter.hasNext()){
+            Map<String, Object> row = (Map<String, Object>)iter.next();
+            JsonNode reference = referenceArr.get(i);
+
+            Assert.assertEquals(7, row.size());
+
+            for(String key : row.keySet()){
+                Object val = row.get(key);
+                if (null == reference.get(key)) {
+                    Assert.assertNull(val);
+                } else {
+                    Assert.assertEquals(reference.get(key).textValue(), val);
+                }
             }
             i++;
         }

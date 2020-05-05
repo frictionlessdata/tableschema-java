@@ -1,14 +1,20 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
+import com.google.common.collect.Iterators;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -64,18 +70,53 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
                 : DataSourceFormat.getDefaultCsvFormat();
     }
 
+
+    @Override
+    public Iterator<String[]> iterator() throws Exception{
+        Iterator<CSVRecord> iterCSVRecords = this.getCSVParser().iterator();
+
+        return Iterators.transform(iterCSVRecords, (CSVRecord input) -> {
+            Iterator<String> iterCols = input.iterator();
+
+            List<String> cols = new ArrayList<>();
+            while(iterCols.hasNext()){
+                cols.add(iterCols.next());
+            }
+
+            return cols.toArray(new String[0]);
+        });
+    }
+
+    @Override
+    public String[] getHeaders() throws Exception{
+        if (null == headers) {
+            // Get a copy of the header map that iterates in column order.
+            // The map keys are column names. The map values are 0-based indices.
+            Map<String, Integer> headerMap = this.getCSVParser().getHeaderMap();
+
+            // Generate list of keys
+            List<String> headerVals = new ArrayList<>();
+
+            headerMap.entrySet().forEach((pair) -> {
+                headerVals.add(pair.getKey());
+            });
+
+            headers = headerVals.toArray(new String[0]);
+        }
+        return headers;
+    }
+
     /**
      * Retrieve the CSV Parser.
      * The parser works record wise. It is not possible to go back, once a
      * record has been parsed from the input stream. Because of this, CSVParser
      * needs to be recreated every time:
      * https://commons.apache.org/proper/commons-csv/apidocs/index.html?org/apache/commons/csv/CSVParser.html
-     * 
+     *
      * @return a CSVParser instance
      * @throws Exception if either the data has the wrong format or some I/O exception occurs
      */
-    @Override
-    CSVParser getCSVParser() throws Exception{
+    private CSVParser getCSVParser() throws Exception{
         CSVFormat format = getFormat();
 
         if (dataSource instanceof String){
@@ -94,21 +135,16 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
             // Get the parser.
             //return CSVFormat.RFC4180.withHeader().parse(fr);
             return CSVParser.parse(lines, format);
-            
+
         } else if(dataSource instanceof URL){
             return CSVParser.parse((URL)dataSource, StandardCharsets.UTF_8, format);
-            
+
         } else{
             throw new TableSchemaException("Data source is of invalid type.");
         }
     }
-/*
-    @Override
-    public void write(File outputFile) throws Exception {
-        CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
-        super.writeCsv(outputFile, format, this.headers);
-    }
-*/
+
+
     @Override
     public boolean hasReliableHeaders() {
         try {
