@@ -60,6 +60,8 @@ public class BooleanField extends Field<Boolean> {
 
     @Override
     public String formatValueAsString(Boolean value) throws InvalidCastException, ConstraintsException {
+        if (null == value)
+            return null;
         return (value) ? trueValues.get(0) : falseValues.get(0);
     }
 
