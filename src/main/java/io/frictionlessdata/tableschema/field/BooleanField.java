@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.field;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
@@ -10,8 +11,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BooleanField extends Field<Boolean> {
-    List<String> trueValues = Arrays.asList("true", "True", "TRUE", "1");
-    List<String> falseValues = Arrays.asList("false", "False", "FALSE", "0");
+    @JsonIgnore
+    private static final List<String> defaultTrueValues = Arrays.asList("true", "True", "TRUE", "1");
+
+    @JsonIgnore
+    private static final List<String> defaultFalseValues = Arrays.asList("false", "False", "FALSE", "0");
+
+    private List<String> trueValues = null;
+    private List<String> falseValues = null;
 
 
     BooleanField() {
@@ -47,10 +54,10 @@ public class BooleanField extends Field<Boolean> {
             }
         }
 
-        if (trueValues.contains(value)){
+        if (_getActualTrueValues().contains(value)){
             return true;
 
-        }else if (falseValues.contains(value)){
+        }else if (_getActualFalseValues().contains(value)){
             return false;
 
         }else{
@@ -67,8 +74,8 @@ public class BooleanField extends Field<Boolean> {
 
     @Override
     public String formatValueAsString(Boolean value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        String trueValue = trueValues.get(0);
-        String falseValue = falseValues.get(0);
+        String trueValue = _getActualTrueValues().get(0);
+        String falseValue = _getActualFalseValues().get(0);
         if (null != options) {
             if (options.containsKey("trueValues")) {
                 trueValue = new ArrayList<String>((Collection) options.get("trueValues")).iterator().next();
@@ -87,5 +94,27 @@ public class BooleanField extends Field<Boolean> {
 
     public static Field fromJson (String json) {
     	return Field.fromJson(json);
+    }
+
+    public List<String> getTrueValues() {
+        return trueValues;
+    }
+
+    public List<String> getFalseValues() {
+        return falseValues;
+    }
+
+    @JsonIgnore
+    private List<String> _getActualTrueValues() {
+        if ((null == trueValues) || (trueValues.isEmpty()))
+            return defaultTrueValues;
+        return trueValues;
+    }
+
+    @JsonIgnore
+    private List<String> _getActualFalseValues() {
+        if ((null == falseValues) || (falseValues.isEmpty()))
+            return defaultFalseValues;
+        return falseValues;
     }
 }

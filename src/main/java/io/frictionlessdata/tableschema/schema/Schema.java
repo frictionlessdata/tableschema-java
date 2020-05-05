@@ -356,7 +356,8 @@ public class Schema {
         }
         return null;
     }
-    
+
+    @JsonIgnore
     public List<String> getFieldNames(){
         return fields
                 .stream()

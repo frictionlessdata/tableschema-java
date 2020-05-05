@@ -173,7 +173,7 @@ public class TableIterationTest {
 
 
     @Test
-    public void testReadKeyedDataWithoutSchemaJson() throws Exception{
+    public void testReadDataWithoutSchemaJson() throws Exception{
         File testDataDir = getTestDataDirectory();
 
         File file = new File("data/employee_data_string_missing_col.json");

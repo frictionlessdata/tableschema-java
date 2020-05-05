@@ -8,10 +8,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.core.util.MinimalPrettyPrinter;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -21,7 +20,7 @@ import io.frictionlessdata.tableschema.exception.JsonParsingException;
 import io.frictionlessdata.tableschema.exception.JsonSerializingException;
 
 public final class JsonUtil {
-
+	private static boolean indent = true;
 	private static JsonUtil instance;
 	private ObjectMapper mapper;
 	
@@ -84,10 +83,10 @@ public final class JsonUtil {
 	public ArrayNode createArrayNode(Object content) {
 		return (ArrayNode) createNode(content);
 	}
-	
+
 	public String serialize(Object value) {
 		try {
-			return mapper.writeValueAsString(value);
+			return _getWriter().writeValueAsString(value);
 		} catch (JsonProcessingException e) {
 			throw new JsonSerializingException(e);
 		}
@@ -135,6 +134,14 @@ public final class JsonUtil {
     		// replace both left and right versions
     		return string.replace("“", "\"").replace("”", "\"");
     	} else return string;
+	}
+
+	public static void setIndent(boolean indent) {
+		JsonUtil.indent = indent;
+	}
+
+	private ObjectWriter _getWriter() {
+		return (indent) ? mapper.writer(new DefaultPrettyPrinter()) : mapper.writer(new MinimalPrettyPrinter());
 	}
 	
 }
