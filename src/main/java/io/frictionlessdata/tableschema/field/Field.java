@@ -9,6 +9,8 @@ import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URI;
 import java.time.*;
 import java.util.*;
@@ -334,12 +336,12 @@ public abstract class Field<T> {
          **/
         if(this.constraints.containsKey(CONSTRAINT_KEY_MINIMUM)){
             
-            if(value instanceof Integer){
-                int minInt = (int)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
-                if((int)value < minInt){
-                    violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minInt);
+            if(value instanceof Number){
+                BigDecimal minNumber = new BigDecimal(this.constraints.get(CONSTRAINT_KEY_MINIMUM).toString());
+                if( new BigDecimal(value.toString()).compareTo(minNumber) < 0 ) {
+                    violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minNumber);
                 }
-                
+
             }else if(value instanceof LocalTime){
                 LocalTime minTime = (LocalTime)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
                 if(((LocalTime)value).isBefore(minTime)){
@@ -358,6 +360,12 @@ public abstract class Field<T> {
                     violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minDate);
                 }
 
+            }else if(value instanceof Year){
+                int minYear = (int)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
+                if(((Year)value).isBefore(Year.of(minYear))) {
+                    violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minYear);
+                    }
+
             }else if(value instanceof YearMonth){
                 YearMonth minDate = (YearMonth)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
                 if(((YearMonth)value).isBefore(minDate)){
@@ -375,12 +383,11 @@ public abstract class Field<T> {
         // As for minimum, but specifies a maximum value for a field.
         if(this.constraints.containsKey(CONSTRAINT_KEY_MAXIMUM)){
             
-            if(value instanceof Integer){
-                int maxInt = (int)this.constraints.get(CONSTRAINT_KEY_MAXIMUM);
-                if((int)value > maxInt){
-                    violatedConstraints.put(CONSTRAINT_KEY_MAXIMUM, maxInt);
+            if(value instanceof Number) {
+                BigDecimal maxNumber = new BigDecimal(this.constraints.get(CONSTRAINT_KEY_MAXIMUM).toString());
+                if (new BigDecimal(value.toString()).compareTo(maxNumber) > 0) {
+                    violatedConstraints.put(CONSTRAINT_KEY_MAXIMUM, maxNumber);
                 }
-                
             }else if(value instanceof LocalTime){
                 LocalTime maxTime = (LocalTime)this.constraints.get(CONSTRAINT_KEY_MAXIMUM);
 
@@ -400,6 +407,12 @@ public abstract class Field<T> {
 
                 if(((LocalDate)value).isAfter(maxDate)){
                     violatedConstraints.put(CONSTRAINT_KEY_MAXIMUM, maxDate);
+                }
+
+            }else if(value instanceof Year){
+            int maxYear = (int)this.constraints.get(CONSTRAINT_KEY_MAXIMUM);
+                if(((Year)value).isAfter(Year.of(maxYear))){
+                    violatedConstraints.put(CONSTRAINT_KEY_MAXIMUM, maxYear);
                 }
 
             }else if(value instanceof YearMonth){
