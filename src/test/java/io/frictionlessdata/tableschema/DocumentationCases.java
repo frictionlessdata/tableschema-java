@@ -119,7 +119,7 @@ class DocumentationCases {
          */
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = schema.getJson().replaceAll("[\\n\\t ]", "");
+        String json = schema.getJson().replaceAll("[\\n\\t\\r ]", "");
         Object jsonObject = objectMapper.readValue(json, Object.class);
         String expectedString = objectMapper.writeValueAsString(jsonObject);
         assertEquals(json, expectedString);
@@ -156,7 +156,7 @@ class DocumentationCases {
         */
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = schema.getJson().replaceAll("[\\n\\t ]", "");
+        String json = schema.getJson().replaceAll("[\\n\\t\\r ]", "");
         Object jsonObject = objectMapper.readValue(json, Object.class);
         String expectedString = objectMapper.writeValueAsString(jsonObject);
         assertEquals(json, expectedString);
@@ -180,7 +180,7 @@ class DocumentationCases {
          */
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = schema.getJson().replaceAll("[\\n\\t ]", "");
+        String json = schema.getJson().replaceAll("[\\n\\t\\r ]", "");
         Object jsonObject = objectMapper.readValue(json, Object.class);
         String expectedString = objectMapper.writeValueAsString(jsonObject);
         assertEquals(json, expectedString);
