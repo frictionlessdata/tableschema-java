@@ -20,8 +20,8 @@ import io.frictionlessdata.tableschema.exception.JsonParsingException;
 import io.frictionlessdata.tableschema.exception.JsonSerializingException;
 
 public final class JsonUtil {
-	private static boolean indent = true;
 	private static JsonUtil instance;
+	private boolean indent = true;
 	private ObjectMapper mapper;
 	
 	private JsonUtil() {
@@ -137,8 +137,8 @@ public final class JsonUtil {
     	} else return string;
 	}
 
-	public static void setIndent(boolean indent) {
-		JsonUtil.indent = indent;
+	public void setIndent(boolean indent) {
+		this.indent = indent;
 	}
 
 	private ObjectWriter _getWriter() {
