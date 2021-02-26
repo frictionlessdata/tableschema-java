@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.schema.Schema;
@@ -15,7 +16,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -119,10 +119,10 @@ class DocumentationCases {
          */
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = schema.getJson().replaceAll("[\\n\\t ]", "");
-        Object jsonObject = objectMapper.readValue(json, Object.class);
-        String expectedString = objectMapper.writeValueAsString(jsonObject);
-        assertEquals(json, expectedString);
+        Object jsonObject = objectMapper.readValue(schema.getJson(), Object.class);
+        String expectedString = TestHelper.getResourceFileContent(
+                "/fixtures/schema/documentation-cases/employee_schema_simple.json");
+        assertEquals(objectMapper.readValue(expectedString, Object.class), jsonObject);
     }
 
     @Test
@@ -156,10 +156,10 @@ class DocumentationCases {
         */
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = schema.getJson().replaceAll("[\\n\\t ]", "");
-        Object jsonObject = objectMapper.readValue(json, Object.class);
-        String expectedString = objectMapper.writeValueAsString(jsonObject);
-        assertEquals(json, expectedString);
+        Object jsonObject = objectMapper.readValue(schema.getJson(), Object.class);
+        String expectedString = TestHelper.getResourceFileContent(
+                "/fixtures/schema/documentation-cases/employee_schema_invalid.json");
+        assertEquals(objectMapper.readValue(expectedString, Object.class), jsonObject);
     }
 
     @Test
@@ -180,10 +180,10 @@ class DocumentationCases {
          */
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = schema.getJson().replaceAll("[\\n\\t ]", "");
-        Object jsonObject = objectMapper.readValue(json, Object.class);
-        String expectedString = objectMapper.writeValueAsString(jsonObject);
-        assertEquals(json, expectedString);
+        Object jsonObject = objectMapper.readValue(schema.getJson(), Object.class);
+        String expectedString = TestHelper.getResourceFileContent(
+                "/fixtures/schema/documentation-cases/simple_data_schema_no_title.json");
+        assertEquals(objectMapper.readValue(expectedString, Object.class), jsonObject);
     }
 
     @Test

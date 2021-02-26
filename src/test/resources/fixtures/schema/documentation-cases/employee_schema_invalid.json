@@ -1,0 +1,19 @@
+{
+  "fields":[
+    {
+      "name":"name",
+      "format":"default",
+      "type":"string"
+    },
+    {
+      "name":"id",
+      "format":"invalid",
+      "type":"integer"
+    },
+    {
+      "name":"coordinates",
+      "format" : "array",
+      "type":"geopoint"
+    }
+  ]
+}
