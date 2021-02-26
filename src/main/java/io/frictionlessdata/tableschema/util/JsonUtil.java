@@ -29,6 +29,7 @@ public final class JsonUtil {
 			.enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS)
 			.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES)
 			.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+			.findAndAddModules()
 			.build();
 	}
 	

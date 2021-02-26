@@ -224,7 +224,7 @@ public class Schema {
     
     /**
      * Check if schema is valid or not.
-     * @return
+     * @return true if schema is valid
      */
     @JsonIgnore
     public boolean isValid(){

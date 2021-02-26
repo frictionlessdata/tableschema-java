@@ -1,0 +1,11 @@
+{
+  "fields" : [ {
+    "name" : "id",
+    "type" : "integer",
+    "format" : "default"
+  }, {
+    "name" : "title",
+    "type" : "string",
+    "format" : "default"
+  } ]
+}

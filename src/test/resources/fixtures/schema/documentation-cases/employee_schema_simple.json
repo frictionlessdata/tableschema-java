@@ -1,0 +1,15 @@
+{
+  "fields":[
+    {
+      "name":"name",
+      "format":"default",
+      "type":"string"
+    },
+
+    {
+      "name":"coordinates",
+      "format" : "default",
+      "type":"geopoint"
+    }
+  ]
+}
