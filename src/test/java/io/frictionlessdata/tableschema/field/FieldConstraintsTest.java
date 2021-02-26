@@ -3,6 +3,7 @@ package io.frictionlessdata.tableschema.field;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
+import java.math.BigInteger;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -208,8 +209,45 @@ public class FieldConstraintsTest {
         }
     }
 
+    @Test
+    public void testMinimumAndMaximumBigInteger(){
+        Map<String, Object> constraints = new HashMap();
+        constraints.put(Field.CONSTRAINT_KEY_MINIMUM, 2);
+        constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, 5);
+
+        IntegerField field = new IntegerField("test", Field.FIELD_FORMAT_DEFAULT, null, null, null, constraints, null);
+
+        for(int i=0; i < 7; i++){
+            Map<String, Object> violatedConstraints = field.checkConstraintViolations(BigInteger.valueOf(i));
+            if(i >= 2 && i <=5){
+                Assert.assertTrue(violatedConstraints.isEmpty());
+            }else if(i < 2){
+                Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
+            }else if(i > 5){
+                Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
+            }
+        }
+    }
+
+    @Test
     public void testMinimumAndMaximumNumber(){
-        //TODO: Implement
+        Map<String, Object> constraints = new HashMap();
+        constraints.put(Field.CONSTRAINT_KEY_MINIMUM, 2.0);
+        constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, 5.0);
+
+        NumberField field = new NumberField("test", Field.FIELD_FORMAT_DEFAULT, null, null, null, constraints, null);
+
+        for(int i=0; i < 7; i++){
+            Map<String, Object> violatedConstraints = field.checkConstraintViolations(i);
+
+            if(i >= 2 && i <=5){
+                Assert.assertTrue(violatedConstraints.isEmpty());
+            }else if(i < 2){
+                Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
+            }else if(i > 5){
+                Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
+            }
+        }
     }
 
     @Test
@@ -369,7 +407,7 @@ public class FieldConstraintsTest {
         YearField field = new YearField("test",  "default", "title", "desc", null, constraints, null);
 
         for(int i=1990; i < 2020; i++){
-            Map<String, Object> violatedConstraints = field.checkConstraintViolations(i);
+            Map<String, Object> violatedConstraints = field.checkConstraintViolations(Year.of(i));
 
             if(i >= 1999 && i <=2018){
                 Assert.assertTrue(violatedConstraints.isEmpty());
