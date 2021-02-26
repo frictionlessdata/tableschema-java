@@ -209,25 +209,27 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
         <!-- Dependencies for Bean-based Schema inferal -->
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-csv</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 		<dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-databind</artifactId>
 		    <version>${jackson.version}</version>
 		</dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.geotools/gt-opengis
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-opengis</artifactId>
-            <version>22.2</version>
-        </dependency> -->
 
         <!-- https://mvnrepository.com/artifact/org.geotools/gt-opengis -->
         <dependency>
