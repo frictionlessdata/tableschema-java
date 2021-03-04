@@ -44,6 +44,20 @@ class FieldOptionsTest {
         testField.castValue("agreed", false, options);
     }
 
+
+    @Test
+    @DisplayName("Test Field options getter/setter")
+    void testFieldOptionsGetterSetter() {
+        Map<String, Object> options = new HashMap<>();
+        options.put("trueValues", trueValues);
+        options.put("falseValues", falseValues);
+
+        Field testField = new BooleanField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
+
+        testField.setOptions(options);
+        Assertions.assertEquals(options, testField.getOptions());
+    }
+
     @Test
     @DisplayName("Create BooleanField with custom true/false options from Schema")
     public void testReadSchemaBooleanFieldOptions() throws Exception{

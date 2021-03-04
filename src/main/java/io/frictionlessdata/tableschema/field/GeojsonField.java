@@ -70,7 +70,7 @@ public class GeojsonField extends Field<JsonNode> {
      */
     private void validateGeoJsonSchema(String json) throws ValidationException {
         if(this.geoJsonSchema == null){
-            // FIXME: Maybe this infering against geojson scheme is too much.
+            // FIXME: Maybe this inferring against geojson scheme is too much.
             // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
             InputStream geoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson/geojson.json");
             geoJsonSchema = JsonSchema.fromJson(geoJsonSchemaInputStream, true);

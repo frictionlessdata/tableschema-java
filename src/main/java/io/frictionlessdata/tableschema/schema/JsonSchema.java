@@ -30,7 +30,7 @@ public class JsonSchema {
 	}
 
 	public static JsonSchema fromJson(String jsonSchema) {
-		return fromJson(jsonSchema, false);
+		return fromJson(jsonSchema, true);
 	}
 	
 	public static JsonSchema fromJson(String jsonSchema, boolean strictValidation) {

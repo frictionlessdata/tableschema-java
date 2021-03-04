@@ -28,7 +28,7 @@ public class FieldConstraintsTest {
 
         Map<String, Object> violatedConstraints = null;
 
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_REQUIRED, true);
 
         StringField field = new StringField("test",  null, null, null, null, constraints, null);
@@ -50,7 +50,7 @@ public class FieldConstraintsTest {
 
         Map<String, Object> violatedConstraints = null;
 
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_REQUIRED, false);
 
         StringField field = new StringField("test",  null, null, null, null, constraints, null);
@@ -68,7 +68,7 @@ public class FieldConstraintsTest {
     public void testMinAndMaxLengthString() throws Exception{
         Map<String, Object> violatedConstraints = null;
 
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_MIN_LENGTH, 36);
         constraints.put(Field.CONSTRAINT_KEY_MAX_LENGTH, 45);
 
@@ -109,7 +109,7 @@ public class FieldConstraintsTest {
     public void testMinandMaxLengthJSONObject() throws Exception{
         Map<String, Object> violatedConstraints = null;
 
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_MIN_LENGTH, 2);
         constraints.put(Field.CONSTRAINT_KEY_MAX_LENGTH, 5);
 
@@ -150,7 +150,7 @@ public class FieldConstraintsTest {
     public void testMinAndMaxLengthJSONArray(){
         Map<String, Object> violatedConstraints = null;
 
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_MIN_LENGTH, 2);
         constraints.put(Field.CONSTRAINT_KEY_MAX_LENGTH, 5);
 
@@ -188,7 +188,7 @@ public class FieldConstraintsTest {
     @Test
     public void testMinimumAndMaximumInteger(){
 
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, 2);
         constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, 5);
 
@@ -203,7 +203,7 @@ public class FieldConstraintsTest {
             }else if(i < 2){
                 Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
 
-            }else if(i > 5){
+            }else {
                 Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
             }
         }
@@ -211,7 +211,7 @@ public class FieldConstraintsTest {
 
     @Test
     public void testMinimumAndMaximumBigInteger(){
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, 2);
         constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, 5);
 
@@ -223,7 +223,7 @@ public class FieldConstraintsTest {
                 Assert.assertTrue(violatedConstraints.isEmpty());
             }else if(i < 2){
                 Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
-            }else if(i > 5){
+            }else {
                 Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
             }
         }
@@ -231,7 +231,7 @@ public class FieldConstraintsTest {
 
     @Test
     public void testMinimumAndMaximumNumber(){
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, 2.0);
         constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, 5.0);
 
@@ -244,7 +244,7 @@ public class FieldConstraintsTest {
                 Assert.assertTrue(violatedConstraints.isEmpty());
             }else if(i < 2){
                 Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
-            }else if(i > 5){
+            }else {
                 Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
             }
         }
@@ -261,7 +261,7 @@ public class FieldConstraintsTest {
         LocalDate dateMin = LocalDate.parse(DATE_STRING_MINIMUM, formatter);
         LocalDate dateMax = LocalDate.parse(DATE_STRING_MAXIMUM, formatter);
 
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, dateMin);
         constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, dateMax);
 
@@ -316,7 +316,7 @@ public class FieldConstraintsTest {
         LocalTime timeMin = LocalTime.parse(TIME_STRING_MINIMUM, formatter);
         LocalTime timeMax = LocalTime.parse(TIME_STRING_MAXIMUM, formatter);
 
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, timeMin);
         constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, timeMax);
 
@@ -371,11 +371,11 @@ public class FieldConstraintsTest {
         ZonedDateTime datetimeMin = ZonedDateTime.parse(DATETIME_STRING_MINIMUM, formatter);
         ZonedDateTime datetimeMax = ZonedDateTime.parse(DATETIME_STRING_MAXIMUM, formatter);
 
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, datetimeMin);
         constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, datetimeMax);
 
-        Field field = new DatetimeField("test", null, null, null, null, constraints, null);
+        DatetimeField field = new DatetimeField("test", null, null, null, null, constraints, null);
 
         ZonedDateTime datetime2017 = ZonedDateTime.parse("2017-01-15T13:44:33.000+0000", formatter);
         violatedConstraints = field.checkConstraintViolations(datetime2017);
@@ -400,7 +400,7 @@ public class FieldConstraintsTest {
 
     @Test
     public void testMinimumAndMaximumYear(){
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, 1999);
         constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, 2018);
 
@@ -415,7 +415,7 @@ public class FieldConstraintsTest {
             }else if(i < 1999){
                 Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
 
-            }else if(i > 2018){
+            }else {
                 Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
             }
         }
@@ -432,11 +432,11 @@ public class FieldConstraintsTest {
         YearMonth yearmonthMin = YearMonth.parse(YEARMONTH_STRING_MINIMUM);
         YearMonth yearmonthMax = YearMonth.parse(YEARMONTH_STRING_MAXIMUM);
 
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, yearmonthMin);
         constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, yearmonthMax);
 
-        Field field = new YearmonthField("test", null, null, null, null, constraints, null);
+        YearmonthField field = new YearmonthField("test", null, null, null, null, constraints, null);
 
         YearMonth yearmonth = YearMonth.parse("2005-05");
         violatedConstraints = field.checkConstraintViolations(yearmonth);
@@ -478,11 +478,11 @@ public class FieldConstraintsTest {
         Duration durationMin = Duration.parse(DURATION_STRING_MINIMUM);
         Duration durationMax = Duration.parse(DURATION_STRING_MAXIMUM);
 
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_MINIMUM, durationMin);
         constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, durationMax);
 
-        Field field = new DurationField("test", null, null, null, null, constraints, null);
+        DurationField field = new DurationField("test", null, null, null, null, constraints, null);
 
         Duration duration = Duration.parse("P2DT4H4M");
         violatedConstraints = field.checkConstraintViolations(duration);
@@ -509,10 +509,10 @@ public class FieldConstraintsTest {
     public void testPattern(){
         Map<String, Object> violatedConstraints = null;
 
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
         constraints.put(Field.CONSTRAINT_KEY_PATTERN, "testing[0-9]+");
 
-        Field field = new StringField("test", null, null, null, null, constraints, null);
+        StringField field = new StringField("test", null, null, null, null, constraints, null);
 
         for(int i=0; i<12; i++){
             violatedConstraints = field.checkConstraintViolations("testing" + i);
@@ -527,16 +527,16 @@ public class FieldConstraintsTest {
     public void testEnumString(){
         Map<String, Object> violatedConstraints = null;
 
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
 
-        List<String> enumStrings = new ArrayList();
+        List<String> enumStrings = new ArrayList<>();
         enumStrings.add("one");
         enumStrings.add("two");
         enumStrings.add("four");
 
         constraints.put(Field.CONSTRAINT_KEY_ENUM, enumStrings);
 
-        Field field = new StringField("test", null, null, null, null, constraints, null);
+        StringField field = new StringField("test", null, null, null, null, constraints, null);
 
         violatedConstraints = field.checkConstraintViolations("one");
         Assert.assertTrue(violatedConstraints.isEmpty());
@@ -555,9 +555,9 @@ public class FieldConstraintsTest {
     public void testEnumInteger(){
         Map<String, Object> violatedConstraints = null;
 
-        Map<String, Object> constraints = new HashMap();
+        Map<String, Object> constraints = new HashMap<>();
 
-        List<Integer> enumInts = new ArrayList();
+        List<Integer> enumInts = new ArrayList<>();
         enumInts.add(1);
         enumInts.add(2);
         enumInts.add(4);
@@ -583,8 +583,8 @@ public class FieldConstraintsTest {
     public void testEnumObject(){
         Map<String, Object> violatedConstraints = null;
 
-        Map<String, Object> constraints = new HashMap();
-        List<JsonNode> enumObjs = new ArrayList();
+        Map<String, Object> constraints = new HashMap<>();
+        List<JsonNode> enumObjs = new ArrayList<>();
 
         JsonNode obj1 = JsonUtil.getInstance().createNode("{\"one\": 1}");
         enumObjs.add(obj1);
@@ -596,7 +596,7 @@ public class FieldConstraintsTest {
         enumObjs.add(obj3);
 
         constraints.put(Field.CONSTRAINT_KEY_ENUM, enumObjs);
-        Field field = new ObjectField("test", null, null, null, null, constraints, null);
+        ObjectField field = new ObjectField("test", null, null, null, null, constraints, null);
 
         violatedConstraints = field.checkConstraintViolations(obj1);
         Assert.assertTrue(violatedConstraints.isEmpty());
@@ -616,8 +616,8 @@ public class FieldConstraintsTest {
     public void testEnumArray(){
         Map<String, Object> violatedConstraints = null;
 
-        Map<String, Object> constraints = new HashMap();
-        List<JsonNode> enumArrs = new ArrayList();
+        Map<String, Object> constraints = new HashMap<>();
+        List<JsonNode> enumArrs = new ArrayList<>();
 
         ArrayNode arr1 = JsonUtil.getInstance().createArrayNode("[\"one\"]");
         enumArrs.add(arr1);
@@ -626,7 +626,7 @@ public class FieldConstraintsTest {
         enumArrs.add(arr2);
 
         constraints.put(Field.CONSTRAINT_KEY_ENUM, enumArrs);
-        Field field = new ArrayField("test",  null, null, null, null, constraints, null);
+        ArrayField field = new ArrayField("test",  null, null, null, null, constraints, null);
 
         violatedConstraints = field.checkConstraintViolations(arr1);
         Assert.assertTrue(violatedConstraints.isEmpty());
@@ -644,8 +644,8 @@ public class FieldConstraintsTest {
     public void testEnumDuration() throws Exception{
         Map<String, Object> violatedConstraints = null;
 
-        Map<String, Object> constraints = new HashMap();
-        List<Duration> enumDurations = new ArrayList();
+        Map<String, Object> constraints = new HashMap<>();
+        List<Duration> enumDurations = new ArrayList<>();
 
         Duration duration1 = Duration.parse("P2DT3H4M");
         enumDurations.add(duration1);
@@ -654,7 +654,7 @@ public class FieldConstraintsTest {
         enumDurations.add(duration2);
 
         constraints.put(Field.CONSTRAINT_KEY_ENUM, enumDurations);
-        Field field = new DurationField("test", null, null, null, null, constraints, null);
+        DurationField field = new DurationField("test", null, null, null, null, constraints, null);
 
         violatedConstraints = field.checkConstraintViolations(duration1);
         Assert.assertTrue(violatedConstraints.isEmpty());
@@ -671,8 +671,8 @@ public class FieldConstraintsTest {
     public void testEnumDatetime(){
         Map<String, Object> violatedConstraints = null;
 
-        Map<String, Object> constraints = new HashMap();
-        List<ZonedDateTime> enumDatetimes = new ArrayList();
+        Map<String, Object> constraints = new HashMap<>();
+        List<ZonedDateTime> enumDatetimes = new ArrayList<>();
 
         DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         ZonedDateTime datetime1 = ZonedDateTime.parse("2000-01-15T13:44:33.000+0000", formatter);
@@ -683,7 +683,7 @@ public class FieldConstraintsTest {
         enumDatetimes.add(datetime2);
 
         constraints.put(Field.CONSTRAINT_KEY_ENUM, enumDatetimes);
-        Field field = new DatetimeField("test", null, null, null, null, constraints, null);
+        DatetimeField field = new DatetimeField("test", null, null, null, null, constraints, null);
 
         violatedConstraints = field.checkConstraintViolations(datetime1);
         Assert.assertTrue(violatedConstraints.isEmpty());
@@ -695,7 +695,65 @@ public class FieldConstraintsTest {
         violatedConstraints = field.checkConstraintViolations(datetime3);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_ENUM));
     }
-    
+
+    @Test
+    public void testEnumLocalTime(){
+        Map<String, Object> violatedConstraints = null;
+
+        Map<String, Object> constraints = new HashMap<>();
+        List<LocalTime> enumTimes = new ArrayList<>();
+
+        DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss");
+        LocalTime time1 = LocalTime.parse("13:44:33", formatter);
+
+        enumTimes.add(time1);
+
+        LocalTime time2 = LocalTime.parse("00:44:33", formatter);
+        enumTimes.add(time2);
+
+        constraints.put(Field.CONSTRAINT_KEY_ENUM, enumTimes);
+        TimeField field = new TimeField("test", null, null, null, null, constraints, null);
+
+        violatedConstraints = field.checkConstraintViolations(time1);
+        Assert.assertTrue(violatedConstraints.isEmpty());
+
+        violatedConstraints = field.checkConstraintViolations(time2);
+        Assert.assertTrue(violatedConstraints.isEmpty());
+
+        LocalTime datetime3 = LocalTime.parse("12:44:33", formatter);
+        violatedConstraints = field.checkConstraintViolations(datetime3);
+        Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_ENUM));
+    }
+
+    @Test
+    public void testEnumLocalDate(){
+        Map<String, Object> violatedConstraints = null;
+
+        Map<String, Object> constraints = new HashMap<>();
+        List<LocalDate> enumDates = new ArrayList<>();
+
+        DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date1 = LocalDate.parse("2000-01-15", formatter);
+
+        enumDates.add(date1);
+
+        LocalDate date2 = LocalDate.parse("2019-01-15", formatter);
+        enumDates.add(date2);
+
+        constraints.put(Field.CONSTRAINT_KEY_ENUM, enumDates);
+        DateField field = new DateField("test", null, null, null, null, constraints, null);
+
+        violatedConstraints = field.checkConstraintViolations(date1);
+        Assert.assertTrue(violatedConstraints.isEmpty());
+
+        violatedConstraints = field.checkConstraintViolations(date2);
+        Assert.assertTrue(violatedConstraints.isEmpty());
+
+        LocalDate date3 = LocalDate.parse("2003-01-15", formatter);
+        violatedConstraints = field.checkConstraintViolations(date3);
+        Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_ENUM));
+    }
+
     private JsonNode createJsonNode(Object obj) {
     	return JsonUtil.getInstance().createNode(obj);
     }

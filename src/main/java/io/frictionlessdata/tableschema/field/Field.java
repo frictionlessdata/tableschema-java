@@ -115,19 +115,6 @@ public abstract class Field<T> {
     private String name = "";
 
     /**
-     * A field's `type` property is a string indicating the type of this field.
-     * http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
-     */
-    String type = "";
-
-
-    /**
-     * A field's `format` property is a string, indicating a format for the field type.
-     * http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
-     */
-    String format = FIELD_FORMAT_DEFAULT;
-
-    /**
      * A human readable label or title for the field
      */
     private String title = null;
@@ -136,6 +123,18 @@ public abstract class Field<T> {
      * A description for this field e.g. "The recipient of the funds"
      */
     private String description = null;
+
+    /**
+     * A field's `type` property is a string indicating the type of this field.
+     * http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
+     */
+    String type = "";
+
+    /**
+     * A field's `format` property is a string, indicating a format for the field type.
+     * http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
+     */
+    String format = FIELD_FORMAT_DEFAULT;
 
     /**
      * A richer, "semantic", description of the "type" of data in a given column MAY be
@@ -308,21 +307,17 @@ public abstract class Field<T> {
         if(this.constraints.containsKey(CONSTRAINT_KEY_MAX_LENGTH)){
             int maxLength = (int)this.constraints.get(CONSTRAINT_KEY_MAX_LENGTH);
             
-            if(value instanceof String){
+            if (value instanceof String){
                 if(((String)value).length() > maxLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MAX_LENGTH, maxLength);
                 }
                 
-            }else if (value instanceof JsonNode){
+            } else if (value instanceof JsonNode){
                 if(((JsonNode)value).size() > maxLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MAX_LENGTH, maxLength);
                 }
                  
-            }else if (value instanceof ArrayNode){
-                if(((ArrayNode)value).size() > maxLength){
-                    violatedConstraints.put(CONSTRAINT_KEY_MAX_LENGTH, maxLength);
-                }                
-            }  
+            }
         }
         
         /*
@@ -485,7 +480,7 @@ public abstract class Field<T> {
                     }
                 }
                 
-            }else if(value instanceof LocalTime){
+            } else if(value instanceof LocalTime){
                 List<LocalTime> timeList = (List<LocalTime>)this.constraints.get(CONSTRAINT_KEY_ENUM);
 
                 Iterator<LocalTime> iter = timeList.iterator();
@@ -632,10 +627,10 @@ public abstract class Field<T> {
         if ((!StringUtils.isEmpty(name)) && (!StringUtils.isEmpty(other.name))){
             if (!name.equals(other.name))
                 return false;
-        }
-        if ((!StringUtils.isEmpty(type)) && (!StringUtils.isEmpty(other.type))){
-            if (!type.equals(other.type))
-                return false;
+        } else if ((!StringUtils.isEmpty(name)) && (StringUtils.isEmpty(other.name))){
+            return false;
+        } else if ((StringUtils.isEmpty(name)) && (!StringUtils.isEmpty(other.name))){
+            return false;
         }
         return Objects.equals(constraints, other.constraints);
     }

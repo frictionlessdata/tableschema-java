@@ -330,6 +330,26 @@ class FieldCreationTest {
     }
 
 
+    @Test
+    @DisplayName("Test similar() method")
+    void testSimilar() throws Exception{
+        Field testField1 = new BooleanField("is_valid");
+        Field testField2 = new BooleanField("is_valid");
+        Field testField3 = new BooleanField(null);
+        Field testField4 = new BooleanField("");
+        Field testField5 = new BooleanField("also_valid");
+        Field testField6 = new YearField("is_valid");
+        Assertions.assertTrue(testField1.similar(testField2));
+        Assertions.assertTrue(testField3.similar(testField4));
+        Assertions.assertFalse(testField1.similar(testField3));
+        Assertions.assertFalse(testField1.similar(testField4));
+        Assertions.assertFalse(testField1.similar(testField5));
+        Assertions.assertFalse(testField3.similar(testField1));
+        Assertions.assertFalse(testField4.similar(testField1));
+        Assertions.assertFalse(testField4.similar(testField5));
+        Assertions.assertFalse(testField1.similar(testField6));
+    }
+
     // spec: https://frictionlessdata.io/specs/table-schema/#rich-types
     @Test
     @DisplayName("Test fix for Issue https://github.com/frictionlessdata/tableschema-java/issues/21")
