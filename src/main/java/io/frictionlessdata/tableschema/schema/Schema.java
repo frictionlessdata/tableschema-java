@@ -29,7 +29,6 @@ import io.frictionlessdata.tableschema.util.JsonUtil;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(value = Include.NON_EMPTY)
 public class Schema {
-    private static final int JSON_INDENT_FACTOR = 4;
     public static final String JSON_KEY_FIELDS = "fields";
     public static final String JSON_KEY_PRIMARY_KEY = "primaryKey";
     public static final String JSON_KEY_FOREIGN_KEYS = "foreignKeys";

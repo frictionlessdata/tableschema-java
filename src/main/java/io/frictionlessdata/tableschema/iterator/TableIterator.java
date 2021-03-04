@@ -79,13 +79,16 @@ public class TableIterator<T> implements Iterator<T> {
         if(this.schema != null){
             for(int i = 0; i < rowLength; i++){
                 Field field = this.schema.getFields().get(i);
-                Integer key = mapping.get(i);
+                Integer mappedKey = mapping.get(i);
                 Object val = null;
                 // null keys can happen for JSON arrays of JSON objects because
                 // null values will lead to missing entries
-                if (null != key) {
-                    String rawVal = row[mapping.get(i)];
-                    val = field.castValue(rawVal);
+                if (null != mappedKey) {
+                    // if the last column(s) contain nulls, prevent an ArrayIndexOutOfBoundsException
+                    if (mappedKey < row.length) {
+                        String rawVal = row[mappedKey];
+                        val = field.castValue(rawVal);
+                    }
                 }
                 if (!extended && keyed) {
                     keyedRow.put(this.headers[i], val);

@@ -4,6 +4,7 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
+import io.frictionlessdata.tableschema.inputstream.ByteOrderMarkStrippingInputStream;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import org.apache.commons.csv.CSVFormat;
@@ -21,7 +22,7 @@ import java.util.zip.ZipFile;
  * Interface for a source of tabular data.
  */
 public interface DataSourceFormat {
-    public static final String UTF16_BOM = "\uFEFF";
+    public static final String UTF16_BOM = "\ufeff";
     public static final String UTF8_BOM = "\u00ef\u00bb\u00bf";
     /**
      * Returns an Iterator that returns String arrays containing
@@ -57,14 +58,13 @@ public interface DataSourceFormat {
      * @return DataSource created from input String
      */
     static DataSourceFormat createDataSourceFormat(String input) {
-        String content = trimBOM(input);
         try {
             // JSON array generation only to see if an exception is thrown -> probably CSV data
-            JsonUtil.getInstance().createArrayNode(content);
-            return new JsonArrayDataSourceFormat(content);
+            JsonUtil.getInstance().createArrayNode(input);
+            return new JsonArrayDataSourceFormat(input);
         } catch (Exception ex) {
             // JSON parsing failed, treat it as a CSV
-            return new CsvDataSourceFormat(content);
+            return new CsvDataSourceFormat(input);
         }
     }
 
@@ -88,12 +88,7 @@ public interface DataSourceFormat {
             ZipFile zipFile = new ZipFile(workDir.getAbsolutePath());
             ZipEntry entry = zipFile.getEntry(path);
             InputStream stream = zipFile.getInputStream(entry);
-            try (BufferedReader rdr = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-                lines = rdr
-                        .lines()
-                        .collect(Collectors.joining("\n"));
-            }
-
+            lines = readSkippingBOM(stream);
         } else {
             // The path value can either be a relative path or a full path.
             // If it's a relative path then build the full path by using the working directory.
@@ -103,15 +98,27 @@ public interface DataSourceFormat {
             //    - https://github.com/frictionlessdata/tableschema-java/issues/29
             //    - https://frictionlessdata.io/specs/data-resource/#url-or-path
             Path resolvedPath = DataSourceFormat.toSecure(new File(path).toPath(), workDir.toPath());
-
-            // Read the file.
-            try (BufferedReader rdr = new BufferedReader(new FileReader(resolvedPath.toFile()))) {
-                lines = rdr
-                        .lines()
-                        .collect(Collectors.joining("\n"));
-            }
+            lines = readSkippingBOM(new FileInputStream(resolvedPath.toFile()));
         }
         return lines;
+    }
+
+    /**
+     * Use the {@link ByteOrderMarkStrippingInputStream} class to read from the provided {@link java.io.InputStream}
+     * and strip the BOM if found. Use the found BOM to determine the UTF dialect if any and read big/little endian
+     * conform
+     * @param is InputStream to read from
+     * @return Contents of the InputStream as a String
+     * @throws IOException if underlying InputStream throws
+     */
+    static String readSkippingBOM(InputStream is) throws IOException {
+        String content;
+        try (ByteOrderMarkStrippingInputStream bims  = new ByteOrderMarkStrippingInputStream(is);
+             InputStreamReader isr = new InputStreamReader(bims.skipBOM(), bims.getCharset());
+             BufferedReader rdr = new BufferedReader(isr)) {
+                content = rdr.lines().collect(Collectors.joining("\n"));
+        }
+        return content;
     }
 
     static CSVFormat getDefaultCsvFormat() {
