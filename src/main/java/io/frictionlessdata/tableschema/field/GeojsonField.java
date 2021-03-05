@@ -1,15 +1,13 @@
 package io.frictionlessdata.tableschema.field;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
+import io.frictionlessdata.tableschema.exception.ValidationException;
 import io.frictionlessdata.tableschema.schema.JsonSchema;
 import io.frictionlessdata.tableschema.schema.TypeInferrer;
 import io.frictionlessdata.tableschema.util.JsonUtil;
-import io.frictionlessdata.tableschema.exception.TypeInferringException;
-import io.frictionlessdata.tableschema.exception.ValidationException;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.InputStream;
 import java.net.URI;

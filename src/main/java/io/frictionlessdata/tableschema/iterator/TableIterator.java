@@ -1,8 +1,8 @@
 package io.frictionlessdata.tableschema.iterator;
 
-import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.field.Field;
+import io.frictionlessdata.tableschema.schema.Schema;
 
 import java.util.HashMap;
 import java.util.Iterator;

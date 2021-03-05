@@ -1,10 +1,6 @@
 package io.frictionlessdata.tableschema.iterator;
 
 import io.frictionlessdata.tableschema.Table;
-import io.frictionlessdata.tableschema.util.TableSchemaUtil;
-
-import java.util.List;
-import java.util.Map;
 
 public class SimpleTableIterator extends TableIterator<String[]> {
 

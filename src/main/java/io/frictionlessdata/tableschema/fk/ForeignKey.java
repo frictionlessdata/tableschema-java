@@ -1,15 +1,13 @@
 package io.frictionlessdata.tableschema.fk;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 

@@ -1,12 +1,11 @@
 package io.frictionlessdata.tableschema.exception;
 
+import com.networknt.schema.ValidationMessage;
+import io.frictionlessdata.tableschema.schema.JsonSchema;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import com.networknt.schema.ValidationMessage;
-
-import io.frictionlessdata.tableschema.schema.JsonSchema;
 
 public class ValidationException extends TableSchemaException {
 	

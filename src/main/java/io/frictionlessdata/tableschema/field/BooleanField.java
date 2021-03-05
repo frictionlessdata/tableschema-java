@@ -3,12 +3,9 @@ package io.frictionlessdata.tableschema.field;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
-import io.frictionlessdata.tableschema.exception.TypeInferringException;
-import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import java.net.URI;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class BooleanField extends Field<Boolean> {
     @JsonIgnore

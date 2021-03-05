@@ -1,21 +1,10 @@
 package io.frictionlessdata.tableschema.schema;
 
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.TreeMap;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.util.*;
 
 
 /**

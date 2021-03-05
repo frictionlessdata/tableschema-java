@@ -1,9 +1,5 @@
 package io.frictionlessdata.tableschema.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Objects;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
@@ -15,9 +11,12 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-
 import io.frictionlessdata.tableschema.exception.JsonParsingException;
 import io.frictionlessdata.tableschema.exception.JsonSerializingException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Objects;
 
 public final class JsonUtil {
 	private static JsonUtil instance;

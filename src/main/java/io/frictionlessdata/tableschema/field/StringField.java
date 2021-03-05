@@ -2,7 +2,6 @@ package io.frictionlessdata.tableschema.field;
 
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.net.URI;

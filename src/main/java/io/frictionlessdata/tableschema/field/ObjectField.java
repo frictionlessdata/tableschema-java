@@ -1,14 +1,12 @@
 package io.frictionlessdata.tableschema.field;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import java.net.URI;
 import java.util.Map;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 
 public class ObjectField extends Field<Map<String, Object>> {
 

@@ -3,14 +3,13 @@ package io.frictionlessdata.tableschema.iterator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.util.concurrent.AtomicDouble;
-import io.frictionlessdata.tableschema.field.ObjectField;
-import io.frictionlessdata.tableschema.schema.BeanSchema;
-import io.frictionlessdata.tableschema.util.JsonUtil;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import io.frictionlessdata.tableschema.field.Field;
+import io.frictionlessdata.tableschema.field.ObjectField;
+import io.frictionlessdata.tableschema.schema.BeanSchema;
+import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.locationtech.jts.geom.Coordinate;
 
 import java.math.BigDecimal;
