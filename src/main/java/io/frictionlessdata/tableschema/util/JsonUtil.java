@@ -113,6 +113,10 @@ public final class JsonUtil {
 		return mapper.convertValue(value, typeRef);
 	}
 
+	public <T> T deserialize(JsonNode value, Class<T> clazz) {
+		return mapper.convertValue(value, clazz);
+	}
+
 	public JsonNode readValue(String value) {
 		try {
 			return mapper.readTree(sanitize(value));
