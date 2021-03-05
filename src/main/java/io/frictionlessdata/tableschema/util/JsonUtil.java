@@ -108,7 +108,11 @@ public final class JsonUtil {
 			throw new JsonParsingException(e);
 		}
 	}
-	
+
+	public <T> T deserialize(JsonNode value, TypeReference<T> typeRef) {
+		return mapper.convertValue(value, typeRef);
+	}
+
 	public JsonNode readValue(String value) {
 		try {
 			return mapper.readTree(sanitize(value));
