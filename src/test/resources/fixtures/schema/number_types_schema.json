@@ -73,5 +73,12 @@
     "name": "atomicDoubleVal",
     "format": "default",
     "type": "number"
+  },
+  {
+    "name": "numberWithComma",
+    "format": "default",
+    "type": "number",
+    "decimalChar": ".",
+    "groupChar": ","
   }
 ]}

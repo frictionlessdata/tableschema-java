@@ -103,6 +103,14 @@ public class SchemaTest {
         Assert.assertArrayEquals(testArr, namesArr);
     }
 
+    @Test
+    public void testCreateSchemaWithNumberOptions() throws Exception {
+        File source = getResourceFile("/fixtures/schema/number_types_schema.json");
+        Schema schema = Schema.fromJson(source, true);
+
+        assertEquals( ",", schema.getField("numberWithComma").getOptions().get("groupChar"));
+        assertEquals( ".", schema.getField("numberWithComma").getOptions().get("decimalChar"));
+    }
 
     @Test
     public void testCreateFromListOfFields() throws Exception {
