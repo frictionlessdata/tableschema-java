@@ -87,6 +87,7 @@ public abstract class Field<T> {
     public static final String FIELD_FORMAT_EMAIL = "email";
     public static final String FIELD_FORMAT_BINARY = "binary";
     public static final String FIELD_FORMAT_UUID = "uuid";
+    public static final String FIELD_FORMAT_ANY = "any";
 
     public static final String CONSTRAINT_KEY_REQUIRED = "required";
     public static final String CONSTRAINT_KEY_UNIQUE = "unique";

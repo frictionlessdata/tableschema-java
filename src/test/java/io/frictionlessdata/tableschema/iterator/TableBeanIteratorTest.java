@@ -3,6 +3,7 @@ package io.frictionlessdata.tableschema.iterator;
 import com.google.common.util.concurrent.AtomicDouble;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.beans.EmployeeBean;
+import io.frictionlessdata.tableschema.beans.EmployeeBeanWithAnnotation;
 import io.frictionlessdata.tableschema.beans.GrossDomesticProductBean;
 import io.frictionlessdata.tableschema.beans.NumbersBean;
 import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
@@ -28,11 +29,10 @@ import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
 class TableBeanIteratorTest {
     private static Schema employeeSchema = null;
+    private static Schema employeeSchemaAlternateDateForma = null;
     private static Schema gdpSchema = null;
-    private static Table validPopulationTable = null;
-    private static Table nullValuesPopulationTable = null;
-    private static Table invalidPopulationTable = null;
     private static Table employeeTable = null;
+    private static Table employeeTableAlternateDateFormat = null;
     private static Table gdpTable = null;
 
     @BeforeEach
@@ -43,19 +43,18 @@ class TableBeanIteratorTest {
             validPopulationSchema = Schema.fromJson (fis, false);
         }
         File testDataDir = getTestDataDirectory();
-        File file = new File("data/population.csv");
-        validPopulationTable
-                = Table.fromSource(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
-        file = new File("data/population-null-values.csv");
-        nullValuesPopulationTable
-                = Table.fromSource(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
-        file = new File("data/population-invalid.csv");
-        invalidPopulationTable
-                = Table.fromSource(file, testDataDir, validPopulationSchema, DataSourceFormat.getDefaultCsvFormat());
 
-        file = new File("data/employee_data.csv");
+        File file = new File("data/employee_data.csv");
         employeeSchema = BeanSchema.infer(EmployeeBean.class);
         employeeTable = Table.fromSource(file, testDataDir, employeeSchema, DataSourceFormat.getDefaultCsvFormat());
+
+        file = new File("data/employee_alternate_date_format.csv");
+        employeeSchemaAlternateDateForma = BeanSchema.infer(EmployeeBeanWithAnnotation.class);
+        employeeTableAlternateDateFormat = Table.fromSource(
+                file,
+                testDataDir,
+                employeeSchemaAlternateDateForma,
+                DataSourceFormat.getDefaultCsvFormat());
 
         file = new File("data/gdp.csv");
         gdpSchema = BeanSchema.infer(GrossDomesticProductBean.class);
@@ -87,8 +86,30 @@ class TableBeanIteratorTest {
     }
 
     @Test
-    @DisplayName("Test deserialization of big floats (GrossDomesticProductBean)")
+    @DisplayName("Test deserialization of EmployeeBean with Annotation")
     void testBeanDeserialization2() throws Exception {
+        List<EmployeeBeanWithAnnotation> employees = new ArrayList<>();
+        BeanIterator<EmployeeBeanWithAnnotation> bit = new BeanIterator<>(employeeTableAlternateDateFormat, EmployeeBeanWithAnnotation.class, false);
+        while (bit.hasNext()) {
+            EmployeeBeanWithAnnotation employee = bit.next();
+            employees.add(employee);
+        }
+        Assertions.assertEquals(3, employees.size());
+        EmployeeBeanWithAnnotation frank = employees.get(1);
+        Assertions.assertEquals("Frank McKrank", frank.getName());
+        Assertions.assertEquals("1992-02-14", new DateField("date").formatValueAsString(frank.getDateOfBirth(), null, null));
+        Assertions.assertFalse(frank.getAdmin());
+        Assertions.assertEquals("(90.0, 45.223, NaN)", frank.getAddressCoordinates().toString());
+        Assertions.assertEquals("PT15M", frank.getContractLength().toString());
+        Map info = frank.getInfo();
+        Assertions.assertEquals(45, info.get("pin"));
+        Assertions.assertEquals(83.23, info.get("rate"));
+        Assertions.assertEquals(90, info.get("ssn"));
+    }
+
+    @Test
+    @DisplayName("Test deserialization of big floats (GrossDomesticProductBean)")
+    void testBeanDeserialization3() throws Exception {
         List<GrossDomesticProductBean> records = new ArrayList<>();
         BeanIterator<GrossDomesticProductBean> bit
                 = new BeanIterator<>(gdpTable, GrossDomesticProductBean.class, false);
@@ -102,7 +123,7 @@ class TableBeanIteratorTest {
 
     @Test
     @DisplayName("Test deserialization of various numbers")
-    void testBeanDeserialization3() throws Exception {
+    void testBeanDeserialization4() throws Exception {
         NumbersBean bn = new NumbersBean();
         bn.setAtomicIntegerVal(new AtomicInteger(2345123));
         bn.setBigDecimalVal(new BigDecimal("3542352304245234542345345423453.02345234"));

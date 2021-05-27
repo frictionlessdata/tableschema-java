@@ -5,9 +5,13 @@ import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
 
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalField;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,8 +45,33 @@ public class DateField extends Field<LocalDate> {
             TemporalAccessor dt = formatter.parse(value);
 
             return LocalDate.from(dt);
+        } else {
+            if (((!format.equals(Field.FIELD_FORMAT_DEFAULT))
+                    && (!format.equals(Field.FIELD_FORMAT_ANY)))) {
+                /* Nasty Python-specific time patterns:
+                    <PATTERN>: date/time values in this field can be parsed according to
+                    <PATTERN>. <PATTERN> MUST follow the syntax of standard Python / C
+                     strptime (That is, values in the this field should be parsable
+                    by Python / C standard strptime using <PATTERN>). Example for "format": "%d/%m/%y" which
+                    would correspond to dates like: 30/11/14
+                 */
+                String regex = format
+                        .replaceAll("%d", "dd")
+                        .replaceAll("%m", "MM")
+                        .replaceAll("%y", "yy");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(regex);
+                try {
+                    return LocalDate.from(formatter.parse(value));
+                } catch (DateTimeParseException ex) {
+                    regex = format
+                            .replaceAll("%d", "dd")
+                            .replaceAll("%m", "MM")
+                            .replaceAll("%y", "yyyy");
 
-        }else{
+                    formatter = DateTimeFormatter.ofPattern(regex);
+                    return LocalDate.from(formatter.parse(value));
+                }
+            }
             throw new TypeInferringException();
         }
     }

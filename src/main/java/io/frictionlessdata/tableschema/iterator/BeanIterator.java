@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.google.common.util.concurrent.AtomicDouble;
 import io.frictionlessdata.tableschema.Table;
+import io.frictionlessdata.tableschema.annotations.FieldFormat;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.field.ObjectField;
@@ -64,14 +65,21 @@ public class BeanIterator<T> extends TableIterator<T> {
                     continue;
                 }
                 AnnotatedField aF = ((BeanSchema) schema).getAnnotatedField(fieldName);
-                // we may have a field that can have different formats
-                // but the Schema doesn't know about the true format
-                if (field.getFormat().equals(Field.FIELD_FORMAT_DEFAULT)) {
-                    // have to parse format here when we have actual sample data
-                    // instead of at BeanSchema inferral time
-                    String fieldFormat = field.parseFormat(row[i], null);
-                    field.setFormat(fieldFormat);
+
+                FieldFormat annotation = aF.getAnnotation(FieldFormat.class);
+                String fieldFormat = field.getFormat();
+                if (null != annotation) {
+                    fieldFormat = annotation.format();
+                } else {
+                    // we may have a field that can have different formats
+                    // but the Schema doesn't know about the true format
+                    if (fieldFormat.equals(Field.FIELD_FORMAT_DEFAULT)) {
+                        // have to parse format here when we have actual sample data
+                        // instead of at BeanSchema inferral time
+                        fieldFormat = field.parseFormat(row[i], null);
+                    }
                 }
+                field.setFormat(fieldFormat);
                 Object val = field.castValue(row[i]);
                 if (null == val)
                     continue;
