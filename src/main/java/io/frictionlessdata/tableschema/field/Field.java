@@ -148,7 +148,17 @@ public abstract class Field<T> {
 
     Map<String, Object> constraints = null;
 
-    Map<String, Object> options = null;
+    Map<String, Object> options = new HashMap<>();
+
+    @JsonAnyGetter
+    public Map<String, Object> otherFields() {
+        return options;
+    }
+
+    @JsonAnySetter
+    public void setOtherField(String key, Object value) {
+        options.put(key, value);
+    }
 
     /**
      * Constructor for our reflection-based instantiation only
