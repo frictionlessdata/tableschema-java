@@ -14,6 +14,7 @@ import org.locationtech.jts.geom.Coordinate;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -90,6 +91,8 @@ public class BeanIterator<T> extends TableIterator<T> {
                     aF.setValue(retVal, ((BigDecimal)val).floatValue());
                 } else if (double.class.equals(annotatedFieldClass)){
                     aF.setValue(retVal, ((BigDecimal)val).doubleValue());
+                } else if (UUID.class.equals(annotatedFieldClass)){
+                    aF.setValue(retVal, UUID.fromString((String)val));
                 } else if (Coordinate.class.isAssignableFrom(annotatedFieldClass)) {
                     double[] arr = (double[])val;
                     Coordinate coordinate = new Coordinate(arr[0], arr[1]);
