@@ -217,6 +217,8 @@ public class Table{
                         .createSchemaHeaderMapping(dataSourceFormat.getHeaders(), getDeclaredHeaders());
             }
         } catch (Exception ex) {
+            if (ex instanceof RuntimeException)
+                throw (RuntimeException)ex;
             throw new RuntimeException(ex);
         }
     }
@@ -290,6 +292,8 @@ public class Table{
             }
             return JsonUtil.getInstance().serialize(arr);
         } catch (Exception ex) {
+            if (ex instanceof RuntimeException)
+                throw (RuntimeException)ex;
             throw new RuntimeException(ex);
         }
     }
@@ -308,6 +312,8 @@ public class Table{
                 }
             });
         } catch (Exception ex) {
+            if (ex instanceof RuntimeException)
+                throw (RuntimeException)ex;
             throw new RuntimeException(ex);
         }
     }
@@ -340,6 +346,8 @@ public class Table{
             writeCSVData( mapping, csvPrinter);
             csvPrinter.close();
         } catch (Exception ex) {
+            if (ex instanceof RuntimeException)
+                throw (RuntimeException)ex;
             throw new RuntimeException(ex);
         }
     }
@@ -363,6 +371,8 @@ public class Table{
                     }
                     writeCsv(out, this.format, headers);
                 } catch (Exception ex) {
+                    if (ex instanceof RuntimeException)
+                        throw ex;
                     throw new RuntimeException(ex);
                 }
             } else if (dataFormat.equals(DataSourceFormat.Format.FORMAT_JSON)) {
@@ -370,6 +380,8 @@ public class Table{
                 out.write(content);
             }
         } catch (Exception ex) {
+            if (ex instanceof RuntimeException)
+                throw (RuntimeException)ex;
             throw new RuntimeException(ex);
         }
     }
