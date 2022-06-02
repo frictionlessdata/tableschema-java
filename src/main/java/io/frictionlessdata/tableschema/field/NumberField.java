@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,7 +29,7 @@ public class NumberField extends Field<Number> {
     private static final String REGEX_INTEGER = "[+-]?\\d+";
     private static final String REGEX_BARE_NUMBER = "((^\\D*)|(\\D*$))";
 
-    private static final NumberFormat numberFormat = NumberFormat.getInstance();
+    private static final NumberFormat numberFormat = NumberFormat.getInstance(Locale.ENGLISH);
     static {
         numberFormat.setMaximumFractionDigits(Integer.MAX_VALUE);
         numberFormat.setGroupingUsed(false);
