@@ -23,9 +23,9 @@
         <apache-commons-csv.version>1.8</apache-commons-csv.version>
         <apache-commons-codec.version>1.15</apache-commons-codec.version>
         <apache-commons-validator.version>1.7</apache-commons-validator.version>
-        <geotools.version>25.0</geotools.version>
-        <jackson.version>2.12.4</jackson.version>
-        <junit.version>5.7.2</junit.version>
+        <geotools.version>26.4</geotools.version>
+        <jackson.version>2.13.3</jackson.version>
+        <junit.version>5.8.2</junit.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
@@ -187,7 +187,7 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>6.0.1</version>
+                <version>7.1.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -245,7 +245,7 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geometry</artifactId>
-            <version>24.4</version>
+            <version>24.6</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.locationtech.jts/jts-core -->
