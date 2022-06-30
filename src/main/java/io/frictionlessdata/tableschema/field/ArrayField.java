@@ -31,7 +31,7 @@ public class ArrayField extends Field<Object[]> {
 
     @Override
     public String formatValueAsString(Object[] value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return value.toString();
+        return JsonUtil.getInstance().serialize(value);
     }
 
 

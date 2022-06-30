@@ -5,6 +5,7 @@ import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -34,11 +35,7 @@ public class TimeField extends Field<LocalTime> {
         Matcher matcher = pattern.matcher(value);
 
         if(matcher.matches()){
-            LocalTime lt = LocalTime.parse(value);
-            //DateTimeFormatter formatter = DateTimeFormat.forPattern("HH:mm:ss");
-            //DateTime dt = formatter.parseDateTime(value);
-
-            return lt;
+            return LocalTime.parse(value);
 
         }else{
             throw new TypeInferringException();
@@ -46,9 +43,13 @@ public class TimeField extends Field<LocalTime> {
     }
 
     @Override
+    public Object formatValueForJson(LocalTime value) throws InvalidCastException, ConstraintsException {
+        return value.format(DateTimeFormatter.ISO_LOCAL_TIME);
+    }
+
+    @Override
     public String formatValueAsString(LocalTime value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         return value.format(DateTimeFormatter.ISO_LOCAL_TIME);
-        //return value.toString(DateTimeFormat.forPattern("HH:mm:ss"));
     }
 
     @Override

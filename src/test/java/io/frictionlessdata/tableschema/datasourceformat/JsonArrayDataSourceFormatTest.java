@@ -1,13 +1,18 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
 import io.frictionlessdata.tableschema.TestHelper;
+import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.stream.Collectors;
+
+import io.frictionlessdata.tableschema.schema.Schema;
+import io.frictionlessdata.tableschema.Table;
+
+import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
 class JsonArrayDataSourceFormatTest {
     private String populationJson = "[" +
@@ -125,27 +130,48 @@ class JsonArrayDataSourceFormatTest {
         });
     }
 
-/*
     @Test
-    void writeJsonToFile() throws Exception{
-        String content = null;
-        String popCsv;
+    @DisplayName("Validate reading from a JSON file and writing out yields the same result")
+    public void testJsonDataSourceFormatToJson() throws Exception{
+        File schemaFile = new File(getTestDataDirectory(), "schema/employee_full_schema.json");
+        Schema schema = Schema.fromJson (schemaFile, true);
+        File inFile = new File("data/employee_full.json");
 
-        File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.json");
-        popCsv = new String(Files.readAllBytes(inFile.toPath()));
-        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(popCsv);
+        Table table = Table.fromSource(inFile, getTestDataDirectory(), schema, null);
+        FileWriter fileWriter = new FileWriter("test.json");
+        table.write(fileWriter, DataSourceFormat.Format.FORMAT_JSON);
+        fileWriter.close();
+        String s = table.asJson().replaceAll("\\s+", " ").replaceAll(" }", "}");
+        FileWriter jsonWriter = new FileWriter("test.json");
+        table.write(jsonWriter, DataSourceFormat.Format.FORMAT_JSON);
+        jsonWriter.close();
 
-        File tempFile = Files.createTempFile("tableschema-", ".json").toFile();
-        ds.write(tempFile);
-        try (FileReader fr = new FileReader(tempFile)) {
-            try (BufferedReader rdr = new BufferedReader(fr)) {
-                content = rdr.lines().collect(Collectors.joining("\n"));
-            }
-        }
-        // evade the CRLF mess by nuking all CR chars
-        Assertions.assertEquals(content.replaceAll("[\\r\\n ]", ""),
-                popCsv.replaceAll("[\\r\\n ]", ""));
+        File referenceFile = new File(getTestDataDirectory(), "data/employee_full.json");
+        String referenceContent = String.join("", Files.readAllLines(referenceFile.toPath()));
+        referenceContent = referenceContent.replaceAll("\\s+", " ").replaceAll(" }", "}");
+
+        Assertions.assertEquals(referenceContent, s);
+
+        File testFile = new File( "test.json");
+        String testContent = String.join("", Files.readAllLines(testFile.toPath()));
+        testContent = testContent.replaceAll("\\s+", " ").replaceAll(" }", "}");
+        Assertions.assertEquals(referenceContent, testContent);
+
+        File testFileCsv = new File("test.csv");
+        table.writeCsv(testFileCsv, CSVFormat.DEFAULT);
+        File referenceFileCsv = new File(getTestDataDirectory(), "data/employee_full.csv");
+        String referenceContentCsv = String.join("", Files.readAllLines(referenceFileCsv.toPath()));
+        referenceContentCsv = referenceContentCsv
+                .replaceAll("\\s+", " ")
+                .replaceAll("TRUE", "true")
+                .replaceAll("FALSE", "false");
+        String testContentCsv = String.join("", Files.readAllLines(testFileCsv.toPath()));
+        testContentCsv = testContentCsv
+                .replaceAll("\\s+", " ")
+                .replaceAll("\\[ ", "[")
+                .replaceAll(" ]", "]");
+                /*.replaceAll(" }", "}");*/
+        testContentCsv = testContentCsv.replaceAll("\\s+", " ").replaceAll(" }", "}");
+        Assertions.assertEquals(referenceContentCsv, testContentCsv);
     }
-
- */
 }

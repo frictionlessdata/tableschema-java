@@ -20,7 +20,6 @@ import java.util.Objects;
 
 public final class JsonUtil {
 	private static JsonUtil instance;
-	private boolean indent = true;
 	private ObjectMapper mapper;
 	
 	private JsonUtil() {
@@ -38,7 +37,7 @@ public final class JsonUtil {
 		}
 		return instance;
 	}
-	
+
 	public ObjectNode createNode() {
 		return mapper.createObjectNode();
 	}
@@ -85,13 +84,16 @@ public final class JsonUtil {
 	}
 
 	public String serialize(Object value) {
+		return serialize (value, true);
+	}
+	public String serialize(Object value, boolean indent) {
 		try {
-			return _getWriter().writeValueAsString(value);
+			return _getWriter(indent).writeValueAsString(value);
 		} catch (JsonProcessingException e) {
 			throw new JsonSerializingException(e);
 		}
 	}
-	
+
 	public <T> T deserialize(String value, Class<T> clazz) {
 		try {
 			return mapper.readValue(sanitize(value), clazz);
@@ -144,11 +146,7 @@ public final class JsonUtil {
     	} else return string;
 	}
 
-	public void setIndent(boolean indent) {
-		this.indent = indent;
-	}
-
-	private ObjectWriter _getWriter() {
+	private ObjectWriter _getWriter(boolean indent) {
 		return (indent) ? mapper.writer(new DefaultPrettyPrinter()) : mapper.writer(new MinimalPrettyPrinter());
 	}
 	

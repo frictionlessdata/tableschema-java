@@ -53,7 +53,12 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
 			List<String> values = new ArrayList<>();
 			for (String header : headers) {
 				JsonNode val = input.get(header);
-				values.add((null != val) ? val.asText("") : null);
+				if (null == val) {
+					values.add(null);
+				} else if ((val instanceof ObjectNode) || (val instanceof ArrayNode)) {
+					values.add(val.toString());
+				} else
+					values.add(val.asText(""));
 			}
 
 			return values.toArray(new String[0]);

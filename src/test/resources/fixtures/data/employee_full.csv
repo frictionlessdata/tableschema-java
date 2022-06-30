@@ -1,4 +1,4 @@
 first_name,last_name,gender,age,period_employed,employment_start,daily_start,daily_end,is_management,photo,interests,home_location,position_title,extra,notes
-John,Doe,m,50,2.6,2017-07-30,10:23:00,06:30:00,FALSE,xxx,[“cooking”],"-101.473911, 38.704022",,{“key”: “value”},
-Frank,McKrank,m,22,0.4,2018-09-13,09:30:00,03:30:00,FALSE,xxx,"[“sports”, “reading”]","-91.254898, 35.6087",Senior Janitor,,"-91.254898, 35.6087"
-Deborah,Vester,f,34,12,2007-01-30,02:00:00,10:00:00,TRUE,xxx,[],"-101.473911, 38.704022",SVP,,[“cooking”]
+John,Doe,m,50,2.6,2017-07-30,10:23:00,06:30:00,FALSE,xxx,"[""cooking""]","-101.473911,38.704022",,"{""key"":""value""}",
+Frank,McKrank,m,22,0.4,2018-09-13,09:30:00,03:30:00,FALSE,xxx,"[""sports"", ""reading""]","-91.254898,35.6087",Senior Janitor,,"-91.254898, 35.6087"
+Deborah,Vester,f,34,12,2007-01-30,02:00:00,10:00:00,TRUE,xxx,[],"-101.473911,38.704022",SVP,,[“cooking”]

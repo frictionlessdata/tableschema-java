@@ -33,7 +33,7 @@ public class ObjectField extends Field<Map<String, Object>> {
     @Override
     public String formatValueAsString(Map<String, Object> value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
-        return JsonUtil.getInstance().serialize(value);
+        return JsonUtil.getInstance().serialize(value, false).replaceAll("[\n\r]", " ");
     }
 
 
