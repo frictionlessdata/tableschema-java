@@ -1,0 +1,51 @@
+[ {
+  "notes" : null,
+  "gender" : "m",
+  "is_management" : false,
+  "employment_start" : "2017-07-30",
+  "last_name" : "Doe",
+  "daily_end" : "06:30:00",
+  "photo" : "xxx",
+  "position_title" : null,
+  "daily_start" : "10:23:00",
+  "extra" : {
+    "key" : "value"
+  },
+  "home_location" : "-101.473911,38.704022",
+  "interests" : [ "cooking" ],
+  "first_name" : "John",
+  "period_employed" : "2.6",
+  "age" : 50
+}, {
+  "notes" : "-91.254898, 35.6087",
+  "gender" : "m",
+  "is_management" : false,
+  "employment_start" : "2018-09-13",
+  "last_name" : "McKrank",
+  "daily_end" : "03:30:00",
+  "photo" : "xxx",
+  "position_title" : "Senior Janitor",
+  "daily_start" : "09:30:00",
+  "extra" : null,
+  "home_location" : "-91.254898,35.6087",
+  "interests" : [ "sports", "reading" ],
+  "first_name" : "Frank",
+  "period_employed" : "0.4",
+  "age" : 22
+}, {
+  "notes" : "[“cooking”]",
+  "gender" : "f",
+  "is_management" : true,
+  "employment_start" : "2007-01-30",
+  "last_name" : "Vester",
+  "daily_end" : "10:00:00",
+  "photo" : "xxx",
+  "position_title" : "SVP",
+  "daily_start" : "02:00:00",
+  "extra" : null,
+  "home_location" : "-101.473911,38.704022",
+  "interests" : [ ],
+  "first_name" : "Deborah",
+  "period_employed" : "12",
+  "age" : 34
+} ]
