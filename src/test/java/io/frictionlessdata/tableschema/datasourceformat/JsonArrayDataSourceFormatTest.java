@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Collectors;
 
 import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
@@ -153,25 +155,25 @@ class JsonArrayDataSourceFormatTest {
         Assertions.assertEquals(referenceContent, s);
 
         File testFile = new File( "test.json");
-        String testContent = String.join("", Files.readAllLines(testFile.toPath()));
+        BufferedReader rdr = new BufferedReader(new FileReader(testFile));
+        String testContent = rdr.lines().collect(Collectors.joining("\n"));
         testContent = testContent.replaceAll("\\s+", " ").replaceAll(" }", "}");
         Assertions.assertEquals(referenceContent, testContent);
 
         File testFileCsv = new File("test.csv");
         table.writeCsv(testFileCsv, CSVFormat.DEFAULT);
         File referenceFileCsv = new File(getTestDataDirectory(), "data/employee_full.csv");
-        String referenceContentCsv = String.join("", Files.readAllLines(referenceFileCsv.toPath()));
+        String referenceContentCsv = String.join("\n", Files.readAllLines(referenceFileCsv.toPath()));
         referenceContentCsv = referenceContentCsv
-                .replaceAll("\\s+", " ")
+                .replaceAll(" +", " ")
                 .replaceAll("TRUE", "true")
                 .replaceAll("FALSE", "false");
-        String testContentCsv = String.join("", Files.readAllLines(testFileCsv.toPath()));
+        rdr = new BufferedReader(new FileReader(testFileCsv));
+        String testContentCsv = rdr.lines().collect(Collectors.joining("\n"));
         testContentCsv = testContentCsv
-                .replaceAll("\\s+", " ")
+                .replaceAll(" +", " ")
                 .replaceAll("\\[ ", "[")
                 .replaceAll(" ]", "]");
-                /*.replaceAll(" }", "}");*/
-        testContentCsv = testContentCsv.replaceAll("\\s+", " ").replaceAll(" }", "}");
         Assertions.assertEquals(referenceContentCsv, testContentCsv);
     }
 }
