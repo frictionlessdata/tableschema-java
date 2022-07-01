@@ -48,6 +48,8 @@ public class YearmonthField extends Field<YearMonth> {
     @Override
     public String formatValueAsString(YearMonth value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
+        if (null == value)
+            return null;
         return value.toString();
     }
 

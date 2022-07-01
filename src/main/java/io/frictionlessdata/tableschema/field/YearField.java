@@ -42,12 +42,16 @@ public class YearField extends Field<Year> {
 
     @Override
     public Object formatValueForJson(Year value) throws InvalidCastException, ConstraintsException {
+        if (null == value)
+            return null;
         return value.getValue();
     }
 
     @Override
     public String formatValueAsString(Year value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
+        if (null == value)
+            return null;
         return value.toString();
     }
 

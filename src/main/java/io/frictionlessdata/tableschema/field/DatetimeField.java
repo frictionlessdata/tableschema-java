@@ -50,6 +50,8 @@ public class DatetimeField extends Field<ZonedDateTime> {
 
     @Override
     public String formatValueAsString(ZonedDateTime value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        if (null == value)
+            return null;
         return value.format(formatter);
     }
 

@@ -78,11 +78,15 @@ public class DateField extends Field<LocalDate> {
 
     @Override
     public Object formatValueForJson(LocalDate value) throws InvalidCastException, ConstraintsException {
+        if (null == value)
+            return null;
         return value.toString();
     }
 
     @Override
     public String formatValueAsString(LocalDate value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        if (null == value)
+            return null;
         return value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 

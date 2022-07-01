@@ -33,6 +33,8 @@ public class IntegerField extends Field<BigInteger> {
 
     @Override
     public String formatValueAsString(BigInteger value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        if (null == value)
+            return null;
         return value.toString();
     }
 

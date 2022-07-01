@@ -44,11 +44,15 @@ public class TimeField extends Field<LocalTime> {
 
     @Override
     public Object formatValueForJson(LocalTime value) throws InvalidCastException, ConstraintsException {
+        if (null == value)
+            return null;
         return value.format(DateTimeFormatter.ISO_LOCAL_TIME);
     }
 
     @Override
     public String formatValueAsString(LocalTime value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        if (null == value)
+            return null;
         return value.format(DateTimeFormatter.ISO_LOCAL_TIME);
     }
 
