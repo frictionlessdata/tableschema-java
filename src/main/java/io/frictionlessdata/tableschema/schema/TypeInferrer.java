@@ -129,7 +129,7 @@ public class TypeInferrer {
             TreeMap<String, Integer> typeInferralCountMapSortedByCount = sortMapByValue(typeInferralCountMap); 
            
             if(!typeInferralCountMapSortedByCount.isEmpty()){
-                String inferredType = typeInferralCountMapSortedByCount.firstEntry().getKey();
+                String inferredType = typeInferralCountMapSortedByCount.lastEntry().getKey();
                 fieldArray.get(j).put(Field.JSON_KEY_TYPE, inferredType);
                 fieldArray.get(j).put(Field.JSON_KEY_FORMAT, formatMap.get(headers[j]));
             }
