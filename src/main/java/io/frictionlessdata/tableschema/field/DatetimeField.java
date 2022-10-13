@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DatetimeField extends Field<ZonedDateTime> {
-    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSS]Z");
+    private static DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
     // ISO 8601 format of yyyy-MM-dd'T'HH:mm:ss.SSSZ in UTC time
     private static final String REGEX_DATETIME
             = "(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?";
