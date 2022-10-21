@@ -39,8 +39,8 @@ public class DatetimeField extends Field<ZonedDateTime> {
         Matcher matcher = pattern.matcher(value);
 
         if(matcher.matches()){
-            String locValue = value.endsWith("Z") ? value.replace("Z", "")+"+0000" : value;
-            TemporalAccessor dt = formatter.parse(locValue);
+            //String locValue = value.endsWith("Z") ? value.replace("Z", "")+"+0000" : value;
+            TemporalAccessor dt = formatter.parse(value);
 
             return ZonedDateTime.from(dt);
         }else{
