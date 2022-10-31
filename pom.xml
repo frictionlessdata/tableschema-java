@@ -25,7 +25,7 @@
         <apache-commons-codec.version>20041127.091804</apache-commons-codec.version>
         <apache-commons-validator.version>1.7</apache-commons-validator.version>
         <geotools.version>24.6</geotools.version>
-        <jackson.version>2.13.4</jackson.version>
+        <jackson.version>2.13.4.1</jackson.version>
         <junit.version>5.9.0</junit.version>
         <locationtech-jts.version>1.19.0</locationtech-jts.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
