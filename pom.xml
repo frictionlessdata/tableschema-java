@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frictionlessdata</groupId>
     <artifactId>tableschema-java</artifactId>
-    <version>0.2.2-SNAPSHOT</version>
+    <version>0.2.3-SNAPSHOT</version>
     <packaging>jar</packaging>
     <issueManagement>
         <url>https://github.com/frictionlessdata/tableschema-java/issues</url>
@@ -16,16 +16,18 @@
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>13</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <google-guava.version>31.1-jre</google-guava.version>
         <apache-commons-lang3.version>3.12.0</apache-commons-lang3.version>
-        <apache-commons-csv.version>1.8</apache-commons-csv.version>
-        <apache-commons-codec.version>1.15</apache-commons-codec.version>
+        <apache-commons-csv.version>1.9.0</apache-commons-csv.version>
+        <apache-commons-codec.version>20041127.091804</apache-commons-codec.version>
         <apache-commons-validator.version>1.7</apache-commons-validator.version>
         <geotools.version>24.6</geotools.version>
-        <jackson.version>2.13.3</jackson.version>
-        <junit.version>5.8.2</junit.version>
+        <jackson.version>2.13.4</jackson.version>
+        <junit.version>5.9.0</junit.version>
+        <locationtech-jts.version>1.19.0</locationtech-jts.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
@@ -34,10 +36,10 @@
         <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-        <networknt-validator-version>1.0.71</networknt-validator-version>
+        <networknt-validator-version>1.0.73</networknt-validator-version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
-        <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
     </properties>
     <repositories>
         <repository>
@@ -96,7 +98,7 @@
                     <doclint>none</doclint>
                     <quiet>true</quiet>
                     <encoding>UTF-8</encoding>
-                    <source>8</source>
+                    <source>${java.version}</source>
                 </configuration>
                 <executions>
                     <execution>
@@ -107,6 +109,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>${maven-deploy-plugin.version}</version>
@@ -135,6 +138,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -146,6 +150,7 @@
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -171,6 +176,7 @@
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>${coveralls-maven-plugin.version}</version>
             </plugin>
+
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -206,6 +212,7 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
@@ -251,7 +258,7 @@
         <dependency>
             <groupId>org.locationtech.jts</groupId>
             <artifactId>jts-core</artifactId>
-            <version>1.19.0</version>
+            <version>${locationtech-jts.version}</version>
         </dependency>
         <!-- End Dependencies for Bean-based Schema inferal -->
 
@@ -261,12 +268,14 @@
             <artifactId>commons-lang3</artifactId>
             <version>${apache-commons-lang3.version}</version>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>${apache-commons-codec.version}</version>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/commons-validator/commons-validator -->
         <dependency>
             <groupId>commons-validator</groupId>
@@ -279,6 +288,7 @@
             <artifactId>commons-csv</artifactId>
             <version>${apache-commons-csv.version}</version>
         </dependency>
+
         <!-- JSON Schema Validator -->
         <dependency>
         	<groupId>com.networknt</groupId>
