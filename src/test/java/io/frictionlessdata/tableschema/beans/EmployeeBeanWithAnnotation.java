@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Map;
 
+// we need to give the property order to get a valid schema, as Java reflection tosses this.
 @JsonPropertyOrder({
    "id", "name", "dateOfBirth", "isAdmin", "addressCoordinates", "contractLength", "info"
 })

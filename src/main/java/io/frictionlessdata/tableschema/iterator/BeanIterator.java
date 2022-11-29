@@ -88,7 +88,7 @@ public class BeanIterator<T> extends TableIterator<T> {
                 if (Number.class.isAssignableFrom(annotatedFieldClass)) {
                     setNumberField(retVal, aF, (Number)val);
                 } else if (byte.class.equals(annotatedFieldClass)){
-                    aF.setValue(retVal, new Byte(((BigInteger)val).shortValue()+""));
+                    aF.setValue(retVal, Byte.valueOf(((BigInteger)val).shortValue()+""));
                 } else if (short.class.equals(annotatedFieldClass)){
                     aF.setValue(retVal, ((BigInteger)val).shortValue());
                 } else if (int.class.equals(annotatedFieldClass)){

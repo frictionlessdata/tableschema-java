@@ -6,14 +6,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.math.BigDecimal;
 import java.time.Year;
 
+//CSV header columns:
+// Country Name,Country Code,Year,Value
+// we need to give the property order to get a valid schema, as Java reflection tosses this.
 @JsonPropertyOrder({
         "countryName", "countryCode", "year", "amount"
 })
 public class GrossDomesticProductBean {
-
-    //CSV header columns:
-    // Country Name,Country Code,Year,Value
-
 
     @JsonProperty("Country Name")
     String countryName;

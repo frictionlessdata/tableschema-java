@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+// we need to give the property order to get a valid schema, as Java reflection tosses this.
 @JsonPropertyOrder({
    "id", "byteVal", "shortVal", "intVal", "longClassVal", "longVal", "floatVal",
         "doubleVal", "floatClassVal", "doubleClassVal", "bigIntVal", "bigDecimalVal",
@@ -214,6 +215,7 @@ public class NumbersBean {
 
  @Override
  public int hashCode() {
-  return Objects.hash(id, byteVal, shortVal, intVal, longClassVal, longVal, floatVal, doubleVal, bigIntVal, bigDecimalVal, atomicIntegerVal, atomicLongVal, atomicDoubleVal);
+  return Objects.hash(id, byteVal, shortVal, intVal, longClassVal, longVal, floatVal, doubleVal, bigIntVal,
+          bigDecimalVal, atomicIntegerVal, atomicLongVal, atomicDoubleVal);
  }
 }
