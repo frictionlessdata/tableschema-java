@@ -160,7 +160,6 @@ public class BeanSchema extends Schema {
                 .getDefaultVisibilityChecker()
                 .withFieldVisibility(JsonAutoDetect.Visibility.ANY));
         Map<String, AnnotatedField> fields = new LinkedHashMap<>();
-        //Map<String, String> fieldNames = ReflectionUtils.getFieldNameMapping(mapper, type);
         JavaType jType = mapper.constructType(type);
         BeanDescription desc = mapper.getSerializationConfig()
                 .introspect(jType);

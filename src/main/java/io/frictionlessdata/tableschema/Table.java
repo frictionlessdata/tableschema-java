@@ -77,7 +77,9 @@ public class Table{
     public static Table fromSource(InputStream dataSource, InputStream schema, CSVFormat format) throws Exception{
         Table table = new Table();
         table.dataSourceFormat = DataSourceFormat.createDataSourceFormat(dataSource);
-        table.schema = Schema.fromJson(schema, true);
+        if (null != schema) {
+            table.schema = Schema.fromJson(schema, true);
+        }
         if (null != format) {
             table.setCsvFormat(format);
         }
@@ -154,12 +156,15 @@ public class Table{
     /**
      * Create Table from a URL containing either CSV or JSON and with  a Schema and a CSVFormat.
      * @param dataSource the URL for the CSV or JSON content
-     * @param schemaUrl the URL for the table schema
+     * @param schemaUrl the URL for the table schema. Can be null
      * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data
      * @throws IOException if reading throws an Exception
      */
     public static Table fromSource(URL dataSource, URL schemaUrl, CSVFormat format) throws Exception {
-        Schema schema = Schema.fromJson(schemaUrl, true);
+        Schema schema = null;
+        if (null != schemaUrl) {
+            schema = Schema.fromJson(schemaUrl, true);
+        }
         return fromSource(dataSource, schema, format);
     }
 
