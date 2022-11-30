@@ -1,9 +1,12 @@
 package io.frictionlessdata.tableschema.schema;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.beans.EmployeeBean;
+import io.frictionlessdata.tableschema.beans.ExplicitNamingBean;
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.PrimaryKeyException;
@@ -11,88 +14,88 @@ import io.frictionlessdata.tableschema.exception.ValidationException;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 import io.frictionlessdata.tableschema.fk.Reference;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class SchemaTest {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    public File folder = Files.createTempDirectory("tableschema-").toFile();
 
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
+    public SchemaTest() throws IOException {
+    }
 
     @Test
+    @DisplayName("Validate creating a Schema from valid JSON representation")
     public void testCreateSchemaFromValidSchemaJson() throws Exception {
         Field<?> nameField = new IntegerField("id");
         String schemaJson = "{\"fields\": [" + nameField.getJson() + "]}";
         Schema validSchema = Schema.fromJson(schemaJson, true);
-        Assert.assertTrue(validSchema.isValid());
+        Assertions.assertTrue(validSchema.isValid());
     }
 
 
     @Test
+    @DisplayName("Validate creating a Schema from an invalid file with strict validation throws")
     public void testReadFromInValidSchemaFileWithStrictValidation() throws Exception {
         File f = new File(TestHelper.getTestDataDirectory(), "schema/invalid_population_schema.json");
-        exception.expect(ValidationException.class);
-        Schema.fromJson(f, true);
+        Assertions.assertThrows(ValidationException.class, () -> Schema.fromJson(f, true));
     }
 
     @Test
+    @DisplayName("Validate simple Schema with one IntegerField")
     public void testIsValid() {
         Schema schema = new Schema();
 
         Field<?> idField = new IntegerField("id");
         schema.addField(idField);
 
-        Assert.assertTrue(schema.isValid());
+        Assertions.assertTrue(schema.isValid());
     }
 
 
     @Test
+    @DisplayName("Validate creation of Schema from valid URL")
     public void testCreateSchemaFromValidSchemaUrl() throws Exception {
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/" +
                 "master/src/test/resources/fixtures/schema/simple_schema.json");
 
         Schema validSchema = Schema.fromJson(url, true);
-        Assert.assertTrue(validSchema.isValid());
+        Assertions.assertTrue(validSchema.isValid());
     }
 
     @Test
+    @DisplayName("Validate creating a Schema from an invalid URL throws")
     public void testCreateSchemaFromBadUrl() throws Exception {
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/" +
                 "tableschema-java/BAD/URL/simple_schema.json");
 
-        exception.expect(Exception.class);
-        Schema.fromJson(url, true);
+        Assertions.assertThrows(Exception.class, () -> Schema.fromJson(url, true));
     }
 
 
     @Test
+    @DisplayName("Validate field names of Schema read from JSON representation")
     public void testReadSchemaFieldNames() throws Exception {
         File source = getResourceFile("/fixtures/schema/population_schema.json");
         Schema schema = Schema.fromJson(source, true);
@@ -100,21 +103,23 @@ public class SchemaTest {
         List<String> fieldNames = schema.getFieldNames();
         Object[] namesArr = fieldNames.toArray();
         String[] testArr = new String[]{"city", "year", "population"};
-        Assert.assertArrayEquals(testArr, namesArr);
+        Assertions.assertArrayEquals(testArr, namesArr);
     }
 
     @Test
+    @DisplayName("Validate creating a Schema having NumberFields with options for group and decimal separator")
     public void testCreateSchemaWithNumberOptions() throws Exception {
         File source = getResourceFile("/fixtures/schema/number_types_schema.json");
         Schema schema = Schema.fromJson(source, true);
 
-        assertEquals( ",", schema.getField("numberWithComma").getOptions().get("groupChar"));
-        assertEquals( ".", schema.getField("numberWithComma").getOptions().get("decimalChar"));
+        Assertions.assertEquals( ",", schema.getField("numberWithComma").getOptions().get("groupChar"));
+        Assertions.assertEquals( ".", schema.getField("numberWithComma").getOptions().get("decimalChar"));
     }
 
     @Test
+    @DisplayName("Validate creating a Schema from a List of Fields")
     public void testCreateFromListOfFields() throws Exception {
-        List<Field> fields = new ArrayList<>();
+        List<Field<?>> fields = new ArrayList<>();
 
         Field<?> fieldString = new StringField("fieldString");
         fields.add(fieldString);
@@ -124,8 +129,8 @@ public class SchemaTest {
         fields.add(fieldBoolean);
 
         Schema schema = new Schema(fields, true);
-        assertEquals(3, schema.getFields().size());
-        assertEquals(fields, schema.getFields());
+        Assertions.assertEquals(3, schema.getFields().size());
+        Assertions.assertEquals(fields, schema.getFields());
     }
 
     @Test
@@ -133,15 +138,15 @@ public class SchemaTest {
         File source = getResourceFile("/fixtures/primarykey/simple_schema_with_valid_pk.json");
         Schema schemaWithValidPK = Schema.fromJson(source, true);
 
-        assertEquals("id", schemaWithValidPK.getPrimaryKey());
+        Assertions.assertEquals("id", schemaWithValidPK.getPrimaryKey());
     }
 
     @Test
     public void testCreateSchemaFromFileWithInvalidPrimaryKey() throws Exception {
         File source = getResourceFile("/fixtures/primarykey/simple_schema_with_invalid_pk.json");
 
-        exception.expect(PrimaryKeyException.class);
-        Schema.fromJson(source, true);
+        Throwable t = Assertions.assertThrows(PrimaryKeyException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertEquals("No such field: invalid.", t.getMessage());
     }
 
     @Test
@@ -150,8 +155,8 @@ public class SchemaTest {
         Schema schemaWithValidCK = Schema.fromJson(source, true);
 
         String[] compositePrimaryKey = schemaWithValidCK.getPrimaryKey();
-        assertEquals("name", compositePrimaryKey[0]);
-        assertEquals("surname", compositePrimaryKey[1]);
+        Assertions.assertEquals("name", compositePrimaryKey[0]);
+        Assertions.assertEquals("surname", compositePrimaryKey[1]);
 
     }
 
@@ -159,8 +164,8 @@ public class SchemaTest {
     public void testCreateSchemaFromFileWithInvalidCompositeKey() throws Exception {
         File source = getResourceFile("/fixtures/primarykey/simple_schema_with_invalid_ck.json");
 
-        exception.expect(PrimaryKeyException.class);
-        Schema.fromJson(source, true);
+        Throwable t = Assertions.assertThrows(PrimaryKeyException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertEquals("No such field: invalid.", t.getMessage());
     }
 
     @Test
@@ -169,7 +174,7 @@ public class SchemaTest {
         Schema validSchema = new Schema();
         validSchema.addField(nameField);
 
-        assertEquals(1, validSchema.getFields().size());
+        Assertions.assertEquals(1, validSchema.getFields().size());
     }
 
     @Test
@@ -178,7 +183,7 @@ public class SchemaTest {
         Schema validSchema = new Schema();
         validSchema.addField(nameField);
 
-        Assert.assertNull(validSchema.getField("lksajdf"));
+        Assertions.assertNull(validSchema.getField("lksajdf"));
     }
 
     @Test
@@ -188,30 +193,30 @@ public class SchemaTest {
         validSchema.addField(nameField.getJson());
         Field<?> foundNameField = validSchema.getField("id");
 
-        assertEquals(nameField, foundNameField);
+        Assertions.assertEquals(nameField, foundNameField);
     }
 
 
     @Test
     public void hasField() {
         Schema schema = new Schema();
-        Assert.assertFalse(schema.hasFields());
+        Assertions.assertFalse(schema.hasFields());
 
         Field<?> idField = new IntegerField("id");
         schema.addField(idField);
-        Assert.assertTrue(schema.hasFields());
+        Assertions.assertTrue(schema.hasFields());
     }
 
     @Test
     public void hasSetField() {
         Schema schema = new Schema();
-        Assert.assertFalse(schema.hasFields());
+        Assertions.assertFalse(schema.hasFields());
 
         Field<?> idField = new IntegerField("id");
         schema.addField(idField);
-        Assert.assertTrue(schema.hasField("id"));
-        Assert.assertFalse(schema.hasField(null));
-        Assert.assertFalse(schema.hasField("sdfsd"));
+        Assertions.assertTrue(schema.hasField("id"));
+        Assertions.assertFalse(schema.hasField(null));
+        Assertions.assertFalse(schema.hasField("sdfsd"));
     }
 
 
@@ -294,23 +299,23 @@ public class SchemaTest {
 
         Object[] castRow = schema.castRow(row);
 
-        assertThat(castRow[0], instanceOf(String.class));
-        assertThat(castRow[1], instanceOf(BigInteger.class));
-        assertThat(castRow[2], instanceOf(Boolean.class));
-        assertThat(castRow[3], instanceOf(Map.class));
+        MatcherAssert.assertThat(castRow[0], instanceOf(String.class));
+        MatcherAssert.assertThat(castRow[1], instanceOf(BigInteger.class));
+        MatcherAssert.assertThat(castRow[2], instanceOf(Boolean.class));
+        MatcherAssert.assertThat(castRow[3], instanceOf(Map.class));
         assertTrue(Map.class.isAssignableFrom(castRow[3].getClass()));
         Map<String, Object> obj = (Map<String, Object>) castRow[3];
         assertTrue(obj.containsKey("one"));
-        assertEquals(1, obj.get("one"));
-        assertThat(castRow[4], instanceOf(Object[].class));
-        assertThat(castRow[5], instanceOf(LocalDate.class));
-        assertThat(castRow[6], instanceOf(LocalTime.class));
-        assertThat(castRow[7], instanceOf(ZonedDateTime.class));
-        assertThat(castRow[8], instanceOf(Year.class));
-        assertThat(castRow[9], instanceOf(YearMonth.class));
-        assertThat(castRow[10], instanceOf(Duration.class));
-        assertThat(castRow[11], instanceOf(BigDecimal.class));
-        assertThat(castRow[12], instanceOf(double[].class));
+        Assertions.assertEquals(1, obj.get("one"));
+        MatcherAssert.assertThat(castRow[4], instanceOf(Object[].class));
+        MatcherAssert.assertThat(castRow[5], instanceOf(LocalDate.class));
+        MatcherAssert.assertThat(castRow[6], instanceOf(LocalTime.class));
+        MatcherAssert.assertThat(castRow[7], instanceOf(ZonedDateTime.class));
+        MatcherAssert.assertThat(castRow[8], instanceOf(Year.class));
+        MatcherAssert.assertThat(castRow[9], instanceOf(YearMonth.class));
+        MatcherAssert.assertThat(castRow[10], instanceOf(Duration.class));
+        MatcherAssert.assertThat(castRow[11], instanceOf(BigDecimal.class));
+        MatcherAssert.assertThat(castRow[12], instanceOf(double[].class));
     }
 
     @Test
@@ -325,8 +330,8 @@ public class SchemaTest {
 
         String[] row = new String[]{"John Doe", "25", "T"}; // length is 3 instead of 2.
 
-        exception.expect(InvalidCastException.class);
-        schema.castRow(row);
+        Throwable t = Assertions.assertThrows(InvalidCastException.class, () -> schema.castRow(row));
+        Assertions.assertEquals("Row length is not equal to the number of defined fields.", t.getMessage());
     }
 
     @Test
@@ -341,13 +346,14 @@ public class SchemaTest {
 
         String[] row = new String[]{"John Doe", "25 String"};
 
-        exception.expect(InvalidCastException.class);
-        schema.castRow(row);
+        Throwable t = Assertions.assertThrows(InvalidCastException.class, () -> schema.castRow(row));
+        Assertions.assertEquals("java.lang.NumberFormatException: For input string: \"25 String\"", t.getMessage());
+
     }
 
     @Test
     public void testSaveWithField() throws Exception {
-        File createdFile = folder.newFile("test_schema.json");
+        File createdFile = new File (folder,"test_schema.json");
 
         Schema createdSchema = new Schema();
 
@@ -385,24 +391,24 @@ public class SchemaTest {
         Schema readSchema = Schema.fromJson(createdFile, true);
 
         // Assert id field
-        assertEquals(Field.FIELD_TYPE_INTEGER, readSchema.getField("id").getType());
-        assertEquals(Field.FIELD_FORMAT_DEFAULT, readSchema.getField("id").getFormat());
-        Assert.assertNull(readSchema.getField("id").getTitle());
-        Assert.assertNull(readSchema.getField("id").getDescription());
-        Assert.assertTrue((boolean) readSchema.getField("id").getConstraints().get(Field.CONSTRAINT_KEY_REQUIRED));
+        Assertions.assertEquals(Field.FIELD_TYPE_INTEGER, readSchema.getField("id").getType());
+        Assertions.assertEquals(Field.FIELD_FORMAT_DEFAULT, readSchema.getField("id").getFormat());
+        Assertions.assertNull(readSchema.getField("id").getTitle());
+        Assertions.assertNull(readSchema.getField("id").getDescription());
+        Assertions.assertTrue((boolean) readSchema.getField("id").getConstraints().get(Field.CONSTRAINT_KEY_REQUIRED));
 
         // Assert name field
-        assertEquals(Field.FIELD_TYPE_STRING, readSchema.getField("name").getType());
-        assertEquals(Field.FIELD_FORMAT_DEFAULT, readSchema.getField("name").getFormat());
-        assertEquals("the title", readSchema.getField("name").getTitle());
-        assertEquals("the description", readSchema.getField("name").getDescription());
-        assertEquals(36, readSchema.getField("name").getConstraints().get(Field.CONSTRAINT_KEY_MIN_LENGTH));
-        assertEquals(45, readSchema.getField("name").getConstraints().get(Field.CONSTRAINT_KEY_MAX_LENGTH));
+        Assertions.assertEquals(Field.FIELD_TYPE_STRING, readSchema.getField("name").getType());
+        Assertions.assertEquals(Field.FIELD_FORMAT_DEFAULT, readSchema.getField("name").getFormat());
+        Assertions.assertEquals("the title", readSchema.getField("name").getTitle());
+        Assertions.assertEquals("the description", readSchema.getField("name").getDescription());
+        Assertions.assertEquals(36, readSchema.getField("name").getConstraints().get(Field.CONSTRAINT_KEY_MIN_LENGTH));
+        Assertions.assertEquals(45, readSchema.getField("name").getConstraints().get(Field.CONSTRAINT_KEY_MAX_LENGTH));
     }
 
     @Test
     public void testSaveWithPrimaryKey() throws Exception {
-        File createdFile = folder.newFile("test_schema.json");
+        File createdFile = new File (folder,"test_schema.json");
 
         Schema createdSchema = new Schema(true);
 
@@ -421,12 +427,12 @@ public class SchemaTest {
         Schema readSchema = Schema.fromJson(createdFile, true);
 
         // Assert Primary Key
-        assertEquals("id", readSchema.getPrimaryKey());
+        Assertions.assertEquals("id", readSchema.getPrimaryKey());
     }
 
     @Test
     public void testSaveWithForeignKey() throws Exception {
-        File createdFile = folder.newFile("test_schema.json");
+        File createdFile = new File (folder,"test_schema.json");
 
         Schema createdSchema = new Schema();
 
@@ -447,9 +453,9 @@ public class SchemaTest {
         Schema readSchema = Schema.fromJson(createdFile, true);
 
         // Assert Foreign Keys
-        assertEquals("name", readSchema.getForeignKeys().get(0).getFields());
-        assertEquals("http://data.okfn.org/data/mydatapackage/", readSchema.getForeignKeys().get(0).getReference().getDatapackage().toString());
-        assertEquals("resource", readSchema.getForeignKeys().get(0).getReference().getResource());
+        Assertions.assertEquals("name", readSchema.getForeignKeys().get(0).getFields());
+        Assertions.assertEquals("http://data.okfn.org/data/mydatapackage/", readSchema.getForeignKeys().get(0).getReference().getDatapackage().toString());
+        Assertions.assertEquals("resource", readSchema.getForeignKeys().get(0).getReference().getResource());
     }
 
     @Test
@@ -462,7 +468,7 @@ public class SchemaTest {
         schema.setPrimaryKey("id");
         String key = schema.getPrimaryKey();
 
-        assertEquals("id", key);
+        Assertions.assertEquals("id", key);
     }
 
     @Test
@@ -472,8 +478,8 @@ public class SchemaTest {
         Field<?> idField = new IntegerField("id");
         schema.addField(idField);
 
-        exception.expect(PrimaryKeyException.class);
-        schema.setPrimaryKey("invalid");
+        Throwable t = Assertions.assertThrows(PrimaryKeyException.class, () -> schema.setPrimaryKey("invalid"));
+        Assertions.assertEquals("No such field: invalid.", t.getMessage());
     }
 
     @Test
@@ -492,8 +498,8 @@ public class SchemaTest {
         schema.setPrimaryKey(new String[]{"name", "surname"});
         String[] compositeKey = schema.getPrimaryKey();
 
-        assertEquals("name", compositeKey[0]);
-        assertEquals("surname", compositeKey[1]);
+        Assertions.assertEquals("name", compositeKey[0]);
+        Assertions.assertEquals("surname", compositeKey[1]);
     }
 
     @Test
@@ -509,8 +515,9 @@ public class SchemaTest {
         Field<?> surnameField = new StringField("surname");
         schema.addField(surnameField);
 
-        exception.expect(PrimaryKeyException.class);
-        schema.setPrimaryKey(new String[]{"name", "invalid"});
+        Throwable t = Assertions.assertThrows(PrimaryKeyException.class,
+                () -> schema.setPrimaryKey(new String[]{"name", "invalid"}));
+        Assertions.assertEquals("No such field: invalid.", t.getMessage());
     }
 
     @Test
@@ -530,88 +537,92 @@ public class SchemaTest {
         schema.setPrimaryKey(compositeKey); // strict=false
 
         List<String> fetchedCompositeKey = schema.getPrimaryKeyParts();
-        assertEquals("name", fetchedCompositeKey.get(0));
-        assertEquals("invalid", fetchedCompositeKey.get(1));
+        Assertions.assertEquals("name", fetchedCompositeKey.get(0));
+        Assertions.assertEquals("invalid", fetchedCompositeKey.get(1));
     }
 
     @Test
-    public void testInvalidForeignKeyArray() throws PrimaryKeyException, ForeignKeyException, Exception {
+    public void testInvalidForeignKeyArray() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_array.json");
 
-        exception.expectMessage("The reference's fields property must be an array if the outer fields is an array.");
-        Schema.fromJson(source, true);
+        Throwable t = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertEquals("The reference's fields property must be an array if the outer fields is an array.", t.getMessage());
     }
 
     @Test
-    public void testInvalidForeignKeyArrayString() throws PrimaryKeyException, ForeignKeyException, Exception {
+    public void testInvalidForeignKeyArrayString() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_array_string.json");
 
-        exception.expectMessage("The reference's fields property must be a string if the outer fields is a string.");
-        Schema.fromJson(source, true);
+        Throwable t = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertEquals("The reference's fields property must be a string if " +
+                "the outer fields is a string.", t.getMessage());
     }
 
     @Test
-    public void testInvalidForeignKeyArrayStringRef() throws PrimaryKeyException, ForeignKeyException, Exception {
+    public void testInvalidForeignKeyArrayStringRef() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_array_string_ref.json");
 
-        exception.expectMessage("The reference's fields property must be an array if the outer fields is an array.");
-        Schema.fromJson(source, true);
+        Throwable t = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertEquals("The reference's fields property must be an array if the outer fields " +
+                "is an array.", t.getMessage());
     }
 
     @Test
-    public void testInvalidForeignKeyArrayWrongNumber() throws PrimaryKeyException, ForeignKeyException, Exception {
+    public void testInvalidForeignKeyArrayWrongNumber() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_array_wrong_number.json");
 
-        exception.expectMessage("The reference's fields property must be an array of the same length as that of the outer fields' array.");
-        Schema.fromJson(source, true);
+        Throwable t =Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertEquals("The reference's fields property must be an array of the same length as that" +
+                        " of the outer fields' array.", t.getMessage());
     }
 
     @Test
-    public void testInvalidForeignKeyNoReference() throws PrimaryKeyException, ForeignKeyException, Exception {
+    public void testInvalidForeignKeyNoReference() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_no_reference.json");
 
-        exception.expectMessage("A foreign key must have the fields and reference properties.");
-        Schema schema = Schema.fromJson(source, true);
+        Throwable t = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertEquals("A foreign key must have the fields and reference properties.", t.getMessage());
     }
 
     @Test
-    public void testInvalidForeignKeyString() throws PrimaryKeyException, ForeignKeyException, Exception {
+    public void testInvalidForeignKeyString() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_string.json");
 
-        exception.expect(ValidationException.class);
-        Schema.fromJson(source, true);
+        Throwable t = Assertions.assertThrows(ValidationException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertEquals("Primary key field doesnotexist not found", t.getMessage());
     }
 
     @Test
-    public void testInvalidForeignKeyStringArrayRef() throws PrimaryKeyException, ForeignKeyException, Exception {
+    public void testInvalidForeignKeyStringArrayRef() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_string_array_ref.json");
 
-        exception.expectMessage("The reference's fields property must be a string if the outer fields is a string.");
-        Schema.fromJson(source, true);
+        Throwable t = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertEquals("The reference's fields property must be a string if " +
+                "the outer fields is a string.", t.getMessage());
     }
 
     @Test
-    public void testValidForeignKeyArray() throws PrimaryKeyException, ForeignKeyException, Exception {
+    public void testValidForeignKeyArray() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_valid_fk_array.json");
         Schema schema = Schema.fromJson(source, true);
 
         ArrayNode parsedFields = schema.getForeignKeys().get(0).getFields();
-        assertEquals("id", parsedFields.get(0).asText());
-        assertEquals("title", parsedFields.get(1).asText());
+        Assertions.assertEquals("id", parsedFields.get(0).asText());
+        Assertions.assertEquals("title", parsedFields.get(1).asText());
 
         ArrayNode refFields = schema.getForeignKeys().get(0).getReference().getFields();
-        assertEquals("fk_id", refFields.get(0).asText());
-        assertEquals("title_id", refFields.get(1).asText());
+        Assertions.assertEquals("fk_id", refFields.get(0).asText());
+        Assertions.assertEquals("title_id", refFields.get(1).asText());
     }
 
     @Test
-    public void testValidForeignKeyString() throws PrimaryKeyException, ForeignKeyException, Exception {
+    public void testValidForeignKeyString() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_valid_fk_string.json");
         Schema schema = Schema.fromJson(source, true);
 
-        assertEquals("position_title", schema.getForeignKeys().get(0).getFields());
-        assertEquals("positions", schema.getForeignKeys().get(0).getReference().getResource());
-        assertEquals("name", schema.getForeignKeys().get(0).getReference().getFields().toString());
+        Assertions.assertEquals("position_title", schema.getForeignKeys().get(0).getFields());
+        Assertions.assertEquals("positions", schema.getForeignKeys().get(0).getReference().getResource());
+        Assertions.assertEquals("name", schema.getForeignKeys().get(0).getReference().getFields().toString());
     }
 
     @Test
@@ -631,47 +642,47 @@ public class SchemaTest {
             for (int i = 0; i < expectedSchema.getFields().size(); i++) {
                 Field<?> expectedField = expectedSchema.getFields().get(i);
                 Field<?> testField = schema.getFields().get(i);
-                Assert.assertEquals(expectedField, testField);
+                Assertions.assertEquals(expectedField, testField);
 
             }
         }
-        assertEquals(expectedSchema, schema);
+        Assertions.assertEquals(expectedSchema, schema);
     }
 
 
     @Test
     public void testSaveDefaultBooleanValues() throws Exception {
-        File createdFile = folder.newFile("test_schema.json");
+        File createdFile = new File(folder, "test_schema.json");
 
         File f = new File(getTestDataDirectory(), "schema/employee_schema.json");
         Schema createdSchema = Schema.fromJson(f, true);
         createdSchema.writeJson(createdFile);
 
         Schema readSchema = Schema.fromJson(createdFile, true);
-        assertEquals(createdSchema, readSchema);
+        Assertions.assertEquals(createdSchema, readSchema);
 
-        assertEquals("true", readSchema.getField("isAdmin").formatValueAsString(true));
-        assertEquals("false", readSchema.getField("isAdmin").formatValueAsString(false));
-        assertEquals("true", createdSchema.getField("isAdmin").formatValueAsString(true));
-        assertEquals("false", createdSchema.getField("isAdmin").formatValueAsString(false));
+        Assertions.assertEquals("true", readSchema.getField("isAdmin").formatValueAsString(true));
+        Assertions.assertEquals("false", readSchema.getField("isAdmin").formatValueAsString(false));
+        Assertions.assertEquals("true", createdSchema.getField("isAdmin").formatValueAsString(true));
+        Assertions.assertEquals("false", createdSchema.getField("isAdmin").formatValueAsString(false));
     }
 
 
     @Test
     public void testSaveAlternateBooleanValues() throws Exception {
-        File createdFile = folder.newFile("test_schema.json");
+        File createdFile = new File(folder, "test_schema.json");
 
         File f = new File(getTestDataDirectory(), "schema/employee_schema_boolean_alternative_values.json");
         Schema createdSchema = Schema.fromJson(f, true);
         createdSchema.writeJson(createdFile);
 
         Schema readSchema = Schema.fromJson(createdFile, true);
-        assertEquals(createdSchema, readSchema);
+        Assertions.assertEquals(createdSchema, readSchema);
 
-        assertEquals("TRUE", readSchema.getField("isAdmin").formatValueAsString(true));
-        assertEquals("FALSE", readSchema.getField("isAdmin").formatValueAsString(false));
-        assertEquals("TRUE", createdSchema.getField("isAdmin").formatValueAsString(true));
-        assertEquals("FALSE", createdSchema.getField("isAdmin").formatValueAsString(false));
+        Assertions.assertEquals("TRUE", readSchema.getField("isAdmin").formatValueAsString(true));
+        Assertions.assertEquals("FALSE", readSchema.getField("isAdmin").formatValueAsString(false));
+        Assertions.assertEquals("TRUE", createdSchema.getField("isAdmin").formatValueAsString(true));
+        Assertions.assertEquals("FALSE", createdSchema.getField("isAdmin").formatValueAsString(false));
     }
 
 
@@ -679,7 +690,7 @@ public class SchemaTest {
     public void testIssue20() throws Exception {
         Schema expectedschema = Schema.fromJson(new File(getTestDataDirectory()
                 , "schema/employee_schema.json"), true);
-        Assert.assertNotNull(expectedschema);
+        Assertions.assertNotNull(expectedschema);
     }
 
     @Test
@@ -691,7 +702,7 @@ public class SchemaTest {
         Schema schema = table.inferSchema();
         String json = schema.getJson();
         Schema newSchema = Schema.fromJson(json, true);
-        Assert.assertTrue(newSchema.isValid());
+        Assertions.assertTrue(newSchema.isValid());
     }
 
 
@@ -699,12 +710,12 @@ public class SchemaTest {
     public void testIssue14() throws Exception {
         Schema schema = Schema.fromJson(new File(getTestDataDirectory()
                 , "schema/employee_full_schema.json"), true);
-        Assert.assertNotNull(schema);
+        Assertions.assertNotNull(schema);
 
         File f = new File("data/employee_full.csv");
         Table table = Table.fromSource(f, getTestDataDirectory(), schema, null);
         List<Object[]> data = table.read();
-        Assert.assertEquals(3, data.size());
+        Assertions.assertEquals(3, data.size());
     }
 
     // Create schema from a provided Bean class and compare with
@@ -718,7 +729,7 @@ public class SchemaTest {
         try (FileInputStream fis = new FileInputStream(f)) {
             expectedSchema = Schema.fromJson(fis, false);
         }
-        Assert.assertTrue(expectedSchema.similar(schema));
+        Assertions.assertTrue(expectedSchema.similar(schema));
     }
 
     private static File getResourceFile(String fileName) throws URISyntaxException {
@@ -732,5 +743,27 @@ public class SchemaTest {
             // special case for invalid path test
             return new File(fileName);
         }
+    }
+
+
+    @org.junit.jupiter.api.Test
+    @DisplayName("Infer a Bean Schema")
+    void inferExplicitNamingBeanSchema() throws Exception{
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, String> fieldNameMapping = new TreeMap<>(ReflectionUtils.getFieldNameMapping(objectMapper, ExplicitNamingBean.class));
+        String expectedString = TestHelper.getResourceFileContent(
+                "/fixtures/beans/explicitnamingbean.json");
+        Map<String, String> expectedFieldMap
+                = new TreeMap<>(objectMapper.readValue(expectedString, new TypeReference<Map<String, String>>() {}));
+        Assertions.assertEquals(expectedFieldMap, fieldNameMapping);
+
+        Schema schema = BeanSchema.infer(ExplicitNamingBean.class);
+        String expectedSchemaString = TestHelper.getResourceFileContent(
+                "/fixtures/beans/explicitnamingbean-schema.json");
+        Schema expectedSchema = Schema.fromJson(expectedSchemaString, true);
+
+        Assertions.assertEquals(expectedSchema, schema);
+        // validate equals() method implementation on Schema and BeanSchema
+        Assertions.assertEquals(schema, expectedSchema);
     }
 }

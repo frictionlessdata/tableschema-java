@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class MapValueComparator implements Comparator<String> {
 
-    Map<String, Integer> map = new HashMap<String, Integer>();
+    Map<String, Integer> map = new HashMap<>();
 
     public MapValueComparator(Map<String, Integer> map) {
         this.map.putAll(map);

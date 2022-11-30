@@ -5,7 +5,6 @@ import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
 
 import java.net.URI;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -25,7 +24,7 @@ public class TimeField extends Field<LocalTime> {
     }
 
     public TimeField(String name, String format, String title, String description,
-                     URI rdfType, Map constraints, Map options){
+                     URI rdfType, Map<String, Object> constraints, Map<String, Object> options){
         super(name, FIELD_TYPE_TIME, format, title, description, rdfType, constraints, options);
     }
 

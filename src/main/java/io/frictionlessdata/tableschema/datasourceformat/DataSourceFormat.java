@@ -1,6 +1,3 @@
-/*
- *
- */
 package io.frictionlessdata.tableschema.datasourceformat;
 
 import io.frictionlessdata.tableschema.inputstream.ByteOrderMarkStrippingInputStream;
@@ -22,8 +19,8 @@ import java.util.zip.ZipFile;
  * Interface for a source of tabular data.
  */
 public interface DataSourceFormat {
-    public static final String UTF16_BOM = "\ufeff";
-    public static final String UTF8_BOM = "\u00ef\u00bb\u00bf";
+    String UTF16_BOM = "\ufeff";
+    String UTF8_BOM = "\u00ef\u00bb\u00bf";
     /**
      * Returns an Iterator that returns String arrays containing
      * one row of data each.
@@ -123,9 +120,11 @@ public interface DataSourceFormat {
 
     static CSVFormat getDefaultCsvFormat() {
         return CSVFormat.RFC4180
-                .withHeader()
-                .withIgnoreSurroundingSpaces(true)
-                .withRecordSeparator("\n");
+                .builder()
+                .setHeader()
+                .setIgnoreSurroundingSpaces(true)
+                .setRecordSeparator("\n")
+                .build();
     }
 
     /**
@@ -134,7 +133,7 @@ public interface DataSourceFormat {
      * @return DataSource created from input String
      */
     static DataSourceFormat createDataSourceFormat(InputStream input) throws IOException {
-        String content = null;
+        String content;
 
         // Read the file.
         try (Reader fr = new InputStreamReader(input)) {
@@ -174,7 +173,7 @@ public interface DataSourceFormat {
         }
         final Path resolvedPath = referencePath.resolve(testPath).normalize();
         if (!Files.exists(resolvedPath))
-            throw new FileNotFoundException("File "+resolvedPath.toString()+" does not exist");
+            throw new FileNotFoundException("File "+resolvedPath+" does not exist");
         if (!resolvedPath.toFile().isFile()){
             throw new IllegalArgumentException("Input must be a file");
         }

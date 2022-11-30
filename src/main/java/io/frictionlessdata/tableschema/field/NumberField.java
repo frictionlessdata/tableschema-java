@@ -52,10 +52,10 @@ public class NumberField extends Field<Number> {
     public Number parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         String locValue = value.trim();
         try{
-            if (value.equalsIgnoreCase("null"))
+            /*if (value.equalsIgnoreCase("null"))
                 return null;
             if (value.length() == 0)
-                return null;
+                return null;*/
             if(options != null){
                 if(options.containsKey(NUMBER_OPTION_DECIMAL_CHAR)){
                     locValue = locValue.replace((String)options.get(NUMBER_OPTION_DECIMAL_CHAR), NUMBER_DEFAULT_DECIMAL_CHAR);

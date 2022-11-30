@@ -128,7 +128,7 @@ class TableBeanIteratorTest {
         bn.setAtomicIntegerVal(new AtomicInteger(2345123));
         bn.setBigDecimalVal(new BigDecimal("3542352304245234542345345423453.02345234"));
         bn.setBigIntVal(new BigInteger("23459734123456676123981234"));
-        bn.setByteVal(new Byte("126"));
+        bn.setByteVal(Byte.parseByte("126"));
         bn.setId(23143245);
         bn.setLongVal(893479850249L);
         bn.setLongClassVal(908347392304952L);
@@ -149,7 +149,7 @@ class TableBeanIteratorTest {
         File dataFile = new File("data/number_types.csv");
         Table numbersTable
                 = Table.fromSource(dataFile, getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
-        BeanIterator<NumbersBean> bit = numbersTable.iterator(NumbersBean.class, false);
+        BeanIterator<NumbersBean> bit = (BeanIterator<NumbersBean>) numbersTable.iterator(NumbersBean.class, false);
 
         NumbersBean record = bit.next();
         Assertions.assertEquals(bn, record);

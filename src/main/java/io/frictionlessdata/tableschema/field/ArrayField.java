@@ -19,7 +19,7 @@ public class ArrayField extends Field<Object[]> {
     }
 
     public ArrayField(String name, String format, String title, String description,
-                      URI rdfType, Map constraints, Map options){
+                      URI rdfType, Map<String, Object> constraints, Map<String, Object> options){
         super(name, FIELD_TYPE_ARRAY, format, title, description, rdfType, constraints, options);
     }
 

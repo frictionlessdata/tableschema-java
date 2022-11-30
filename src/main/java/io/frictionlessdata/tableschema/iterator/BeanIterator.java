@@ -2,7 +2,6 @@ package io.frictionlessdata.tableschema.iterator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.google.common.util.concurrent.AtomicDouble;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.annotations.FieldFormat;
@@ -13,6 +12,7 @@ import io.frictionlessdata.tableschema.schema.BeanSchema;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.locationtech.jts.geom.Coordinate;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.UUID;
@@ -27,8 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @param <T> the Bean class this BeanIterator expects
  */
 public class BeanIterator<T> extends TableIterator<T> {
-    private Class<T> type = null;
-    private CsvMapper mapper = new CsvMapper();
+    private final Class<T> type;
 
     public BeanIterator(Table table,  Class<T> beanType, boolean relations) throws Exception {
         this.type = beanType;
@@ -57,10 +56,10 @@ public class BeanIterator<T> extends TableIterator<T> {
         final String[] row = super.wrappedIterator.next();
 
         try {
-            retVal = type.newInstance();
+            retVal = type.getDeclaredConstructor().newInstance();
             for (int i = 0; i < row.length; i++) {
                 String fieldName = headers[i];
-                Field field = schema.getField(fieldName);
+                Field<?> field = schema.getField(fieldName);
                 if (null == field) {
                     continue;
                 }
@@ -83,7 +82,7 @@ public class BeanIterator<T> extends TableIterator<T> {
                 Object val = field.castValue(row[i]);
                 if (null == val)
                     continue;
-                Class annotatedFieldClass = aF.getRawType();
+                Class<?> annotatedFieldClass = aF.getRawType();
                 aF.fixAccess(true);
                 if (Number.class.isAssignableFrom(annotatedFieldClass)) {
                     setNumberField(retVal, aF, (Number)val);
@@ -117,14 +116,13 @@ public class BeanIterator<T> extends TableIterator<T> {
                 }
             }
             return retVal;
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new TableSchemaException(e);
         }
-
     }
 
     private void setNumberField(T obj, AnnotatedField field, Number val) {
-        Class fClass = field.getRawType();
+        Class<?> fClass = field.getRawType();
         if (fClass.equals(BigDecimal.class)) {
             BigDecimal big = new BigDecimal(val.toString());
             field.setValue(obj, big);

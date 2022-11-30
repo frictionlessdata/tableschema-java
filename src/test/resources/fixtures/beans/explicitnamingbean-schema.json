@@ -1,0 +1,23 @@
+{
+  "fields" : [ {
+    "name" : "pink_field",
+    "type" : "boolean",
+    "format" : "default"
+  }, {
+    "name" : "is_red",
+    "type" : "boolean",
+    "format" : "default"
+  }, {
+    "name" : "is_white",
+    "type" : "boolean",
+    "format" : "default"
+  }, {
+    "name" : "blue",
+    "type" : "boolean",
+    "format" : "default"
+  }, {
+    "name" : "black",
+    "type" : "boolean",
+    "format" : "default"
+  }]
+}

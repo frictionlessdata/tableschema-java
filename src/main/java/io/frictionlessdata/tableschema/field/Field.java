@@ -24,25 +24,25 @@ import java.util.regex.Pattern;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(value = Include.NON_EMPTY)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = AnyField.class, 
-	include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = AnyField.class,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = StringField.class, name = Field.FIELD_TYPE_STRING),
-    @JsonSubTypes.Type(value = IntegerField.class, name = Field.FIELD_TYPE_INTEGER),
-    @JsonSubTypes.Type(value = NumberField.class, name = Field.FIELD_TYPE_NUMBER),
-    @JsonSubTypes.Type(value = BooleanField.class, name = Field.FIELD_TYPE_BOOLEAN),
-    @JsonSubTypes.Type(value = ObjectField.class, name = Field.FIELD_TYPE_OBJECT),
-    @JsonSubTypes.Type(value = ArrayField.class, name = Field.FIELD_TYPE_ARRAY),
-    @JsonSubTypes.Type(value = DateField.class, name = Field.FIELD_TYPE_DATE),
-    @JsonSubTypes.Type(value = TimeField.class, name = Field.FIELD_TYPE_TIME),
-    @JsonSubTypes.Type(value = DatetimeField.class, name = Field.FIELD_TYPE_DATETIME),
-    @JsonSubTypes.Type(value = YearField.class, name = Field.FIELD_TYPE_YEAR),
-    @JsonSubTypes.Type(value = YearmonthField.class, name = Field.FIELD_TYPE_YEARMONTH),
-    @JsonSubTypes.Type(value = DurationField.class, name = Field.FIELD_TYPE_DURATION),
-    @JsonSubTypes.Type(value = GeopointField.class, name = Field.FIELD_TYPE_GEOPOINT),
-    @JsonSubTypes.Type(value = GeojsonField.class, name = Field.FIELD_TYPE_GEOJSON),
-    @JsonSubTypes.Type(value = AnyField.class, name = Field.FIELD_TYPE_ANY)
-    }
+        @JsonSubTypes.Type(value = StringField.class, name = Field.FIELD_TYPE_STRING),
+        @JsonSubTypes.Type(value = IntegerField.class, name = Field.FIELD_TYPE_INTEGER),
+        @JsonSubTypes.Type(value = NumberField.class, name = Field.FIELD_TYPE_NUMBER),
+        @JsonSubTypes.Type(value = BooleanField.class, name = Field.FIELD_TYPE_BOOLEAN),
+        @JsonSubTypes.Type(value = ObjectField.class, name = Field.FIELD_TYPE_OBJECT),
+        @JsonSubTypes.Type(value = ArrayField.class, name = Field.FIELD_TYPE_ARRAY),
+        @JsonSubTypes.Type(value = DateField.class, name = Field.FIELD_TYPE_DATE),
+        @JsonSubTypes.Type(value = TimeField.class, name = Field.FIELD_TYPE_TIME),
+        @JsonSubTypes.Type(value = DatetimeField.class, name = Field.FIELD_TYPE_DATETIME),
+        @JsonSubTypes.Type(value = YearField.class, name = Field.FIELD_TYPE_YEAR),
+        @JsonSubTypes.Type(value = YearmonthField.class, name = Field.FIELD_TYPE_YEARMONTH),
+        @JsonSubTypes.Type(value = DurationField.class, name = Field.FIELD_TYPE_DURATION),
+        @JsonSubTypes.Type(value = GeopointField.class, name = Field.FIELD_TYPE_GEOPOINT),
+        @JsonSubTypes.Type(value = GeojsonField.class, name = Field.FIELD_TYPE_GEOJSON),
+        @JsonSubTypes.Type(value = AnyField.class, name = Field.FIELD_TYPE_ANY)
+}
 )
 public abstract class Field<T> {
     public static final String FIELD_TYPE_STRING = "string";
@@ -60,25 +60,25 @@ public abstract class Field<T> {
     public static final String FIELD_TYPE_GEOPOINT = "geopoint";
     public static final String FIELD_TYPE_GEOJSON = "geojson";
     public static final String FIELD_TYPE_ANY = "any";
-    
-    private List<String> wellKnownFieldTypes = Arrays.asList(
-    	FIELD_TYPE_STRING,
-    	FIELD_TYPE_INTEGER,
-    	FIELD_TYPE_NUMBER,
-    	FIELD_TYPE_BOOLEAN,
-    	FIELD_TYPE_OBJECT,
-    	FIELD_TYPE_ARRAY,
-    	FIELD_TYPE_DATE,
-    	FIELD_TYPE_TIME,
-    	FIELD_TYPE_DATETIME,
-    	FIELD_TYPE_YEAR,
-    	FIELD_TYPE_YEARMONTH,
-    	FIELD_TYPE_DURATION,
-    	FIELD_TYPE_GEOPOINT,
-    	FIELD_TYPE_GEOJSON,
-    	FIELD_TYPE_ANY
+
+    private static final List<String> wellKnownFieldTypes = Arrays.asList(
+            FIELD_TYPE_STRING,
+            FIELD_TYPE_INTEGER,
+            FIELD_TYPE_NUMBER,
+            FIELD_TYPE_BOOLEAN,
+            FIELD_TYPE_OBJECT,
+            FIELD_TYPE_ARRAY,
+            FIELD_TYPE_DATE,
+            FIELD_TYPE_TIME,
+            FIELD_TYPE_DATETIME,
+            FIELD_TYPE_YEAR,
+            FIELD_TYPE_YEARMONTH,
+            FIELD_TYPE_DURATION,
+            FIELD_TYPE_GEOPOINT,
+            FIELD_TYPE_GEOJSON,
+            FIELD_TYPE_ANY
     );
-    
+
     public static final String FIELD_FORMAT_DEFAULT = "default";
     public static final String FIELD_FORMAT_ARRAY = "array";
     public static final String FIELD_FORMAT_OBJECT = "object";
@@ -97,7 +97,7 @@ public abstract class Field<T> {
     public static final String CONSTRAINT_KEY_MAXIMUM = "maximum";
     public static final String CONSTRAINT_KEY_PATTERN = "pattern";
     public static final String CONSTRAINT_KEY_ENUM = "enum";
-    
+
     public static final String JSON_KEY_NAME = "name";
     public static final String JSON_KEY_TYPE = "type";
     public static final String JSON_KEY_FORMAT = "format";
@@ -177,8 +177,8 @@ public abstract class Field<T> {
             String title,
             String description,
             URI rdfType,
-            Map constraints,
-            Map options){
+            Map<String, Object> constraints,
+            Map<String, Object> options){
         this.name = name;
         this.type = type;
         this.format = format;
@@ -189,7 +189,7 @@ public abstract class Field<T> {
         this.options = options;
     }
 
-    public static Field fromJson (String json) {
+    public static Field<?> fromJson (String json) {
         return JsonUtil.getInstance().deserialize(json, Field.class);
     }
 
@@ -220,7 +220,7 @@ public abstract class Field<T> {
      */
     public abstract String parseFormat(String value, Map<String, Object> options);
 
-    
+
     /**
      * Use the Field definition to cast (=parse) a value into the Field type. Constraints enforcing
      * can be switched on or off.
@@ -239,7 +239,7 @@ public abstract class Field<T> {
         } else {
             try{
                 T castValue = parseValue(value, format, options);
-            
+
                 // Check for constraint violations
                 if(enforceConstraints && this.constraints != null){
                     Map<String, Object> violatedConstraints = checkConstraintViolations(castValue);
@@ -247,16 +247,16 @@ public abstract class Field<T> {
                         throw new ConstraintsException("Violated "+ violatedConstraints.size()+" contstraints");
                     }
                 }
-                
+
                 return castValue;
-                
+
             }catch(ConstraintsException ce){
                 throw ce;
-                
+
             }catch(Exception e){
                 throw new InvalidCastException(e);
             }
-        } 
+        }
     }
 
     /**
@@ -271,23 +271,23 @@ public abstract class Field<T> {
         return castValue(value, true, options);
     }
 
-    
+
     /**
      * Returns a Map with all the constraints that have been violated.
      * @param value either a JSONArray/JSONObject or a string containing JSON
      * @return Map containing all the contraints violations
      */
     public Map<String, Object> checkConstraintViolations(Object value){
-       
+
         Map<String, Object> violatedConstraints = new HashMap<>();
-        
+
         // Indicates whether this field is allowed to be null. If required is true, then null is disallowed. 
         if(this.constraints.containsKey(CONSTRAINT_KEY_REQUIRED)){
             if((boolean) this.constraints.get(CONSTRAINT_KEY_REQUIRED) && value == null){
                 violatedConstraints.put(CONSTRAINT_KEY_REQUIRED, true);
             }
         }
-        
+
         // All values for that field MUST be unique within the data file in which it is found.
         // Can't check UNIQUE constraint when operating with only one value.
         // TODO: Implement a method that takes List<Object> value as argument.
@@ -295,41 +295,41 @@ public abstract class Field<T> {
         if(this.constraints.containsKey(CONSTRAINT_KEY_UNIQUE)){
     
         }*/
-        
+
         // An integer that specifies the minimum length of a value.
         if(this.constraints.containsKey(CONSTRAINT_KEY_MIN_LENGTH)){
             int minLength = (int)this.constraints.get(CONSTRAINT_KEY_MIN_LENGTH);
- 
+
             if(value instanceof String){
                 if(((String)value).length() < minLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MIN_LENGTH, minLength);
                 }
-                
-            }else if (value instanceof JsonNode){
+
+            } else if (value instanceof JsonNode){
                 if(((JsonNode)value).size() < minLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MIN_LENGTH, minLength);
                 }
-                 
+
             }
         }
-        
+
         // An integer that specifies the maximum length of a value.
         if(this.constraints.containsKey(CONSTRAINT_KEY_MAX_LENGTH)){
             int maxLength = (int)this.constraints.get(CONSTRAINT_KEY_MAX_LENGTH);
-            
+
             if (value instanceof String){
-                if(((String)value).length() > maxLength){
+                if (((String)value).length() > maxLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MAX_LENGTH, maxLength);
                 }
-                
+
             } else if (value instanceof JsonNode){
-                if(((JsonNode)value).size() > maxLength){
+                if (((JsonNode)value).size() > maxLength){
                     violatedConstraints.put(CONSTRAINT_KEY_MAX_LENGTH, maxLength);
                 }
-                 
+
             }
         }
-        
+
         /*
          * Specifies a minimum value for a field.
          * This is different to minLength which checks the number of items in the value.
@@ -339,222 +339,214 @@ public abstract class Field<T> {
          * If a minimum value constraint is specified then the field descriptor MUST contain a type key.
          **/
         if(this.constraints.containsKey(CONSTRAINT_KEY_MINIMUM)){
-            
+
             if(value instanceof Number){
                 BigDecimal minNumber = new BigDecimal(this.constraints.get(CONSTRAINT_KEY_MINIMUM).toString());
                 if( new BigDecimal(value.toString()).compareTo(minNumber) < 0 ) {
                     violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minNumber);
                 }
 
-            }else if(value instanceof LocalTime){
+            } else if(value instanceof LocalTime){
                 LocalTime minTime = (LocalTime)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
                 if(((LocalTime)value).isBefore(minTime)){
                     violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minTime);
                 }
 
-            }else if(value instanceof ZonedDateTime){
+            } else if(value instanceof ZonedDateTime){
                 ZonedDateTime minTime = (ZonedDateTime)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
                 if(((ZonedDateTime)value).isBefore(minTime)){
                     violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minTime);
                 }
 
-            }else if(value instanceof LocalDate){
+            } else if(value instanceof LocalDate){
                 LocalDate minDate = (LocalDate)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
                 if(((LocalDate)value).isBefore(minDate)){
                     violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minDate);
                 }
 
-            }else if(value instanceof Year){
+            } else if(value instanceof Year){
                 int minYear = (int)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
                 if(((Year)value).isBefore(Year.of(minYear))) {
                     violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minYear);
-                    }
+                }
 
-            }else if(value instanceof YearMonth){
+            } else if(value instanceof YearMonth){
                 YearMonth minDate = (YearMonth)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
                 if(((YearMonth)value).isBefore(minDate)){
                     violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minDate);
                 }
 
-            }else if(value instanceof Duration){
+            } else if(value instanceof Duration){
                 Duration minDuration = (Duration)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
                 if(((Duration)value).compareTo(minDuration) < 0){
                     violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minDuration);
                 }
-            } 
+            }
         }
-        
+
         // As for minimum, but specifies a maximum value for a field.
         if(this.constraints.containsKey(CONSTRAINT_KEY_MAXIMUM)){
-            
+
             if(value instanceof Number) {
                 BigDecimal maxNumber = new BigDecimal(this.constraints.get(CONSTRAINT_KEY_MAXIMUM).toString());
                 if (new BigDecimal(value.toString()).compareTo(maxNumber) > 0) {
                     violatedConstraints.put(CONSTRAINT_KEY_MAXIMUM, maxNumber);
                 }
-            }else if(value instanceof LocalTime){
+            } else if(value instanceof LocalTime){
                 LocalTime maxTime = (LocalTime)this.constraints.get(CONSTRAINT_KEY_MAXIMUM);
 
                 if(((LocalTime)value).isAfter(maxTime)){
                     violatedConstraints.put(CONSTRAINT_KEY_MAXIMUM, maxTime);
                 }
 
-            }else if(value instanceof ZonedDateTime){
+            } else if(value instanceof ZonedDateTime){
                 ZonedDateTime maxTime = (ZonedDateTime)this.constraints.get(CONSTRAINT_KEY_MAXIMUM);
 
                 if(((ZonedDateTime)value).isAfter(maxTime)){
                     violatedConstraints.put(CONSTRAINT_KEY_MAXIMUM, maxTime);
                 }
 
-            }else if(value instanceof LocalDate){
+            } else if(value instanceof LocalDate){
                 LocalDate maxDate = (LocalDate)this.constraints.get(CONSTRAINT_KEY_MAXIMUM);
 
                 if(((LocalDate)value).isAfter(maxDate)){
                     violatedConstraints.put(CONSTRAINT_KEY_MAXIMUM, maxDate);
                 }
 
-            }else if(value instanceof Year){
-            int maxYear = (int)this.constraints.get(CONSTRAINT_KEY_MAXIMUM);
+            } else if(value instanceof Year){
+                int maxYear = (int)this.constraints.get(CONSTRAINT_KEY_MAXIMUM);
                 if(((Year)value).isAfter(Year.of(maxYear))){
                     violatedConstraints.put(CONSTRAINT_KEY_MAXIMUM, maxYear);
                 }
 
-            }else if(value instanceof YearMonth){
+            } else if(value instanceof YearMonth){
                 YearMonth maxDate = (YearMonth)this.constraints.get(CONSTRAINT_KEY_MAXIMUM);
 
                 if(((YearMonth)value).isAfter(maxDate)){
                     violatedConstraints.put(CONSTRAINT_KEY_MAXIMUM, maxDate);
                 }
 
-            }else if(value instanceof Duration){
+            } else if(value instanceof Duration){
                 Duration maxDuration = (Duration)this.constraints.get(CONSTRAINT_KEY_MAXIMUM);
                 if(((Duration)value).compareTo(maxDuration) > 0){
                     violatedConstraints.put(CONSTRAINT_KEY_MAXIMUM, maxDuration);
                 }
-            } 
+            }
         }
-        
+
         // A regular expression that can be used to test field values. If the regular expression matches then the value is valid.
         if(this.constraints.containsKey(CONSTRAINT_KEY_PATTERN)){
             String regexPatternString = (String)this.constraints.get(CONSTRAINT_KEY_PATTERN);
-            
+
             // Constraint only applies to a String value.
-            if(value instanceof String){       
+            if(value instanceof String){
                 Pattern pattern = Pattern.compile(regexPatternString);
                 Matcher matcher = pattern.matcher((String)value);
-                
+
                 if(!matcher.matches()){
                     violatedConstraints.put(CONSTRAINT_KEY_PATTERN, regexPatternString);
                 }
-            
-            }else{
+
+            } else{
                 // If the value is not a String, then just interpret as a constraint violation.
                 violatedConstraints.put(CONSTRAINT_KEY_PATTERN, regexPatternString);
             }
         }
-        
+
         // The value of the field must exactly match a value in the enum array.
         if(this.constraints.containsKey(CONSTRAINT_KEY_ENUM)){
             boolean violatesEnumConstraint = true;
-            
+
             if(value instanceof String){
-                List<String> stringList = (List<String>)this.constraints.get(CONSTRAINT_KEY_ENUM); 
-                
-                Iterator<String> iter = stringList.iterator();
-                while(iter.hasNext()){
-                    if(iter.next().equalsIgnoreCase((String)value)){
+                List<String> stringList = (List<String>)this.constraints.get(CONSTRAINT_KEY_ENUM);
+
+                for (String s : stringList) {
+                    if (s.equalsIgnoreCase((String) value)) {
                         violatesEnumConstraint = false;
                         break;
                     }
                 }
-                
-            }else if(value instanceof JsonNode){
+
+            } else if(value instanceof JsonNode){
                 List<JsonNode> jsonObjList = (List<JsonNode>)this.constraints.get(CONSTRAINT_KEY_ENUM);
-                
-                Iterator<JsonNode> iter = jsonObjList.iterator();
-                while(iter.hasNext()){
-                    if(iter.next().equals((JsonNode)value)){
+
+                for (JsonNode jsonNode : jsonObjList) {
+                    if (jsonNode.equals((JsonNode) value)) {
                         violatesEnumConstraint = false;
                         break;
                     }
                 }
-                
-            }else if(value instanceof Integer){
+
+            } else if(value instanceof Integer){
                 List<Integer> intList = (List<Integer>)this.constraints.get(CONSTRAINT_KEY_ENUM);
-                
-                Iterator<Integer> iter = intList.iterator();
-                while(iter.hasNext()){
-                    if(iter.next() == (int)value){
+
+                for (Integer integer : intList) {
+                    if (integer == (int) value) {
                         violatesEnumConstraint = false;
                         break;
                     }
                 }
-                
+
             } else if(value instanceof LocalTime){
                 List<LocalTime> timeList = (List<LocalTime>)this.constraints.get(CONSTRAINT_KEY_ENUM);
 
-                Iterator<LocalTime> iter = timeList.iterator();
-                while(iter.hasNext()){
-                    if(iter.next().compareTo((LocalTime)value) == 0){
+                for (LocalTime localTime : timeList) {
+                    if (localTime.compareTo((LocalTime) value) == 0) {
                         violatesEnumConstraint = false;
                         break;
                     }
                 }
-            }else if(value instanceof ZonedDateTime){
+            } else if(value instanceof ZonedDateTime){
                 List<ZonedDateTime> timeList = (List<ZonedDateTime>)this.constraints.get(CONSTRAINT_KEY_ENUM);
 
-                Iterator<ZonedDateTime> iter = timeList.iterator();
-                while(iter.hasNext()){
-                    if(iter.next().compareTo((ZonedDateTime)value) == 0){
+                for (ZonedDateTime zonedDateTime : timeList) {
+                    if (zonedDateTime.compareTo((ZonedDateTime) value) == 0) {
                         violatesEnumConstraint = false;
                         break;
                     }
                 }
 
-            }else if(value instanceof LocalDate){
+            } else if(value instanceof LocalDate){
                 List<LocalDate> dateList = (List<LocalDate>)this.constraints.get(CONSTRAINT_KEY_ENUM);
 
-                Iterator<LocalDate> iter = dateList.iterator();
-                while(iter.hasNext()){
-                    if(iter.next().compareTo((LocalDate)value) == 0){
+                for (LocalDate localDate : dateList) {
+                    if (localDate.compareTo((LocalDate) value) == 0) {
                         violatesEnumConstraint = false;
                         break;
                     }
                 }
 
-            }else if(value instanceof YearMonth){
+            } else if(value instanceof YearMonth){
                 List<YearMonth> dateTimeList = (List<YearMonth>)this.constraints.get(CONSTRAINT_KEY_ENUM);
 
-                Iterator<YearMonth> iter = dateTimeList.iterator();
-                while(iter.hasNext()){
-                    if(iter.next().compareTo((YearMonth)value) == 0){
+                for (YearMonth yearMonth : dateTimeList) {
+                    if (yearMonth.compareTo((YearMonth) value) == 0) {
                         violatesEnumConstraint = false;
                         break;
                     }
                 }
 
-            }else if(value instanceof Duration){
+            } else if(value instanceof Duration){
                 List<Duration> durationList = (List<Duration>)this.constraints.get(CONSTRAINT_KEY_ENUM);
-                
-                Iterator<Duration> iter = durationList.iterator();
-                while(iter.hasNext()){
-                    if(iter.next().compareTo((Duration)value) == 0){
+
+                for (Duration duration : durationList) {
+                    if (duration.compareTo((Duration) value) == 0) {
                         violatesEnumConstraint = false;
                         break;
                     }
                 }
-                
+
             }
-            
+
             if(violatesEnumConstraint){
                 violatedConstraints.put(CONSTRAINT_KEY_ENUM, this.constraints.get(CONSTRAINT_KEY_ENUM));
             }
         }
-        
+
         return violatedConstraints;
     }
 
-    public static Field forType(String type, String name) {
+    public static Field<?> forType(String type, String name) {
         Map<String, Object> fieldMap = new HashMap<>();
         fieldMap.put(JSON_KEY_TYPE, type);
         fieldMap.put(JSON_KEY_NAME, name);
@@ -579,14 +571,14 @@ public abstract class Field<T> {
     public String getName(){
         return this.name;
     }
-    
+
     public String getType(){
-    	if(Objects.nonNull(this.type) && !isWellKnownType(this.type)) {
-    		return FIELD_TYPE_ANY;
-    	} else return this.type;
+        if(Objects.nonNull(this.type) && !isWellKnownType(this.type)) {
+            return FIELD_TYPE_ANY;
+        } else return this.type;
     }
 
-	public String getFormat(){
+    public String getFormat(){
         return this.format;
     }
 
@@ -597,11 +589,11 @@ public abstract class Field<T> {
     public String getTitle(){
         return this.title;
     }
-    
+
     public String getDescription(){
         return this.description;
     }
-    
+
     public Map<String, Object> getConstraints(){
         return this.constraints;
     }
@@ -631,7 +623,7 @@ public abstract class Field<T> {
      * @param other the Field to compare against
      * @return true if the other Field is equals ignoring the format, false otherwise
      */
-    public boolean similar(Field other) {
+    public boolean similar(Field<?> other) {
         if (this == other) return true;
         if (other == null || getClass() != other.getClass()) return false;
         if ((!StringUtils.isEmpty(name)) && (!StringUtils.isEmpty(other.name))){
@@ -644,17 +636,17 @@ public abstract class Field<T> {
         }
         return Objects.equals(constraints, other.constraints);
     }
-    
+
 
     private boolean isWellKnownType(String typeName) {
-		return wellKnownFieldTypes.contains(typeName);
-	}
+        return wellKnownFieldTypes.contains(typeName);
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Field field = (Field) o;
+        Field<?> field = (Field<?>) o;
         return name.equalsIgnoreCase(field.name) &&
                 type.equals(field.type) &&
                 Objects.equals(format, field.format) &&
@@ -668,7 +660,7 @@ public abstract class Field<T> {
 
     @Override
     public String toString() {
-        Class clazz = this.getClass();
+        Class<?> clazz = this.getClass();
         return clazz.getName().replace(clazz.getPackage().getName(), "")
                 +" {" +
                 "name='" + name + '\'' +

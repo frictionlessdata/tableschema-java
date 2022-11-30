@@ -128,8 +128,8 @@ public class TableCreationTest {
 
         if (!expectedSchema.equals(schema)) {
             for (int i = 0; i < expectedSchema.getFields().size(); i++) {
-                Field expectedField = expectedSchema.getFields().get(i);
-                Field actualField = schema.getFields().get(i);
+                Field<?> expectedField = expectedSchema.getFields().get(i);
+                Field<?> actualField = schema.getFields().get(i);
                 Assert.assertEquals(expectedField,actualField);
             }
         }
@@ -152,8 +152,8 @@ public class TableCreationTest {
 
         if (!expectedSchema.equals(schema)) {
             for (int i = 0; i < expectedSchema.getFields().size(); i++) {
-                Field expectedField = expectedSchema.getFields().get(i);
-                Field actualField = schema.getFields().get(i);
+                Field<?> expectedField = expectedSchema.getFields().get(i);
+                Field<?> actualField = schema.getFields().get(i);
                 Assert.assertEquals(expectedField,actualField);
             }
         }

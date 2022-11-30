@@ -1,15 +1,8 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.module.SimpleSerializers;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.google.common.collect.Iterators;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
@@ -74,36 +67,10 @@ public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
 	public String[] getHeaders() {
 		Set<String> headers = new LinkedHashSet<>();
 		((ArrayNode)dataSource).elements().forEachRemaining((firstObject) -> {
-			Map<String, JsonNode> fields = new HashMap<>();
 			firstObject.fields().forEachRemaining(f -> {
-				fields.put(f.getKey(), f.getValue());
 				headers.add(f.getKey());
 			});
 		});
 		return headers.toArray(new String[]{});
-	}
-
-	private CsvMapper getCsvMapper() {
-		return CsvMapper.builder()
-				.addModule(complexObjectSerializationModule())
-				.build();
-	}
-	
-	private Module complexObjectSerializationModule() {
-		SimpleModule module = new SimpleModule();
-		module.setSerializers(new SimpleSerializers());
-		module.addSerializer(ObjectNode.class, mapSerializer());
-		return module;
-	}
-
-	private JsonSerializer<ObjectNode> mapSerializer() {
-		return new JsonSerializer<ObjectNode>() {
-
-			@Override
-			public void serialize(ObjectNode value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-				gen.writeString(value.toString());
-			}
-			
-		};
 	}
 }

@@ -18,11 +18,10 @@ public class JsonSchema {
 	private static final Logger log = LoggerFactory.getLogger(JsonSchema.class);
 	
 	private final boolean strictValidation;
-	private final JsonSchemaFactory factory;
-	private com.networknt.schema.JsonSchema jsonSchema;
+	private final com.networknt.schema.JsonSchema jsonSchema;
 	
 	private JsonSchema(JsonNode schemaNode, boolean strictValidation) {
-		this.factory = JsonSchemaFactory.getInstance(VersionFlag.V4);
+		JsonSchemaFactory factory = JsonSchemaFactory.getInstance(VersionFlag.V4);
 		this.jsonSchema = factory.getSchema(schemaNode);
 		this.strictValidation = strictValidation;
 	}

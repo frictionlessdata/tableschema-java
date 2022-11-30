@@ -21,8 +21,8 @@ public class TypeInferrer {
      */
     private static TypeInferrer instance = null;
 
-    private Map<String, Map<String, Integer>> typeInferralMap = new HashMap<>();
-    private Map<String, String> formatMap = new HashMap<>();
+    private final Map<String, Map<String, Integer>> typeInferralMap = new HashMap<>();
+    private final Map<String, String> formatMap = new HashMap<>();
     
     // The order in which the types will be attempted to be inferred.
     // Once a type is successfully inferred, we do not bother with the remaining types.
@@ -59,11 +59,13 @@ public class TypeInferrer {
    }
     
     /**
-     * Infer the data types and return the generated schema.
-     * @param data
-     * @param headers
-     * @return
-     * @throws TypeInferringException 
+     * Infer the data types and return the generated schema. Do not limit the
+     * number of rows to scan - this can take a long time depending on your
+     * data size
+     * @param data List of table rows
+     * @param headers the table headers
+     * @return Return Schema as a String
+     * @throws TypeInferringException if inferring the schema fails
      */
     synchronized String infer(List<Object[]> data, String[] headers) throws TypeInferringException{
         return this.infer(data, headers, -1);
@@ -71,14 +73,13 @@ public class TypeInferrer {
     
     /**
      * Infer the data types and return the generated schema.
-     * @param data
-     * @param headers
-     * @param rowLimit
-     * @return
-     * @throws TypeInferringException 
+     * @param data  List of table rows
+     * @param headers the table headers
+     * @param rowLimit the max number of rows to scan
+     * @return Return Schema as a String
+     * @throws TypeInferringException  if inferring the schema fails
      */
     synchronized String infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException{
-        
         // If the given row limit is bigger than the length of the data
         // then just use the length of the data.
         if(rowLimit > data.size()-1){
@@ -95,7 +96,7 @@ public class TypeInferrer {
         // Init the type inferral map and init the schema objects
         for (String header : headers) {
             // Init the type inferral map to track our inferences for each row.
-            this.getTypeInferralMap().put(header, new HashMap());
+            this.getTypeInferralMap().put(header, new HashMap<>());
             
             // Init the schema objects
             Map<String, Object> fieldObj = new HashMap<>();
@@ -154,14 +155,14 @@ public class TypeInferrer {
                 // Keep invoking the type casting methods until one doesn't throw an exception
                 String dataType = typeInferralDefinition[0];
 
-                Field field = Field.forType(dataType, dataType);
+                Field<?> field = Field.forType(dataType, dataType);
                 String format = formatMap.get(header);
                 if (null == format) {
                     format = field.parseFormat(datum, null);
                 }
                 field.parseValue(datum, format, null);
                 this.formatMap.put(header, format);
-                // If no exception is thrown, in means that a type has been inferred.
+                // If no exception is thrown, it means that a type has been inferred.
                 // Let's keep track of it in the inferral map.
                 this.updateInferralScoreMap(header, field.getType());
                 
@@ -179,8 +180,8 @@ public class TypeInferrer {
     
     /**
      * The type inferral map is where we keep track of the types inferred for values within the same field.
-     * @param header
-     * @param typeKey 
+     * @param header the column header in the table
+     * @param typeKey type of the column
      */
     private void updateInferralScoreMap(String header, String typeKey){
         if(this.getTypeInferralMap().get(header).containsKey(typeKey)){
@@ -193,9 +194,10 @@ public class TypeInferrer {
     
     /**
      * We use a map to keep track the inferred type counts for each field.
-     * Once we are done inferring, we settle for the type with that was inferred the most for the same field.
-     * @param map
-     * @return 
+     * Once we are done inferring, we settle for the type with that was inferred
+     * the most for the same field. Here we sort by score
+     * @param map the mapping of types to score to sort
+     * @return sorted mapping of types to score
      */
     private TreeMap<String, Integer> sortMapByValue(Map<String, Integer> map){
         Comparator<String> comparator = new MapValueComparator(map);

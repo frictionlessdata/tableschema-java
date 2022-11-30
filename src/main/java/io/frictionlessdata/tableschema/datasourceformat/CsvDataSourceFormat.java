@@ -95,15 +95,7 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
             // Get a copy of the header map that iterates in column order.
             // The map keys are column names. The map values are 0-based indices.
             Map<String, Integer> headerMap = this.getCSVParser().getHeaderMap();
-
-            // Generate list of keys
-            List<String> headerVals = new ArrayList<>();
-
-            headerMap.entrySet().forEach((pair) -> {
-                headerVals.add(pair.getKey());
-            });
-
-            headers = headerVals.toArray(new String[0]);
+            headers = headerMap.keySet().toArray(new String[0]);
         }
         return headers;
     }

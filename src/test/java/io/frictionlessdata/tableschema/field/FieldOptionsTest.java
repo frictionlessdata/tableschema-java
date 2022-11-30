@@ -52,7 +52,14 @@ class FieldOptionsTest {
         options.put("trueValues", trueValues);
         options.put("falseValues", falseValues);
 
-        Field testField = new BooleanField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
+        Field<?> testField = new BooleanField(
+                "name",
+                Field.FIELD_FORMAT_DEFAULT,
+                null,
+                null,
+                null,
+                null,
+                null);
 
         testField.setOptions(options);
         Assertions.assertEquals(options, testField.getOptions());

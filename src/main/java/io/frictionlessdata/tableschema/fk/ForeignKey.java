@@ -20,7 +20,7 @@ public class ForeignKey {
     private Reference reference = null;
     
     private boolean strictValidation = false;
-    private List<Exception> errors = new ArrayList();
+    private final ArrayList<Exception> errors = new ArrayList<>();
     
     public ForeignKey(){   
     }
@@ -90,8 +90,8 @@ public class ForeignKey {
             fke = new ForeignKeyException("The reference's fields property must be a string if the outer fields is a string.");
             
         }else if(this.fields instanceof ArrayNode && this.reference.getFields() instanceof ArrayNode){
-        	ArrayNode fkFields = (ArrayNode)this.fields;
-        	ArrayNode refFields = (ArrayNode)this.reference.getFields();
+        	ArrayNode fkFields = (ArrayNode)fields;
+        	ArrayNode refFields = reference.getFields();
             
             if(fkFields.size() != refFields.size()){
                 fke = new ForeignKeyException("The reference's fields property must be an array of the same length as that of the outer fields' array.");

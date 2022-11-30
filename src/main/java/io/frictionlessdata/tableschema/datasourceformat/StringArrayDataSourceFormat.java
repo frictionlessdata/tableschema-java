@@ -13,16 +13,12 @@ import java.util.List;
  * 
  */
 public class StringArrayDataSourceFormat extends AbstractDataSourceFormat {
-    private  String[] headers;
+    private final String[] headers;
 
     public StringArrayDataSourceFormat(Collection<String[]> data, String[] headers){
         this.dataSource = data;
         this.headers = headers;
     }
-
-    CSVParser getCSVParser() {
-        throw new TableSchemaException("Not implemented for StringArrayDataSourceFormat");
-    };
 
     @Override
     public Iterator<String[]> iterator() throws Exception{

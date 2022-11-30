@@ -65,32 +65,4 @@ class StringArrayDataSourceFormatTest {
         List<String[]> data = ds.data();
         Assertions.assertEquals(populationArr, data);
     }
-
-    /*
-    @Test
-    @DisplayName("Test writing data as CSV")
-    void writeCsvToFile() throws Exception{
-        String content = null;
-        File tempFile = Files.createTempFile("tableschema-", ".csv").toFile();
-
-        DataSourceFormat ds = new StringArrayDataSourceFormat(populationArr, populationHeaders);
-        ds.write(tempFile);
-
-        try (FileReader fr = new FileReader(tempFile)) {
-            try (BufferedReader rdr = new BufferedReader(fr)) {
-                content = rdr.lines().collect(Collectors.joining("\n"));
-            }
-        }
-        String testStr = String.join(",", populationHeaders) +"\n"+populationCsv;
-        // evade the CRLF mess by nuking all CR chars
-        Assertions.assertEquals(testStr.replaceAll("\\r", ""), content.replaceAll("\\r", ""));
-    }
-*/
-    @Test
-    @DisplayName("Test method is unimplemented")
-    void testGetCSVParserIsUnimplemented() throws Exception{
-        StringArrayDataSourceFormat ds = new StringArrayDataSourceFormat(populationArr, populationHeaders);
-        Assertions.assertThrows(TableSchemaException.class, ds::getCSVParser);
-    }
-
 }

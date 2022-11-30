@@ -1,6 +1,7 @@
 package io.frictionlessdata.tableschema.schema;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,19 +24,22 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class BeanSchema extends Schema {
 
-    Map<String, Field> fieldMap;
+    @JsonIgnore
+    Map<String, Field<?>> fieldMap;
 
+    @JsonIgnore
     Map<String, AnnotatedField> annotatedFieldMap;
 
+    @JsonIgnore
     private CsvSchema csvSchema;
 
-    private BeanSchema(List<Field> fields, boolean strict) {
+    private BeanSchema(List<Field<?>> fields, boolean strict) {
         super(fields, strict);
         fieldMap = createFieldMap(fields);
     }
 
-    public static BeanSchema infer(Class beanClass) throws NoSuchFieldException {
-        List<Field> fields = new ArrayList<>();
+    public static BeanSchema infer(Class<?> beanClass) throws NoSuchFieldException {
+        List<Field<?>> fields = new ArrayList<>();
         CsvMapper mapper = new CsvMapper();
         mapper.setVisibility(mapper.getSerializationConfig()
                         .getDefaultVisibilityChecker()
@@ -47,8 +51,8 @@ public class BeanSchema extends Schema {
             CsvSchema.Column next = iterator.next();
             String name = next.getName();
             CsvSchema.ColumnType type = next.getType();
-            Field field = null;
-            Class declaredClass = null;
+            Field<?> field;
+            Class<?> declaredClass;
             String fieldMethodName = fieldNames.get(name);
             try {
                 java.lang.reflect.Field declaredField = beanClass.getDeclaredField(fieldMethodName);
@@ -68,7 +72,7 @@ public class BeanSchema extends Schema {
                     break;
                 case NUMBER: {
                     field = generateNumberField(declaredClass, name);
-;                }
+                }
                 break;
                 case NUMBER_OR_STRING: {
                     field = generateNumberField(declaredClass, name);
@@ -117,8 +121,8 @@ public class BeanSchema extends Schema {
         return bs;
     }
 
-    private static Field generateNumberField(Class declaredClass, String name) {
-        Field field = null;
+    private static Field<?> generateNumberField(Class<?> declaredClass, String name) {
+        Field<?> field = null;
         if ((declaredClass.equals(Integer.class))
                 || (declaredClass.equals(int.class))
                 || (declaredClass.equals(Long.class))
@@ -144,17 +148,17 @@ public class BeanSchema extends Schema {
         return field;
     }
 
-    public Field getField(String name) {
+    public Field<?> getField(String name) {
         return fieldMap.get(name);
     }
 
-    static Map<String, Field> createFieldMap(Collection<Field> fields) {
-        Map<String, Field> fieldMap = new HashMap<>();
+    static Map<String, Field<?>> createFieldMap(Collection<Field<?>> fields) {
+        Map<String, Field<?>> fieldMap = new HashMap<>();
         fields.forEach((f) -> fieldMap.put(f.getName(), f));
         return fieldMap;
     }
 
-    static Map<String, AnnotatedField> createAnnotatedFieldMap(Class type) {
+    static Map<String, AnnotatedField> createAnnotatedFieldMap(Class<?> type) {
         CsvMapper mapper = new CsvMapper();
         mapper.setVisibility(mapper.getSerializationConfig()
                 .getDefaultVisibilityChecker()
@@ -176,7 +180,7 @@ public class BeanSchema extends Schema {
         return csvSchema;
     }
 
-    public Map<String, AnnotatedField> getFAnnotatedFieldMap() {
+    public Map<String, AnnotatedField> getAnnotatedFieldMap() {
         return annotatedFieldMap;
     }
 

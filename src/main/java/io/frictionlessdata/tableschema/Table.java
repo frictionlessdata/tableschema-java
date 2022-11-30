@@ -192,7 +192,7 @@ public class Table{
        return new TableIterator<>(this, keyed, extended, cast, relations);
     }
 
-    public BeanIterator iterator(Class<?> beanType, boolean relations) throws Exception{
+    public BeanIterator<?> iterator(Class<?> beanType, boolean relations) throws Exception{
         return new BeanIterator(this,  beanType, relations);
     }
 
@@ -280,6 +280,7 @@ public class Table{
         boolean cast = (null != schema);
         return read(cast);
     }
+
     public String asJson() {
         try {
             List<Map<String, Object>> arr = new ArrayList<>();
@@ -342,7 +343,7 @@ public class Table{
                     ? format
                     : DataSourceFormat.getDefaultCsvFormat();
 
-            locFormat = locFormat.withHeader(sortedHeaders);
+            locFormat = locFormat.builder().setHeader(sortedHeaders).build();
             CSVPrinter csvPrinter = new CSVPrinter(out, locFormat);
 
             String[] headers = getHeaders();
@@ -367,7 +368,7 @@ public class Table{
         try  {
             if (dataFormat.equals(DataSourceFormat.Format.FORMAT_CSV)) {
                 try {
-                    String[] headers = null;
+                    String[] headers;
                     if (null != schema) {
                         List<String> fieldNames = schema.getFieldNames();
                         headers = fieldNames.toArray(new String[0]);
@@ -438,7 +439,7 @@ public class Table{
     public void validate() throws TableValidationException, TableSchemaException {
         if (null == schema)
             return;
-        String[] headers = null;
+        String[] headers;
         try {
             headers = this.dataSourceFormat.getHeaders();
         } catch (Exception ex) {
@@ -541,7 +542,7 @@ public class Table{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Table table = (Table) o;
-        boolean equals = false;
+        boolean equals;
         try {
             equals = Arrays.equals(table.getHeaders(), ((Table) o).getHeaders());
             if ((this.schema != null) && (table.schema != null)) {
