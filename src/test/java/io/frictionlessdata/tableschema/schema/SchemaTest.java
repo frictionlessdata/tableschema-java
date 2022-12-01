@@ -18,6 +18,7 @@ import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,8 +35,6 @@ import java.util.*;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class SchemaTest {
@@ -746,9 +745,9 @@ public class SchemaTest {
     }
 
 
-    @org.junit.jupiter.api.Test
-    @DisplayName("Infer a Bean Schema")
-    void inferExplicitNamingBeanSchema() throws Exception{
+    @Test
+    @DisplayName("Validate creating Field mapping from Bean")
+    void testCreateFieldMapping() throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> fieldNameMapping = new TreeMap<>(ReflectionUtils.getFieldNameMapping(objectMapper, ExplicitNamingBean.class));
         String expectedString = TestHelper.getResourceFileContent(
@@ -756,14 +755,5 @@ public class SchemaTest {
         Map<String, String> expectedFieldMap
                 = new TreeMap<>(objectMapper.readValue(expectedString, new TypeReference<Map<String, String>>() {}));
         Assertions.assertEquals(expectedFieldMap, fieldNameMapping);
-
-        Schema schema = BeanSchema.infer(ExplicitNamingBean.class);
-        String expectedSchemaString = TestHelper.getResourceFileContent(
-                "/fixtures/beans/explicitnamingbean-schema.json");
-        Schema expectedSchema = Schema.fromJson(expectedSchemaString, true);
-
-        Assertions.assertEquals(expectedSchema, schema);
-        // validate equals() method implementation on Schema and BeanSchema
-        Assertions.assertEquals(schema, expectedSchema);
     }
 }

@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class ReflectionUtils {
 
-    public static Map<String, String> getFieldNameMapping(ObjectMapper mapper, Class type) {
+    public static Map<String, String> getFieldNameMapping(ObjectMapper mapper, Class<?> type) {
         Map<String, String> fieldNames = new HashMap<>();
         JavaType jType = mapper.constructType(type);
         BeanDescription desc = mapper.getSerializationConfig()
@@ -21,11 +21,14 @@ public class ReflectionUtils {
         List<BeanPropertyDefinition> properties = desc.findProperties();
         for (BeanPropertyDefinition def : properties) {
             AnnotatedField field = def.getField();
-            Field annotated = field.getAnnotated();
-            String fieldName = annotated.getName();
-            //String fieldName = def.getInternalName();
-            String declaredName = def.getName();
-            fieldNames.put(declaredName, fieldName);
+            // fields with names where the JsonProperty name differs from the field name create zombie
+            // entries here which we do not need.
+            if (null != field) {
+                Field annotated = field.getAnnotated();
+                String fieldName = annotated.getName();
+                String declaredName = def.getName();
+                fieldNames.put(declaredName, fieldName);
+            }
         }
         return fieldNames;
     }

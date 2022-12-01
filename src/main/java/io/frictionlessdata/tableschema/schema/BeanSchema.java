@@ -54,6 +54,9 @@ public class BeanSchema extends Schema {
             Field<?> field;
             Class<?> declaredClass;
             String fieldMethodName = fieldNames.get(name);
+            if (null == fieldMethodName) {
+                continue;
+            }
             try {
                 java.lang.reflect.Field declaredField = beanClass.getDeclaredField(fieldMethodName);
                 declaredClass = declaredField.getType();

@@ -19,5 +19,9 @@
     "name" : "black",
     "type" : "boolean",
     "format" : "default"
+  }, {
+    "name" : "visible",
+    "type" : "boolean",
+    "format" : "default"
   }]
 }

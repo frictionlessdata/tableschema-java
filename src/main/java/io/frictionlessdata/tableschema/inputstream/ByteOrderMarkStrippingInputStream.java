@@ -231,13 +231,13 @@ public class ByteOrderMarkStrippingInputStream extends InputStream {
     }
 
     @Override
-    public int read(final byte b[]) throws IOException,
+    public int read(final byte[] b) throws IOException,
             NullPointerException {
         return in.read(b, 0, b.length);
     }
 
     @Override
-    public int read(final byte b[],
+    public int read(final byte[] b,
                     final int off,
                     final int len) throws IOException,
             NullPointerException {

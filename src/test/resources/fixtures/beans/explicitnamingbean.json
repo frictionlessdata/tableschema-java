@@ -3,5 +3,6 @@
   "blue" : "isBlue",
   "is_white" : "isWhite",
   "pink_field" : "isPink",
-  "black" : "isBlack"
+  "black" : "isBlack",
+  "visible" : "isVisibleColor"
 }

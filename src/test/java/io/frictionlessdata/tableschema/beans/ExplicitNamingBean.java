@@ -21,11 +21,22 @@ public class ExplicitNamingBean {
     @JsonProperty("black")
     boolean isBlack;
 
+    @JsonProperty("visible")
+    boolean isVisibleColor;
+
     public boolean isBlack() {
         return isBlack;
     }
 
     public void setBlack(boolean black) {
         isBlack = black;
+    }
+
+    public boolean isVisibleColor() {
+        return isVisibleColor;
+    }
+
+    public void setVisibleColor(boolean visibleColor) {
+        isVisibleColor = visibleColor;
     }
 }

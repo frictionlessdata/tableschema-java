@@ -39,14 +39,6 @@ public class SchemaInferralTests {
     @Test
     @DisplayName("Infer a Bean Schema")
     void inferExplicitNamingBeanSchema() throws Exception{
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, String> fieldNameMapping = new TreeMap<>(ReflectionUtils.getFieldNameMapping(objectMapper, ExplicitNamingBean.class));
-        String expectedString = TestHelper.getResourceFileContent(
-                "/fixtures/beans/explicitnamingbean.json");
-        Map<String, String> expectedFieldMap
-                = new TreeMap<>(objectMapper.readValue(expectedString, new TypeReference<Map<String, String>>() {}));
-        Assertions.assertEquals(expectedFieldMap, fieldNameMapping);
-
         Schema schema = BeanSchema.infer(ExplicitNamingBean.class);
         String expectedSchemaString = TestHelper.getResourceFileContent(
                 "/fixtures/beans/explicitnamingbean-schema.json");
