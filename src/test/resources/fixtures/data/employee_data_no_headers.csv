@@ -1,0 +1,3 @@
+1,John Doe,1976-01-13,true,"{""lon"": 90.123, ""lat"": 45}",P2DT3H4M,"{""ssn"": 90, ""pin"": 45, ""rate"": 83.23}"
+2,Frank McKrank,1992-02-14,false,"{""lon"": 90, ""lat"": 45.223}",PT15M,"{""ssn"": 90, ""pin"": 45, ""rate"": 83.23}"
+3,Pencil Vester,1983-03-16,false,"{""lon"": 90, ""lat"": 45}",PT20.345S,"{""ssn"": 90, ""pin"": 45, ""rate"": 83.23}"

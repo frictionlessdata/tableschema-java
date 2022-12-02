@@ -460,7 +460,8 @@ public class Table{
      * throws a TableValidationException if they aren't. If the headers derived from the
      * DataSourceFormat aren't reliable (eg. JSON array of JSON objects where properties
      * that are `null` would be omitted), then we don't test whether all declared header
-     * names are present.
+     * names are present. Likewise, if the CSVFormat used doesn't specify a header row
+     * (e.g. CSVFormat.DEFAULT), then stop validation.
      *
      * Sort order is neglected to allow a Schema to define column order. This is intentional,
      * as JSON-objects do not have a sort order of their keys. Therefore, reading not from
@@ -478,6 +479,9 @@ public class Table{
             headers = this.dataSourceFormat.getHeaders();
         } catch (Exception ex) {
             throw new TableSchemaException(ex);
+        }
+        if (null == headers) {
+            return;
         }
         List<String> declaredHeaders = Arrays.asList(getDeclaredHeaders());
         List<String> foundHeaders = Arrays.asList(headers);

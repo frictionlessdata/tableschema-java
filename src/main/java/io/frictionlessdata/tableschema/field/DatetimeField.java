@@ -33,7 +33,7 @@ public class DatetimeField extends Field<ZonedDateTime> {
 
     @Override
     public ZonedDateTime parseValue(String value, String format, Map<String, Object> options)
-            throws InvalidCastException, ConstraintsException {
+            throws TypeInferringException {
 
         Pattern pattern = Pattern.compile(REGEX_DATETIME);
         Matcher matcher = pattern.matcher(value);
@@ -59,4 +59,15 @@ public class DatetimeField extends Field<ZonedDateTime> {
     public String parseFormat(String value, Map<String, Object> options) {
         return "default";
     }
+
+    @Override
+    ZonedDateTime checkMinimumContraintViolated(ZonedDateTime value) {
+        ZonedDateTime minTime = (ZonedDateTime)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
+        if(value.isBefore(minTime)){
+            return minTime;
+        }
+        return null;
+    }
+
+
 }

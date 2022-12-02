@@ -29,7 +29,7 @@ public class TimeField extends Field<LocalTime> {
     }
 
     @Override
-    public LocalTime parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public LocalTime parseValue(String value, String format, Map<String, Object> options) throws TypeInferringException {
         Pattern pattern = Pattern.compile(REGEX_TIME);
         Matcher matcher = pattern.matcher(value);
 
@@ -58,5 +58,14 @@ public class TimeField extends Field<LocalTime> {
     @Override
     public String parseFormat(String value, Map<String, Object> options) {
         return "default";
+    }
+
+    @Override
+    LocalTime checkMinimumContraintViolated(LocalTime value) {
+        LocalTime minTime = (LocalTime)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
+        if(value.isBefore(minTime)){
+           return minTime;
+        }
+        return null;
     }
 }

@@ -28,7 +28,7 @@ public class GeopointField extends Field<double[]> {
 
     @Override
     public double[] parseValue(String value, String format, Map<String, Object> options)
-            throws InvalidCastException, ConstraintsException {
+            throws TypeInferringException {
         try{
             if(format.equalsIgnoreCase(Field.FIELD_FORMAT_DEFAULT)){
                 String[] geopoint = value.split(", *");
@@ -126,6 +126,11 @@ public class GeopointField extends Field<double[]> {
         } catch (Exception ex) {
         	return FIELD_FORMAT_DEFAULT;
         }
+    }
+
+    @Override
+    double[] checkMinimumContraintViolated(double[] value) {
+        return null;
     }
 
 }

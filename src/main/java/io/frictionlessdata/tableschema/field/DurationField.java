@@ -25,7 +25,7 @@ public class DurationField extends Field<Duration> {
 
     @Override
     public Duration parseValue(String value, String format, Map<String, Object> options)
-            throws InvalidCastException, ConstraintsException {
+            throws TypeInferringException {
         try{
             return Duration.parse(value);
         }catch(Exception e){
@@ -44,5 +44,14 @@ public class DurationField extends Field<Duration> {
     @Override
     public String parseFormat(String value, Map<String, Object> options) {
         return "default";
+    }
+
+    @Override
+    Duration checkMinimumContraintViolated(Duration value) {
+        Duration minDuration = (Duration)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
+        if(value.compareTo(minDuration) < 0){
+            return minDuration;
+        }
+        return null;
     }
 }

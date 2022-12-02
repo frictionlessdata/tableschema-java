@@ -32,7 +32,7 @@ public class DateField extends Field<LocalDate> {
 
     @Override
     public LocalDate parseValue(String value, String format, Map<String, Object> options)
-            throws InvalidCastException, ConstraintsException {
+            throws TypeInferringException {
 
         Pattern pattern = Pattern.compile(REGEX_DATE);
         Matcher matcher = pattern.matcher(value);
@@ -92,4 +92,15 @@ public class DateField extends Field<LocalDate> {
     public String parseFormat(String value, Map<String, Object> options) {
         return "default";
     }
+
+    @Override
+    LocalDate checkMinimumContraintViolated(LocalDate value) {
+        LocalDate minDate = (LocalDate)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
+        if(value.isBefore(minDate)){
+            return minDate;
+        }
+        return null;
+    }
+
+
 }

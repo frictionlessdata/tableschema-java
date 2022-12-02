@@ -290,28 +290,6 @@ public class Schema {
     	return JsonUtil.getInstance().serialize(this);
     }
 
-    public Object[] castRow(String[] row) throws InvalidCastException{
-        
-        if(row.length != this.fields.size()){
-            throw new InvalidCastException("Row length is not equal to the number of defined fields.");
-        }
-        
-        try{
-            Object[] castRow = new Object[this.fields.size()];
-        
-            for(int i=0; i<row.length; i++){
-                Field<?> field = this.fields.get(i);
-                castRow[i] = field.parseValue(row[i], field.getFormat(), null);
-            }
-
-            return castRow;
-            
-        }catch(Exception e){
-            throw new InvalidCastException(e);
-        }
-        
-    }
-    
     public void writeJson (File outputFile) throws IOException{
         try (FileOutputStream fos = new FileOutputStream(outputFile)) {
             writeJson(fos);

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -193,11 +194,28 @@ public abstract class Field<T> {
         return JsonUtil.getInstance().deserialize(json, Field.class);
     }
 
+    public boolean isCompatibleValue(String value, String format) {
+        try {
+            parseValue(value, format, null);
+            return true;
+        } catch (TypeInferringException ex) {
+            return false;
+        }
+    }
 
-    public abstract T parseValue(String value, String format, Map<String, Object> options)
-            throws InvalidCastException, ConstraintsException;
+    /**
+     * Parse string value into Java object according to the Field type. If `value` can't be
+     * parsed, throw a TypeInferringException
+     * @param value String serialization of Field value
+     * @param format applicable format
+     * @param options applicable options
+     * @return Deserialized object
+     * @throws TypeInferringException if parsing fails because value can't be parsed
+     */
+    public abstract T parseValue(String value, String format, Map<String, Object> options) throws
+            TypeInferringException;
 
-    public abstract String formatValueAsString(T value, String format, Map<String, Object> options)
+    abstract String formatValueAsString(T value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException;
 
     public String formatValueAsString(T value) throws InvalidCastException, ConstraintsException {
@@ -222,44 +240,6 @@ public abstract class Field<T> {
 
 
     /**
-     * Use the Field definition to cast (=parse) a value into the Field type. Constraints enforcing
-     * can be switched on or off.
-     * @param value the value string to cast
-     * @param enforceConstraints whether to enforce Field constraints
-     * @param options casting options
-     * @return result of the cast operation
-     * @throws InvalidCastException if the content of `value` cannot be cast to the destination type
-     * @throws ConstraintsException thrown if `enforceConstraints` was set to `true`and constraints were violated
-     */
-    public T castValue(String value, boolean enforceConstraints, Map<String, Object> options) throws InvalidCastException, ConstraintsException{
-        if(this.type.isEmpty()){
-            throw new InvalidCastException("Property 'type' must not be empty");
-        } else if (StringUtils.isEmpty(value)) {
-            return null;
-        } else {
-            try{
-                T castValue = parseValue(value, format, options);
-
-                // Check for constraint violations
-                if(enforceConstraints && this.constraints != null){
-                    Map<String, Object> violatedConstraints = checkConstraintViolations(castValue);
-                    if(!violatedConstraints.isEmpty()){
-                        throw new ConstraintsException("Violated "+ violatedConstraints.size()+" contstraints");
-                    }
-                }
-
-                return castValue;
-
-            }catch(ConstraintsException ce){
-                throw ce;
-
-            }catch(Exception e){
-                throw new InvalidCastException(e);
-            }
-        }
-    }
-
-    /**
      * Use the Field definition to cast a value into the Field type.
      * Enforces constraints by default.
      * @param value the value string to cast
@@ -271,6 +251,7 @@ public abstract class Field<T> {
         return castValue(value, true, options);
     }
 
+    abstract T checkMinimumContraintViolated(T value);
 
     /**
      * Returns a Map with all the constraints that have been violated.
@@ -339,48 +320,9 @@ public abstract class Field<T> {
          * If a minimum value constraint is specified then the field descriptor MUST contain a type key.
          **/
         if(this.constraints.containsKey(CONSTRAINT_KEY_MINIMUM)){
-
-            if(value instanceof Number){
-                BigDecimal minNumber = new BigDecimal(this.constraints.get(CONSTRAINT_KEY_MINIMUM).toString());
-                if( new BigDecimal(value.toString()).compareTo(minNumber) < 0 ) {
-                    violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minNumber);
-                }
-
-            } else if(value instanceof LocalTime){
-                LocalTime minTime = (LocalTime)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
-                if(((LocalTime)value).isBefore(minTime)){
-                    violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minTime);
-                }
-
-            } else if(value instanceof ZonedDateTime){
-                ZonedDateTime minTime = (ZonedDateTime)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
-                if(((ZonedDateTime)value).isBefore(minTime)){
-                    violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minTime);
-                }
-
-            } else if(value instanceof LocalDate){
-                LocalDate minDate = (LocalDate)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
-                if(((LocalDate)value).isBefore(minDate)){
-                    violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minDate);
-                }
-
-            } else if(value instanceof Year){
-                int minYear = (int)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
-                if(((Year)value).isBefore(Year.of(minYear))) {
-                    violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minYear);
-                }
-
-            } else if(value instanceof YearMonth){
-                YearMonth minDate = (YearMonth)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
-                if(((YearMonth)value).isBefore(minDate)){
-                    violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minDate);
-                }
-
-            } else if(value instanceof Duration){
-                Duration minDuration = (Duration)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
-                if(((Duration)value).compareTo(minDuration) < 0){
-                    violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, minDuration);
-                }
+            T violatedContraint = checkMinimumContraintViolated((T)value);
+            if (null != violatedContraint) {
+                violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, violatedContraint);
             }
         }
 
@@ -526,6 +468,16 @@ public abstract class Field<T> {
                     }
                 }
 
+            } else if(value instanceof Year){
+                List<Year> yearList = (List<Year>)this.constraints.get(CONSTRAINT_KEY_ENUM);
+
+                for (Year year : yearList) {
+                    if (year.compareTo((Year) value) == 0) {
+                        violatesEnumConstraint = false;
+                        break;
+                    }
+                }
+
             } else if(value instanceof Duration){
                 List<Duration> durationList = (List<Duration>)this.constraints.get(CONSTRAINT_KEY_ENUM);
 
@@ -546,10 +498,10 @@ public abstract class Field<T> {
         return violatedConstraints;
     }
 
-    public static Field<?> forType(String type, String name) {
+    public static Field<?> forType(String type) {
         Map<String, Object> fieldMap = new HashMap<>();
         fieldMap.put(JSON_KEY_TYPE, type);
-        fieldMap.put(JSON_KEY_NAME, name);
+        fieldMap.put(JSON_KEY_NAME, type);
         return JsonUtil.getInstance().convertValue(fieldMap, Field.class);
     }
 
@@ -635,6 +587,44 @@ public abstract class Field<T> {
             return false;
         }
         return Objects.equals(constraints, other.constraints);
+    }
+
+    /**
+     * Use the Field definition to cast (=parse) a value into the Field type. Constraints enforcing
+     * can be switched on or off.
+     * @param value the value string to cast
+     * @param enforceConstraints whether to enforce Field constraints
+     * @param options casting options
+     * @return result of the cast operation
+     * @throws InvalidCastException if the content of `value` cannot be cast to the destination type
+     * @throws ConstraintsException thrown if `enforceConstraints` was set to `true`and constraints were violated
+     */
+    T castValue(String value, boolean enforceConstraints, Map<String, Object> options) throws InvalidCastException, ConstraintsException{
+        if(this.type.isEmpty()){
+            throw new InvalidCastException("Property 'type' must not be empty");
+        } else if (StringUtils.isEmpty(value)) {
+            return null;
+        } else {
+            try{
+                T castValue = parseValue(value, format, options);
+
+                // Check for constraint violations
+                if(enforceConstraints && this.constraints != null){
+                    Map<String, Object> violatedConstraints = checkConstraintViolations(castValue);
+                    if(!violatedConstraints.isEmpty()){
+                        throw new ConstraintsException("Violated "+ violatedConstraints.size()+" contstraints");
+                    }
+                }
+
+                return castValue;
+
+            }catch(ConstraintsException ce){
+                throw ce;
+
+            }catch(Exception e){
+                throw new InvalidCastException(e);
+            }
+        }
     }
 
 

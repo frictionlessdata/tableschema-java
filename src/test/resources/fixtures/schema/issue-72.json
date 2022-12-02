@@ -1,0 +1,43 @@
+{
+  "fields" : [ {
+    "name" : "PERIOD",
+    "type" : "integer",
+    "format" : "default"
+  }, {
+    "name" : "SCENARIO",
+    "type" : "string",
+    "format" : "default"
+  }, {
+    "name" : "PRODUCT",
+    "type" : "string",
+    "format" : "default"
+  }, {
+    "name" : "REGION",
+    "type" : "string",
+    "format" : "default"
+  }, {
+    "name" : "CHANNEL",
+    "type" : "string",
+    "format" : "default"
+  }, {
+    "name" : "MEASURE",
+    "type" : "string",
+    "format" : "default"
+  }, {
+    "name" : "AMOUNT",
+    "type" : "number",
+    "format" : "default"
+  }, {
+    "name" : "USERUPD",
+    "type" : "any",
+    "format" : "default"
+  }, {
+    "name" : "DATEUPD",
+    "type" : "any",
+    "format" : "default"
+  }, {
+    "name" : "PROVENIENZA",
+    "type" : "string",
+    "format" : "default"
+  } ]
+}

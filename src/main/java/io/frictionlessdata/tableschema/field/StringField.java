@@ -2,6 +2,7 @@ package io.frictionlessdata.tableschema.field;
 
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.net.URI;
@@ -41,7 +42,12 @@ public class StringField extends Field<String> {
     }
 
     @Override
-    public String parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public boolean isCompatibleValue(String value, String format) {
+        return true;
+    }
+
+    @Override
+    public String parseValue(String value, String format, Map<String, Object> options) throws TypeInferringException  {
         return value;
     }
 
@@ -84,5 +90,10 @@ public class StringField extends Field<String> {
         } catch (URISyntaxException ex) {
             return FIELD_FORMAT_DEFAULT;
         }
+    }
+
+    @Override
+    String checkMinimumContraintViolated(String value) {
+        return null;
     }
 }

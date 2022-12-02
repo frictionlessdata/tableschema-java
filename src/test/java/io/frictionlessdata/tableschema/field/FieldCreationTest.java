@@ -311,8 +311,7 @@ class FieldCreationTest {
     @DisplayName("Test undefined Field type creation")
     void testUndefinedFieldCreation() throws Exception{
         String type = "anon";
-        String name = "anon";
-        Field testField = Field.forType(type, name);
+        Field testField = Field.forType(type);
         Assertions.assertTrue(testField instanceof AnyField);
         Assertions.assertEquals(testField.getName(), "anon");
         Assertions.assertEquals(testField.getType(), "any");

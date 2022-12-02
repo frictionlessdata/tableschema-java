@@ -28,7 +28,7 @@ public class YearField extends Field<Year> {
     }
 
     @Override
-    public Year parseValue(String value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+    public Year parseValue(String value, String format, Map<String, Object> options) throws TypeInferringException {
         Pattern pattern = Pattern.compile(REGEX_YEAR);
         Matcher matcher = pattern.matcher(value);
 
@@ -58,6 +58,15 @@ public class YearField extends Field<Year> {
     @Override
     public String parseFormat(String value, Map<String, Object> options) {
         return "default";
+    }
+
+    @Override
+    Year checkMinimumContraintViolated(Year value) {
+        int minYear = (int)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
+        if(value.isBefore(Year.of(minYear))) {
+            return Year.of(minYear);
+        }
+        return null;
     }
 
 

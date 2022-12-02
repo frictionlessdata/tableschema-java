@@ -3,6 +3,8 @@ package io.frictionlessdata.tableschema.field;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.JsonParsingException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import java.net.URI;
@@ -25,8 +27,13 @@ public class ObjectField extends Field<Map<String, Object>> {
 
     @Override
     public Map<String, Object> parseValue(String value, String format, Map<String, Object> options)
-            throws InvalidCastException, ConstraintsException {
-        return JsonUtil.getInstance().deserialize(value, new TypeReference<Map<String, Object>>(){});
+            throws TypeInferringException {
+        try {
+            return JsonUtil.getInstance().deserialize(value, new TypeReference<Map<String, Object>>() {
+            });
+        } catch (JsonParsingException ex) {
+            throw new TypeInferringException(ex);
+        }
     }
 
 
@@ -42,5 +49,10 @@ public class ObjectField extends Field<Map<String, Object>> {
     @Override
     public String parseFormat(String value, Map<String, Object> options) {
         return "default";
+    }
+
+    @Override
+    Map<String, Object> checkMinimumContraintViolated(Map<String, Object> value) {
+        return null;
     }
 }

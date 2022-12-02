@@ -3,6 +3,7 @@ package io.frictionlessdata.tableschema.field;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 
 import java.net.URI;
 import java.util.*;
@@ -41,7 +42,7 @@ public class BooleanField extends Field<Boolean> {
 
     @Override
     public Boolean parseValue(String value, String format, Map<String, Object> options)
-            throws InvalidCastException, ConstraintsException {
+            throws TypeInferringException {
         if (null != options) {
             if (options.containsKey("trueValues")) {
                 trueValues = new ArrayList<>((Collection) options.get("trueValues"));
@@ -58,7 +59,7 @@ public class BooleanField extends Field<Boolean> {
             return false;
 
         }else{
-            throw new InvalidCastException("Value "+value+" not in 'trueValues' or 'falseValues'");
+            throw new TypeInferringException("Value "+value+" not in 'trueValues' or 'falseValues'");
         }
     }
 
@@ -89,6 +90,11 @@ public class BooleanField extends Field<Boolean> {
         return "default";
     }
 
+    @Override
+    Boolean checkMinimumContraintViolated(Boolean value) {
+        return null;
+    }
+
     public static Field fromJson (String json) {
     	return Field.fromJson(json);
     }
@@ -100,6 +106,8 @@ public class BooleanField extends Field<Boolean> {
     public List<String> getFalseValues() {
         return falseValues;
     }
+
+
 
     @JsonIgnore
     private List<String> _getActualTrueValues() {

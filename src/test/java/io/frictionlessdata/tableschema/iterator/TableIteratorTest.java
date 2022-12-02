@@ -1,9 +1,12 @@
 package io.frictionlessdata.tableschema.iterator;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.Table;
+import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.schema.Schema;
+import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,12 +14,18 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.math.BigInteger;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static io.frictionlessdata.tableschema.TestHelper.getResourceFile;
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TableIteratorTest {
     private static Table validPopulationTable = null;
@@ -49,8 +58,6 @@ class TableIteratorTest {
         try (FileInputStream fis = new FileInputStream(f)) {
             validPopulationSchema = Schema.fromJson (fis, false);
         }
-        f = new File(getTestDataDirectory(), "schema/simple_data_schema.json");
-        Schema validSimpleSchema = Schema.fromJson(f, true);
         File testDataDir = getTestDataDirectory();
         File file = new File("data/population.csv");
         validPopulationTable
@@ -247,7 +254,7 @@ class TableIteratorTest {
 
         // Assert data.
         while(iter.hasNext()){
-            Map record = iter.next();
+            Map<String, Object> record = iter.next();
             String year = record.get("year").toString();
             String city = record.get("city").toString();
             String population = record.get("population").toString();
@@ -258,6 +265,74 @@ class TableIteratorTest {
 
             expectedDataIndex++;
         }
+    }
+
+    @Test
+    @DisplayName("No headers specified")
+    void noHeaders() throws Exception{
+        ObjectMapper objectMapper = new ObjectMapper();
+        File basePath = getResourceFile("/fixtures/data/");
+        String expectedString = TestHelper.getResourceFileContent(
+                "/fixtures/schema/employee_schema.json");
+        Schema schema = Schema.fromJson(expectedString, true);
+
+        File source = new File("employee_data_no_headers.csv");
+        // the CSVFormat.DEFAULT format specifies "no header"
+        Table table = Table.fromSource(source, basePath, schema, CSVFormat.DEFAULT);
+        Iterator<Object[]> iterator = table.iterator(false, false, true, false);
+        Object[] testRow = iterator.next();
+        Assertions.assertEquals(BigInteger.class, testRow[0].getClass());
+        Assertions.assertEquals(1, ((BigInteger) testRow[0]).intValue());
+        Assertions.assertEquals(String.class, testRow[1].getClass());
+        Assertions.assertEquals("John Doe", testRow[1]);
+        Assertions.assertEquals(LocalDate.class, testRow[2].getClass());
+        Assertions.assertEquals("1976-01-13", ((LocalDate) testRow[2]).format(DateTimeFormatter.ISO_LOCAL_DATE));
+        Assertions.assertEquals(Boolean.class, testRow[3].getClass());
+        Assertions.assertEquals(true, testRow[3]);
+        Assertions.assertTrue(testRow[4] instanceof double[]);
+        Assertions.assertArrayEquals(new double[]{90.123, 45.0}, ((double[]) testRow[4]));
+        Assertions.assertEquals(Duration.class, testRow[5].getClass());
+        Assertions.assertEquals("PT51H4M", ((Duration) testRow[5]).toString());
+        Assertions.assertEquals(java.util.LinkedHashMap.class, testRow[6].getClass());
+        Assertions.assertEquals(90, ((Map) testRow[6]).get("ssn"));
+        Assertions.assertEquals(45, ((Map) testRow[6]).get("pin"));
+        Assertions.assertEquals(83.23, ((Map) testRow[6]).get("rate"));
+    }
+
+
+    @Test
+    @DisplayName("EmptyColumnsWithNumberField")
+    void emptyColumns() throws Exception{
+        ObjectMapper objectMapper = new ObjectMapper();
+        File basePath = getResourceFile("/fixtures/data/");
+        String expectedString = TestHelper.getResourceFileContent(
+                "/fixtures/schema/empty_number_field_schema.json");
+        Schema schema = Schema.fromJson(expectedString, true);
+
+        // first, a CSV with empty cols
+        File source = getResourceFile("AW_229_000001_000002.csv");
+        Table table = Table.fromSource(source, basePath, schema, DataSourceFormat.getDefaultCsvFormat());
+        Iterator<Object[]> iterator = table.iterator(false, false, true, false);
+        while (iterator.hasNext()) {
+            Object[] next = iterator.next();
+            System.out.println(next);
+        }
+
+
+        /*Object jsonObject = objectMapper.readValue(schema.getJson(), Object.class);
+        String expectedString = TestHelper.getResourceFileContent(
+                "/fixtures/schema/issue-72.json");
+        assertEquals(objectMapper.readValue(expectedString, Object.class), jsonObject);
+
+
+        // then, a CSV with quoted empty cols
+        File source2 = getResourceFile("AW_229_000001_000002_1Row.csv");
+        Table table2 = Table.fromSource(source2, basePath);
+
+        Schema schema2 = table2.inferSchema();
+
+        jsonObject = objectMapper.readValue(schema2.getJson(), Object.class);
+        assertEquals(objectMapper.readValue(expectedString, Object.class), jsonObject);*/
     }
 
     private List<String[]> getExpectedAlternatePopulationData(){

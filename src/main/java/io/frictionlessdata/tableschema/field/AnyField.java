@@ -2,6 +2,7 @@ package io.frictionlessdata.tableschema.field;
 
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 
 import java.net.URI;
 import java.util.Map;
@@ -11,6 +12,7 @@ public class AnyField extends Field<Object> {
     AnyField() {
         super();
     }
+
 
     public AnyField(String name) {
         super(name, FIELD_TYPE_ANY);
@@ -22,8 +24,13 @@ public class AnyField extends Field<Object> {
     }
 
     @Override
+    public boolean isCompatibleValue(String value, String format) {
+        return true;
+    }
+
+    @Override
     public Object parseValue(String value, String format, Map<String, Object> options)
-            throws InvalidCastException, ConstraintsException {
+            throws TypeInferringException {
         return value;
     }
 
@@ -36,6 +43,11 @@ public class AnyField extends Field<Object> {
     @Override
     public String parseFormat(String value, Map<String, Object> options) {
         return "default";
+    }
+
+    @Override
+    Object checkMinimumContraintViolated(Object value) {
+        return null;
     }
 
 }

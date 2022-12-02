@@ -2,6 +2,8 @@ package io.frictionlessdata.tableschema.field;
 
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.exception.JsonParsingException;
+import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import java.net.URI;
@@ -25,8 +27,12 @@ public class ArrayField extends Field<Object[]> {
 
     @Override
     public Object[] parseValue(String value, String format, Map<String, Object> options)
-            throws InvalidCastException, ConstraintsException {
-        return JsonUtil.getInstance().deserialize(value, Object[].class);
+            throws TypeInferringException {
+        try {
+            return JsonUtil.getInstance().deserialize(value, Object[].class);
+        } catch (JsonParsingException ex) {
+            throw new TypeInferringException(ex);
+        }
     }
 
     @Override
@@ -38,6 +44,11 @@ public class ArrayField extends Field<Object[]> {
     @Override
     public String parseFormat(String value, Map<String, Object> options) {
         return "default";
+    }
+
+    @Override
+    Object[] checkMinimumContraintViolated(Object[] value) {
+        return null;
     }
 
 }

@@ -185,29 +185,6 @@ public class FieldConstraintsTest {
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAX_LENGTH));
     }
 
-    @Test
-    public void testMinimumAndMaximumInteger(){
-
-        Map<String, Object> constraints = new HashMap<>();
-        constraints.put(Field.CONSTRAINT_KEY_MINIMUM, 2);
-        constraints.put(Field.CONSTRAINT_KEY_MAXIMUM, 5);
-
-        IntegerField field = new IntegerField("test", Field.FIELD_FORMAT_DEFAULT, null, null, null, constraints, null);
-
-        for(int i=0; i < 7; i++){
-            Map<String, Object> violatedConstraints = field.checkConstraintViolations(i);
-
-            if(i >= 2 && i <=5){
-                Assert.assertTrue(violatedConstraints.isEmpty());
-
-            }else if(i < 2){
-                Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MINIMUM));
-
-            }else {
-                Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAXIMUM));
-            }
-        }
-    }
 
     @Test
     public void testMinimumAndMaximumBigInteger(){
@@ -753,6 +730,65 @@ public class FieldConstraintsTest {
         violatedConstraints = field.checkConstraintViolations(date3);
         Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_ENUM));
     }
+
+    @Test
+    public void testEnumYear(){
+        Map<String, Object> violatedConstraints = null;
+
+        Map<String, Object> constraints = new HashMap<>();
+        List<Year> enumDates = new ArrayList<>();
+
+        DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy");
+        Year date1 = Year.parse("2000", formatter);
+
+        enumDates.add(date1);
+
+        Year date2 = Year.parse("2019", formatter);
+        enumDates.add(date2);
+
+        constraints.put(Field.CONSTRAINT_KEY_ENUM, enumDates);
+        YearField field = new YearField("test", null, null, null, null, constraints, null);
+
+        violatedConstraints = field.checkConstraintViolations(date1);
+        Assert.assertTrue(violatedConstraints.isEmpty());
+
+        violatedConstraints = field.checkConstraintViolations(date2);
+        Assert.assertTrue(violatedConstraints.isEmpty());
+
+        Year date3 = Year.parse("2003", formatter);
+        violatedConstraints = field.checkConstraintViolations(date3);
+        Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_ENUM));
+    }
+
+    @Test
+    public void testEnumYearMonth(){
+        Map<String, Object> violatedConstraints = null;
+
+        Map<String, Object> constraints = new HashMap<>();
+        List<YearMonth> enumDates = new ArrayList<>();
+
+        DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM");
+        YearMonth date1 = YearMonth.parse("2000-01", formatter);
+
+        enumDates.add(date1);
+
+        YearMonth date2 = YearMonth.parse("2019-01", formatter);
+        enumDates.add(date2);
+
+        constraints.put(Field.CONSTRAINT_KEY_ENUM, enumDates);
+        YearmonthField field = new YearmonthField("test", null, null, null, null, constraints, null);
+
+        violatedConstraints = field.checkConstraintViolations(date1);
+        Assert.assertTrue(violatedConstraints.isEmpty());
+
+        violatedConstraints = field.checkConstraintViolations(date2);
+        Assert.assertTrue(violatedConstraints.isEmpty());
+
+        YearMonth date3 = YearMonth.parse("2003-01", formatter);
+        violatedConstraints = field.checkConstraintViolations(date3);
+        Assert.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_ENUM));
+    }
+
 
     private JsonNode createJsonNode(Object obj) {
     	return JsonUtil.getInstance().createNode(obj);

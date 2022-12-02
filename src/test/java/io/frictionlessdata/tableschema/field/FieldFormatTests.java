@@ -47,7 +47,7 @@ class FieldFormatTests {
         BooleanField field = (BooleanField)BooleanField.fromJson("{'name': 'name', 'type': 'boolean', 'trueValues': ['agreed']}");
 
         // expect exception
-        assertThrows(InvalidCastException.class, () -> field.parseValue("true", null, null));
+        assertThrows(TypeInferringException.class, () -> field.parseValue("true", null, null));
         Boolean val = field.parseValue("agreed", null, null); // True
         Assertions.assertTrue(val);
     }
@@ -59,7 +59,7 @@ class FieldFormatTests {
         BooleanField field = (BooleanField)BooleanField.fromJson("{'name': 'name', 'type': 'boolean', 'falseValues': ['declined']}");
 
         // expect exception
-        assertThrows(InvalidCastException.class, () -> field.parseValue("false", null, null));
+        assertThrows(TypeInferringException.class, () -> field.parseValue("false", null, null));
         Boolean val = field.parseValue("declined", null, null); // false
         Assertions.assertFalse(val);
     }

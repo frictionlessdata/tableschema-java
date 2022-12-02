@@ -3,8 +3,11 @@ package io.frictionlessdata.tableschema.schema;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.util.JsonUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
+
+import static io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_ANY;
 
 
 /**
@@ -44,7 +47,7 @@ public class TypeInferrer {
         new String[]{Field.FIELD_TYPE_OBJECT, Field.FIELD_FORMAT_DEFAULT},
         new String[]{Field.FIELD_TYPE_ARRAY, Field.FIELD_FORMAT_DEFAULT},
         new String[]{Field.FIELD_TYPE_STRING, Field.FIELD_FORMAT_DEFAULT}, // No different formats, just use default.
-        new String[]{Field.FIELD_TYPE_ANY, Field.FIELD_FORMAT_DEFAULT})); // No different formats, just use default.
+        new String[]{FIELD_TYPE_ANY, Field.FIELD_FORMAT_DEFAULT})); // No different formats, just use default.
 
     
     private TypeInferrer(){
@@ -148,32 +151,32 @@ public class TypeInferrer {
     }
     
     private void findType(String header, String datum){
+        // fixes https://github.com/frictionlessdata/tableschema-java/issues/72
+        if (StringUtils.isEmpty(datum)) {
+            updateInferralScoreMap(header, FIELD_TYPE_ANY);
+            formatMap.put(header, "default");
+            return;
+        }
         // Go through all the field types and call their parsing method to find
         // the first that won't throw
         for(String[] typeInferralDefinition: TYPE_INFERRAL_ORDER_LIST){
-            try{
-                // Keep invoking the type casting methods until one doesn't throw an exception
-                String dataType = typeInferralDefinition[0];
+            // Keep invoking the type casting methods until one doesn't throw an exception
+            String dataType = typeInferralDefinition[0];
 
-                Field<?> field = Field.forType(dataType, dataType);
-                String format = formatMap.get(header);
-                if (null == format) {
-                    format = field.parseFormat(datum, null);
-                }
-                field.parseValue(datum, format, null);
+            Field<?> field = Field.forType(dataType);
+            String format = formatMap.get(header);
+            if (null == format) {
+                format = field.parseFormat(datum, null);
+            }
+            if (field.isCompatibleValue(datum, format)) {
                 this.formatMap.put(header, format);
                 // If no exception is thrown, it means that a type has been inferred.
                 // Let's keep track of it in the inferral map.
                 this.updateInferralScoreMap(header, field.getType());
-                
-                // We no longer need to try to infer other types. 
+
+                // We no longer need to try to infer other types.
                 // Let's break out of the loop.
                 break;
-
-            } catch (Exception e) {
-                // Do nothing.
-                // An exception here means that we failed to infer with the current type.
-                // Move on to attempt with the next type in the following iteration.
             }
         }
     }
