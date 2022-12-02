@@ -16,51 +16,8 @@ It allows you to read and write tabular data with assurances to format integrity
 CSV free-form, ie. without a Schema).
 
 ## Usage
-### Parsing a CSV using a Schema
-
-
-```java
-// Let's start by defining and building the schema of a table that contains data about employees:
-Schema schema = new Schema();
-
-schema.addField(new IntegerField("id"));
-schema.addField(new StringField("title"));
-// Load the data from URL with the schema.
-Table table = Table.fromSource(
-    new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
-            "/src/test/resources/fixtures/data/simple_data.csv"),
-    schema, DataSourceFormat.getDefaultCsvFormat());
-
-List<Object[]> allData = table.read();
-
-// [1, foo]
-// [2, bar]
-// [3, baz]
-```
-
-### Parse a CSV without a Schema
-
-Cast [data](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/simple_data.csv) from a CSV without a schema:
-
-```java
-URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
-                "/src/test/resources/fixtures/data/simple_data.csv");
-Table table = Table.fromSource(url);
-
-// Iterate through rows
-Iterator<Object[]> iter = table.iterator();
-while(iter.hasNext()){
-    Object[] row = iter.next();
-    System.out.println(Arrays.toString(row));
-}
-
-// [1, foo]
-// [2, bar]
-// [3, baz]
-
-// Read the entire CSV and output it as a List:
-List<Object[]> allData = table.read();
-```
+- [Reading data](docs/table-reading.md) for various ways of reading data
+- [Creating a Schema](docs/creating-schemas.md) for ways of creating a Table Schema
 
 ### Write a Table Into a File
 
@@ -72,107 +29,6 @@ Table table = Table.fromSource(url);
 table.write("/path/to/write/table.csv");
 ```
 
-### Build a Schema
-
-You can build a `Schema` instance from scratch or modify an existing one:
-
-```java
-Schema schema = new Schema();
-
-Field nameField = new StringField("name");
-schema.addField(nameField);
-
-Field coordinatesField = new GeopointField("coordinates");
-schema.addField(coordinatesField);
-
-System.out.println(schema.getJson());
-
-// {"fields":[{"name":"name","format":"default","description":"","type":"string","title":""},{"name":"coordinates","format":"default","description":"","type":"geopoint","title":""}]}
-```
-
-You can also build a `Schema` instance with `JSONObject` instances instead of `Field` instances:
-
-```java
-Schema schema = new Schema(); // By default strict=false validation
-
-JSONObject nameFieldJsonObject = new JSONObject();
-nameFieldJsonObject.put("name", "name");
-nameFieldJsonObject.put("type", Field.FIELD_TYPE_STRING);
-schema.addField(nameFieldJsonObject);
-
-// Because strict=false, an invalid Field definition will be included.
-// The error will be logged/tracked in the error list schema.getErrors().
-JSONObject invalidFieldJsonObject = new JSONObject();
-invalidFieldJsonObject.put("name", "id");
-invalidFieldJsonObject.put("type", Field.FIELD_TYPE_INTEGER);
-invalidFieldJsonObject.put("format", "invalid");
-schema.addField(invalidFieldJsonObject);
-
-JSONObject coordinatesFieldJsonObject = new JSONObject();
-coordinatesFieldJsonObject.put("name", "coordinates");
-coordinatesFieldJsonObject.put("type", Field.FIELD_TYPE_GEOPOINT);
-coordinatesFieldJsonObject.put("format", Field.FIELD_FORMAT_ARRAY);
-schema.addField(coordinatesFieldJsonObject);
-
-System.out.println(schema.getJson());
-
-/* 
-{"fields":[
-    {"name":"name","format":"default","type":"string"},
-    {"name":"id","format":"invalid","type":"integer"},
-    {"name":"coordinates","format":"array","type":"geopoint"}
-]}
-*/
-```
-
-When using the `addField` method, the schema undergoes validation after every field addition.
-If adding a field causes the schema to fail validation, then the field is automatically removed.
-
-Alternatively, you might want to build your `Schema` by loading the schema definition from a JSON file:
-
-```java
-String schemaFilePath = "/path/to/schema/file/shema.json";
-Schema schema = new Schema(schemaFilePath, true); // enforce validation with strict=true.
-```
-
-### Infer a Schema
-
-If you don't have a schema for a CSV and don't want to manually define one then you can generate it:
-
-```java
-URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
-                                "/src/test/resources/fixtures/data/simple_data.csv");
-Table table = Table.fromSource(url);
-
-Schema schema = table.inferSchema();
-System.out.println(schema.getJson());
-
-// {"fields":[{"name":"id","format":"","description":"","title":"","type":"integer","constraints":{}},{"name":"title","format":"","description":"","title":"","type":"string","constraints":{}}]}
-
-```
-
-The type inferral algorithm tries to cast to available types and each successful type casting increments a popularity score for the successful type cast in question. At the end, the best score so far is returned.
-The inferral algorithm traverses all of the table's rows and attempts to cast every single value of the table. When dealing with large tables, you might want to limit the number of rows that the inferral algorithm processes:
-
-```java
-// Only process the first 25 rows for type inferral.
-Schema schema = table.inferSchema(25);
-```
-
-If `List<Object[]> data` and `String[] headers` are available, the schema can also be inferred from the a Schema object:
-```java
-JSONObject inferredSchema = schema.infer(data, headers);
-```
-
-Row limit can also be set:
-```java
-JSONObject inferredSchema = schema.infer(data, headers, 25);
-```
-
-Using an instance of Table or Scheme to infer a schema invokes the same method from the TypeInferred Singleton:
-```java
-TypeInferrer.getInstance().infer(data, headers, 25);
-```
 
 ### Write a Schema Into a File:
 
@@ -191,57 +47,7 @@ schema.writeJson(new File("schema.json"));
    
 ```
 
-### Parse a CSV with a Schema
 
-If you have a schema, you can input it as parameter when creating the `Table` instance so that the [data](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/test/resources/fixtures/employee_data.csv) from the CSV will be cast into the field types defined in the schema:
-
-```java
-// Let's start by defining and building the schema of a table that contains data on employees:
-Schema schema = new Schema();
-
-Field idField = new IntegerField("id");
-schema.addField(idField);
-
-Field nameField = new StringField("name");
-schema.addField(nameField);
-
-Field dobField = new DateField("dateOfBirth");
-schema.addField(dobField);
-
-Field isAdminField = new BooleanField("isAdmin");
-schema.addField(isAdminField);
-
-Field addressCoordinatesField = new GeopointField("addressCoordinates");
-addressCoordinatesField.setFormat(Field.FIELD_FORMAT_OBJECT);
-schema.addField(addressCoordinatesField);
-
-Field contractLengthField = new DurationField("contractLength");
-schema.addField(contractLengthField);
-
-Field infoField = new ObjectField("info");
-schema.addField(infoField);
-
-// Load the data from URL with the schema.
-URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
-        "/src/test/resources/fixtures/data/employee_data.csv");
-Table table = Table.fromSource(url, schema, DataSourceFormat.getDefaultCsvFormat());
-
-Iterator<Object[]> iter = table.iterator(false, false, true, false);
-while(iter.hasNext()){
-
-    // The fetched array will contain row values that have been cast into their
-    // appropriate types as per field definitions in the schema.
-    Object[] row = iter.next();
-
-    BigInteger id = (BigInteger)row[0];
-    String name = (String)row[1];
-    LocalDate dob = (LocalDate)row[2];
-    boolean isAdmin = (boolean)row[3];
-    double[] addressCoordinates = (double[])row[4];
-    Duration contractLength = (Duration)row[5];
-    Map info = (Map)row[6];
-}
-```
 
 ### Validate a Schema
 To make sure a schema complies with [Table Schema specifications](https://specs.frictionlessdata.io/table-schema/), we can validate each custom schema against the official [Table Schema schema](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/schemas/table-schema.json):

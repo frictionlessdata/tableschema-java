@@ -1,8 +1,11 @@
 package io.frictionlessdata.tableschema;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.frictionlessdata.tableschema.beans.EmployeeBean;
+import io.frictionlessdata.tableschema.beans.SimpleDataBean;
 import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
 import io.frictionlessdata.tableschema.field.*;
+import io.frictionlessdata.tableschema.iterator.BeanIterator;
 import io.frictionlessdata.tableschema.schema.Schema;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,10 +15,7 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,6 +25,36 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * the examples are still valid
  */
 class DocumentationCases {
+
+    @Test
+    @DisplayName("Parsing a CSV using a Bean")
+    void csvParsingWithBean() throws Exception{
+
+        URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
+                "/src/test/resources/fixtures/data/simple_data.csv");
+        // Load the data from URL without a schema.
+        Table simpleTable = Table.fromSource(url, (Schema)null, DataSourceFormat.getDefaultCsvFormat());
+
+        List<SimpleDataBean> data = new ArrayList<>();
+        Iterator<SimpleDataBean> bit = new BeanIterator<>(simpleTable, SimpleDataBean.class, false);
+        while (bit.hasNext()) {
+            SimpleDataBean record = bit.next();
+            data.add(record);
+            System.out.println(record);
+        }
+
+        // 1 foo
+        // 2 bar
+        // 3 baz
+
+        assertEquals(data.get(0).getId(), 1);
+        assertEquals(data.get(0).getTitle(), "foo");
+        assertEquals(data.get(1).getId(), 2);
+        assertEquals(data.get(1).getTitle(), "bar");
+        assertEquals(data.get(2).getId(), 3);
+        assertEquals(data.get(2).getTitle(), "baz");
+    }
+
 
     /**
      * Example
