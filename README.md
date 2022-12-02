@@ -18,6 +18,7 @@ CSV free-form, ie. without a Schema).
 ## Usage
 - [Reading data](docs/table-reading.md) for various ways of reading data
 - [Creating a Schema](docs/creating-schemas.md) for ways of creating a Table Schema
+- [As part of Datapackages](https://github.com/frictionlessdata/datapackage-java) to distribute data sets as self-contained units
 
 ### Write a Table Into a File
 
