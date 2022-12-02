@@ -32,14 +32,14 @@ import java.util.*;
  *
  * Reading data from a Table instance is done via a {@link io.frictionlessdata.tableschema.iterator.TableIterator},
  * which can be configured to return table rows as:
- *
- * - String arrays,
- * - as Object arrays (parameter `cast` = true),
- * - as a Map&lt;key,val&gt; where key is the header name, and val is the data (parameter `keyed` = true),
- * - or in an "extended" form (parameter `extended` = true) that returns an Object array where the first entry is the
+ *<ul>
+ * <li> String arrays</li>
+ * <li> as Object arrays (parameter `cast` = true)</li>
+ * <li> as a Map&lt;key,val&gt; where key is the header name, and val is the data (parameter `keyed` = true)</li>
+ * <li> or in an "extended" form (parameter `extended` = true) that returns an Object array where the first entry is the
  *      row number, the second is a String array holding the headers, and the third is an Object array holding
- *      the row data.
- *
+ *      the row data.</li>
+ *</ul>
  *  Roughly implemented after https://github.com/frictionlessdata/tableschema-py/blob/master/tableschema/table.py
  */
 public class Table{
@@ -184,14 +184,48 @@ public class Table{
         return table;
     }
 
+    /**
+     * This is the simplest case to read data from a Table referencing a file or URL.
+     *
+     * Each row of the table will be returned as an Object array. Values in each column
+     * are parsed and converted ("cast) to Java objects on a best guess approach.
+     * @return Interator returning table rows as Object Arrays
+     * @throws Exception if parsing the data fails
+     */
     public Iterator<Object[]> iterator() throws Exception{
        return new TableIterator<>(this, false, false, true, false);
     }
 
+    /**
+     * This is the most flexible way to read data from a Table referencing a file or URL.Each row of the table
+     * will be returned as an Object array. Options allow you to tailor the behavior of the Iterator to your needs:
+     *  *<ul>
+     *  * <li> String arrays (parameter `cast` = false)</li>
+     *  * <li> as Object arrays (parameter `cast` = true)</li>
+     *  * <li> as a Map&lt;key,val&gt; where key is the header name, and val is the data (parameter `keyed` = true)</li>
+     *  * <li> or in an "extended" form (parameter `extended` = true) that returns an Object array where the first entry is the
+     *  *      row number, the second is a String array holding the headers, and the third is an Object array holding
+     *  *      the row data.</li>
+     *  * <li> Resolving references to other data sources (parameter `relations` = true)</li>
+     *  *</ul>
+     *
+     * Values in each column
+     * are parsed and converted ("cast) to Java objects on a best guess approach.
+     * @return Interator returning table rows as Object Arrays
+     * @throws Exception if parsing the data fails
+     */
     public Iterator<Object[]> iterator(boolean keyed, boolean extended, boolean cast, boolean relations) throws Exception{
        return new TableIterator<>(this, keyed, extended, cast, relations);
     }
 
+    /**
+     * This method creates an Iterator that will return table rows as Java objects of the type `beanClass`.
+     * It therefore disregards the Schema set on the table but creates its own Schema from the supplied `beanType`.
+     *
+     * @param beanType the Bean class this BeanIterator expects
+     * @param relations Whether references to other data sources get resolved
+     * @return Iterator that returns rows as bean instances.
+     */
     public BeanIterator<?> iterator(Class<?> beanType, boolean relations) throws Exception{
         return new BeanIterator(this,  beanType, relations);
     }
