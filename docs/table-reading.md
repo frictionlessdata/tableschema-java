@@ -1,4 +1,4 @@
-# reading tabular data
+# Reading tabular data
 
 There are basically two distinct ways to read data with the help of the tableschema-java library:
 - The way other language implementation of the Frictionless Tableschema standard handle this
