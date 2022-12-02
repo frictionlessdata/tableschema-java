@@ -9,7 +9,8 @@ friction in maintenance, or in a big-data environment where modeling data as Jav
 not suitable
 
 The Java-native way is superior if the modeling of data sets to Java classes is possible, as the user
-of the library does not have to create Schemas and later convert the row data into Java objecs.
+of the library does not have to create Schemas and later convert the row data into Java objecs. It also 
+allows very precise control over the mapping between CSV/JSON and domain objects.
 
 ## Reading tabular data the Java way
 Since Java is a strongly typed language, we can derive the data type for each column of a table from a
