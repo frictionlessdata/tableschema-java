@@ -8,33 +8,26 @@ import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.beans.EmployeeBean;
 import io.frictionlessdata.tableschema.beans.ExplicitNamingBean;
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
-import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.PrimaryKeyException;
 import io.frictionlessdata.tableschema.exception.ValidationException;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 import io.frictionlessdata.tableschema.fk.Reference;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.*;
 import java.util.*;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
-import static org.hamcrest.CoreMatchers.instanceOf;
 
 
 public class SchemaTest {
@@ -310,7 +303,7 @@ public class SchemaTest {
         createdSchema.addField(stringField);
 
         // Foreign Keys
-        Reference ref = new Reference(new URL("http://data.okfn.org/data/mydatapackage/"), "resource", "name");
+        Reference ref = new Reference("resource", "fields", true);
         ForeignKey fk = new ForeignKey("name", ref, true);
         createdSchema.addForeignKey(fk);
 
@@ -321,7 +314,7 @@ public class SchemaTest {
 
         // Assert Foreign Keys
         Assertions.assertEquals("name", readSchema.getForeignKeys().get(0).getFields());
-        Assertions.assertEquals("http://data.okfn.org/data/mydatapackage/", readSchema.getForeignKeys().get(0).getReference().getDatapackage().toString());
+        Assertions.assertEquals("fields", readSchema.getForeignKeys().get(0).getReference().getFields());
         Assertions.assertEquals("resource", readSchema.getForeignKeys().get(0).getReference().getResource());
     }
 

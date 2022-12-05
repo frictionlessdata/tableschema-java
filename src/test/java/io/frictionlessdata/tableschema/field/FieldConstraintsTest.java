@@ -1,7 +1,11 @@
 package io.frictionlessdata.tableschema.field;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 import java.time.*;
@@ -10,11 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

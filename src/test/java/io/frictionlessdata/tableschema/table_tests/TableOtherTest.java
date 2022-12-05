@@ -1,13 +1,13 @@
 package io.frictionlessdata.tableschema.table_tests;
 
-import io.frictionlessdata.tableschema.TestHelper;
-import io.frictionlessdata.tableschema.datasourceformat.CsvDataSourceFormat;
-import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
-import io.frictionlessdata.tableschema.exception.TableValidationException;
-import io.frictionlessdata.tableschema.schema.Schema;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.Table;
+import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
+import io.frictionlessdata.tableschema.exception.TableValidationException;
 import io.frictionlessdata.tableschema.field.*;
+import io.frictionlessdata.tableschema.schema.Schema;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -21,10 +21,7 @@ import java.nio.file.Files;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
 

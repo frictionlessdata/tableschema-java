@@ -14,11 +14,9 @@ import java.net.URL;
  * 
  */
 public class Reference {
-    private static final String JSON_KEY_DATAPACKAGE = "datapackage";
     private static final String JSON_KEY_RESOURCE = "resource";
     private static final String JSON_KEY_FIELDS = "fields";
-    
-    private URL datapackage = null;
+
     private String resource = null;
     private Object fields = null;
     
@@ -38,31 +36,8 @@ public class Reference {
         }
     }
     
-    public Reference(URL datapackage, String resource, Object fields) throws ForeignKeyException{
-        this(datapackage, resource, fields, false);
-    }
-    
-    public Reference(URL datapackage, String resource, Object fields, boolean strict) throws ForeignKeyException{
-        this.resource = resource;
-        this.fields = fields;
-        this.datapackage = datapackage;
-        
-        if(strict){
-            this.validate();
-        }
-    }
-    
     public Reference(String json, boolean strict) throws ForeignKeyException{
         JsonNode refJsonObject = JsonUtil.getInstance().createNode(json);
-        if(refJsonObject.has(JSON_KEY_DATAPACKAGE)){
-            try{
-                this.datapackage = new URL(refJsonObject.get(JSON_KEY_DATAPACKAGE).asText());
-                
-            }catch(MalformedURLException mue){
-                // leave datapackage set to null;
-                this.datapackage = null;
-            }  
-        }
         
         if(refJsonObject.has(JSON_KEY_RESOURCE)){
             this.resource = refJsonObject.get(JSON_KEY_RESOURCE).asText();
@@ -80,11 +55,7 @@ public class Reference {
             this.validate();
         }
     }
-    
-    public URL getDatapackage(){
-        return this.datapackage;
-    }
-    
+
     public String getResource(){
         return this.resource;
     }

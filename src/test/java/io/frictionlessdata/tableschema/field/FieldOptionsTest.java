@@ -1,10 +1,10 @@
 package io.frictionlessdata.tableschema.field;
 
+import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
-import io.frictionlessdata.tableschema.schema.Schema;
-import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
+import io.frictionlessdata.tableschema.schema.Schema;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

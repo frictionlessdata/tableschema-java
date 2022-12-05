@@ -25,7 +25,6 @@ import java.util.Map;
 
 import static io.frictionlessdata.tableschema.TestHelper.getResourceFile;
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TableIteratorTest {
     private static Table validPopulationTable = null;

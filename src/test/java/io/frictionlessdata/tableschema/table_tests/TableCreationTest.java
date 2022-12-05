@@ -1,10 +1,10 @@
 package io.frictionlessdata.tableschema.table_tests;
 
+import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
 import io.frictionlessdata.tableschema.exception.TableValidationException;
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.schema.Schema;
-import io.frictionlessdata.tableschema.Table;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +19,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Year;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 import static org.junit.Assert.assertThrows;

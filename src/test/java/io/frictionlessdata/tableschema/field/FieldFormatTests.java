@@ -1,6 +1,5 @@
 package io.frictionlessdata.tableschema.field;
 
-import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;

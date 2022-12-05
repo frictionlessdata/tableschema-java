@@ -1,6 +1,8 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
+import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
+import io.frictionlessdata.tableschema.schema.Schema;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -8,11 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.stream.Collectors;
-
-import io.frictionlessdata.tableschema.schema.Schema;
-import io.frictionlessdata.tableschema.Table;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 

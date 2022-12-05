@@ -18,6 +18,11 @@ public class TestHelper {
         return path.getParent().getParent().toFile();
     }
 
+    public static File getTestsuiteDataDirectory()throws Exception {
+        URL u = TestHelper.class.getResource("/testsuite-data/files/csv/1mb.csv");
+        Path path = Paths.get(u.toURI());
+        return path.getParent().getParent().toFile();
+    }
 
     public static File getResourceFile(String fileName) throws URISyntaxException {
         try {

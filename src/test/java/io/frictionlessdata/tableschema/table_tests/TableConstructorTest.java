@@ -1,12 +1,8 @@
 package io.frictionlessdata.tableschema.table_tests;
 
 import io.frictionlessdata.tableschema.Table;
-import io.frictionlessdata.tableschema.beans.SimpleDataBean;
-import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
 import io.frictionlessdata.tableschema.datasourceformat.JsonArrayDataSourceFormat;
-import io.frictionlessdata.tableschema.iterator.BeanIterator;
 import io.frictionlessdata.tableschema.schema.Schema;
-import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,15 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TableConstructorTest {
 

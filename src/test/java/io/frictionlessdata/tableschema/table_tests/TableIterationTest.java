@@ -1,9 +1,11 @@
 package io.frictionlessdata.tableschema.table_tests;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.schema.Schema;
-import io.frictionlessdata.tableschema.Table;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,8 +21,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
 public class TableIterationTest {

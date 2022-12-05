@@ -1,19 +1,14 @@
 package io.frictionlessdata.tableschema.schema;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.beans.ExplicitNamingBean;
-import io.frictionlessdata.tableschema.field.ReflectionUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.net.URL;
-import java.util.Map;
-import java.util.TreeMap;
 
 import static io.frictionlessdata.tableschema.TestHelper.getResourceFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
