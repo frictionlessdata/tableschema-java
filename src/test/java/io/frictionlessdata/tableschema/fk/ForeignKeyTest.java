@@ -1,10 +1,5 @@
 package io.frictionlessdata.tableschema.fk;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
@@ -12,12 +7,12 @@ import io.frictionlessdata.tableschema.util.JsonUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ForeignKeyTest {
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testValidStringFields() throws ForeignKeyException {
@@ -26,7 +21,7 @@ public class ForeignKeyTest {
 
         // Validation set to strict=true and no exception has been thrown.
         // Test passes.
-        Assert.assertNotNull(fk);
+        Assertions.assertNotNull(fk);
     }
 
     @Test
@@ -41,39 +36,41 @@ public class ForeignKeyTest {
 
         // Validation set to strict=true and no exception has been thrown.
         // Test passes.
-        Assert.assertNotNull(fk);
+        Assertions.assertNotNull(fk);
     }
 
     @Test
     public void testNullFields() throws ForeignKeyException {
         Reference ref = new Reference("aResource", "aField", true);
 
-        exception.expectMessage("A foreign key must have the fields and reference properties.");
-        ForeignKey fk = new ForeignKey(null, ref, true);
+
+        ForeignKeyException ex = assertThrows(ForeignKeyException.class, () -> {
+            new ForeignKey(null, ref, true);
+        });
+        Assertions.assertEquals("A foreign key must have the fields and reference properties.", ex.getMessage());
     }
 
     @Test
     public void testNullReference() throws ForeignKeyException{
         ForeignKey fk = new ForeignKey(true);
         fk.setFields("aField");
-
-        exception.expectMessage("A foreign key must have the fields and reference properties.");
-        fk.validate();
+        ForeignKeyException ex = assertThrows(ForeignKeyException.class, fk::validate);
+        Assertions.assertEquals("A foreign key must have the fields and reference properties.", ex.getMessage());
     }
 
     @Test
     public void testNullFieldsAndReference() throws ForeignKeyException{
         ForeignKey fk = new ForeignKey(true);
-        exception.expectMessage("A foreign key must have the fields and reference properties.");
-        fk.validate();
+        ForeignKeyException ex = assertThrows(ForeignKeyException.class, fk::validate);
+        Assertions.assertEquals("A foreign key must have the fields and reference properties.", ex.getMessage());
     }
 
     @Test
     public void testFieldsNotStringOrArray() throws ForeignKeyException{
         Reference ref = new Reference("aResource", "aField", true);
 
-        exception.expectMessage("The foreign key's fields property must be a string or an array.");
-        ForeignKey fk = new ForeignKey(25, ref, true);
+        ForeignKeyException ex = assertThrows(ForeignKeyException.class, () -> new ForeignKey(25, ref, true));
+        Assertions.assertEquals("The foreign key's fields property must be a string or an array.", ex.getMessage());
     }
 
     @Test
@@ -85,8 +82,8 @@ public class ForeignKeyTest {
 
         Reference ref = new Reference("aResource", JsonUtil.getInstance().createArrayNode(refFields), true);
 
-        exception.expectMessage("The reference's fields property must be a string if the outer fields is a string.");
-        ForeignKey fk = new ForeignKey("aStringField", ref, true);
+        ForeignKeyException ex = assertThrows(ForeignKeyException.class, () -> new ForeignKey("aStringField", ref, true));
+        Assertions.assertEquals("The reference's fields property must be a string if the outer fields is a string.", ex.getMessage());
     }
 
     @Test
@@ -98,8 +95,10 @@ public class ForeignKeyTest {
         fkFields.add("field2");
         fkFields.add("field3");
 
-        exception.expectMessage("The reference's fields property must be an array if the outer fields is an array.");
-        ForeignKey fk = new ForeignKey(JsonUtil.getInstance().createArrayNode(fkFields), ref, true);
+        ForeignKeyException ex = assertThrows(ForeignKeyException.class,
+                () -> new ForeignKey(JsonUtil.getInstance().createArrayNode(fkFields), ref, true));
+        Assertions.assertEquals("The reference's fields property must be an array " +
+                "if the outer fields is an array.", ex.getMessage());
     }
 
     @Test
@@ -115,7 +114,9 @@ public class ForeignKeyTest {
         fkFields.add("field1");
         fkFields.add("field2");
 
-        exception.expectMessage("The reference's fields property must be an array of the same length as that of the outer fields' array.");
-        ForeignKey fk = new ForeignKey(JsonUtil.getInstance().createArrayNode(fkFields), ref, true);
+        ForeignKeyException ex = assertThrows(ForeignKeyException.class,
+                () -> new ForeignKey(JsonUtil.getInstance().createArrayNode(fkFields), ref, true));
+        Assertions.assertEquals("The reference's fields property must be an array" +
+                " of the same length as that of the outer fields' array.", ex.getMessage());
     }
 }

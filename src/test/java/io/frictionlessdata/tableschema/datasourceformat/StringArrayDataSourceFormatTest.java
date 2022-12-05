@@ -1,21 +1,12 @@
 package io.frictionlessdata.tableschema.datasourceformat;
 
-import io.frictionlessdata.tableschema.exception.TableSchemaException;
-import io.frictionlessdata.tableschema.schema.Schema;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
 class StringArrayDataSourceFormatTest {
     private static List<String[]> populationArr;
