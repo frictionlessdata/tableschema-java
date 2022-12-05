@@ -3,6 +3,8 @@
 - [Creating from scratch via Java methods](#via-java-methods)
 - [Creating from a serialized JSON representation](#from-json)
 - [Creating from sample data (inferring)](#inferring-a-schema-from-data)
+- [Schema validation](#schema-validation)
+- [Writing a Schema to a File](#writing-a-schema-to-a-file)
 
 
 ## Via Java methods
@@ -109,3 +111,36 @@ Using an instance of Table or Scheme to infer a schema invokes the same method f
 TypeInferrer.getInstance().infer(data, headers, 25);
 ```
 
+
+### Schema validation
+To make sure a schema complies with [Table Schema specifications](https://specs.frictionlessdata.io/table-schema/), we can validate each custom schema against the official [Table Schema schema](https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/schemas/table-schema.json):
+
+```java
+JSONObject schemaJsonObj = new JSONObject();
+Field nameField = new IntegerField("id");
+schemaJsonObj.put("fields", new JSONArray());
+schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
+
+Schema schema = Schema.fromJson(schemaJsonObj.toString(), true);
+
+System.out.println(schema.isValid());
+// true
+```
+
+
+### Writing a Schema to a File:
+
+You can write a `Schema` into a JSON file:
+
+```java
+Schema schema = new Schema();
+
+Field nameField = new StringField("name");
+schema.addField(nameField);
+
+Field coordinatesField = new GeopointField("coordinates");
+schema.addField(coordinatesField);
+
+schema.writeJson(new File("schema.json"));
+   
+```

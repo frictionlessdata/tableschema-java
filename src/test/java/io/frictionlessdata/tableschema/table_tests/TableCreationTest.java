@@ -6,11 +6,9 @@ import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.Table;
 import org.apache.commons.csv.CSVFormat;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -24,36 +22,33 @@ import java.time.Year;
 import java.util.*;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
  *
  */
 public class TableCreationTest {
-    private static String populationTestJson =  "[{\"city\":\"london\",\"year\":2017,\"population\":8780000},"
+    private static final String populationTestJson =  "[{\"city\":\"london\",\"year\":2017,\"population\":8780000},"
         + "{\"city\":\"paris\",\"year\":2017,\"population\":2240000},"
         + "{\"city\":\"rome\",\"year\":2017,\"population\":2860000}]";
 
-    private static Object[][] populationTestData = new Object[][] {
+    private static final Object[][] populationTestData = new Object[][] {
         new Object[]{"london", Year.of(2017), new BigInteger("8780000")},
         new Object[]{"paris",Year.of(2017), new BigInteger("2240000")},
         new Object[]{"rome",Year.of(2017), new BigInteger("2860000")}
     };
 
-    private static Object[][] populationStringTestData = new Object[][] {
+    private static final Object[][] populationStringTestData = new Object[][] {
             new Object[]{"london","2017", "8780000"},
             new Object[]{"paris","2017", "2240000"},
             new Object[]{"rome","2017", "2860000"}
     };
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
-
 
     @Test
+    @DisplayName("Create a Table from String array without a Schema or CSVFormat")
     public void testCreate1() {
         List<String[]> data = new ArrayList<>();
         for (Object[] row: populationStringTestData) {
@@ -66,11 +61,12 @@ public class TableCreationTest {
         String[] headers = new String[]{"city", "year", "population"};
         Table testTable = new Table(data, headers, null);
         Table expectedTable = Table.fromSource(populationTestJson);
-        Assert.assertEquals(expectedTable, testTable);
+        Assertions.assertEquals(expectedTable, testTable);
     }
 
 
     @Test
+    @DisplayName("Create a Table from String array with Schema but no CSVFormat")
     public void testCreate2() throws Exception {
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema schema = Schema.fromJson (f, true);
@@ -86,22 +82,24 @@ public class TableCreationTest {
         String[] headers = new String[]{"city", "year", "population"};
         Table testTable = new Table(data, headers, schema);
         Table expectedTable = Table.fromSource(populationTestJson, schema, null);
-        Assert.assertEquals(expectedTable, testTable);
+        Assertions.assertEquals(expectedTable, testTable);
     }
 
     @Test
+    @DisplayName("Create a Table from File without a Schema or CSVFormat")
     public void testReadFromValidFilePath() throws Exception{
         File testDataDir = getTestDataDirectory();
         // get path of test CSV file
         File file = new File("data/simple_data.csv");
         Table table = Table.fromSource(file, testDataDir);
 
-        Assert.assertEquals(3, table.read().size());
+        Assertions.assertEquals(3, table.read().size());
         // must not throw an exception
         table.validate();
     }
 
     @Test
+    @DisplayName("Create a Table from CSV String data without a Schema and with default CSVFormat")
     public void testReadFromValidCSVContentString() throws Exception{
         // get path of test CSV file
         URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/data/simple_data.csv");
@@ -110,15 +108,16 @@ public class TableCreationTest {
 
         Table table = Table.fromSource(csvContent, null, DataSourceFormat.getDefaultCsvFormat());
 
-        Assert.assertEquals(3, table.read().size());
+        Assertions.assertEquals(3, table.read().size());
         // must not throw an exception
         table.validate();
     }
 
     @Test
+    @DisplayName("Create a Table from JSON String data without a Schema and with default CSVFormat")
     public void testReadFromValidJSONArray() throws Exception{
         Table table = Table.fromSource(populationTestJson);
-        Assert.assertEquals(3, table.read().size());
+        Assertions.assertEquals(3, table.read().size());
         Schema schema = table.inferSchema();
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema expectedSchema = null;
@@ -130,21 +129,22 @@ public class TableCreationTest {
             for (int i = 0; i < expectedSchema.getFields().size(); i++) {
                 Field<?> expectedField = expectedSchema.getFields().get(i);
                 Field<?> actualField = schema.getFields().get(i);
-                Assert.assertEquals(expectedField,actualField);
+                Assertions.assertEquals(expectedField,actualField);
             }
         }
-        Assert.assertEquals(expectedSchema, schema);
+        Assertions.assertEquals(expectedSchema, schema);
 
     }
 
 
     @Test
+    @DisplayName("Create a Table from JSON String data with a Schema and with default CSVFormat")
     public void testReadFromValidJSONArrayWithSchema() throws Exception{
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
 
         Schema schema = Schema.fromJson (f, true);
         Table table = Table.fromSource(populationTestJson, schema, DataSourceFormat.getDefaultCsvFormat());
-        Assert.assertEquals(3, table.read().size());
+        Assertions.assertEquals(3, table.read().size());
         Schema expectedSchema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
             expectedSchema = Schema.fromJson (fis, false);
@@ -154,28 +154,30 @@ public class TableCreationTest {
             for (int i = 0; i < expectedSchema.getFields().size(); i++) {
                 Field<?> expectedField = expectedSchema.getFields().get(i);
                 Field<?> actualField = schema.getFields().get(i);
-                Assert.assertEquals(expectedField,actualField);
+                Assertions.assertEquals(expectedField,actualField);
             }
         }
-        Assert.assertEquals(expectedSchema, schema);
+        Assertions.assertEquals(expectedSchema, schema);
         // must not throw an exception
         table.validate();
     }
 
     @Test
+    @DisplayName("Create a Table from URL without a Schema or CSVFormat")
     public void testReadFromValidUrl() throws Exception{
         // get path of test CSV file
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java" +
                 "/master/src/test/resources/fixtures/data/simple_data.csv");
         Table table = Table.fromSource(url);
 
-        Assert.assertEquals(3, table.read().size());
+        Assertions.assertEquals(3, table.read().size());
         // must not throw an exception
         table.validate();
     }
 
 
     @Test
+    @DisplayName("Create a Table from URL with Schema and with default CSVFormat")
     public void testReadFromValidUrlAndValidSchemaURL() throws Exception{
         // get path of test CSV file
         URL tableUrl = new URL("https://raw.githubusercontent.com/frictionlessdata" +
@@ -188,13 +190,14 @@ public class TableCreationTest {
         Schema testSchema = Schema.fromJson (schemaFile, true);
         Table testTable = Table.fromSource(populationTestJson, testSchema, DataSourceFormat.getDefaultCsvFormat());
 
-        Assert.assertEquals(testTable, table);
+        Assertions.assertEquals(testTable, table);
     }
 
     /*
-        With schema means data gets casted to objects
+        With schema means data gets cast to objects
      */
     @Test
+    @DisplayName("Create a Table from a CSV String with Schema and with default CSVFormat")
     public void testReadFromValidFileWithValidSchema() throws Exception{
         // get path of test CSV file
         URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/data/population.csv");
@@ -209,22 +212,20 @@ public class TableCreationTest {
 
         Table table = Table.fromSource(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
 
-        Assert.assertEquals(3, table.read().size());
+        Assertions.assertEquals(3, table.read().size());
         List<Object[]> actualData = table.read();
         for (int i = 0; i < actualData.size(); i++) {
             Object[] actualRow = actualData.get(i);
             Object[] testRow = populationTestData[i];
-            Assert.assertArrayEquals(testRow, actualRow);
+            Assertions.assertArrayEquals(testRow, actualRow);
         }
         // must not throw an exception
         table.validate();
     }
 
-    /*
-        With schema means data does not get casted to objects, we will
-        receive String-Arrays
-     */
+
     @Test
+    @DisplayName("Create a Table from CSV String data without a Schema and without CSVFormat")
     public void testReadFromValidFileWithoutValidSchema() throws Exception{
         // get path of test CSV file
         URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/data/population.csv");
@@ -233,18 +234,19 @@ public class TableCreationTest {
 
         Table table = Table.fromSource(csvContent);
 
-        Assert.assertEquals(3, table.read().size());
+        Assertions.assertEquals(3, table.read().size());
         List<Object[]> actualData = table.read();
         for (int i = 0; i < actualData.size(); i++) {
             Object[] actualRow = actualData.get(i);
             Object[] testRow = populationStringTestData[i];
-            Assert.assertArrayEquals(testRow, actualRow);
+            Assertions.assertArrayEquals(testRow, actualRow);
         }
         // must not throw an exception
         table.validate();
     }
 
     @Test
+    @DisplayName("Create a Table from CSV String data with Schema and with default CSVFormat")
     public void testReadFromValidCSVFileWithValidSchemaViaStream() throws Exception{
         // get path of test CSV file
         URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/data/population.csv");
@@ -260,7 +262,7 @@ public class TableCreationTest {
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema testSchema = Schema.fromJson (schemaFile, true);
         Table testTable = Table.fromSource(populationTestJson, testSchema, DataSourceFormat.getDefaultCsvFormat());
-        Assert.assertEquals(testTable, table);
+        Assertions.assertEquals(testTable, table);
         try {
             bis.close();
         } finally {
@@ -272,7 +274,8 @@ public class TableCreationTest {
 
 
     @Test
-    public void testReadFromValidJSONFileWithValidSchemaViaStream() throws Exception{
+    @DisplayName("Create a Table from JSON String data with Schema and with default CSVFormat")
+    public void testReadFromValidJSONFileWithValidSchema() throws Exception{
         // get path of test CSV file
         URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/data/population.json");
         Path path = Paths.get(sourceFileUrl.toURI());
@@ -287,7 +290,7 @@ public class TableCreationTest {
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema testSchema = Schema.fromJson (schemaFile, true);
         Table testTable = Table.fromSource(populationTestJson, testSchema, DataSourceFormat.getDefaultCsvFormat());
-        Assert.assertEquals(testTable, table);
+        Assertions.assertEquals(testTable, table);
         try {
             bis.close();
         } finally {
@@ -299,6 +302,7 @@ public class TableCreationTest {
 
 
     @Test
+    @DisplayName("Create a Table from CSV String data with Schema from Stream and with default CSVFormat")
     public void testReadFromValidFileWithMismatchingValidSchemaViaStream() throws Exception{
         // get path of test CSV file
         URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/data/population.csv");
@@ -312,12 +316,12 @@ public class TableCreationTest {
         Table table = Table.fromSource(bis, fis, DataSourceFormat.getDefaultCsvFormat());
 
         // must throw an exception
-        exception.expect(TableValidationException.class);
-        table.validate();
+        assertThrows(TableValidationException.class, table::validate);
     }
 
     @Test
-    public void testReadFileWithBOM() throws Exception{
+    @DisplayName("Create a Table from CSV String data with BOM with Schema from Stream and with default CSVFormat")
+    public void testReadFileWithBOMAndSchema() throws Exception{
         File testDataDir = getTestDataDirectory();
         // get path of test CSV file
         File file = new File("data/simple_data_bom2.tsv");
@@ -333,13 +337,21 @@ public class TableCreationTest {
     }
 
     @Test
-    public void testReadFileWithBomAndSchema() throws Exception{
+    @DisplayName("Create a Table from CSV String data with BOM without a Schema from Stream " +
+            "and with custom CSVFormat")
+    public void testReadFileWithBOM() throws Exception{
         File testDataDir = getTestDataDirectory();
         // get path of test CSV file
         File file = new File("data/simple_data_bom2.tsv");
         Table table = Table.fromSource(file, testDataDir);
-        table.setCsvFormat(CSVFormat.TDF.withRecordSeparator("\n").withHeader(new String[0]));
-        Assert.assertEquals(3, table.read().size());
+        CSVFormat csvFormat = CSVFormat
+                .TDF
+                .builder()
+                .setRecordSeparator("\n")
+                .setHeader(new String[0])
+                .build();
+        table.setCsvFormat(csvFormat);
+        Assertions.assertEquals(3, table.read().size());
         // must not throw an exception
         table.validate();
     }
@@ -348,6 +360,8 @@ public class TableCreationTest {
     // object records can be read into a consistent String array with the help of
     // a Schema.
     @Test
+    @DisplayName("Create a Table from JSON String data with a differing ordering of properties and " +
+            "with a Schema and with default CSVFormat")
     public void testReadFromValidJSONFileWithDifferingOrderingWithValidSchema() throws Exception{
         // get path of test CSV file
         URL sourceFileUrl = TableCreationTest.class.getResource("/fixtures/data/population_alternate.json");
@@ -366,10 +380,64 @@ public class TableCreationTest {
         for (int i = 0; i < actualData.size(); i++) {
             Object[] actualRow = actualData.get(i);
             Object[] testRow = populationTestData[i];
-            Assert.assertArrayEquals(testRow, actualRow);
+            Assertions.assertArrayEquals(testRow, actualRow);
         }
         // must not throw an exception
         table.validate();
     }
 
+    @Test
+    @DisplayName("Create a Table from URL without Schema or CSVFormat")
+    void csvParsingWithSchemaNullAndCsvFormatNullFromURL() throws Exception{
+
+        URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
+                "/src/test/resources/fixtures/data/simple_data.csv");
+        // Load the data from URL without a schema.
+        Table table = Table.fromSource(url, (Schema)null, null);
+
+        List<Object[]> data = new ArrayList<>();
+        Iterator<Object[]> iterator = table.iterator();
+        while (iterator.hasNext()) {
+            Object[] record = iterator.next();
+            data.add(record);
+        }
+        Assertions.assertNull(table.getSchema());
+        Assertions.assertNotNull(table.getCsvFormat());
+        Assertions.assertNotNull(table.getDataSourceFormat());
+
+        assertEquals("1", data.get(0)[0]);
+        assertEquals("foo", data.get(0)[1]);
+        assertEquals("2", data.get(1)[0]);
+        assertEquals("bar", data.get(1)[1]);
+        assertEquals("3", data.get(2)[0]);
+        assertEquals("baz", data.get(2)[1]);
+    }
+
+    @Test
+    @DisplayName("Create a Table from URL without Schema or CSVFormat")
+    void csvParsingWithSchemaNullAndCsvFormatNullFromFile() throws Exception{
+        File testDataDir = getTestDataDirectory();
+        File testFile = new File( "data/simple_data.csv");
+
+        Table table = Table.fromSource(testFile, testDataDir, (Schema)null, null);
+
+        List<Object[]> data = new ArrayList<>();
+        Iterator<Object[]> iterator = table.iterator();
+        while (iterator.hasNext()) {
+            Object[] record = iterator.next();
+            data.add(record);
+        }
+        Assertions.assertNull(table.getSchema());
+        // The CSVFormat of the Table can't be null, but must be default even if we create the table with a null value
+        Assertions.assertNotNull(table.getCsvFormat());
+        Assertions.assertEquals(DataSourceFormat.getDefaultCsvFormat(), table.getCsvFormat());
+        Assertions.assertNotNull(table.getDataSourceFormat());
+
+        assertEquals("1", data.get(0)[0]);
+        assertEquals("foo", data.get(0)[1]);
+        assertEquals("2", data.get(1)[0]);
+        assertEquals("bar", data.get(1)[1]);
+        assertEquals("3", data.get(2)[0]);
+        assertEquals("baz", data.get(2)[1]);
+    }
 }

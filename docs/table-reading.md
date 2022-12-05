@@ -47,6 +47,7 @@ public class SimpleDataBean {
     }
 }
 ```
+
 And with that, we can read the data as `SimpleDataBean` instances:
 ```java
 URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +

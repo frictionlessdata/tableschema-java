@@ -70,8 +70,9 @@ public class Table{
      * Create Table on an {@link java.io.InputStream} for reading both the CSV/JSON
      * data and the table schema.
      * @param dataSource InputStream for reading the data from
-     * @param schema InputStream for reading table schema from
-     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data
+     * @param schema InputStream for reading table schema from. Can be `null`
+     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data.
+     *               Can be `null`
      * @throws Exception if either reading or parsing throws an Exception
      */
     public static Table fromSource(InputStream dataSource, InputStream schema, CSVFormat format) throws Exception{
@@ -89,7 +90,8 @@ public class Table{
     /**
      * Create Table from a {@link java.io.File} containing the CSV/JSON
      * data and without either a Schema or a CSVFormat.
-     * @param dataSource InputStream for reading the data from
+     * @param dataSource relative File for reading the data from. Must be inside `basePath`
+     * @param basePath Parent directory
      * @throws Exception if either reading or parsing throws an Exception
      */
     public static Table fromSource(File dataSource, File basePath) throws Exception{
@@ -101,9 +103,11 @@ public class Table{
     /**
      * Create Table from a {@link java.io.File} containing the CSV/JSON
      * data and with  a Schema and a CSVFormat.
-     * @param dataSource InputStream for reading the data from
-     * @param schema InputStream for reading table schema from
-     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data
+     * @param dataSource relative File for reading the data from. Must be inside `basePath`
+     * @param basePath Parent directory
+     * @param schema The table Schema. Can be `null`
+     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data.
+     *               Can be `null`
      * @throws Exception if either reading or parsing throws an Exception
      */
     public static Table fromSource(File dataSource, File basePath, Schema schema, CSVFormat format) throws Exception{
@@ -128,8 +132,9 @@ public class Table{
     /**
      * Create Table using either a CSV or JSON array-containing string and with  a Schema and a CSVFormat.
      * @param dataSource the CSV or JSON content for the Table
-     * @param schema table schema
-     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data
+     * @param schema table schema. Can be `null`
+     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data.
+     *               Can be `null`
      */
     public static Table fromSource(String dataSource, Schema schema, CSVFormat format) {
         Table table = new Table();
@@ -157,7 +162,8 @@ public class Table{
      * Create Table from a URL containing either CSV or JSON and with  a Schema and a CSVFormat.
      * @param dataSource the URL for the CSV or JSON content
      * @param schemaUrl the URL for the table schema. Can be null
-     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data
+     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data.
+     *               Can be `null`
      * @throws IOException if reading throws an Exception
      */
     public static Table fromSource(URL dataSource, URL schemaUrl, CSVFormat format) throws Exception {
@@ -171,8 +177,9 @@ public class Table{
     /**
      * Create Table from a URL containing either CSV or JSON and with  a Schema and a CSVFormat.
      * @param dataSource the URL for the CSV or JSON content
-     * @param schema table schema
-     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data
+     * @param schema table schema. Can be `null`
+     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data.
+     *               Can be `null`
      * @throws IOException if reading throws an Exception
      */
     public static Table fromSource(URL dataSource, Schema schema, CSVFormat format) throws IOException {

@@ -47,12 +47,13 @@ class DocumentationCases {
         // 2 bar
         // 3 baz
 
-        assertEquals(data.get(0).getId(), 1);
-        assertEquals(data.get(0).getTitle(), "foo");
-        assertEquals(data.get(1).getId(), 2);
-        assertEquals(data.get(1).getTitle(), "bar");
-        assertEquals(data.get(2).getId(), 3);
-        assertEquals(data.get(2).getTitle(), "baz");
+
+        assertEquals(1, data.get(0).getId());
+        assertEquals("foo", data.get(0).getTitle());
+        assertEquals(2, data.get(1).getId());
+        assertEquals("bar", data.get(1).getTitle());
+        assertEquals(3, data.get(2).getId());
+        assertEquals("baz", data.get(2).getTitle());
     }
 
 
