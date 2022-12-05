@@ -17,10 +17,10 @@ CSV free-form, ie. without a Schema).
 
 ## Usage
 - [Reading data](docs/table-reading.md) explains various ways of reading data
-  - [Via Java Beans](doc/table-reading.md#reading-tabular-data-the-java-way) via a Java Bean class
-  - [Without a Schema](doc/table-reading.md#reading-tabular-data-without-a-schema) Read as Object arrays and without 
+  - [Via Java Beans](docs/table-reading.md#reading-tabular-data-the-java-way) via a Java Bean class
+  - [Without a Schema](docs/table-reading.md#reading-tabular-data-without-a-schema) Read as Object arrays and without 
          format integrity assurance
-  - [With a Schema](doc/table-reading.md#reading-tabular-data-using-a-schema) Read as converted Java object arrays with
+  - [With a Schema](docs/table-reading.md#reading-tabular-data-using-a-schema) Read as converted Java object arrays with
     format integrity assurance
 - [Writing data](docs/table-writing.md) explains various ways of writing data
 - [Creating a Schema](docs/creating-schemas.md) shows ways of creating a Table Schema from scratch or from example data
