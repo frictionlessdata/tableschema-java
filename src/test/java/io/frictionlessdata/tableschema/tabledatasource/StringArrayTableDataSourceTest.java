@@ -1,4 +1,4 @@
-package io.frictionlessdata.tableschema.datasourceformat;
+package io.frictionlessdata.tableschema.tabledatasource;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-class StringArrayDataSourceFormatTest {
+class StringArrayTableDataSourceTest {
     private static List<String[]> populationArr;
 
     private final static String populationCsv =
@@ -50,10 +50,10 @@ class StringArrayDataSourceFormatTest {
     }
 
     @Test
-    @DisplayName("Test StringArrayDataSourceFormat creation and data reading")
+    @DisplayName("Test StringArrayTableDataSource creation and data reading")
     void testReadStringArrayDataSourceFormat() throws Exception{
-        DataSourceFormat ds = new StringArrayDataSourceFormat(populationArr, populationHeaders);
-        List<String[]> data = ds.data();
+        TableDataSource ds = new StringArrayTableDataSource(populationArr, populationHeaders);
+        List<String[]> data = ds.getDataAsStringArray();
         Assertions.assertEquals(populationArr, data);
     }
 }

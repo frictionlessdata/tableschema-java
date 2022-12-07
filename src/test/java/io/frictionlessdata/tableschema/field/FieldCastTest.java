@@ -3,7 +3,7 @@ package io.frictionlessdata.tableschema.field;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
-import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
+import io.frictionlessdata.tableschema.tabledatasource.TableDataSource;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.schema.Schema;
 import org.junit.jupiter.api.Assertions;
@@ -404,7 +404,7 @@ class FieldCastTest {
         try (FileInputStream fis = new FileInputStream(schemaFile)) {
             schema = Schema.fromJson (fis, false);
         }
-        Table table = Table.fromSource(f, TestHelper.getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(f, TestHelper.getTestDataDirectory(), schema, TableDataSource.getDefaultCsvFormat());
         Iterator iter = table.iterator(true, false, true, false);
         Object obj = null;
         int cnt = 0;

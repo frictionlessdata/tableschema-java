@@ -13,7 +13,7 @@ public class URLFileReference implements FileReference<URL> {
     }
 
     @Override
-    public InputStream getInputStream() throws Exception {
+    public InputStream getInputStream() throws IOException {
         if (null == is)
             is = inputFile.openStream();
         return is;

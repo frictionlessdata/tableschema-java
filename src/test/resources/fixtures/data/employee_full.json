@@ -1,51 +1,59 @@
-[ {
-  "notes" : null,
-  "gender" : "m",
-  "is_management" : false,
-  "employment_start" : "2017-07-30",
-  "last_name" : "Doe",
-  "daily_end" : "06:30:00",
-  "photo" : "xxx",
-  "position_title" : null,
-  "daily_start" : "10:23:00",
-  "extra" : {
-    "key" : "value"
+[
+  {
+    "first_name":"John",
+    "last_name":"Doe",
+    "gender":"m",
+    "dateOfBirth":"01/13/1976",
+    "age":50,
+    "period_employed":"2.6",
+    "employment_start":"2017-07-30",
+    "daily_start":"10:23:00",
+    "daily_end":"06:30:00",
+    "is_management":false,
+    "interests":[
+      "cooking"
+    ],
+    "home_location":"-101.473911,38.704022",
+    "extra":{
+      "key":"value"
+    }
   },
-  "home_location" : "-101.473911,38.704022",
-  "interests" : [ "cooking" ],
-  "first_name" : "John",
-  "period_employed" : "2.6",
-  "age" : 50
-}, {
-  "notes" : "-91.254898, 35.6087",
-  "gender" : "m",
-  "is_management" : false,
-  "employment_start" : "2018-09-13",
-  "last_name" : "McKrank",
-  "daily_end" : "03:30:00",
-  "photo" : "xxx",
-  "position_title" : "Senior Janitor",
-  "daily_start" : "09:30:00",
-  "extra" : null,
-  "home_location" : "-91.254898,35.6087",
-  "interests" : [ "sports", "reading" ],
-  "first_name" : "Frank",
-  "period_employed" : "0.4",
-  "age" : 22
-}, {
-  "notes" : "[“cooking”]",
-  "gender" : "f",
-  "is_management" : true,
-  "employment_start" : "2007-01-30",
-  "last_name" : "Vester",
-  "daily_end" : "10:00:00",
-  "photo" : "xxx",
-  "position_title" : "SVP",
-  "daily_start" : "02:00:00",
-  "extra" : null,
-  "home_location" : "-101.473911,38.704022",
-  "interests" : [ ],
-  "first_name" : "Deborah",
-  "period_employed" : "12",
-  "age" : 34
-} ]
+  {
+    "first_name":"Frank",
+    "last_name":"McKrank",
+    "gender":"m",
+    "dateOfBirth":"02/14/1992",
+    "age":22,
+    "period_employed":"0.4",
+    "employment_start":"2018-09-13",
+    "daily_start":"09:30:00",
+    "daily_end":"03:30:00",
+    "is_management":false,
+    "photo":"iVBORw0KGgoAAAANSUhEUgAAAB0AAAAjCAYAAABo4wHSAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAACESURBVFhH7dCxCYAwEIXh28ARAlnHDVwgG7iQI1ikdIWMkDq9hdWzSaOCRMMp4vvhihwcH0TwQkRVI6oaUdWuoUMLESmbdshHx66hc0KMcTPeGYhx8Lt9THM+Olb9vaG3ENsj5HdJRIsjehbR4r6BLtPT6IKxa+rROxFVjahqRFX7CwqsMYt0cBTjwGIAAAAASUVORK5CYII=",
+    "interests":[
+      "sports",
+      "reading"
+    ],
+    "home_location":"-91.254898,35.6087",
+    "position_title":"Senior Janitor",
+    "notes":"-91.254898, 35.6087"
+  },
+  {
+    "first_name":"Deborah",
+    "last_name":"Vester",
+    "gender":"f",
+    "dateOfBirth":"03/16/1983",
+    "age":34,
+    "period_employed":"12",
+    "employment_start":"2007-01-30",
+    "daily_start":"02:00:00",
+    "daily_end":"10:00:00",
+    "is_management":true,
+    "interests":[
+
+    ],
+    "home_location":"-101.473911,38.704022",
+    "position_title":"SVP",
+    "notes":"[“cooking”]"
+  }
+]

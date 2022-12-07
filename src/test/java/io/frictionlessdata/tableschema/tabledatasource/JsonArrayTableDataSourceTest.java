@@ -1,4 +1,4 @@
-package io.frictionlessdata.tableschema.datasourceformat;
+package io.frictionlessdata.tableschema.tabledatasource;
 
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
-class JsonArrayDataSourceFormatTest {
+class JsonArrayTableDataSourceTest {
     private String populationJson = "[" +
             "{" +
             "\"city\": \"london\"," +
@@ -55,33 +55,33 @@ class JsonArrayDataSourceFormatTest {
     };
 
     @Test
-    @DisplayName("Test DataSourceFormat.createDataSourceFormat creates JsonArrayDataSourceFormat from " +
+    @DisplayName("Test TableDataSource.createDataSourceFormat creates JsonArrayTableDataSource from " +
             "JSON array data")
     void testCreateJsonArrayDataSource() throws Exception{
-        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(populationJson);
-        Assertions.assertTrue(ds instanceof JsonArrayDataSourceFormat);
+        TableDataSource ds = TableDataSource.fromSource(populationJson);
+        Assertions.assertTrue(ds instanceof JsonArrayTableDataSource);
     }
 
     @Test
-    @DisplayName("Validate Header extraction from a JsonArrayDataSourceFormat")
+    @DisplayName("Validate Header extraction from a JsonArrayTableDataSource")
     void testJsonArrayDataSourceHeaders() throws Exception{
-        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(populationJson);
+        TableDataSource ds = TableDataSource.fromSource(populationJson);
         String[] headers = ds.getHeaders();
         Assertions.assertArrayEquals(populationHeaders, headers);
     }
 
     @Test
-    @DisplayName("Validate creating a JsonArrayDataSourceFormat from JSON file")
+    @DisplayName("Validate creating a JsonArrayTableDataSource from JSON file")
     void testSafePathCreationJson() throws Exception {
-        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(new File("simple_geojson.json"),
+        TableDataSource ds = TableDataSource.fromSource(new File("simple_geojson.json"),
                 TestHelper.getTestDataDirectory());
         Assertions.assertNotNull(ds);
     }
 /*
     @Test
-    @DisplayName("Validate creating and writing a JsonArrayDataSourceFormat from JSON with null entries")
+    @DisplayName("Validate creating and writing a JsonArrayTableDataSource from JSON with null entries")
     void testCreateAndWriteJsonArrayDataSourceWithMissingEntries() throws Exception {
-        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(populationJsonMissingEntry);
+        TableDataSource ds = TableDataSource.createDataSourceFormat(populationJsonMissingEntry);
 
         File tempFile = Files.createTempFile("tableschema-", ".json").toFile();
         try (FileWriter wr = new FileWriter(tempFile);
@@ -91,10 +91,10 @@ class JsonArrayDataSourceFormatTest {
     }
 
     @Test
-    @DisplayName("Validate creating and writing a JsonArrayDataSourceFormat from JSON without headers " +
+    @DisplayName("Validate creating and writing a JsonArrayTableDataSource from JSON without headers " +
             "raises an exception")
     void testCreateAndWriteJsonArrayDataSourceWithoutHeaders() throws Exception {
-        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(populationJsonMissingEntry);
+        TableDataSource ds = TableDataSource.createDataSourceFormat(populationJsonMissingEntry);
 
         File tempFile = Files.createTempFile("tableschema-", ".json").toFile();
         Assertions.assertThrows(Exception.class, () -> {
@@ -106,25 +106,25 @@ class JsonArrayDataSourceFormatTest {
     }
 */
     @Test
-    @DisplayName("Validate creating a JsonArrayDataSourceFormat from InputStream containing JSON")
+    @DisplayName("Validate creating a JsonArrayTableDataSource from InputStream containing JSON")
     void testSafePathInputStreamCreationJson() throws Exception {
-        DataSourceFormat ds;
+        TableDataSource ds;
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.json");
         try (FileInputStream is = new FileInputStream(inFile)) {
-            ds = new JsonArrayDataSourceFormat(is);
+            ds = new JsonArrayTableDataSource(is);
             Assertions.assertArrayEquals(populationHeaders, ds.getHeaders());
         }
         Assertions.assertNotNull(ds);
     }
 
     @Test
-    @DisplayName("Validate creating a JsonArrayDataSourceFormat from wrong input data (CSV) raises" +
+    @DisplayName("Validate creating a JsonArrayTableDataSource from wrong input data (CSV) raises" +
             "an exception")
     void testWrongInputStreamCreationJson() throws Exception {
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.csv");
         Assertions.assertThrows(Exception.class, () -> {
             try (FileInputStream is = new FileInputStream(inFile)) {
-                DataSourceFormat ds = new JsonArrayDataSourceFormat(is);
+                TableDataSource ds = new JsonArrayTableDataSource(is);
                 Assertions.assertArrayEquals(populationHeaders, ds.getHeaders());
             }
         });
@@ -135,37 +135,50 @@ class JsonArrayDataSourceFormatTest {
     public void testJsonDataSourceFormatToJson() throws Exception{
         File schemaFile = new File(getTestDataDirectory(), "schema/employee_full_schema.json");
         Schema schema = Schema.fromJson (schemaFile, true);
-        File inFile = new File("data/employee_full.json");
 
+        File inFile = new File("data/employee_full.json");
         Table table = Table.fromSource(inFile, getTestDataDirectory(), schema, null);
         FileWriter fileWriter = new FileWriter("test.json");
-        table.write(fileWriter, DataSourceFormat.Format.FORMAT_JSON);
+        table.write(fileWriter, TableDataSource.Format.FORMAT_JSON);
         fileWriter.close();
-        String s = table.asJson().replaceAll("\\s+", " ").replaceAll(" }", "}");
-        FileWriter jsonWriter = new FileWriter("test.json");
-        table.write(jsonWriter, DataSourceFormat.Format.FORMAT_JSON);
-        jsonWriter.close();
+
+        String s = table
+                .asJson()
+                .replaceAll("\\s+", " ")
+                .replaceAll(" }", "}")
+                .replaceAll("\" : ", "\":")
+                .replaceAll(" ]", "]");
 
         File referenceFile = new File(getTestDataDirectory(), "data/employee_full.json");
         String referenceContent = String.join("", Files.readAllLines(referenceFile.toPath()));
-        referenceContent = referenceContent.replaceAll("\\s+", " ").replaceAll(" }", "}");
+        referenceContent = referenceContent
+                .replaceAll("\\s+", " ")
+                .replaceAll(" }", "}")
+                .replaceAll(" ]", "]")
+                .replaceAll("\" : ", "\":");
 
         Assertions.assertEquals(referenceContent, s);
 
         File testFile = new File( "test.json");
         BufferedReader rdr = new BufferedReader(new FileReader(testFile));
         String testContent = rdr.lines().collect(Collectors.joining("\n"));
-        testContent = testContent.replaceAll("\\s+", " ").replaceAll(" }", "}");
+        testContent = testContent
+                .replaceAll("\\s+", " ")
+                .replaceAll(" }", "}")
+                .replaceAll(" ]", "]")
+                .replaceAll("\" : ", "\":");
         Assertions.assertEquals(referenceContent, testContent);
 
         File testFileCsv = new File("test.csv");
         table.writeCsv(testFileCsv, CSVFormat.DEFAULT);
+
         File referenceFileCsv = new File(getTestDataDirectory(), "data/employee_full.csv");
         String referenceContentCsv = String.join("\n", Files.readAllLines(referenceFileCsv.toPath()));
         referenceContentCsv = referenceContentCsv
                 .replaceAll(" +", " ")
                 .replaceAll("TRUE", "true")
                 .replaceAll("FALSE", "false");
+
         rdr = new BufferedReader(new FileReader(testFileCsv));
         String testContentCsv = rdr.lines().collect(Collectors.joining("\n"));
         testContentCsv = testContentCsv

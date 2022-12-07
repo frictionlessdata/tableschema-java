@@ -1,4 +1,4 @@
-package io.frictionlessdata.tableschema.datasourceformat;
+package io.frictionlessdata.tableschema.tabledatasource;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -15,22 +15,32 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * Implements a {@link TableDataSource} based on a Jackson {@link ArrayNode} holding JSON-encoded table.
  *
+ * The outer structure is a JSON array, and each row in the tabular data is an {@link ObjectNode} where the
+ * key to each property is the row name and the value is the column value.
+ *
+ * Since JSON objects might omit properties with a `null` value, it is hard to recreate the headers without
+ * possibly missing some column names, and since in a JSON object, the order of properties need not be preserved,
+ * it is not possible to recreate the header column order reliably. Recreating the headers is therefore a
+ * very costly operation that has to iterate through the data to extract the column names.
  */
-public class JsonArrayDataSourceFormat extends AbstractDataSourceFormat {
+public class JsonArrayTableDataSource extends AbstractTableDataSource {
 
-    public JsonArrayDataSourceFormat(String json){
-        super();
-        this.dataSource = JsonUtil.getInstance().createArrayNode(DataSourceFormat.trimBOM(json));
-    }
-
-    public JsonArrayDataSourceFormat (InputStream inStream) throws IOException {
+    public JsonArrayTableDataSource (InputStream inStream) throws IOException {
         try (InputStreamReader inputStreamReader = new InputStreamReader(inStream, StandardCharsets.UTF_8);
         BufferedReader br = new BufferedReader(inputStreamReader)) {
             String content = br.lines().collect(Collectors.joining("\n"));
-            this.dataSource = JsonUtil.getInstance().createArrayNode(DataSourceFormat.trimBOM(content));
+            dataSource = JsonUtil.getInstance().createArrayNode(TableDataSource.trimBOM(content));
         }
     }
+	protected JsonArrayTableDataSource (ArrayNode json){
+		dataSource = json;
+	}
+
+	public JsonArrayTableDataSource (String json){
+		this(JsonUtil.getInstance().createArrayNode(TableDataSource.trimBOM(json)));
+	}
 
     @Override
     public boolean hasReliableHeaders() {

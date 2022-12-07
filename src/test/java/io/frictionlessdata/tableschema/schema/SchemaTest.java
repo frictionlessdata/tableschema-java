@@ -27,6 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static io.frictionlessdata.tableschema.TestHelper.getResourceFile;
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
 
@@ -590,19 +591,6 @@ public class SchemaTest {
             expectedSchema = Schema.fromJson(fis, false);
         }
         Assertions.assertTrue(expectedSchema.similar(schema));
-    }
-
-    private static File getResourceFile(String fileName) throws URISyntaxException {
-        try {
-            // Create file-URL of source file:
-            URL sourceFileUrl = SchemaTest.class.getResource(fileName);
-            // normal case: resolve against resources path
-            Path path = Paths.get(sourceFileUrl.toURI());
-            return path.toFile();
-        } catch (NullPointerException ex) {
-            // special case for invalid path test
-            return new File(fileName);
-        }
     }
 
 

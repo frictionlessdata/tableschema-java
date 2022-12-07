@@ -10,7 +10,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- *
+ * This implements a reference from one Table to another. Weirdly, this is in tableschema as per
+ * the spec: https://specs.frictionlessdata.io/table-schema/#foreign-keys while it is used from
+ * the datapackage standard (Tables have no notion of resources).
  * 
  */
 public class Reference {

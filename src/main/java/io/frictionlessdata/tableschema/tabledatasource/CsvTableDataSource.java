@@ -1,5 +1,6 @@
-package io.frictionlessdata.tableschema.datasourceformat;
+package io.frictionlessdata.tableschema.tabledatasource;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Iterators;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
@@ -7,10 +8,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -20,11 +18,24 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * Implements a {@link TableDataSource} based on CSV-Data in:
+ * <ul>
+ *     <li>An {@link InputStream}</li>
+ *     <li>An remote URL</li>
+ *     <li>A local File</li>
+ *     <li>A String</li>
+ * </ul>
  *
+ * To define CSV properties like record delimiters or whether the data has a header row,
+ * the class uses the Apache Commons CSV {@link CSVFormat} class.
+ * Actual parsing is done via the {@link CSVParser} from the same project.
+ *
+ * The default CSV format for this class is based on RFC4180 (https://www.rfc-editor.org/rfc/rfc4180)
+ * with a header row, ignoring whitespace around column values and "\n" as a record separator.
  */
-public class CsvDataSourceFormat extends AbstractDataSourceFormat {
+public class CsvTableDataSource extends AbstractTableDataSource {
 
-    private CSVFormat format = DataSourceFormat.getDefaultCsvFormat();
+    private CSVFormat format = TableDataSource.getDefaultCsvFormat();
 
     /**
      * Constructor from a Stream. In contrast to lazy-loading File- or URL-based constructors, this one
@@ -32,11 +43,11 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
      * @param inStream the stream to read from
      * @throws Exception if an IOException occurs
      */
-    CsvDataSourceFormat(InputStream inStream) throws Exception{
+    CsvTableDataSource(InputStream inStream){
         try (InputStreamReader is = new InputStreamReader(inStream, StandardCharsets.UTF_8);
                 BufferedReader br = new BufferedReader(is)) {
             String content = br.lines().collect(Collectors.joining("\n"));
-            this.dataSource = DataSourceFormat.trimBOM(content);
+            this.dataSource = TableDataSource.trimBOM(content);
 
             // ensure that both parsing as json fails. If it succeeds,
             // then the data is not CSV, but JSON -> throw exception
@@ -46,22 +57,24 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
                 return;
             }
             throw new IllegalArgumentException("Input seems to be in JSON format");
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
-    CsvDataSourceFormat(URL dataSource){
+    CsvTableDataSource(URL dataSource){
         super(dataSource);
     }
     
-    CsvDataSourceFormat(File dataSource, File workDir){
+    CsvTableDataSource(File dataSource, File workDir){
         super(dataSource, workDir);
     }
 
-    CsvDataSourceFormat(String dataSource){
+    CsvTableDataSource(String dataSource){
         super(dataSource);
     }
 
-    public CsvDataSourceFormat setFormat(CSVFormat format) {
+    public CsvTableDataSource setFormat(CSVFormat format) {
         this.format = format;
         return this;
     }
@@ -69,13 +82,19 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
     public CSVFormat getFormat() {
         return (this.format != null)
                 ? this.format
-                : DataSourceFormat.getDefaultCsvFormat();
+                : TableDataSource.getDefaultCsvFormat();
     }
 
 
     @Override
-    public Iterator<String[]> iterator() throws Exception{
-        Iterator<CSVRecord> iterCSVRecords = this.getCSVParser().iterator();
+    public Iterator<String[]> iterator(){
+        CSVParser parser;
+        try {
+            parser = getCSVParser();
+        } catch (IOException e) {
+           throw new RuntimeException(e);
+        }
+        Iterator<CSVRecord> iterCSVRecords = parser.iterator();
 
         return Iterators.transform(iterCSVRecords, (CSVRecord input) -> {
             Iterator<String> iterCols = input.iterator();
@@ -90,11 +109,16 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
     }
 
     @Override
-    public String[] getHeaders() throws Exception{
+    public String[] getHeaders(){
         if (null == headers) {
             // Get a copy of the header map that iterates in column order.
             // The map keys are column names. The map values are 0-based indices.
-            Map<String, Integer> headerMap = this.getCSVParser().getHeaderMap();
+            Map<String, Integer> headerMap = null;
+            try {
+                headerMap = getCSVParser().getHeaderMap();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
             if (null == headerMap) {
                 return null;
             }
@@ -111,9 +135,9 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
      * https://commons.apache.org/proper/commons-csv/apidocs/index.html?org/apache/commons/csv/CSVParser.html
      *
      * @return a CSVParser instance
-     * @throws Exception if either the data has the wrong format or some I/O exception occurs
+     * @throws IOException if either the data has the wrong format or some I/O exception occurs
      */
-    private CSVParser getCSVParser() throws Exception{
+    private CSVParser getCSVParser() throws IOException {
         CSVFormat format = getFormat();
 
         if (dataSource instanceof String){

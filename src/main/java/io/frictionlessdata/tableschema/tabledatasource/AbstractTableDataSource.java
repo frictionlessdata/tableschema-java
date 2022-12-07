@@ -1,4 +1,4 @@
-package io.frictionlessdata.tableschema.datasourceformat;
+package io.frictionlessdata.tableschema.tabledatasource;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,29 +10,29 @@ import java.util.List;
  *
  * 
  */
-public abstract class AbstractDataSourceFormat implements DataSourceFormat {
+public abstract class AbstractTableDataSource implements TableDataSource {
     String[] headers;
     Object dataSource = null;
     private File workDir;
 
-    AbstractDataSourceFormat(){}
+    AbstractTableDataSource(){}
 
-    AbstractDataSourceFormat(URL dataSource){
+    AbstractTableDataSource(URL dataSource){
         this.dataSource = dataSource;
     }
 
-    AbstractDataSourceFormat(File dataSource, File workDir){
+    AbstractTableDataSource(File dataSource, File workDir){
         this.dataSource = dataSource;
         this.workDir = workDir;
     }
 
-    AbstractDataSourceFormat(String dataSource){
+    AbstractTableDataSource(String dataSource){
         this.dataSource = dataSource;
     }
 
 
     @Override
-    public List<String[]> data() throws Exception{
+    public List<String[]> getDataAsStringArray() {
         List<String[]> data = new ArrayList<>();
         iterator().forEachRemaining(data::add);
         return data;
@@ -40,7 +40,7 @@ public abstract class AbstractDataSourceFormat implements DataSourceFormat {
 
 
     String getFileContents(String path) throws IOException {
-        return DataSourceFormat.getFileContents(path, workDir);
+        return TableDataSource.getFileContents(path, workDir);
     }
 
 }

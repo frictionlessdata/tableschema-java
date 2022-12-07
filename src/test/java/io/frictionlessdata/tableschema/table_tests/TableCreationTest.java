@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema.table_tests;
 
 import io.frictionlessdata.tableschema.Table;
-import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
+import io.frictionlessdata.tableschema.tabledatasource.TableDataSource;
 import io.frictionlessdata.tableschema.exception.TableValidationException;
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.schema.Schema;
@@ -108,7 +108,7 @@ public class TableCreationTest {
         Path path = Paths.get(sourceFileUrl.toURI());
         String csvContent = new String(Files.readAllBytes(path));
 
-        Table table = Table.fromSource(csvContent, null, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(csvContent, null, TableDataSource.getDefaultCsvFormat());
 
         Assertions.assertEquals(3, table.read().size());
         // must not throw an exception
@@ -145,7 +145,7 @@ public class TableCreationTest {
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
 
         Schema schema = Schema.fromJson (f, true);
-        Table table = Table.fromSource(populationTestJson, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(populationTestJson, schema, TableDataSource.getDefaultCsvFormat());
         Assertions.assertEquals(3, table.read().size());
         Schema expectedSchema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
@@ -190,7 +190,7 @@ public class TableCreationTest {
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema testSchema = Schema.fromJson (schemaFile, true);
-        Table testTable = Table.fromSource(populationTestJson, testSchema, DataSourceFormat.getDefaultCsvFormat());
+        Table testTable = Table.fromSource(populationTestJson, testSchema, TableDataSource.getDefaultCsvFormat());
 
         Assertions.assertEquals(testTable, table);
     }
@@ -212,7 +212,7 @@ public class TableCreationTest {
             schema = Schema.fromJson (fis, false);
         }
 
-        Table table = Table.fromSource(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(csvContent, schema, TableDataSource.getDefaultCsvFormat());
 
         Assertions.assertEquals(3, table.read().size());
         List<Object[]> actualData = table.read();
@@ -259,11 +259,11 @@ public class TableCreationTest {
 
         ByteArrayInputStream bis = new ByteArrayInputStream(csvContent.getBytes());
         FileInputStream fis = new FileInputStream(f);
-        Table table = Table.fromSource(bis, fis, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(bis, fis, TableDataSource.getDefaultCsvFormat());
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema testSchema = Schema.fromJson (schemaFile, true);
-        Table testTable = Table.fromSource(populationTestJson, testSchema, DataSourceFormat.getDefaultCsvFormat());
+        Table testTable = Table.fromSource(populationTestJson, testSchema, TableDataSource.getDefaultCsvFormat());
         Assertions.assertEquals(testTable, table);
         try {
             bis.close();
@@ -287,11 +287,11 @@ public class TableCreationTest {
 
         ByteArrayInputStream bis = new ByteArrayInputStream(jsonContent.getBytes());
         FileInputStream fis = new FileInputStream(f);
-        Table table = Table.fromSource(bis, fis, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(bis, fis, TableDataSource.getDefaultCsvFormat());
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema testSchema = Schema.fromJson (schemaFile, true);
-        Table testTable = Table.fromSource(populationTestJson, testSchema, DataSourceFormat.getDefaultCsvFormat());
+        Table testTable = Table.fromSource(populationTestJson, testSchema, TableDataSource.getDefaultCsvFormat());
         Assertions.assertEquals(testTable, table);
         try {
             bis.close();
@@ -315,7 +315,7 @@ public class TableCreationTest {
 
         ByteArrayInputStream bis = new ByteArrayInputStream(csvContent.getBytes());
         FileInputStream fis = new FileInputStream(f);
-        Table table = Table.fromSource(bis, fis, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(bis, fis, TableDataSource.getDefaultCsvFormat());
 
         // must throw an exception
         assertThrows(TableValidationException.class, table::validate);
@@ -376,7 +376,7 @@ public class TableCreationTest {
             schema = Schema.fromJson (fis, false);
         }
 
-        Table table = Table.fromSource(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(csvContent, schema, TableDataSource.getDefaultCsvFormat());
 
         List<Object[]> actualData = table.read(true);
         for (int i = 0; i < actualData.size(); i++) {
@@ -405,7 +405,7 @@ public class TableCreationTest {
         }
         Assertions.assertNull(table.getSchema());
         Assertions.assertNotNull(table.getCsvFormat());
-        Assertions.assertNotNull(table.getDataSourceFormat());
+        Assertions.assertNotNull(table.getTableDataSource());
 
         assertEquals("1", data.get(0)[0]);
         assertEquals("foo", data.get(0)[1]);
@@ -432,8 +432,8 @@ public class TableCreationTest {
         Assertions.assertNull(table.getSchema());
         // The CSVFormat of the Table can't be null, but must be default even if we create the table with a null value
         Assertions.assertNotNull(table.getCsvFormat());
-        Assertions.assertEquals(DataSourceFormat.getDefaultCsvFormat(), table.getCsvFormat());
-        Assertions.assertNotNull(table.getDataSourceFormat());
+        Assertions.assertEquals(TableDataSource.getDefaultCsvFormat(), table.getCsvFormat());
+        Assertions.assertNotNull(table.getTableDataSource());
 
         assertEquals("1", data.get(0)[0]);
         assertEquals("foo", data.get(0)[1]);

@@ -4,11 +4,11 @@ import io.frictionlessdata.tableschema.Table;
 
 public class SimpleTableIterator extends TableIterator<String[]> {
 
-    public SimpleTableIterator(Table table) throws Exception {
+    public SimpleTableIterator(Table table)  {
         super(table);
     }
 
-    public SimpleTableIterator(Table table, boolean relations) throws Exception{
+    public SimpleTableIterator(Table table, boolean relations) {
         this(table);
         this.relations = relations;
     }

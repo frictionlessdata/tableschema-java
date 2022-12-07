@@ -120,7 +120,7 @@ public class TypeInferrer {
             Object[] row = data.get(i);
             
             for(int j = 0; j < row.length; j++){
-                this.findType(headers[j], row[j].toString());
+                this.findType(headers[j], (null == row[j]) ? "" : row[j].toString());
             }
         }
         

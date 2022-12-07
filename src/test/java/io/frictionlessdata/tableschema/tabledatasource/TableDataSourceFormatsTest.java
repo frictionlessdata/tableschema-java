@@ -1,4 +1,4 @@
-package io.frictionlessdata.tableschema.datasourceformat;
+package io.frictionlessdata.tableschema.tabledatasource;
 
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class DataSourceFormatsTest {
+public class TableDataSourceFormatsTest {
 
     private String populationCsv = "city,year,population\n" +
             "london,2017,8780000\n" +
@@ -45,17 +45,17 @@ public class DataSourceFormatsTest {
             "]";
 
     @Test
-    @DisplayName("Create a DataSourceFormat from CSV String data and ensure it is a CsvDataSourceFormat")
+    @DisplayName("Create a TableDataSource from CSV String data and ensure it is a CsvTableDataSource")
     public void createCsvDataSource() throws Exception{
         String dates = this.getDatesCsvData();
-        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(dates);
-        Assertions.assertTrue(ds instanceof CsvDataSourceFormat);
+        TableDataSource ds = TableDataSource.fromSource(dates);
+        Assertions.assertTrue(ds instanceof CsvTableDataSource);
     }
 
     @Test
-    @DisplayName("Create a DataSourceFormat from an unsafe path and ensure an exception is thrown")
+    @DisplayName("Create a TableDataSource from an unsafe path and ensure an exception is thrown")
     public void testUnsafePath1() throws Exception {
-       URL u = DataSourceFormatsTest.class.getResource("/fixtures/dates_data.csv");
+       URL u = TableDataSourceFormatsTest.class.getResource("/fixtures/dates_data.csv");
        Path path = Paths.get(u.toURI());
        Path testPath = path.getParent();
        String maliciousPathName = "/etc/passwd";
@@ -64,13 +64,14 @@ public class DataSourceFormatsTest {
        }
        Path maliciousPath = new File(maliciousPathName).toPath();
 
-       assertThrows(IllegalArgumentException.class, () -> {DataSourceFormat.toSecure(maliciousPath, testPath);});
+       assertThrows(IllegalArgumentException.class, () -> {
+           TableDataSource.toSecure(maliciousPath, testPath);});
     }
 
     @Test
-    @DisplayName("Create a DataSourceFormat from a safe path and ensure no exception is thrown")
+    @DisplayName("Create a TableDataSource from a safe path and ensure no exception is thrown")
     public void testSafePath() throws Exception {
-        URL u = DataSourceFormatsTest.class.getResource("/fixtures/dates_data.csv");
+        URL u = TableDataSourceFormatsTest.class.getResource("/fixtures/dates_data.csv");
         Path path = Paths.get(u.toURI());
         Path testPath = path.getParent().getParent();
         String maliciousPathName = "fixtures/dates_data.csv";
@@ -78,36 +79,36 @@ public class DataSourceFormatsTest {
             maliciousPathName = "fixtures/dates_data.csv";
         }
         Path maliciousPath = new File(maliciousPathName).toPath();
-        DataSourceFormat.toSecure(maliciousPath, testPath);
+        TableDataSource.toSecure(maliciousPath, testPath);
     }
 
     @Test
-    @DisplayName("Create a DataSourceFormat from a safe path and ensure no exception is thrown")
+    @DisplayName("Create a TableDataSource from a safe path and ensure no exception is thrown")
     public void testSafePathCreationCsv() throws Exception {
-        DataSourceFormat ds = DataSourceFormat.createDataSourceFormat(new File ("data/population.csv"), TestHelper.getTestDataDirectory());
+        TableDataSource ds = TableDataSource.fromSource(new File ("data/population.csv"), TestHelper.getTestDataDirectory());
         Assertions.assertNotNull(ds);
     }
 
 
     @Test
-    @DisplayName("Create a CsvDataSourceFormat from an URL containing CSV String data and ensure the data size is 3")
+    @DisplayName("Create a CsvTableDataSource from an URL containing CSV String data and ensure the data size is 3")
     public void testUrlCreationCsv() throws Exception {
-        DataSourceFormat ds = new CsvDataSourceFormat(new URL ("https://raw.githubusercontent.com/frictionlessdata" +
+        TableDataSource ds = new CsvTableDataSource(new URL ("https://raw.githubusercontent.com/frictionlessdata" +
                 "/tableschema-java/master/src/test/resources/fixtures/data/population.csv"));
         Assertions.assertNotNull(ds);
-        List<String[]> data = ds.data();
+        List<String[]> data = ds.getDataAsStringArray();
         Assertions.assertEquals(3, data.size());
     }
 
 
     @Test
-    @DisplayName("Create a CsvDataSourceFormat from InputStream and validate content matches")
+    @DisplayName("Create a CsvTableDataSource from InputStream and validate content matches")
     public void testSafePathInputStreamCreationCsv() throws Exception {
-        DataSourceFormat ds;
+        TableDataSource ds;
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.csv");
         try (FileInputStream is = new FileInputStream(inFile)) {
-            ds = new CsvDataSourceFormat(is);
-            List<String[]> data = ds.data();
+            ds = new CsvTableDataSource(is);
+            List<String[]> data = ds.getDataAsStringArray();
             Assertions.assertNotNull(data);
             byte[] bytes = Files.readAllBytes(new File(TestHelper.getTestDataDirectory(), "data/population.csv").toPath());
             String[] content = new String(bytes).split("[\n\r]+");
@@ -120,13 +121,13 @@ public class DataSourceFormatsTest {
     }
 
     @Test
-    @DisplayName("Create a CsvDataSourceFormat from File and validate content matches")
+    @DisplayName("Create a CsvTableDataSource from File and validate content matches")
     public void testInputFileCreationCsv() throws Exception {
-        DataSourceFormat ds;
+        TableDataSource ds;
         File basePath = new File(TestHelper.getTestDataDirectory(),"data");
         File inFile = new File("population.csv");
-        ds = new CsvDataSourceFormat(inFile,basePath);
-        List<String[]> data = ds.data();
+        ds = new CsvTableDataSource(inFile,basePath);
+        List<String[]> data = ds.getDataAsStringArray();
         Assertions.assertNotNull(data);
         byte[] bytes = Files.readAllBytes(new File(TestHelper.getTestDataDirectory(), "data/population.csv").toPath());
         String[] content = new String(bytes).split("[\n\r]+");
@@ -138,13 +139,13 @@ public class DataSourceFormatsTest {
     }
 
     @Test
-    @DisplayName("Create a CsvDataSourceFormat from zipped File and validate content matches")
+    @DisplayName("Create a CsvTableDataSource from zipped File and validate content matches")
     public void testZipInputFileCreationCsv() throws Exception {
-        DataSourceFormat ds;
+        TableDataSource ds;
         File basePath = new File(TestHelper.getTestDataDirectory(),"data/population.zip");
         File inFile = new File("population.csv");
-        ds = new CsvDataSourceFormat(inFile,basePath);
-        List<String[]> data = ds.data();
+        ds = new CsvTableDataSource(inFile,basePath);
+        List<String[]> data = ds.getDataAsStringArray();
         Assertions.assertNotNull(data);
         byte[] bytes = Files.readAllBytes(new File(TestHelper.getTestDataDirectory(), "data/population.csv").toPath());
         String[] content = new String(bytes).split("[\n\r]+");
@@ -156,13 +157,13 @@ public class DataSourceFormatsTest {
     }
 
     @Test
-    @DisplayName("Create a CsvDataSourceFormat from zipped File and validate content matches")
+    @DisplayName("Create a CsvTableDataSource from zipped File and validate content matches")
     public void testZipInputFileCreationCsv2() throws Exception {
-        DataSourceFormat ds;
+        TableDataSource ds;
         File basePath = new File(TestHelper.getTestDataDirectory(),"data/population.zip");
         File inFile = new File("population.csv");
-        ds = DataSourceFormat.createDataSourceFormat(inFile,basePath);
-        List<String[]> data = ds.data();
+        ds = TableDataSource.fromSource(inFile,basePath);
+        List<String[]> data = ds.getDataAsStringArray();
         Assertions.assertNotNull(data);
         byte[] bytes = Files.readAllBytes(new File(TestHelper.getTestDataDirectory(), "data/population.csv").toPath());
         String[] content = new String(bytes).split("[\n\r]+");
@@ -174,20 +175,20 @@ public class DataSourceFormatsTest {
     }
 
     @Test
-    @DisplayName("Create a CsvDataSourceFormat from JSON data and ensure Exception is thrown")
+    @DisplayName("Create a CsvTableDataSource from JSON data and ensure Exception is thrown")
     public void testWrongInputStreamCreationCsv() throws Exception {
-        final DataSourceFormat[] ds = new DataSourceFormat[1];
+        final TableDataSource[] ds = new TableDataSource[1];
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.json");
 
         assertThrows(IllegalArgumentException.class, () -> {
             FileInputStream is = new FileInputStream(inFile);
-            ds[0] = new CsvDataSourceFormat(is);
+            ds[0] = new CsvTableDataSource(is);
             is.close();
         });
     }
 
     @Test
-    @DisplayName("Create a CsvDataSourceFormat from CSV data write it back to file and ensure content matches")
+    @DisplayName("Create a CsvTableDataSource from CSV data write it back to file and ensure content matches")
     public void writeCsvToFile() throws Exception{
         File tempFile = Files.createTempFile("tableschema-", ".csv").toFile();
 
@@ -196,7 +197,7 @@ public class DataSourceFormatsTest {
         Table ds = Table.fromSource(popCsv);
         Assertions.assertArrayEquals(populationHeaders, ds.getHeaders());
         try (FileWriter fr = new FileWriter(tempFile)) {
-            ds.write(fr, DataSourceFormat.Format.FORMAT_CSV);
+            ds.write(fr, TableDataSource.Format.FORMAT_CSV);
         }
         String content;
         try (FileReader fr = new FileReader(tempFile)) {
@@ -220,7 +221,7 @@ public class DataSourceFormatsTest {
     private static String getFileContents(String fileName) {
         try {
             // Create file-URL of source file:
-            URL sourceFileUrl = DataSourceFormatsTest.class.getResource(fileName);
+            URL sourceFileUrl = TableDataSourceFormatsTest.class.getResource(fileName);
             // Get path of URL
             Path path = Paths.get(sourceFileUrl.toURI());
             return new String(Files.readAllBytes(path));

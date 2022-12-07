@@ -38,7 +38,7 @@ public class BeanSchema extends Schema {
         fieldMap = createFieldMap(fields);
     }
 
-    public static BeanSchema infer(Class<?> beanClass) throws NoSuchFieldException {
+    public static BeanSchema infer(Class<?> beanClass) {
         List<Field<?>> fields = new ArrayList<>();
         CsvMapper mapper = new CsvMapper();
         mapper.setVisibility(mapper.getSerializationConfig()
@@ -114,7 +114,12 @@ public class BeanSchema extends Schema {
                     field = new AnyField(name);
             }
             if (null == field) {
-                throw new TableSchemaException("Field "+name+" could not be mapped, class: "+declaredClass.getName());
+                String canonicalName = declaredClass.getCanonicalName();
+                if (canonicalName.equals("java.lang.Object")) {
+                    field = new AnyField(name);
+                } else {
+                    throw new TableSchemaException("Field " + name + " could not be mapped, class: " + declaredClass.getName());
+                }
             }
             fields.add(field);
         }

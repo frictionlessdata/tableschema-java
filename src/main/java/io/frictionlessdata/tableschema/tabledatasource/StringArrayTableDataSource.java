@@ -1,7 +1,4 @@
-package io.frictionlessdata.tableschema.datasourceformat;
-
-import io.frictionlessdata.tableschema.exception.TableSchemaException;
-import org.apache.commons.csv.CSVParser;
+package io.frictionlessdata.tableschema.tabledatasource;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,26 +9,26 @@ import java.util.List;
  *
  * 
  */
-public class StringArrayDataSourceFormat extends AbstractDataSourceFormat {
+public class StringArrayTableDataSource extends AbstractTableDataSource {
     private final String[] headers;
 
-    public StringArrayDataSourceFormat(Collection<String[]> data, String[] headers){
+    public StringArrayTableDataSource(Collection<String[]> data, String[] headers){
         this.dataSource = data;
         this.headers = headers;
     }
 
     @Override
-    public Iterator<String[]> iterator() throws Exception{
+    public Iterator<String[]> iterator(){
         return ((Collection<String[]>)dataSource).iterator();
     }
 
     @Override
-    public List<String[]> data() throws Exception{
+    public List<String[]> getDataAsStringArray() {
         return new ArrayList<>((Collection<String[]>)dataSource);
     }
 
     @Override
-    public String[] getHeaders() throws Exception{
+    public String[] getHeaders(){
         return headers;
     }
 

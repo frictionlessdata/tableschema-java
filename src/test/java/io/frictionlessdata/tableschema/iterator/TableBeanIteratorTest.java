@@ -6,7 +6,7 @@ import io.frictionlessdata.tableschema.beans.EmployeeBean;
 import io.frictionlessdata.tableschema.beans.EmployeeBeanWithAnnotation;
 import io.frictionlessdata.tableschema.beans.GrossDomesticProductBean;
 import io.frictionlessdata.tableschema.beans.NumbersBean;
-import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
+import io.frictionlessdata.tableschema.tabledatasource.TableDataSource;
 import io.frictionlessdata.tableschema.field.DateField;
 import io.frictionlessdata.tableschema.schema.BeanSchema;
 import io.frictionlessdata.tableschema.schema.Schema;
@@ -34,19 +34,21 @@ class TableBeanIteratorTest {
     private static Table employeeTable = null;
     private static Table employeeTableAlternateDateFormat = null;
     private static Table gdpTable = null;
+    private static File testDataDir;
 
     @BeforeEach
     void setUp() throws Exception {
+        testDataDir = getTestDataDirectory();
         File f = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema validPopulationSchema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
             validPopulationSchema = Schema.fromJson (fis, false);
         }
-        File testDataDir = getTestDataDirectory();
+
 
         File file = new File("data/employee_data.csv");
         employeeSchema = BeanSchema.infer(EmployeeBean.class);
-        employeeTable = Table.fromSource(file, testDataDir, employeeSchema, DataSourceFormat.getDefaultCsvFormat());
+        employeeTable = Table.fromSource(file, testDataDir, employeeSchema, TableDataSource.getDefaultCsvFormat());
 
         file = new File("data/employee_alternate_date_format.csv");
         employeeSchemaAlternateDateForma = BeanSchema.infer(EmployeeBeanWithAnnotation.class);
@@ -54,11 +56,11 @@ class TableBeanIteratorTest {
                 file,
                 testDataDir,
                 employeeSchemaAlternateDateForma,
-                DataSourceFormat.getDefaultCsvFormat());
+                TableDataSource.getDefaultCsvFormat());
 
         file = new File("data/gdp.csv");
         gdpSchema = BeanSchema.infer(GrossDomesticProductBean.class);
-        gdpTable = Table.fromSource(file, testDataDir, gdpSchema, DataSourceFormat.getDefaultCsvFormat());
+        gdpTable = Table.fromSource(file, testDataDir, gdpSchema, TableDataSource.getDefaultCsvFormat());
 
     }
 
@@ -88,6 +90,13 @@ class TableBeanIteratorTest {
     @Test
     @DisplayName("Test deserialization of EmployeeBean with Annotation")
     void testBeanDeserialization2() throws Exception {
+        File inFile = new File("data/employee_full.csv");
+        employeeSchemaAlternateDateForma = BeanSchema.infer(EmployeeBeanWithAnnotation.class);
+        employeeTableAlternateDateFormat = Table.fromSource(
+                inFile,
+                testDataDir,
+                employeeSchemaAlternateDateForma,
+                TableDataSource.getDefaultCsvFormat());
         List<EmployeeBeanWithAnnotation> employees = new ArrayList<>();
         BeanIterator<EmployeeBeanWithAnnotation> bit = new BeanIterator<>(employeeTableAlternateDateFormat, EmployeeBeanWithAnnotation.class, false);
         while (bit.hasNext()) {
@@ -96,15 +105,20 @@ class TableBeanIteratorTest {
         }
         Assertions.assertEquals(3, employees.size());
         EmployeeBeanWithAnnotation frank = employees.get(1);
-        Assertions.assertEquals("Frank McKrank", frank.getName());
+        Assertions.assertEquals("McKrank", frank.getLastName());
         Assertions.assertEquals("1992-02-14", new DateField("date").formatValueAsString(frank.getDateOfBirth(), null, null));
-        Assertions.assertFalse(frank.getAdmin());
-        Assertions.assertEquals("(90.0, 45.223, NaN)", frank.getAddressCoordinates().toString());
-        Assertions.assertEquals("PT15M", frank.getContractLength().toString());
-        Map info = frank.getInfo();
-        Assertions.assertEquals(45, info.get("pin"));
+        Assertions.assertFalse(frank.getManager());
+        Assertions.assertEquals("(-91.254898, 35.6087, NaN)", frank.getAddressCoordinates().toString());
+
+        List<String> interests = frank.getInterests();
+        Assertions.assertEquals(2, interests.size());
+        Assertions.assertEquals("sports", interests.get(0));
+        Assertions.assertEquals("reading", interests.get(1));
+
+        Object info = frank.getInfo();
+        /*Assertions.assertEquals(45, info.get("pin"));
         Assertions.assertEquals(83.23, info.get("rate"));
-        Assertions.assertEquals(90, info.get("ssn"));
+        Assertions.assertEquals(90, info.get("ssn"));*/
     }
 
     @Test
@@ -148,7 +162,7 @@ class TableBeanIteratorTest {
         }
         File dataFile = new File("data/number_types.csv");
         Table numbersTable
-                = Table.fromSource(dataFile, getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
+                = Table.fromSource(dataFile, getTestDataDirectory(), schema, TableDataSource.getDefaultCsvFormat());
         BeanIterator<NumbersBean> bit = (BeanIterator<NumbersBean>) numbersTable.iterator(NumbersBean.class, false);
 
         NumbersBean record = bit.next();

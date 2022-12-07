@@ -1,5 +1,8 @@
-package io.frictionlessdata.tableschema.datasourceformat;
+package io.frictionlessdata.tableschema.tabledatasource;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import io.frictionlessdata.tableschema.Table;
+import io.frictionlessdata.tableschema.exception.TableIOException;
 import io.frictionlessdata.tableschema.inputstream.ByteOrderMarkStrippingInputStream;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.apache.commons.csv.CSVFormat;
@@ -16,31 +19,39 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * Interface for a source of tabular data.
+ * Interface defining the structure holding data for a {@link Table}.
+ *
+ * Concrete implementations implement this interface to provide ways for creating a Table on
+ * <ul>
+ *     <li>JSON-encoded array data</li>
+ *     <li>CSV-encoded data</li>
+ *     <li>String arrays</li>
+ * </ul>
+ *
+ * This class and its subclasses will strip Unicode BOMs from the input data
  */
-public interface DataSourceFormat {
+public interface TableDataSource {
     String UTF16_BOM = "\ufeff";
     String UTF8_BOM = "\u00ef\u00bb\u00bf";
     /**
      * Returns an Iterator that returns String arrays containing
      * one row of data each.
      * @return Iterator over the data
-     * @throws Exception thrown if reading the data fails
      */
-    Iterator<String[]> iterator() throws Exception;
+    Iterator<String[]> iterator();
 
     /**
      * Returns the data headers if no headers were set or the set headers
      * @return Column headers as a String array
      */
-    String[] getHeaders() throws Exception;
+    String[] getHeaders();
 
     /**
      * Returns the whole data as a List of String arrays, each List entry is one row
      * @return List containing the data
      * @throws Exception thrown if reading the data fails
      */
-    List<String[]> data() throws Exception;
+    List<String[]> getDataAsStringArray() throws Exception;
 
     /**
      * Signals whether extracted headers can be trusted (CSV with header row) or not
@@ -54,25 +65,48 @@ public interface DataSourceFormat {
      * CsvDataSource based on input format
      * @return DataSource created from input String
      */
-    static DataSourceFormat createDataSourceFormat(String input) {
+    static TableDataSource fromSource(String input) {
         try {
-            // JSON array generation only to see if an exception is thrown -> probably CSV data
-            JsonUtil.getInstance().createArrayNode(input);
-            return new JsonArrayDataSourceFormat(input);
+            // JSON array generation. If an exception is thrown -> probably CSV data
+            ArrayNode json = JsonUtil.getInstance().createArrayNode(input);
+            return new JsonArrayTableDataSource(json);
         } catch (Exception ex) {
             // JSON parsing failed, treat it as a CSV
-            return new CsvDataSourceFormat(input);
+            return new CsvTableDataSource(input);
         }
     }
 
     /**
-     * Factory method to instantiate either a {@link JsonArrayDataSourceFormat} or a
-     * {@link CsvDataSourceFormat} based on input format
+     * Factory method to instantiate either a {@link JsonArrayTableDataSource} or a
+     * {@link CsvTableDataSource} based on input format
      * @return DataSource created from input File
      */
-    static DataSourceFormat createDataSourceFormat(File input, File workDir) throws IOException {
-        String content = getFileContents(input.getPath(), workDir);
-        return createDataSourceFormat(content);
+    static TableDataSource fromSource(File input, File workDir) {
+        try {
+            String content = getFileContents(input.getPath(), workDir);
+            return fromSource(content);
+        } catch (IOException ex) {
+            throw new TableIOException(ex);
+        }
+    }
+
+    /**
+     * Factory method to instantiate either a {@link JsonArrayTableDataSource} or a
+     * {@link CsvTableDataSource}  based on input format
+     * @return DataSource created from input String
+     */
+    static TableDataSource fromSource(InputStream input) {
+        String content;
+
+        try (Reader fr = new InputStreamReader(input)) {
+            try (BufferedReader rdr = new BufferedReader(fr)) {
+                content = rdr.lines().collect(Collectors.joining("\n"));
+            }
+        } catch (IOException ex) {
+            throw new TableIOException(ex);
+        }
+
+        return fromSource(content);
     }
 
     static String getFileContents(String path, File workDir) throws IOException {
@@ -94,7 +128,7 @@ public interface DataSourceFormat {
             // see:
             //    - https://github.com/frictionlessdata/tableschema-java/issues/29
             //    - https://frictionlessdata.io/specs/data-resource/#url-or-path
-            Path resolvedPath = DataSourceFormat.toSecure(new File(path).toPath(), workDir.toPath());
+            Path resolvedPath = TableDataSource.toSecure(new File(path).toPath(), workDir.toPath());
             lines = readSkippingBOM(new FileInputStream(resolvedPath.toFile()));
         }
         return lines;
@@ -106,14 +140,15 @@ public interface DataSourceFormat {
      * conform
      * @param is InputStream to read from
      * @return Contents of the InputStream as a String
-     * @throws IOException if underlying InputStream throws
      */
-    static String readSkippingBOM(InputStream is) throws IOException {
+    static String readSkippingBOM(InputStream is) {
         String content;
         try (ByteOrderMarkStrippingInputStream bims  = new ByteOrderMarkStrippingInputStream(is);
              InputStreamReader isr = new InputStreamReader(bims.skipBOM(), bims.getCharset());
              BufferedReader rdr = new BufferedReader(isr)) {
                 content = rdr.lines().collect(Collectors.joining("\n"));
+        } catch (IOException ex) {
+            throw new TableIOException(ex);
         }
         return content;
     }
@@ -125,24 +160,6 @@ public interface DataSourceFormat {
                 .setIgnoreSurroundingSpaces(true)
                 .setRecordSeparator("\n")
                 .build();
-    }
-
-    /**
-     * Factory method to instantiate either a {@link JsonArrayDataSourceFormat} or a
-     * {@link CsvDataSourceFormat}  based on input format
-     * @return DataSource created from input String
-     */
-    static DataSourceFormat createDataSourceFormat(InputStream input) throws IOException {
-        String content;
-
-        // Read the file.
-        try (Reader fr = new InputStreamReader(input)) {
-            try (BufferedReader rdr = new BufferedReader(fr)) {
-                content = rdr.lines().collect(Collectors.joining("\n"));
-            }
-        }
-
-        return createDataSourceFormat(content);
     }
 
     static String trimBOM(String input) {
@@ -184,6 +201,9 @@ public interface DataSourceFormat {
         return resolvedPath;
     }
 
+    /**
+     * Data format, currently either CSV or JSON. Formats like Excel are not supported
+     */
     enum Format {
         FORMAT_CSV("csv"),
         FORMAT_JSON("json");

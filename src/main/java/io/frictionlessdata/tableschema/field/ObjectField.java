@@ -29,8 +29,7 @@ public class ObjectField extends Field<Map<String, Object>> {
     public Map<String, Object> parseValue(String value, String format, Map<String, Object> options)
             throws TypeInferringException {
         try {
-            return JsonUtil.getInstance().deserialize(value, new TypeReference<Map<String, Object>>() {
-            });
+            return JsonUtil.getInstance().deserialize(value, new TypeReference<Map<String, Object>>() {});
         } catch (JsonParsingException ex) {
             throw new TypeInferringException(ex);
         }

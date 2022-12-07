@@ -3,7 +3,7 @@ package io.frictionlessdata.tableschema.table_tests;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.Table;
-import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
+import io.frictionlessdata.tableschema.tabledatasource.TableDataSource;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.schema.Schema;
 import org.junit.Assert;
@@ -60,7 +60,7 @@ public class TableIterationTest {
 
         // Fetch the data and apply the schema
         File file = new File("data/employee_data.csv");
-        Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, DataSourceFormat.getDefaultCsvFormat());
+        Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, TableDataSource.getDefaultCsvFormat());
 
         // We will iterate the rows and these are the values classes we expect:
         Class[] expectedTypes = new Class[]{
@@ -263,7 +263,7 @@ public class TableIterationTest {
             schema = Schema.fromJson (fis, false);
         }
 
-        Table table = Table.fromSource(csvContent, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(csvContent, schema, TableDataSource.getDefaultCsvFormat());
 
         Assert.assertEquals(3, table.read().size());
         List<Object[]> actualData = table.read(true);

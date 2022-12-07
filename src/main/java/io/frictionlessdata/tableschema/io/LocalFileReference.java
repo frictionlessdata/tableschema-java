@@ -30,7 +30,7 @@ public class LocalFileReference implements FileReference<File> {
     }
 
     @Override
-    public InputStream getInputStream() throws Exception {
+    public InputStream getInputStream() throws IOException {
         if (this.isInArchive) {
             ZipFile zipFile = new ZipFile(basePath);
             ZipEntry entry = findZipEntry(zipFile, relativePath);

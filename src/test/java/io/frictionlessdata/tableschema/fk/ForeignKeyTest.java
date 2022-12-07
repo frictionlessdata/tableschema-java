@@ -1,17 +1,60 @@
 package io.frictionlessdata.tableschema.fk;
 
 
+import io.frictionlessdata.tableschema.Table;
+import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
+import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.util.JsonUtil;
+import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ForeignKeyTest {
+
+    @Test
+    @DisplayName("Check ForeignKey against matching data, good case")
+    public void testValidFkReference() throws Exception {
+        File testDataDir = TestHelper.getTestDataDirectory();
+        File source = TestHelper.getResourceFile("/fixtures/schema/population_schema_for_fk_check.json");
+
+        Schema schema = Schema.fromJson(source, true);
+        // get path of test CSV file
+        File file = new File("data/population_for_fk_check.csv");
+        Table table = Table.fromSource(
+                file,
+                testDataDir,
+                schema,
+                CSVFormat.DEFAULT.builder().setHeader().build());
+        schema.getForeignKeys().get(0).validate(table);
+    }
+
+    @Test
+    @DisplayName("Check ForeignKey against not matching data -> must throw")
+    public void testInvalidFkReference() throws Exception {
+        File testDataDir = TestHelper.getTestDataDirectory();
+        File source = TestHelper.getResourceFile("/fixtures/schema/population_schema_for_fk_check.json");
+
+        Schema schema = Schema.fromJson(source, true);
+        // get path of test CSV file
+        File file = new File("data/population_for_fk_check_invalid.csv");
+        Table table = Table.fromSource(
+                file,
+                testDataDir,
+                schema,
+                CSVFormat.DEFAULT.builder().setHeader().build());
+        ForeignKeyException fke = assertThrows(ForeignKeyException.class, ()
+                -> schema.getForeignKeys().get(0).validate(table));
+        Assertions.assertEquals("Foreign key [check_year-> year] violation : expected: 2018 found: 2017",
+                fke.getMessage());
+    }
 
     @Test
     public void testValidStringFields() throws ForeignKeyException {

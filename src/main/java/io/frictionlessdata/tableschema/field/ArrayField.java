@@ -4,10 +4,15 @@ import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.JsonParsingException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
+import io.frictionlessdata.tableschema.schema.TypeInferrer;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class ArrayField extends Field<Object[]> {
@@ -36,8 +41,20 @@ public class ArrayField extends Field<Object[]> {
     }
 
     @Override
-    public String formatValueAsString(Object[] value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
-        return JsonUtil.getInstance().serialize(value);
+    public String formatValueAsString(Object[] value, String format, Map<String, Object> options)
+            throws InvalidCastException, ConstraintsException {
+        List<String> vals = new ArrayList<>();
+        String val;
+        for (Object o : value) {
+            if (o instanceof String) {
+                val = "\""+o+"\"";
+            } else {
+                Field f = FieldInferrer.infer(o);
+                val = f.formatValueAsString(o);
+            }
+            vals.add(val);
+        }
+        return "[" + vals.stream().collect(Collectors.joining(",")) +"]";
     }
 
 

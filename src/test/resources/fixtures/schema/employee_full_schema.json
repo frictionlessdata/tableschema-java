@@ -19,6 +19,13 @@
       "description": "The gender of the person."
     },
     {
+      "name": "dateOfBirth",
+      "title": "dateOfBirth",
+      "type": "date",
+      "format" : "%m/%d/%Y",
+      "description": "The day of birth."
+    },
+    {
       "name": "age",
       "title": "Age",
       "type": "integer",

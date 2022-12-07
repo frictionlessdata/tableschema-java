@@ -81,6 +81,9 @@ public class GeopointField extends Field<double[]> {
             }
 
         }catch(Exception e){
+            if (e instanceof TypeInferringException) {
+                throw e;
+            }
             throw new TypeInferringException(e);
         }
     }

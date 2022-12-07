@@ -2,7 +2,7 @@ package io.frictionlessdata.tableschema;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.beans.SimpleDataBean;
-import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
+import io.frictionlessdata.tableschema.tabledatasource.TableDataSource;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.iterator.BeanIterator;
 import io.frictionlessdata.tableschema.schema.Schema;
@@ -25,21 +25,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class DocumentationCases {
 
+    /**
+     * Example
+     * https://github.com/frictionlessdata/tableschema-java/blob/main/docs/table-reading.md#reading-tabular-data-the-java-way
+     */
     @Test
     @DisplayName("Parsing a CSV using a Bean")
     void csvParsingWithBean() throws Exception{
 
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
                 "/src/test/resources/fixtures/data/simple_data.csv");
-        // Load the data from URL without a schema.
-        Table simpleTable = Table.fromSource(url, (Schema)null, DataSourceFormat.getDefaultCsvFormat());
+// Load the data from URL without a schema.
+        Table table = Table.fromSource(url, (Schema)null, TableDataSource.getDefaultCsvFormat());
 
         List<SimpleDataBean> data = new ArrayList<>();
-        Iterator<SimpleDataBean> bit = new BeanIterator<>(simpleTable, SimpleDataBean.class, false);
+        Iterator<SimpleDataBean> bit = new BeanIterator<>(table, SimpleDataBean.class, false);
         while (bit.hasNext()) {
             SimpleDataBean record = bit.next();
             data.add(record);
-            System.out.println(record);
         }
 
         // 1 foo
@@ -58,7 +61,7 @@ class DocumentationCases {
 
     /**
      * Example
-     * https://github.com/frictionlessdata/tableschema-java#parsing-a-csv-using-a-schema
+     * https://github.com/frictionlessdata/tableschema-java/blob/main/docs/table-reading.md#reading-tabular-data-using-a-schema
      */
 
     @Test
@@ -73,7 +76,7 @@ class DocumentationCases {
         Table table = Table.fromSource(
             new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
                 "/src/test/resources/fixtures/data/simple_data.csv"),
-            schema, DataSourceFormat.getDefaultCsvFormat());
+            schema, TableDataSource.getDefaultCsvFormat());
 
         List<Object[]> allData = table.read();
 
@@ -91,7 +94,7 @@ class DocumentationCases {
 
     /**
      * Example
-     * https://github.com/frictionlessdata/tableschema-java#parse-a-csv-without-a-schema
+     * https://github.com/frictionlessdata/tableschema-java/blob/main/docs/table-reading.md#reading-tabular-data-without-a-schema
      */
 
     @Test
@@ -121,6 +124,35 @@ class DocumentationCases {
         assertEquals(allData.get(1)[1], "bar");
         assertEquals(allData.get(2)[0], "3");
         assertEquals(allData.get(2)[1], "baz");
+    }
+
+    /**
+     * Example
+     * https://github.com/frictionlessdata/tableschema-java/blob/main/docs/table-reading.md#reading-tabular-data-without-a-schema
+     */
+
+    @Test
+    @DisplayName("Parse a CSV with Rows as Maps")
+    void csvParsingAsMap() throws Exception{
+        Schema schema = new Schema();
+
+        schema.addField(new IntegerField("id"));
+        schema.addField(new StringField("title"));
+        URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
+                "/src/test/resources/fixtures/data/simple_data.csv");
+        Table table = Table.fromSource(url);
+
+        // Iterate through rows
+        Iterator<Map<String, Object>> iter = table.mappingIterator();
+        while(iter.hasNext()){
+            Map<String, Object> row = iter.next();
+            System.out.println(row);
+        }
+
+        // {id=1, title=foo}
+        // {id=2, title=bar}
+        // {id=3, title=baz}
+
     }
 
     /**
@@ -262,14 +294,14 @@ class DocumentationCases {
         // Load the data from URL with the schema.
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
             "/src/test/resources/fixtures/data/employee_data.csv");
-        Table table = Table.fromSource(url, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(url, schema, TableDataSource.getDefaultCsvFormat());
 
-        Iterator<Object[]> iter = table.iterator(false, false, true, false);
+        Iterator<Object> iter = table.iterator(false, false, true, false);
         while(iter.hasNext()){
 
             // The fetched array will contain row values that have been cast into their
             // appropriate types as per field definitions in the schema.
-            Object[] row = iter.next();
+            Object[] row = (Object[])iter.next();
 
             BigInteger id = (BigInteger)row[0];
             String name = (String)row[1];

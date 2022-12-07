@@ -3,11 +3,11 @@ package io.frictionlessdata.tableschema.fk;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 
@@ -29,8 +29,7 @@ public class ForeignKey {
         this();
         this.strictValidation = strict;
     }
-    
-    
+
     public ForeignKey(Object fields, Reference reference, boolean strict) throws ForeignKeyException{
         this.fields = fields;
         this.reference = reference;
@@ -97,7 +96,7 @@ public class ForeignKey {
                 fke = new ForeignKeyException("The reference's fields property must be an array of the same length as that of the outer fields' array.");
             }
         }
-        
+
         if(fke != null){
             if(this.strictValidation){
                 throw fke;  
@@ -105,6 +104,38 @@ public class ForeignKey {
                 this.getErrors().add(fke);
             }           
         }
+
+    }
+
+    public final void validate(Table table) throws ForeignKeyException{
+        validate();
+
+        // self-referencing FK
+        if (reference.getResource().equals("")) {
+            List<String> fieldNames = new ArrayList<>();
+            List<String> foreignFieldNames = new ArrayList<>();
+            if (fields instanceof String) {
+                fieldNames.add((String) fields);
+                foreignFieldNames.add(reference.getFields());
+            } else  if (fields instanceof ArrayNode) {
+                for (int i = 0; i < ((ArrayNode) fields).size(); i++) {
+                    fieldNames.add(((ArrayNode) fields).get(i).asText());
+                    foreignFieldNames.add(((ArrayNode) reference.getFields()).get(i).asText());
+                }
+            }
+            Iterator<Object> iterator = table.iterator(true, false, false, false);
+            while (iterator.hasNext()) {
+                Map<String, Object> next = (Map<String, Object>)iterator.next();
+                for (int i = 0; i < fieldNames.size(); i++){
+                    if (!next.get(fieldNames.get(i)).equals(next.get(foreignFieldNames.get(i)))) {
+                        throw new ForeignKeyException("Foreign key ["+fieldNames.get(i)+ "-> "
+                                +foreignFieldNames.get(i)+"] violation : expected: "
+                                +next.get(fieldNames.get(i)) + " found: "
+                                +next.get(foreignFieldNames.get(i)));
+                    }
+                }
+            }
+         }
 
     }
     

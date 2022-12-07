@@ -1,5 +1,8 @@
 package io.frictionlessdata.tableschema.util;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
@@ -28,7 +31,9 @@ public final class JsonUtil {
 			.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES)
 			.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
 			.findAndAddModules()
-			.build();
+			.build()
+			.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			//.setDefaultSetterInfo(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY));;
 	}
 	
 	public static JsonUtil getInstance() {

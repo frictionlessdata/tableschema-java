@@ -92,9 +92,9 @@ public class Schema {
      *
      * @param schemaUrl the URL to read the schema JSON data from
      * @param strict whether to enforce strict validation
-     * @throws Exception thrown if reading from the stream or parsing throws an exception
+     * @throws IOException thrown if reading from the stream or parsing throws an exception
      */
-    public static Schema fromJson(URL schemaUrl, boolean strict) throws Exception{
+    public static Schema fromJson(URL schemaUrl, boolean strict) throws IOException{
         FileReference<URL> reference = new URLFileReference(schemaUrl);
         Schema schema = fromJson (reference.getInputStream(), strict);
         schema.reference = reference;
@@ -107,7 +107,7 @@ public class Schema {
      *
      * @param reference the File or URL to read schema JSON data from
      * @param strict whether to enforce strict validation
-     * @throws Exception thrown if reading from the stream or parsing throws an exception
+     * @throws IOException thrown if reading from the stream or parsing throws an exception
      */
     public static Schema fromJson (FileReference<?> reference, boolean strict) throws Exception {
         Schema schema = fromJson (reference.getInputStream(), strict);
@@ -121,9 +121,9 @@ public class Schema {
      *
      * @param schemaFile the File to read schema JSON data from
      * @param strict whether to enforce strict validation
-     * @throws Exception thrown if reading from the stream or parsing throws an exception
+     * @throws IOException thrown if reading from the stream or parsing throws an exception
      */
-    public static Schema fromJson (File schemaFile, boolean strict) throws Exception {
+    public static Schema fromJson (File schemaFile, boolean strict) throws IOException {
         FileReference<File> reference = new LocalFileReference(schemaFile);
         Schema schema = fromJson (reference.getInputStream(), strict);
         schema.reference = reference;

@@ -1,4 +1,4 @@
-first_name,last_name,gender,age,period_employed,employment_start,daily_start,daily_end,is_management,photo,interests,home_location,position_title,extra,notes
-John,Doe,m,50,2.6,2017-07-30,10:23:00,06:30:00,FALSE,xxx,"[""cooking""]","-101.473911,38.704022",,"{""key"":""value""}",
-Frank,McKrank,m,22,0.4,2018-09-13,09:30:00,03:30:00,FALSE,xxx,"[""sports"", ""reading""]","-91.254898,35.6087",Senior Janitor,,"-91.254898, 35.6087"
-Deborah,Vester,f,34,12,2007-01-30,02:00:00,10:00:00,TRUE,xxx,[],"-101.473911,38.704022",SVP,,[“cooking”]
+first_name,last_name,gender,dateOfBirth,age,period_employed,employment_start,daily_start,daily_end,is_management,photo,interests,home_location,position_title,extra,notes
+John,Doe,m,01/13/1976,50,2.6,2017-07-30,10:23:00,06:30:00,FALSE,,"[""cooking""]","-101.473911,38.704022",,"{""key"":""value""}",
+Frank,McKrank,m,02/14/1992,22,0.4,2018-09-13,09:30:00,03:30:00,FALSE,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAjCAYAAABo4wHSAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAACESURBVFhH7dCxCYAwEIXh28ARAlnHDVwgG7iQI1ikdIWMkDq9hdWzSaOCRMMp4vvhihwcH0TwQkRVI6oaUdWuoUMLESmbdshHx66hc0KMcTPeGYhx8Lt9THM+Olb9vaG3ENsj5HdJRIsjehbR4r6BLtPT6IKxa+rROxFVjahqRFX7CwqsMYt0cBTjwGIAAAAASUVORK5CYII=,"[""sports"",""reading""]","-91.254898,35.6087",Senior Janitor,,"-91.254898, 35.6087"
+Deborah,Vester,f,03/16/1983,34,12,2007-01-30,02:00:00,10:00:00,TRUE,,[],"-101.473911,38.704022",SVP,,[“cooking”]

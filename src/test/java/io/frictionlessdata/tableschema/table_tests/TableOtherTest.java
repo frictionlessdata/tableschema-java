@@ -3,7 +3,7 @@ package io.frictionlessdata.tableschema.table_tests;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.Table;
-import io.frictionlessdata.tableschema.datasourceformat.DataSourceFormat;
+import io.frictionlessdata.tableschema.tabledatasource.TableDataSource;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import io.frictionlessdata.tableschema.exception.TableValidationException;
 import io.frictionlessdata.tableschema.field.*;
@@ -86,12 +86,12 @@ public class TableOtherTest {
     public void testReadFromValidJSONArrayWithSchema() throws Exception{
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema schema = Schema.fromJson (schemaFile, true);
-        Table table = Table.fromSource(populationTestJson, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(populationTestJson, schema, TableDataSource.getDefaultCsvFormat());
 
         Assert.assertEquals(3, table.read().size());
         Schema expectedSchema = Schema.fromJson(populationSchema, true);
         Table expectedTable = Table.fromSource(new File("data/population.csv")
-            , getTestDataDirectory(), expectedSchema, DataSourceFormat.getDefaultCsvFormat());
+            , getTestDataDirectory(), expectedSchema, TableDataSource.getDefaultCsvFormat());
         Assert.assertEquals(expectedTable, table);
     }
 
@@ -142,7 +142,7 @@ public class TableOtherTest {
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema_additional_field.json");
         Schema schema = Schema.fromJson (schemaFile, true);
         Table table = Table.fromSource(new File("data/population.json")
-            , getTestDataDirectory(), schema, DataSourceFormat.getDefaultCsvFormat());
+            , getTestDataDirectory(), schema, TableDataSource.getDefaultCsvFormat());
         List<Object[]> data = table.read();
         Assert.assertEquals(3, data.size());
         ObjectMapper objectMapper = new ObjectMapper();
@@ -231,7 +231,7 @@ public class TableOtherTest {
 
         // Fetch the data and apply the schema
         File file = new File("data/employee_data.csv");
-        Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, DataSourceFormat.getDefaultCsvFormat());
+        Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, TableDataSource.getDefaultCsvFormat());
 
         Iterator<Map<String, Object>> iter = employeeTable.keyedIterator(false, false, false);
 
@@ -266,7 +266,7 @@ public class TableOtherTest {
         File file = new File("data/population.json");
         Schema schema = Schema.fromJson(new File(testDataDir, "schema/employee_schema.json"), true);
 
-        Table table = Table.fromSource(file, testDataDir, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table table = Table.fromSource(file, testDataDir, schema, TableDataSource.getDefaultCsvFormat());
         exception.expect(TableValidationException.class);
         table.validate();
     }
@@ -292,7 +292,7 @@ public class TableOtherTest {
 
         // Fetch the data and apply the schema
         File file = new File("data/employee_data.csv");
-        Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, DataSourceFormat.getDefaultCsvFormat());
+        Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, TableDataSource.getDefaultCsvFormat());
 
         // We will iterate the rows and these are the values classes we expect:
         Class[] expectedTypes = new Class[]{
@@ -340,7 +340,7 @@ public class TableOtherTest {
         File testDataDir = getTestDataDirectory();
         File file = new File("data/population.json");
         Schema schema = Schema.fromJson(new File (testDataDir, "schema/population_schema_alternate.json"), true);
-        Table loadedTable = Table.fromSource(file, testDataDir, schema, DataSourceFormat.getDefaultCsvFormat());
+        Table loadedTable = Table.fromSource(file, testDataDir, schema, TableDataSource.getDefaultCsvFormat());
 
         loadedTable.writeCsv(new File (createdFileDir, createdFileName), CSVFormat.RFC4180);
 
@@ -400,7 +400,7 @@ public class TableOtherTest {
 
         // Fetch the data and apply the schema
         File file = new File("data/employee_data.csv");
-        Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, DataSourceFormat.getDefaultCsvFormat());
+        Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, TableDataSource.getDefaultCsvFormat());
 
         CSVFormat expectedFmt = CSVFormat.INFORMIX_UNLOAD_CSV;
         employeeTable.setCsvFormat(expectedFmt);

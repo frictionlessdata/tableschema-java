@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema.table_tests;
 
 import io.frictionlessdata.tableschema.Table;
-import io.frictionlessdata.tableschema.datasourceformat.JsonArrayDataSourceFormat;
+import io.frictionlessdata.tableschema.tabledatasource.JsonArrayTableDataSource;
 import io.frictionlessdata.tableschema.schema.Schema;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,7 @@ class TableConstructorTest {
     void createTable1() throws Exception{
         Table table = new Table();
         Assertions.assertNull(table.getSchema());
-        Assertions.assertNull(table.getDataSourceFormat());
+        Assertions.assertNull(table.getTableDataSource());
     }
 
     @Test
@@ -33,44 +33,44 @@ class TableConstructorTest {
         Schema schema = Schema.fromJson(new File(testDataDir, "schema/employee_schema.json"), true);
         table.setSchema(schema);
         Assertions.assertNotNull(table.getSchema());
-        Assertions.assertNull(table.getDataSourceFormat());
+        Assertions.assertNull(table.getTableDataSource());
     }
 
 
     @Test
-    @DisplayName("Create a Table And Set a DataSourceFormat")
+    @DisplayName("Create a Table And Set a TableDataSource")
     void createTable3() throws Exception{
         Table table = new Table();
         File testDataDir = getTestDataDirectory();
 
         try (InputStream inStream = new FileInputStream(new File(testDataDir, "data/population.json"))) {
-            JsonArrayDataSourceFormat fmt = new JsonArrayDataSourceFormat (inStream);
-            table.setDataSourceFormat(fmt);
+            JsonArrayTableDataSource fmt = new JsonArrayTableDataSource(inStream);
+            table.setTableDataSource(fmt);
         }
 
         Assertions.assertNull(table.getSchema());
-        Assertions.assertNotNull(table.getDataSourceFormat());
+        Assertions.assertNotNull(table.getTableDataSource());
     }
 
     @Test
-    @DisplayName("Create a Table And set a Schema and a DataSourceFormat")
+    @DisplayName("Create a Table And set a Schema and a TableDataSource")
     void createTable4() throws Exception{
         Table table = new Table();
         File testDataDir = getTestDataDirectory();
 
         Schema schema = Schema.fromJson(new File(testDataDir, "schema/population_schema.json"), true);
         try (InputStream inStream = new FileInputStream(new File(testDataDir, "data/population.json"))) {
-            JsonArrayDataSourceFormat fmt = new JsonArrayDataSourceFormat (inStream);
-            table.setDataSourceFormat(fmt);
+            JsonArrayTableDataSource fmt = new JsonArrayTableDataSource(inStream);
+            table.setTableDataSource(fmt);
         }
 
         table.setSchema(schema);
         Assertions.assertNotNull(table.getSchema());
-        Assertions.assertNotNull(table.getDataSourceFormat());
+        Assertions.assertNotNull(table.getTableDataSource());
     }
 
     @Test
-    @DisplayName("Create a Table And set a Schema and a DataSourceFormat - 2")
+    @DisplayName("Create a Table And set a Schema and a TableDataSource - 2")
     void createTable5() throws Exception{
         Table table = new Table();
         File testDataDir = getTestDataDirectory();
@@ -78,11 +78,11 @@ class TableConstructorTest {
         Schema schema = Schema.fromJson(new File(testDataDir, "schema/population_schema.json"), true);
         table.setSchema(schema);
         try (InputStream inStream = new FileInputStream(new File(testDataDir, "data/population.json"))) {
-            JsonArrayDataSourceFormat fmt = new JsonArrayDataSourceFormat (inStream);
-            table.setDataSourceFormat(fmt);
+            JsonArrayTableDataSource fmt = new JsonArrayTableDataSource(inStream);
+            table.setTableDataSource(fmt);
         }
 
         Assertions.assertNotNull(table.getSchema());
-        Assertions.assertNotNull(table.getDataSourceFormat());
+        Assertions.assertNotNull(table.getTableDataSource());
     }
 }

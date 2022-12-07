@@ -612,7 +612,7 @@ public abstract class Field<T> {
                 if(enforceConstraints && this.constraints != null){
                     Map<String, Object> violatedConstraints = checkConstraintViolations(castValue);
                     if(!violatedConstraints.isEmpty()){
-                        throw new ConstraintsException("Violated "+ violatedConstraints.size()+" contstraints");
+                        throw new ConstraintsException("Violated "+ violatedConstraints.size()+" constraints");
                     }
                 }
 
