@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class JsonSchema {
@@ -52,10 +54,14 @@ public class JsonSchema {
 				log.warn(msg);
 				throw new ValidationException(this, errors);
 			} else {
-				log.info(msg);
+				log.warn(msg);
 				return errors;
 			}
 		}
+	}
+
+	public String getName() {
+		return (null == jsonSchema) ? null : jsonSchema.getSchemaNode().get("title").asText();
 	}
 
 }
