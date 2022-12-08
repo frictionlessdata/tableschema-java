@@ -58,4 +58,8 @@ public class JsonSchema {
 		}
 	}
 
+	public String getName() {
+		if (null == jsonSchema) return null;
+		return jsonSchema.getRefSchemaNode("#title").asText();
+	}
 }

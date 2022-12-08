@@ -31,14 +31,15 @@ public class Schema {
     public static final String JSON_KEY_FIELDS = "fields";
     public static final String JSON_KEY_PRIMARY_KEY = "primaryKey";
     public static final String JSON_KEY_FOREIGN_KEYS = "foreignKeys";
+
+    List<Field<?>> fields = new ArrayList<>();
+    boolean strictValidation = true;
     
     private JsonSchema tableJsonSchema = null;
-    private List<Field<?>> fields = new ArrayList<>();
     private Object primaryKey = null;
     private final List<ForeignKey> foreignKeys = new ArrayList<>();
-    
-    private boolean strictValidation = true;
-    private final List<Exception> errors = new ArrayList<>();
+
+    private final List<ValidationException> errors = new ArrayList<>();
 
     @JsonIgnore
     FileReference<?> reference;
@@ -138,7 +139,7 @@ public class Schema {
      * @param strict whether to enforce strict validation
      * @throws IOException thrown if reading from the stream or parsing throws an exception
      */
-    public  static Schema fromJson (String schemaJson, boolean strict) throws IOException {
+    public static Schema fromJson (String schemaJson, boolean strict) throws IOException {
         return fromJson (new ByteArrayInputStream(schemaJson.getBytes()), strict);
     }
     
@@ -217,7 +218,7 @@ public class Schema {
     private void initValidator(){
         // Init for validation
         InputStream tableSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/table-schema.json");
-        this.tableJsonSchema = JsonSchema.fromJson(tableSchemaInputStream, strictValidation);
+        tableJsonSchema = JsonSchema.fromJson(tableSchemaInputStream, strictValidation);
     }
     
     /**
@@ -229,7 +230,7 @@ public class Schema {
         try{
             validate();
             return errors.isEmpty();
-        }catch(ValidationException ve){
+        } catch (ValidationException ve){
             return false;
         }
     }
@@ -255,33 +256,50 @@ public class Schema {
      * @throws ValidationException If validation fails and validation is strict
      */
     @JsonIgnore
-    private void validate() throws ValidationException{
-        try{
-        	String json = this.getJson();
-            this.tableJsonSchema.validate(json);
-            for (ForeignKey fk : foreignKeys) {
-                Object fields = fk.getFields();
-                if (fields instanceof ArrayNode) {
-                    List<Object> subFields = new ArrayList<>();
-                    ((ArrayNode) fields).elements().forEachRemaining(f->subFields.add(f.asText()));
-                    for (Object subField : subFields) {
+    void validate() throws ValidationException{
+        String json = this.getJson();
+        tableJsonSchema.validate(json);
+        for (ForeignKey fk : foreignKeys) {
+            Object fields = fk.getFields();
+            if (fields instanceof ArrayNode) {
+                List<Object> subFields = new ArrayList<>();
+                ((ArrayNode) fields).elements().forEachRemaining(f->subFields.add(f.asText()));
+                for (Object subField : subFields) {
+                    try{
                         validate((String) subField);
+                    } catch(ValidationException ve){
+                        if(this.strictValidation){
+                            throw ve;
+                        }else{
+                            errors.add(ve);
+                        }
                     }
-                } else if (fields instanceof String) {
+                }
+            } else if (fields instanceof String) {
+                try{
                     validate((String) fields);
+                } catch(ValidationException ve){
+                    if(this.strictValidation){
+                        throw ve;
+                    }else{
+                        errors.add(ve);
+                    }
                 }
             }
-
-        } catch(ValidationException ve){
-            if(this.strictValidation){
-                throw ve;
-            }else{
-                this.getErrors().add(ve);
-            }
         }
+        if (errors.isEmpty()) {
+            return;
+        }
+        ValidationException ex = new ValidationException(tableJsonSchema.getName(), errors);
+        if(this.strictValidation){
+            throw ve;
+        }else{
+            this.getErrors().add(ve);
+        }
+
     }
     
-    public List<Exception> getErrors(){
+    public List<ValidationException> getErrors(){
         return this.errors;
     }
     
@@ -379,8 +397,9 @@ public class Schema {
             PrimaryKeyException pke = new PrimaryKeyException("No such field: " + key + ".");
             if(this.strictValidation){
                 throw pke;
-            }else{
-                this.getErrors().add(pke);
+            } else {
+                ValidationException vex = new ValidationException("PrimaryKeyException"+pke.getMessage());
+                this.getErrors().add(vex);
             }
         }
     }

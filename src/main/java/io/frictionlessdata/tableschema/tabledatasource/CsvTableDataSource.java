@@ -33,7 +33,11 @@ import java.util.stream.Collectors;
  * The default CSV format for this class is based on RFC4180 (https://www.rfc-editor.org/rfc/rfc4180)
  * with a header row, ignoring whitespace around column values and "\n" as a record separator.
  */
-public class CsvTableDataSource extends AbstractTableDataSource {
+public class CsvTableDataSource extends AbstractTableDataSource<String> {
+
+    CsvTableDataSource(String dataSource){
+        this.dataSource = dataSource;
+    }
 
     private CSVFormat format = TableDataSource.getDefaultCsvFormat();
 
@@ -62,21 +66,8 @@ public class CsvTableDataSource extends AbstractTableDataSource {
         }
     }
 
-    CsvTableDataSource(URL dataSource){
-        super(dataSource);
-    }
-    
-    CsvTableDataSource(File dataSource, File workDir){
-        super(dataSource, workDir);
-    }
-
-    CsvTableDataSource(String dataSource){
-        super(dataSource);
-    }
-
-    public CsvTableDataSource setFormat(CSVFormat format) {
+    public void setFormat(CSVFormat format) {
         this.format = format;
-        return this;
     }
 
     public CSVFormat getFormat() {

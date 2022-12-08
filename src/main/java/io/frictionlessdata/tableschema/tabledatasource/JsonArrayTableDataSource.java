@@ -6,10 +6,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Iterators;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,7 +23,7 @@ import java.util.stream.Collectors;
  * it is not possible to recreate the header column order reliably. Recreating the headers is therefore a
  * very costly operation that has to iterate through the data to extract the column names.
  */
-public class JsonArrayTableDataSource extends AbstractTableDataSource {
+public class JsonArrayTableDataSource extends AbstractTableDataSource<ArrayNode> {
 
     public JsonArrayTableDataSource (InputStream inStream) throws IOException {
         try (InputStreamReader inputStreamReader = new InputStreamReader(inStream, StandardCharsets.UTF_8);
@@ -76,7 +74,7 @@ public class JsonArrayTableDataSource extends AbstractTableDataSource {
 	 */
 	public String[] getHeaders() {
 		Set<String> headers = new LinkedHashSet<>();
-		((ArrayNode)dataSource).elements().forEachRemaining((firstObject) -> {
+		dataSource.elements().forEachRemaining((firstObject) -> {
 			firstObject.fields().forEachRemaining(f -> {
 				headers.add(f.getKey());
 			});

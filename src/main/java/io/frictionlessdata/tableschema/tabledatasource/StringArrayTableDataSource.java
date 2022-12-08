@@ -1,15 +1,12 @@
 package io.frictionlessdata.tableschema.tabledatasource;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  *
  * 
  */
-public class StringArrayTableDataSource extends AbstractTableDataSource {
+public class StringArrayTableDataSource extends AbstractTableDataSource<Collection<String[]>> {
     private final String[] headers;
 
     public StringArrayTableDataSource(Collection<String[]> data, String[] headers){
@@ -17,9 +14,14 @@ public class StringArrayTableDataSource extends AbstractTableDataSource {
         this.headers = headers;
     }
 
+    public StringArrayTableDataSource(String[][] data, String[] headers){
+        this.dataSource = Arrays.asList(data);
+        this.headers = headers;
+    }
+
     @Override
     public Iterator<String[]> iterator(){
-        return ((Collection<String[]>)dataSource).iterator();
+        return dataSource.iterator();
     }
 
     @Override

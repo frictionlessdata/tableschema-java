@@ -4,29 +4,22 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
  *
  * 
  */
-public abstract class AbstractTableDataSource implements TableDataSource {
+public abstract class AbstractTableDataSource<T> implements TableDataSource {
     String[] headers;
-    Object dataSource = null;
+    T dataSource = null;
     private File workDir;
 
     AbstractTableDataSource(){}
 
-    AbstractTableDataSource(URL dataSource){
-        this.dataSource = dataSource;
-    }
-
-    AbstractTableDataSource(File dataSource, File workDir){
-        this.dataSource = dataSource;
-        this.workDir = workDir;
-    }
-
-    AbstractTableDataSource(String dataSource){
+    AbstractTableDataSource(T dataSource){
         this.dataSource = dataSource;
     }
 
@@ -37,7 +30,6 @@ public abstract class AbstractTableDataSource implements TableDataSource {
         iterator().forEachRemaining(data::add);
         return data;
     }
-
 
     String getFileContents(String path) throws IOException {
         return TableDataSource.getFileContents(path, workDir);

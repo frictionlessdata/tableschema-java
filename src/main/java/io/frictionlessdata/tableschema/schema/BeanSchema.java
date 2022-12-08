@@ -33,9 +33,103 @@ public class BeanSchema extends Schema {
     @JsonIgnore
     private CsvSchema csvSchema;
 
+    public BeanSchema (Class<?> beanClass) {
+        return infer(beanClass);
+    }
+
     private BeanSchema(List<Field<?>> fields, boolean strict) {
         super(fields, strict);
         fieldMap = createFieldMap(fields);
+    }
+
+    private void infer(Class<?> beanClass) {
+        strictValidation = true;
+        fields = new ArrayList<>();
+        CsvMapper mapper = new CsvMapper();
+        mapper.setVisibility(mapper.getSerializationConfig()
+                .getDefaultVisibilityChecker()
+                .withFieldVisibility(JsonAutoDetect.Visibility.ANY));
+        CsvSchema csvSchema = mapper.typedSchemaFor(beanClass);
+        Iterator<CsvSchema.Column> iterator = csvSchema.iterator();
+        Map<String, String> fieldNames = ReflectionUtils.getFieldNameMapping(mapper, beanClass);
+        while (iterator.hasNext()) {
+            CsvSchema.Column next = iterator.next();
+            String name = next.getName();
+            CsvSchema.ColumnType type = next.getType();
+            Field<?> field;
+            Class<?> declaredClass;
+            String fieldMethodName = fieldNames.get(name);
+            if (null == fieldMethodName) {
+                continue;
+            }
+            try {
+                java.lang.reflect.Field declaredField = beanClass.getDeclaredField(fieldMethodName);
+                declaredClass = declaredField.getType();
+            } catch (NoSuchFieldException ex) {
+                continue;
+            }
+            switch (type) {
+                case ARRAY:
+                    field = new ArrayField(name);
+                    break;
+                case STRING:
+                    field = new StringField(name);
+                    break;
+                case BOOLEAN:
+                    field = new BooleanField(name);
+                    break;
+                case NUMBER: {
+                    field = generateNumberField(declaredClass, name);
+                }
+                break;
+                case NUMBER_OR_STRING: {
+                    field = generateNumberField(declaredClass, name);
+                    if (null == field) {
+                        if (declaredClass.equals(Year.class))
+                            field = new YearField(name);
+                        else if (declaredClass.equals(YearMonth.class))
+                            field = new YearmonthField(name);
+                        else if (declaredClass.equals(LocalDate.class))
+                            field = new DateField(name);
+                        else if ((declaredClass.equals(ZonedDateTime.class))
+                                || (declaredClass.equals(LocalDateTime.class))
+                                || (declaredClass.equals(OffsetDateTime.class))
+                                || (declaredClass.equals(Calendar.class))
+                                || (declaredClass.equals(Date.class)))
+                            field = new DatetimeField(name);
+                        else if ((declaredClass.equals(Duration.class))
+                                || (declaredClass.equals(Period.class)))
+                            field = new DurationField(name);
+                        else if ((declaredClass.equals(LocalTime.class))
+                                || (declaredClass.equals(OffsetTime.class)))
+                            field = new TimeField(name);
+                        else if ((declaredClass.equals(Coordinate.class))
+                                || (declaredClass.equals(DirectPosition2D.class)))
+                            field = new GeopointField(name);
+                        else if (declaredClass.equals(JsonNode.class))
+                            field = new ObjectField(name);
+                        else if (declaredClass.equals(Map.class))
+                            field = new ObjectField(name);
+                        else if (declaredClass.equals(UUID.class))
+                            field = new StringField(name);
+                    }
+                }
+                break;
+                default:
+                    field = new AnyField(name);
+            }
+            if (null == field) {
+                String canonicalName = declaredClass.getCanonicalName();
+                if (canonicalName.equals("java.lang.Object")) {
+                    field = new AnyField(name);
+                } else {
+                    throw new TableSchemaException("Field " + name + " could not be mapped, class: " + declaredClass.getName());
+                }
+            }
+            fields.add(field);
+        }
+        setAnnotatedFieldMap(createAnnotatedFieldMap(beanClass));
+        this.csvSchema = csvSchema;
     }
 
     public static BeanSchema infer(Class<?> beanClass) {
@@ -154,6 +248,20 @@ public class BeanSchema extends Schema {
             }
         }
         return field;
+    }
+
+    public String[] getHeaders() {
+        CsvMapper mapper = createMapper();
+        CsvSchema csvSchema = mapper.typedSchemaFor(beanClass);
+        Iterator<CsvSchema.Column> iterator = csvSchema.iterator();
+    }
+
+    private CsvMapper createMapper() {
+        CsvMapper mapper = new CsvMapper();
+        mapper.setVisibility(mapper.getSerializationConfig()
+                .getDefaultVisibilityChecker()
+                .withFieldVisibility(JsonAutoDetect.Visibility.ANY));
+        return mapper;
     }
 
     public Field<?> getField(String name) {
