@@ -18,10 +18,7 @@ import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.frictionlessdata.tableschema.TestHelper.getResourceFile;
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
@@ -80,6 +77,35 @@ class TableIteratorTest {
     }
 
     @Test
+    @DisplayName("Test non-casting Iterator")
+    void nonCasting() {
+        validPopulationTable.iterator(false, false, false, false).forEachRemaining((r) -> {
+            Assertions.assertTrue(r instanceof Object[]);
+            Arrays.stream(((Object[])r)).forEach((c)->{
+                Assertions.assertTrue(c instanceof String);
+            });
+        });
+
+    }
+
+
+    @Test
+    @DisplayName("Test no Schema, but casting Iterator")
+    void noSchema() throws Exception {
+        File testDataDir = getTestDataDirectory();
+        File file = new File("data/population.csv");
+        Table populationTable
+                = Table.fromSource(file, testDataDir, null, TableDataSource.getDefaultCsvFormat());
+        populationTable.iterator(false, false, true, false).forEachRemaining((r) -> {
+            Assertions.assertTrue(r instanceof Object[]);
+            Arrays.stream(((Object[])r)).forEach((c)->{
+                Assertions.assertTrue(c instanceof String);
+            });
+        });
+
+    }
+
+    @Test
     @DisplayName("Test Iterator throws on remove")
     void remove() {
         Assertions.assertThrows(UnsupportedOperationException.class, () -> {
@@ -89,12 +115,12 @@ class TableIteratorTest {
 
     @Test
     @DisplayName("Test casting Iterator")
-    void testNextCast() throws Exception {
+    void testNextCast()  {
         Iterator<Map<String, Object>> iter
-                = nullValuesPopulationTable.keyedIterator( false, true, false);
-        Map<String, Object> obj =  (Map<String, Object>)iter.next();
+                = nullValuesPopulationTable.mappingIterator( false, true, false);
+        Map<String, Object> obj = iter.next();
         Assertions.assertNull(obj.get("year"));
-        obj =  (Map<String, Object>)iter.next();
+        obj = iter.next();
         Assertions.assertNull(obj.get("year"));
     }
 
@@ -248,7 +274,7 @@ class TableIteratorTest {
         List<String[]> expectedData = this.getExpectedAlternatePopulationData();
 
         // Get Iterator.
-        Iterator<Map<String, Object>> iter = table.keyedIterator(false, true, false);
+        Iterator<Map<String, Object>> iter = table.mappingIterator(false, true, false);
         int expectedDataIndex = 0;
 
         // Assert data.

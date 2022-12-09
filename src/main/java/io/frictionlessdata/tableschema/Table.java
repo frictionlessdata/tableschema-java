@@ -214,12 +214,14 @@ public class Table{
     /**
      * This is the simplest case to read data from a Table referencing a file or URL.
      *
-     * Each row of the table will be returned as an Object array. Values in each column
-     * are parsed and converted ("cast) to Java objects on a best guess approach.
-     * @return Interator returning table rows as Object Arrays
+     * If a Schema is set on a table, each row will be returned as an Object array. Values in each column
+     * are parsed and converted ("cast") to Java objects based on the Field definitions of the Schema. If no Schema is
+     * present, rows will always return string arrays
+     *
+     * @return Iterator returning table rows as Object/String Arrays
      */
     public Iterator<Object[]> iterator() {
-       return new TableIterator<>(this, false, false, true, false);
+        return new TableIterator<>(this, false, false, true, false);
     }
 
     /**
@@ -237,8 +239,14 @@ public class Table{
      *   <  li> Resolving references to other data sources (parameter `relations` = true)</li>
      *  </ul>
      *
-     * Without a Schema, values in each column are parsed and converted ("cast) to Java objects on a
-     * best guess approach. If a Schema is set on a table, the Field definitions will be used for parsing
+     * The following rules apply:
+     * <ul>
+     *   <li>if no Schema is present, rows will always return string arrays, not objects, as if `cast` was always off</li>
+     *   <li>if `extended` is true, then `cast` is also true, but `keyed` is false</li>
+     *   <li>if `keyed` is true, then `cast` is also true, but `extended` is false</li>
+     * </ul>
+     *
+     * If a Schema is set on a table, the Field definitions will be used for parsing
      * data values to objects.
      *
      * @return Interator returning table rows as Objects, either Arrays or Maps
@@ -249,7 +257,7 @@ public class Table{
 
     /**
      * This method creates an Iterator that will return table rows as String arrays.
-     * It therefore disregards the Schema set on the table.
+     * It therefore disregards the Schema set on the table. It does not follow relations.
      *
      * @return Iterator that returns rows as string arrays.
      */
@@ -259,7 +267,7 @@ public class Table{
 
     /**
      * This method creates an Iterator that will return table rows as String arrays.
-     * It therefore disregards the Schema set on the table.
+     * It therefore disregards the Schema set on the table. It can be configured to follow relations.
      *
      * @param relations Whether references to other data sources get resolved
      * @return Iterator that returns rows as string arrays.
@@ -270,7 +278,7 @@ public class Table{
 
     /**
      * This method creates an Iterator that will return table rows as a Map&lt;String,Object&gt;
-     * where key is the header name, and val is the data converted to Java objects
+     * where key is the header name, and val is the data converted to Java objects. It does not follow relations.
      *
      * @return Iterator that returns rows as Maps.
      */
@@ -280,12 +288,13 @@ public class Table{
 
     /**
      * This method creates an Iterator that will return table rows as a Map&lt;String,Object&gt;
-     * where key is the header name, and val is the data converted to Java objects
+     * where key is the header name, and val is the data converted to Java objects.
+     * It can be configured to follow relations
      *
      * @param relations Whether references to other data sources get resolved
      * @return Iterator that returns rows as Maps.
      */
-    public Iterator<Map<String, Object>> keyedIterator(boolean extended, boolean cast, boolean relations){
+    public Iterator<Map<String, Object>> mappingIterator(boolean extended, boolean cast, boolean relations){
         return new TableIterator<>(this, true, extended, cast, relations);
     }
 
