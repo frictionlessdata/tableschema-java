@@ -32,7 +32,7 @@ public class Schema {
     public static final String JSON_KEY_PRIMARY_KEY = "primaryKey";
     public static final String JSON_KEY_FOREIGN_KEYS = "foreignKeys";
 
-    private JsonSchema tableJsonSchema = null;
+    private FormalSchemaValidator tableFormalSchemaValidator = null;
     private List<Field<?>> fields = new ArrayList<>();
     private Object primaryKey = null;
     private final List<ForeignKey> foreignKeys = new ArrayList<>();
@@ -226,7 +226,7 @@ public class Schema {
     private void initValidator() {
         // Init for validation
         InputStream tableSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/table-schema.json");
-        this.tableJsonSchema = JsonSchema.fromJson(tableSchemaInputStream, strictValidation);
+        this.tableFormalSchemaValidator = FormalSchemaValidator.fromJson(tableSchemaInputStream, strictValidation);
     }
 
     /**
@@ -268,9 +268,9 @@ public class Schema {
     @JsonIgnore
     private void validate() throws ValidationException {
         String json = this.getJson();
-        Set<ValidationMessage> messages = tableJsonSchema.validate(json);
+        Set<ValidationMessage> messages = tableFormalSchemaValidator.validate(json);
         if (!messages.isEmpty()) {
-            errors.add(new ValidationException(tableJsonSchema, messages));
+            errors.add(new ValidationException(tableFormalSchemaValidator, messages));
         }
         for (ForeignKey fk : foreignKeys) {
             Object fields = fk.getFields();
@@ -293,7 +293,7 @@ public class Schema {
             }
         }
         if (strictValidation && !errors.isEmpty()) {
-            throw new ValidationException(tableJsonSchema.getName(), errors);
+            throw new ValidationException(tableFormalSchemaValidator.getName(), errors);
         }
     }
 

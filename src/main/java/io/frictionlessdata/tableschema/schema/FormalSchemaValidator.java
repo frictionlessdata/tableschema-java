@@ -1,6 +1,7 @@
 package io.frictionlessdata.tableschema.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion.VersionFlag;
 import com.networknt.schema.ValidationMessage;
@@ -10,34 +11,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class JsonSchema {
+public class FormalSchemaValidator {
 	
-	private static final Logger log = LoggerFactory.getLogger(JsonSchema.class);
+	private static final Logger log = LoggerFactory.getLogger(FormalSchemaValidator.class);
 	
 	private final boolean strictValidation;
-	private final com.networknt.schema.JsonSchema jsonSchema;
+	private final JsonSchema jsonSchema;
 	
-	private JsonSchema(JsonNode schemaNode, boolean strictValidation) {
+	private FormalSchemaValidator(JsonNode schemaNode, boolean strictValidation) {
 		JsonSchemaFactory factory = JsonSchemaFactory.getInstance(VersionFlag.V4);
 		this.jsonSchema = factory.getSchema(schemaNode);
 		this.strictValidation = strictValidation;
 	}
 
-	public static JsonSchema fromJson(String jsonSchema) {
+	public static FormalSchemaValidator fromJson(String jsonSchema) {
 		return fromJson(jsonSchema, true);
 	}
 	
-	public static JsonSchema fromJson(String jsonSchema, boolean strictValidation) {
-		return new JsonSchema(JsonUtil.getInstance().readValue(jsonSchema), strictValidation);
+	public static FormalSchemaValidator fromJson(String jsonSchema, boolean strictValidation) {
+		return new FormalSchemaValidator(JsonUtil.getInstance().readValue(jsonSchema), strictValidation);
 	}
 
-	public static JsonSchema fromJson(InputStream jsonSchema, boolean strictValidation) {
-		return new JsonSchema(JsonUtil.getInstance().readValue(jsonSchema), strictValidation);
+	public static FormalSchemaValidator fromJson(InputStream jsonSchema, boolean strictValidation) {
+		return new FormalSchemaValidator(JsonUtil.getInstance().readValue(jsonSchema), strictValidation);
 	}
 	
 	public Set<ValidationMessage> validate(String json) {
@@ -47,7 +46,7 @@ public class JsonSchema {
 	public Set<ValidationMessage> validate(JsonNode json) {
 		Set<ValidationMessage> errors = jsonSchema.validate(json);
 		if (errors.isEmpty()) {
-			return Collections.EMPTY_SET;
+			return new LinkedHashSet<>();
 		} else {
 			String msg = String.format("validation failed: %s", errors);
 			if (this.strictValidation) {

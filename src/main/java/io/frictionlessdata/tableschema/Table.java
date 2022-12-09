@@ -561,12 +561,11 @@ public class Table{
 
     public Schema inferSchema(String[] headers, int rowLimit) throws TypeInferringException{
         try{
-            boolean cast = null != schema;
-            List<Object[]> data = (List<Object[]>)read();
+            List<Object[]> data = read();
             schema = Schema.infer(data, headers, rowLimit);
             return schema;
 
-        }catch(Exception e){
+        } catch(Exception e){
             throw new TypeInferringException(e);
         }
     }
