@@ -233,7 +233,7 @@ public class TableOtherTest {
         File file = new File("data/employee_data.csv");
         Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, TableDataSource.getDefaultCsvFormat());
 
-        Iterator<Map<String, Object>> iter = employeeTable.keyedIterator(false, false, false);
+        Iterator<Map<String, Object>> iter = employeeTable.mappingIterator(false, false, false);
 
         while(iter.hasNext()){
             Map row = iter.next();

@@ -43,18 +43,18 @@ public class ForeignKey {
         
         if(fkJsonObject.has(JSON_KEY_FIELDS)){
         	if(fkJsonObject.get(JSON_KEY_FIELDS).isArray()) {
-        		this.fields = fkJsonObject.get(JSON_KEY_FIELDS);
+        		fields = fkJsonObject.get(JSON_KEY_FIELDS);
         	} else {
-        		this.fields = fkJsonObject.get(JSON_KEY_FIELDS).asText();
+        		fields = fkJsonObject.get(JSON_KEY_FIELDS).asText();
         	}
         }
         
         if(fkJsonObject.has(JSON_KEY_REFERENCE)){
             JsonNode refJsonObject = fkJsonObject.get(JSON_KEY_REFERENCE);
-            this.reference = new Reference(refJsonObject.toString(), strict);
+            reference = new Reference(refJsonObject.toString(), strict);
         }
         
-        this.validate();
+        validate();
     }
     
     public void setFields(Object fields){
@@ -101,7 +101,7 @@ public class ForeignKey {
             if(this.strictValidation){
                 throw fke;  
             }else{
-                this.getErrors().add(fke);
+                errors.add(fke);
             }           
         }
 
@@ -145,7 +145,7 @@ public class ForeignKey {
     }
     
     public List<Exception> getErrors(){
-        return this.errors;
+        return errors;
     }
     
 }

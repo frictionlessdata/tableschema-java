@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "id": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/schemas/geojson/geometry.json",
+    "id": "https://raw.githubusercontent.com/nhuebel/TopoJSON_schema/master/geometry.json",
     "title": "Geometry objects",
     "description": "A Geometry object as defined by TopoJSON",
     "type": "object",
@@ -51,10 +51,10 @@
                 "type": { "enum": [ "MultiLineString" ] },
                 "arcs": {
                     "type": "array",
-                    "items": { 
-			"type": "array",
-			"items": {"type": "integer"}
-		    }
+                    "items": {
+                        "type": "array",
+                        "items": {"type": "integer"}
+                    }
                 }
             }
         },
@@ -65,12 +65,12 @@
             "properties": {
                 "type": { "enum": [ "Polygon" ] },
                 "arcs": {
-		    "TODO": "Check if arcs refer to valid LinearRings",
+                    "TODO": "Check if arcs refer to valid LinearRings",
                     "type": "array",
-                    "items": { 
-			"type": "array",
-			"items": {"type": "integer"}
-		    }
+                    "items": {
+                        "type": "array",
+                        "items": {"type": "integer"}
+                    }
                 }
             }
         },
@@ -82,13 +82,13 @@
                 "type": { "enum": [ "MultiPolygon" ] },
                 "arcs": {
                     "type": "array",
-                    "items": { 
-			"type": "array",
-			"items": { 
-			    "type": "array",
-			    "items": {"type": "integer"}
-			}
-		    }
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {"type": "integer"}
+                        }
+                    }
                 }
             }
         },
@@ -98,18 +98,18 @@
             "required": [ "type","geometries" ],
             "properties": {
                 "type": { "enum": [ "GeometryCollection" ] },
-                "geometries": { 
-		    "type": "array",
-		    "items": { "$ref": "geometry.json"  }
-		}
+                "geometries": {
+                    "type": "array",
+                    "items": { "$ref": "https://raw.githubusercontent.com/nhuebel/TopoJSON_schema/master/geometry.json"  }
+                }
             }
         }
     ],
     "definitions": {
-	"position": {
-	    "type": "array",
-	    "items": { "type": "number"},
-	    "minItems": 2
-	}
+        "position": {
+            "type": "array",
+            "items": { "type": "number"},
+            "minItems": 2
+        }
     }
 }

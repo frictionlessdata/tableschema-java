@@ -47,12 +47,20 @@ public class SchemaTest {
         Assertions.assertTrue(validSchema.isValid());
     }
 
-
     @Test
     @DisplayName("Validate creating a Schema from an invalid file with strict validation throws")
     public void testReadFromInValidSchemaFileWithStrictValidation() throws Exception {
         File f = new File(TestHelper.getTestDataDirectory(), "schema/invalid_population_schema.json");
         Assertions.assertThrows(ValidationException.class, () -> Schema.fromJson(f, true));
+    }
+
+    @Test
+    @DisplayName("Validate creating a Schema from an invalid file with lenient validation does not throw")
+    public void testReadFromInValidSchemaFileWithLenientValidation() throws Exception {
+        File f = new File(TestHelper.getTestDataDirectory(), "schema/invalid_population_schema.json");
+        Schema schema = Schema.fromJson(f, false);
+
+        Assertions.assertFalse(schema.getErrors().isEmpty());
     }
 
     @Test
@@ -450,7 +458,7 @@ public class SchemaTest {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_string.json");
 
         Throwable t = Assertions.assertThrows(ValidationException.class, () -> Schema.fromJson(source, true));
-        Assertions.assertEquals("Primary key field doesnotexist not found", t.getMessage());
+        Assertions.assertEquals("Table Schema: validation failed: Primary key field doesnotexist not found", t.getMessage());
     }
 
     @Test
