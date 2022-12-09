@@ -221,8 +221,17 @@ public abstract class Field<T> {
     public String formatValueAsString(T value) throws InvalidCastException, ConstraintsException {
         if (null == value)
             return null;
-        return formatValueAsString( value, format, options);
+        // some fields can have quite some different types in Bean classes, so the call will fail
+        // and we use the more generic `formatObjectValueAsString` method
+        try {
+            return formatValueAsString(value, format, options);
+        } catch (ClassCastException ex) {
+            return formatObjectValueAsString((Object)value, format, options);
+        }
     }
+
+    abstract String formatObjectValueAsString(Object value, String format, Map<String, Object> options)
+            throws InvalidCastException, ConstraintsException;
 
     public Object formatValueForJson(T value) throws InvalidCastException, ConstraintsException {
         return value;
@@ -632,6 +641,14 @@ public abstract class Field<T> {
         return wellKnownFieldTypes.contains(typeName);
     }
 
+    /**
+     * Disregards optional properties like `title`. Regards two fields as equal if they are
+     * either the same or of the same type, have the same name and the same format and
+     * constraints.
+     *
+     * @param o Another Field to check for equality
+     * @return true if both Fields are equal
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

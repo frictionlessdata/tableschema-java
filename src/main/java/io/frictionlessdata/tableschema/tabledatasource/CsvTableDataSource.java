@@ -7,6 +7,7 @@ import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.net.URL;
@@ -34,6 +35,17 @@ import java.util.stream.Collectors;
  * with a header row, ignoring whitespace around column values and "\n" as a record separator.
  */
 public class CsvTableDataSource extends AbstractTableDataSource<String> {
+
+    private Object dataResource;
+
+    CsvTableDataSource(URL dataSource){
+        dataResource = dataSource;
+    }
+
+    CsvTableDataSource(File dataSource, File workDir){
+        dataResource = dataSource;
+        this.workDir = workDir;
+    }
 
     CsvTableDataSource(String dataSource){
         this.dataSource = dataSource;
@@ -131,9 +143,9 @@ public class CsvTableDataSource extends AbstractTableDataSource<String> {
     private CSVParser getCSVParser() throws IOException {
         CSVFormat format = getFormat();
 
-        if (dataSource instanceof String){
-            return CSVParser.parse((String)dataSource, format);
-        } else if(dataSource instanceof File){
+        if (null != dataSource){
+            return CSVParser.parse(dataSource, format);
+        } else if(dataResource instanceof File){
             // The path value can either be a relative path or a full path.
             // If it's a relative path then build the full path by using the working directory.
             // Caution: here, we cannot simply use provided paths, we have to check
@@ -142,14 +154,14 @@ public class CsvTableDataSource extends AbstractTableDataSource<String> {
             //    - https://github.com/frictionlessdata/tableschema-java/issues/29
             //    - https://frictionlessdata.io/specs/data-resource/#url-or-path
 
-            String lines = getFileContents(((File)dataSource).getPath());
+            String lines = getFileContents(((File)dataResource).getPath());
 
             // Get the parser.
             //return CSVFormat.RFC4180.withHeader().parse(fr);
             return CSVParser.parse(lines, format);
 
-        } else if(dataSource instanceof URL){
-            return CSVParser.parse((URL)dataSource, StandardCharsets.UTF_8, format);
+        } else if(dataResource instanceof URL){
+            return CSVParser.parse((URL)dataResource, StandardCharsets.UTF_8, format);
 
         } else{
             throw new TableSchemaException("Data source is of invalid type.");

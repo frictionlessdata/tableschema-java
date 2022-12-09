@@ -125,6 +125,11 @@ public class NumberField extends Field<Number> {
         return value.toString();
     }
 
+    @Override
+    String formatObjectValueAsString(Object value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        return value.toString();
+    }
+
     private static String formatNumber(String value, Map<String, Object> options) {
         String decSeparator = ".";
         String locValue = value;

@@ -70,6 +70,7 @@ public class BooleanField extends Field<Boolean> {
         return (value) ? _getActualTrueValues().get(0) : _getActualFalseValues().get(0);
     }
 
+
     @Override
     public String formatValueAsString(Boolean value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
         String trueValue = _getActualTrueValues().get(0);
@@ -83,6 +84,12 @@ public class BooleanField extends Field<Boolean> {
             }
         }
         return (value) ? trueValue : falseValue;
+    }
+
+
+    @Override
+    String formatObjectValueAsString(Object value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        return value.toString();
     }
 
     @Override

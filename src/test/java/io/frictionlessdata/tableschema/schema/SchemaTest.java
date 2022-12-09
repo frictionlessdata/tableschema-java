@@ -13,6 +13,7 @@ import io.frictionlessdata.tableschema.exception.ValidationException;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 import io.frictionlessdata.tableschema.fk.Reference;
+import io.frictionlessdata.tableschema.util.ReflectionUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -458,7 +459,9 @@ public class SchemaTest {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_string.json");
 
         Throwable t = Assertions.assertThrows(ValidationException.class, () -> Schema.fromJson(source, true));
-        Assertions.assertEquals("Table Schema: validation failed: Primary key field doesnotexist not found", t.getMessage());
+        List<Object> messages = ((ValidationException) t).getMessages();
+        Assertions.assertEquals(1,messages.size());
+        Assertions.assertEquals("Primary key field doesnotexist not found", messages.get(0));
     }
 
     @Test
@@ -606,7 +609,7 @@ public class SchemaTest {
     @DisplayName("Validate creating Field mapping from Bean")
     void testCreateFieldMapping() throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, String> fieldNameMapping = new TreeMap<>(ReflectionUtils.getFieldNameMapping(objectMapper, ExplicitNamingBean.class));
+        Map<String, String> fieldNameMapping = new TreeMap<>(ReflectionUtil.getFieldNameMapping(ExplicitNamingBean.class));
         String expectedString = TestHelper.getResourceFileContent(
                 "/fixtures/beans/explicitnamingbean.json");
         Map<String, String> expectedFieldMap

@@ -67,7 +67,6 @@ public class BeanIterator<T> extends TableIterator<T> {
                     continue;
                 }
                 AnnotatedField aF = ((BeanSchema) schema).getAnnotatedField(fieldName);
-
                 FieldFormat annotation = aF.getAnnotation(FieldFormat.class);
                 String fieldFormat = field.getFormat();
                 if (null != annotation) {

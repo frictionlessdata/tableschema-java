@@ -1,5 +1,7 @@
 package io.frictionlessdata.tableschema;
 
+import io.frictionlessdata.tableschema.schema.BeanSchema;
+import io.frictionlessdata.tableschema.tabledatasource.BeanTableDataSource;
 import io.frictionlessdata.tableschema.tabledatasource.CsvTableDataSource;
 import io.frictionlessdata.tableschema.tabledatasource.StringArrayTableDataSource;
 import io.frictionlessdata.tableschema.tabledatasource.TableDataSource;
@@ -56,6 +58,18 @@ public class Table{
     public Table() { }
 
     /**
+     * Constructor for a Table from a Collection of Java Beans and the Bean class.
+     * @param data a {@link java.util.Collection} holding Java Beans of type `type`
+     * @param type the Bean class
+     */
+    public Table(Collection<?> data, Class<?> type) {
+        BeanTableDataSource ds = new BeanTableDataSource(data, type);
+        this.dataSource = ds;
+        schema = BeanSchema.infer(ds.getBeanClass());
+        validate();
+    }
+
+    /**
      * Constructor for a Table from String array input data and optionally
      * a Schema. Data is parsed into a TableDataSource object
      * @param data a {@link java.util.Collection} holding rows of data encoded as String-arrays
@@ -69,17 +83,24 @@ public class Table{
             validate();
     }
 
+    public static Table fromSource(BeanTableDataSource dataSource) {
+        Table table = new Table();
+        table.dataSource = dataSource;
+        table.schema = BeanSchema.infer(dataSource.getBeanClass());
+        return table;
+    }
+
     /**
      * Create Table on an {@link java.io.InputStream} for reading both the CSV/JSON
      * data and the table schema.
-     * @param dataSource InputStream for reading the data from
+     * @param data InputStream for reading the data from
      * @param schema InputStream for reading table schema from. Can be `null`
-     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data.
+     * @param format The expected CSVFormat if data is a CSV-containing InputStream; ignored for JSON data.
      *               Can be `null`
      */
-    public static Table fromSource(InputStream dataSource, InputStream schema, CSVFormat format){
+    public static Table fromSource(InputStream data, InputStream schema, CSVFormat format){
         Table table = new Table();
-        table.dataSource = TableDataSource.fromSource(dataSource);
+        table.dataSource = TableDataSource.fromSource(data);
         if (null != schema) {
             try {
                 table.schema = Schema.fromJson(schema, true);

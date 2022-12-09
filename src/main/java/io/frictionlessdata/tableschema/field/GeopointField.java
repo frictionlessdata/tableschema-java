@@ -6,6 +6,7 @@ import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
+import org.locationtech.jts.geom.Coordinate;
 
 import java.net.URI;
 import java.util.LinkedHashMap;
@@ -98,6 +99,16 @@ public class GeopointField extends Field<double[]> {
             return "{\"lon\": "+value[0]+", \"lat\":"+value[1]+"}";
         }
         return null;
+    }
+
+    @Override
+    String formatObjectValueAsString(Object value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        if (value instanceof Coordinate) {
+            Coordinate coor = (Coordinate)value;
+            double[] vals = new double[]{coor.x, coor.y, coor.z};
+            return formatValueAsString(vals, format,options);
+        }
+        return value.toString();
     }
 
     @Override

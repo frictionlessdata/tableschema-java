@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "id": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/schemas/geojson/geojson.json",
+    "id": "https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master/src/main/resources/schemas/geojson-schema/geojson.json",
     "title": "Geo JSON object",
     "description": "Schema for a Geo JSON object",
     "type": "object",

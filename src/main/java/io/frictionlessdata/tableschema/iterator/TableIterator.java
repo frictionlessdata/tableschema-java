@@ -83,19 +83,21 @@ public class TableIterator<T> implements Iterator<T> {
                 Object val = null;
                 // if the CSVFormat does not specify a header row, mapping will be null and we use the
                 // row order from the Schema
-                if (null == mapping) {
-                    String rawVal = row[i];
-                    val = field.castValue(rawVal);
-                } else {
-                    Integer mappedKey = mapping.get(i);
-                    // null keys can happen for JSON arrays of JSON objects because
-                    // null values will lead to missing entries
-                    if (null != mappedKey) {
-                        // if the last column(s) contain nulls, prevent an ArrayIndexOutOfBoundsException
-                        if (mappedKey < row.length) {
-                            String rawVal = row[mappedKey];
-                            val = field.castValue(rawVal);
-                        }
+                Integer mappedKey = i;
+                if (null != mapping) {
+                    if (null != mapping.get(i))
+                        mappedKey = mapping.get(i);
+                    else
+                        mappedKey = null;
+
+                }
+                // null keys can happen for JSON arrays of JSON objects because
+                // null values will lead to missing entries
+                if (null != mappedKey) {
+                    // if the last column(s) contain nulls, prevent an ArrayIndexOutOfBoundsException
+                    if (mappedKey < row.length) {
+                        String rawVal = row[mappedKey];
+                        val = field.castValue(rawVal);
                     }
                 }
                 if (!extended && keyed) {

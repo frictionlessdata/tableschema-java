@@ -1,5 +1,20 @@
 # Reading tabular data
 
+- [Reading data the Java way](#reading-tabular-data-the-java-way) explains various ways of reading data
+       as instances of a provided Bean class
+  - [Reading from CSV/JSON data](#reading-from-CSV/JSON-data) Read data and transparently convert them
+       to Java Beans.
+  - [Creating a Table from Java Bean Objects](#creating-a-table-from-java-bean-objects) Construct a Table
+       on a Collection of Java Beans.
+- [Reading data the Frictionless way](#reading-tabular-data-the-frictionless-way) - either as String Arrays, 
+       Object Arrays, or Maps
+  - [Without a Schema](#reading-tabular-data-without-a-schema) Read as String arrays and without
+        format integrity assurance
+  - [With a Schema](#reading-tabular-data-using-a-schema) Read as converted Java object arrays with
+        format integrity assurance
+  - [Read data as Maps](#reading-tabular-data-returning-rows-as-maps) if you prefer your data as
+        key/value pairs
+
 There are basically two distinct ways to read data with the help of the tableschema-java library:
 - The way other language implementation of the Frictionless Tableschema standard handle this
 - In a true native Java way
@@ -16,6 +31,11 @@ allows very precise control over the mapping between CSV/JSON and domain objects
 Since Java is a strongly typed language, we can derive the data type for each column of a table from a
 Java bean. This allows us to model our domain model in terms of Java beans, enjoy the format integrity
 of a Table Schema, and while reading data, get it returned as instances of our bean class.
+
+Some limitations apply: the Bean serialization/deserialization does not know all the bells and whistles
+that e.g. Jackson does and you can't use nested data - after all, tabular data is not hierarchical and
+is not well suited for object trees. Also, you can't use custom classes for your members, you need 
+to stick to a pre-defined list of classes.
 
 First we define a Bean class:
 ```java
@@ -47,7 +67,7 @@ public class SimpleDataBean {
     }
 }
 ```
-
+### Reading from CSV/JSON data
 And with that, we can read the data as `SimpleDataBean` instances:
 ```java
 URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
@@ -66,6 +86,28 @@ while (bit.hasNext()) {
 // 2 bar
 // 3 baz
 ```
+
+### Creating a Table from Java Bean Objects
+
+If we have a Collection of our business objects as data, we can construct a Table with the data as backing. 
+All the iterators from the other examples are available for reading the serialized data - or a Data Package
+could be written.
+
+You can export a synthesized Schema based on the Bean class. It is a regular Table Schema.
+
+```java
+List<EmployeeBeanWithAnnotation> employees = new ArrayList<>();
+
+Table t = new Table(employees, EmployeeBeanWithAnnotation.class);
+
+Schema schema = t.getSchema();
+Iterator<Object[]> iter = table.iterator();
+while(iter.hasNext()){
+    Object[] row = iter.next();
+    System.out.println(Arrays.toString(row));
+}
+```
+
 
 ## Reading tabular data the Frictionless way
 

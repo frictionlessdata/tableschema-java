@@ -7,6 +7,7 @@ import org.apache.commons.validator.routines.EmailValidator;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Base64;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,6 +57,15 @@ public class StringField extends Field<String> {
         return value;
     }
 
+    @Override
+    String formatObjectValueAsString(Object value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        if (value instanceof byte[]) {
+            byte[] encode = Base64.getEncoder().encode((byte[]) value);
+            String retVal = new String(encode);
+            return retVal;
+        }
+        return value.toString();
+    }
 
     /**
      * Given a value, try to parse the format.

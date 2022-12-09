@@ -3,7 +3,9 @@ package io.frictionlessdata.tableschema.schema;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
+import io.frictionlessdata.tableschema.beans.EmployeeBeanWithAnnotation;
 import io.frictionlessdata.tableschema.beans.ExplicitNamingBean;
+import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 
 import static io.frictionlessdata.tableschema.TestHelper.getResourceFile;
+import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SchemaInferralTests {
@@ -29,6 +32,7 @@ public class SchemaInferralTests {
         String expectedString = TestHelper.getResourceFileContent(
                 "/fixtures/schema/employee_schema.json");
         assertEquals(objectMapper.readValue(expectedString, Object.class), jsonObject);
+        Assertions.assertTrue(schema.isValid());
     }
 
     @Test
@@ -44,6 +48,7 @@ public class SchemaInferralTests {
         // don't simplify this to assertEquals()
         Assertions.assertTrue(schema.equals(expectedSchema));
         Assertions.assertTrue(expectedSchema.equals(schema));
+        Assertions.assertTrue(schema.isValid());
     }
 
     @Test
@@ -72,5 +77,16 @@ public class SchemaInferralTests {
 
         jsonObject = objectMapper.readValue(schema2.getJson(), Object.class);
         assertEquals(objectMapper.readValue(expectedString, Object.class), jsonObject);
+        Assertions.assertTrue(schema.isValid());
+    }
+
+    @Test
+    @DisplayName("Test inferal of Schema from EmployeeBean with Annotation")
+    void testBeanDeserialization2() throws Exception {
+        File testDataDir = getTestDataDirectory();
+        File inFile = new File(testDataDir, "schema/employee_full_schema_no_primary_secondary_keys.json");
+        Schema reference = Schema.fromJson(inFile, true);
+        Schema testSchema = BeanSchema.infer(EmployeeBeanWithAnnotation.class);
+        assertEquals(reference, testSchema);
     }
 }

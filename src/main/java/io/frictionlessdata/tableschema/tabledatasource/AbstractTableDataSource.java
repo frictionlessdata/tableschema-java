@@ -15,7 +15,7 @@ import java.util.List;
 public abstract class AbstractTableDataSource<T> implements TableDataSource {
     String[] headers;
     T dataSource = null;
-    private File workDir;
+    File workDir;
 
     AbstractTableDataSource(){}
 

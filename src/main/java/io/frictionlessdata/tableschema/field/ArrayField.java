@@ -8,10 +8,7 @@ import io.frictionlessdata.tableschema.schema.TypeInferrer;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -43,6 +40,32 @@ public class ArrayField extends Field<Object[]> {
     @Override
     public String formatValueAsString(Object[] value, String format, Map<String, Object> options)
             throws InvalidCastException, ConstraintsException {
+        return _format(value);
+        /*List<String> vals = new ArrayList<>();
+        String val;
+        for (Object o : value) {
+            if (o instanceof String) {
+                val = "\""+o+"\"";
+            } else {
+                Field f = FieldInferrer.infer(o);
+                val = f.formatValueAsString(o);
+            }
+            vals.add(val);
+        }
+        return "[" + vals.stream().collect(Collectors.joining(",")) +"]";*/
+    }
+
+    @Override
+    String formatObjectValueAsString(Object value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        if (value instanceof Collection) {
+            Collection vals = (Collection)value;
+            return _format(vals.toArray(new Object[0]));
+            //return "[" + vals.stream().collect(Collectors.joining(",")) +"]";
+        }
+        return value.toString();
+    }
+
+    private String _format(Object... value) {
         List<String> vals = new ArrayList<>();
         String val;
         for (Object o : value) {
@@ -56,7 +79,6 @@ public class ArrayField extends Field<Object[]> {
         }
         return "[" + vals.stream().collect(Collectors.joining(",")) +"]";
     }
-
 
     @Override
     public String parseFormat(String value, Map<String, Object> options) {

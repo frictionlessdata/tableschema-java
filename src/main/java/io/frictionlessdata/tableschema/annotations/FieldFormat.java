@@ -38,9 +38,9 @@ public @interface FieldFormat {
      *
      * From the specs. https://specs.frictionlessdata.io/table-schema/#types-and-formats
      *  date/time values in this field can be parsed according to
-     * <PATTERN>. <PATTERN> MUST follow the syntax of standard Python / C
+     * &lt;PATTERN&gt;. &lt;PATTERN&gt; MUST follow the syntax of standard Python / C
      * strptime (That is, values in the this field should be parsable
-     * by Python / C standard strptime using <PATTERN>).
+     * by Python / C standard strptime using &lt;PATTERN&gt;).
      * Example for "format": "%d/%m/%y" which would correspond to dates like: 30/11/14
      */
     String format() default "default";

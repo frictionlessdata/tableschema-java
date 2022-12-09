@@ -56,6 +56,11 @@ public class GeojsonField extends Field<JsonNode> {
     }
 
 
+    @Override
+    String formatObjectValueAsString(Object value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
+        return value.toString();
+    }
+
     /**
      * We only want to go through this initialization if we have to because it's a
      * performance issue the first time it is executed.
