@@ -325,7 +325,7 @@ public class Table{
                     .createSchemaHeaderMapping(dataSource.getHeaders(), dataSource.getHeaders());
         } else {
             return TableSchemaUtil
-                    .createSchemaHeaderMapping(dataSource.getHeaders(), getDeclaredHeaders());
+                    .createSchemaHeaderMapping(dataSource.getHeaders(), schema.getHeaders());
         }
     }
 
@@ -344,17 +344,23 @@ public class Table{
      */
     public String[] getHeaders(){
         if (null != schema) {
-            return getDeclaredHeaders();
+            return schema.getHeaders();
         }
         return this.dataSource.getHeaders();
     }
 
-    private String[] getDeclaredHeaders() {
-        return schema
-                .getFieldNames()
-                .toArray(new String[]{});
-    }
-
+    /**
+     * Read all data from the Table, each row as Object arrays if `cast` is set to true, String arrays if false.
+     * This can be used for smaller data tables but for huge or unknown sizes, reading via iterator  is preferred,
+     * as this method loads all data into RAM.
+     *
+     * It ignores relations to other data sources.
+     *
+     * The method is roughly implemented after
+     * https://github.com/frictionlessdata/tableschema-py/blob/master/tableschema/table.py
+     *
+     * @return A list of table rows.
+     */
     public List<Object[]> read(boolean cast){
         if(cast && (null == schema)){
             throw new TableSchemaException("Cannot cast without a schema");
@@ -378,12 +384,33 @@ public class Table{
 
         return rows;
     }
-    
+
+    /**
+     * Read all data from the Table, each row as Object arrays if a Schema is set on the table, String arrays if not.
+     * This can be used for smaller data tables but for huge or unknown sizes, reading via iterator  is preferred,
+     * as this method loads all data into RAM.
+     *
+     * It ignores relations to other data sources.
+     *
+     * The method is roughly implemented after
+     * https://github.com/frictionlessdata/tableschema-py/blob/master/tableschema/table.py
+     *
+     * @return A list of table rows.
+     */
     public List<Object[]> read(){
         boolean cast = (null != schema);
         return read(cast);
     }
 
+    /**
+     * Read all data from the Table and return it as JSON. If no Schema is set on the table, one will be inferred.
+     * This can be used for smaller data tables but for huge or unknown sizes, there will be performance considerations,
+     * as this method loads all data into RAM *and* does a costly schema inferral.
+     *
+     * It ignores relations to other data sources.
+     *
+     * @return A JSON representation of the data as a String.
+     */
     public String asJson() {
         List<Map<String, Object>> rows = new ArrayList<>();
         Schema schema = (null != this.schema) ? this.schema : this.inferSchema();
@@ -402,32 +429,6 @@ public class Table{
         });
 
         return JsonUtil.getInstance().serialize(rows);
-    }
-
-    private void writeCSVData(Map<Integer, Integer> mapping, CSVPrinter csvPrinter) {
-        List<Map<String, Object>> rows = new ArrayList<>();
-        Schema schema = (null != this.schema) ? this.schema : this.inferSchema();
-
-        Iterator<Object> iter = this.iterator(false, false, true, false);
-        iter.forEachRemaining((rec) -> {
-            Object[] row = (Object[])rec;
-            Object[] sortedRec = new Object[row.length];
-            for (int i = 0; i < row.length; i++) {
-                sortedRec[mapping.get(i)] = row[i];
-            }
-            List<String> obj = new ArrayList<>();
-            int i = 0;
-            for (Field field : schema.getFields()) {
-                Object s = sortedRec[i];
-                obj.add(field.formatValueAsString(s));
-                i++;
-            }
-            try {
-                csvPrinter.printRecord(obj);
-            } catch (Exception ex) {
-                throw new TableIOException(ex);
-            }
-        });
     }
 
     /**
@@ -543,17 +544,14 @@ public class Table{
     public void validate() throws TableValidationException, TableSchemaException {
         if (null == schema)
             return;
-        String[] headers;
-        try {
-            headers = this.dataSource.getHeaders();
-        } catch (Exception ex) {
-            throw new TableSchemaException(ex);
-        }
+        String[] headers = dataSource.getHeaders();
+        // if the data has no headers (CSV table without header row), we can't validate against the Schema
         if (null == headers) {
             return;
         }
-        List<String> declaredHeaders = Arrays.asList(getDeclaredHeaders());
+        List<String> declaredHeaders = schema.getFieldNames();
         List<String> foundHeaders = Arrays.asList(headers);
+        //If we have JSON data, fields with `null` values might be omitted, therefore do not do a strict check
         if (dataSource.hasReliableHeaders()) {
             for (String col : declaredHeaders) {
                 if (!foundHeaders.contains(col)) {
@@ -567,11 +565,38 @@ public class Table{
             }
         }
     }
-    
+
+    /**
+     * The type inferring algorithm takes a data sample and tries to cast each row to
+     * the {@link Field} types and each successful type casting increments a popularity score
+     * for the Field in question. At the end, the best score so far is returned.
+     *
+     * This method iterates through the whole data set, which can be very costly for huge
+     * CSV/JSON files
+     *
+     * For {@link BeanSchema}, the operation is much less costly, it is simply done via reflection
+     * on the Bean class.
+     *
+     * @return the created Schema
+     *
+     */
     public Schema inferSchema() throws TypeInferringException{
         return inferSchema(-1);
     }
 
+    /**
+     * The type inferring algorithm takes a data sample and tries to cast each row to
+     * the {@link Field} types and each successful type casting increments a popularity score
+     * for the Field in question. At the end, the best score so far is returned.
+     *
+     * This method iterates through a limited row number
+     *
+     * For {@link BeanSchema}, the operation is simply done via reflection
+     * on the Bean class, so the `rowLimit`does not have any effect.
+     *
+     * @return the created Schema
+     *
+     */
     public Schema inferSchema(int rowLimit) throws TypeInferringException{
         try{
             return inferSchema(getHeaders(),rowLimit);
@@ -591,7 +616,6 @@ public class Table{
         }
     }
 
-
     public Table setCsvFormat(CSVFormat format) {
         this.format = format;
         if ((null != dataSource) && (dataSource instanceof CsvTableDataSource)) {
@@ -605,7 +629,8 @@ public class Table{
     }
 
     /**
-     * Get the current Schema for this Table
+     * Get the current Schema for this Table or `null` if no Schema is set.
+     *
      * @return the active Schema
      */
     public Schema getSchema(){
@@ -678,4 +703,30 @@ public class Table{
         return Objects.hash(dataSource, schema, format);
     }
 
+
+    private void writeCSVData(Map<Integer, Integer> mapping, CSVPrinter csvPrinter) {
+        List<Map<String, Object>> rows = new ArrayList<>();
+        Schema schema = (null != this.schema) ? this.schema : this.inferSchema();
+
+        Iterator<Object> iter = this.iterator(false, false, true, false);
+        iter.forEachRemaining((rec) -> {
+            Object[] row = (Object[])rec;
+            Object[] sortedRec = new Object[row.length];
+            for (int i = 0; i < row.length; i++) {
+                sortedRec[mapping.get(i)] = row[i];
+            }
+            List<String> obj = new ArrayList<>();
+            int i = 0;
+            for (Field field : schema.getFields()) {
+                Object s = sortedRec[i];
+                obj.add(field.formatValueAsString(s));
+                i++;
+            }
+            try {
+                csvPrinter.printRecord(obj);
+            } catch (Exception ex) {
+                throw new TableIOException(ex);
+            }
+        });
+    }
 }

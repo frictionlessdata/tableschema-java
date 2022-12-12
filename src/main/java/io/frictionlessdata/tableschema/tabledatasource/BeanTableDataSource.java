@@ -93,7 +93,7 @@ public class BeanTableDataSource<C> extends AbstractTableDataSource<C> {
 	}
 
 	/**
-	 * Let a BeanSchema define the headers.s
+	 * Let a BeanSchema define the headers.
 	 */
 	public String[] getHeaders() {
 		BeanSchema bs = BeanSchema.infer(type);

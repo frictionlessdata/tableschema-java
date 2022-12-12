@@ -159,8 +159,8 @@ public class Schema {
      * @param strict     whether to enforce strict validation
      * @throws IOException thrown if reading from the stream or parsing throws an exception
      */
-    public static Schema fromJson (String schemaJson, boolean strict) throws IOException {
-        return fromJson (new ByteArrayInputStream(schemaJson.getBytes()), strict);
+    public static Schema fromJson(String schemaJson, boolean strict) throws IOException {
+        return fromJson(new ByteArrayInputStream(schemaJson.getBytes()), strict);
     }
 
     /**
@@ -199,7 +199,7 @@ public class Schema {
         try {
             validate();
             return errors.isEmpty();
-        } catch (ValidationException ve){
+        } catch (ValidationException ve) {
             return false;
         }
     }
@@ -255,6 +255,11 @@ public class Schema {
                 .stream()
                 .map(Field::getName)
                 .collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public String[] getHeaders() {
+         return getFieldNames().toArray(new String[0]);
     }
 
     /**
