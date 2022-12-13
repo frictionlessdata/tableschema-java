@@ -1,6 +1,7 @@
 package io.frictionlessdata.tableschema.tabledatasource;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.common.primitives.Chars;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.exception.TableIOException;
 import io.frictionlessdata.tableschema.inputstream.ByteOrderMarkStrippingInputStream;
@@ -8,6 +9,7 @@ import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.apache.commons.csv.CSVFormat;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -81,9 +83,9 @@ public interface TableDataSource {
      * {@link CsvTableDataSource} based on input format
      * @return DataSource created from input File
      */
-    static TableDataSource fromSource(File input, File workDir) {
+    static TableDataSource fromSource(File input, File workDir, Charset charset) {
         try {
-            String content = getFileContents(input.getPath(), workDir);
+            String content = getFileContents(input.getPath(), workDir, charset);
             return fromSource(content);
         } catch (IOException ex) {
             throw new TableIOException(ex);
@@ -109,7 +111,7 @@ public interface TableDataSource {
         return fromSource(content);
     }
 
-    static String getFileContents(String path, File workDir) throws IOException {
+    static String getFileContents(String path, File workDir, Charset charset) throws IOException {
         String lines;
         if (workDir.getName().endsWith(".zip")) {
             //have to exchange the backslashes on Windows, as
@@ -119,7 +121,7 @@ public interface TableDataSource {
             ZipFile zipFile = new ZipFile(workDir.getAbsolutePath());
             ZipEntry entry = zipFile.getEntry(path);
             InputStream stream = zipFile.getInputStream(entry);
-            lines = readSkippingBOM(stream);
+            lines = readSkippingBOM(stream, charset);
         } else {
             // The path value can either be a relative path or a full path.
             // If it's a relative path then build the full path by using the working directory.
@@ -129,7 +131,7 @@ public interface TableDataSource {
             //    - https://github.com/frictionlessdata/tableschema-java/issues/29
             //    - https://frictionlessdata.io/specs/data-resource/#url-or-path
             Path resolvedPath = TableDataSource.toSecure(new File(path).toPath(), workDir.toPath());
-            lines = readSkippingBOM(new FileInputStream(resolvedPath.toFile()));
+            lines = readSkippingBOM(new FileInputStream(resolvedPath.toFile()), charset);
         }
         return lines;
     }
@@ -141,10 +143,10 @@ public interface TableDataSource {
      * @param is InputStream to read from
      * @return Contents of the InputStream as a String
      */
-    static String readSkippingBOM(InputStream is) {
+    static String readSkippingBOM(InputStream is, Charset charset) {
         String content;
         try (ByteOrderMarkStrippingInputStream bims  = new ByteOrderMarkStrippingInputStream(is);
-             InputStreamReader isr = new InputStreamReader(bims.skipBOM(), bims.getCharset());
+             InputStreamReader isr = new InputStreamReader(bims.skipBOM(), charset == null ? bims.getCharset() : charset);
              BufferedReader rdr = new BufferedReader(isr)) {
                 content = rdr.lines().collect(Collectors.joining("\n"));
         } catch (IOException ex) {

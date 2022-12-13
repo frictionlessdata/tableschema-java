@@ -3,6 +3,7 @@ package io.frictionlessdata.tableschema.tabledatasource;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,7 +33,7 @@ public abstract class AbstractTableDataSource<T> implements TableDataSource {
     }
 
     String getFileContents(String path) throws IOException {
-        return TableDataSource.getFileContents(path, workDir);
+        return TableDataSource.getFileContents(path, workDir, Charset.defaultCharset());
     }
 
 }

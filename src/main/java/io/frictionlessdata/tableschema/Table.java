@@ -18,6 +18,8 @@ import org.apache.commons.csv.CSVPrinter;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -123,12 +125,29 @@ public class Table{
      * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data.
      *               Can be `null`
      */
-    public static Table fromSource(File dataSource, File basePath, Schema schema, CSVFormat format) {
-        Table table = fromSource(dataSource, basePath);
+    public static Table fromSource(File dataSource, File basePath, Schema schema, CSVFormat format, Charset charset) {
+        Table table = fromSource(dataSource, basePath, charset);
         table.schema = schema;
         if (null != format) {
             table.setCsvFormat(format);
         }
+        return table;
+    }
+
+    public static Table fromSource(File dataSource, File basePath, Schema schema, CSVFormat format) {
+        return fromSource(dataSource, basePath, schema, format, null);
+    }
+
+        /**
+         * Create Table from a {@link java.io.File} containing the CSV/JSON
+         * data and without either a Schema or a CSVFormat.
+         * @param dataSource relative File for reading the data from. Must be inside `basePath`
+         * @param basePath Parent directory
+         * @param charset Character encoding of the file
+         */
+    public static Table fromSource(File dataSource, File basePath, Charset charset) {
+        Table table = new Table();
+        table.dataSource = TableDataSource.fromSource(dataSource, basePath, charset);
         return table;
     }
 
@@ -139,9 +158,7 @@ public class Table{
      * @param basePath Parent directory
      */
     public static Table fromSource(File dataSource, File basePath) {
-        Table table = new Table();
-        table.dataSource = TableDataSource.fromSource(dataSource, basePath);
-        return table;
+        return fromSource(dataSource, basePath, null);
     }
 
     /**

@@ -7,8 +7,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
+import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 import static io.frictionlessdata.tableschema.TestHelper.getTestsuiteDataDirectory;
 
 public class TableEncodingTests {
@@ -17,12 +19,11 @@ public class TableEncodingTests {
     // currently disabled
     @Test
     @DisplayName("Create a Table from a ISO-8859-1 encoded file")
-    @Disabled
     void createTableFromIso8859() throws Exception{
-        File testDataDir = getTestsuiteDataDirectory();
+        File testDataDir = getTestDataDirectory();
 
         Table table
-                = Table.fromSource(new File("csv/encodings/iso8859.csv"), testDataDir, null, null);
+                = Table.fromSource(new File("csv/encodings/iso8859.csv"), testDataDir, null, null, StandardCharsets.ISO_8859_1);
 
         Iterator<Object[]> iter = table.iterator();
         Object[] row = iter.next();

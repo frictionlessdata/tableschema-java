@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.stream.Collectors;
 
@@ -74,7 +75,7 @@ class JsonArrayTableDataSourceTest {
     @DisplayName("Validate creating a JsonArrayTableDataSource from JSON file")
     void testSafePathCreationJson() throws Exception {
         TableDataSource ds = TableDataSource.fromSource(new File("simple_geojson.json"),
-                TestHelper.getTestDataDirectory());
+                TestHelper.getTestDataDirectory(), Charset.defaultCharset());
         Assertions.assertNotNull(ds);
     }
 /*
