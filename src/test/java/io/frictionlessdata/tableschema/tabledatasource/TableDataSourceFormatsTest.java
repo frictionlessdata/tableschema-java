@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -85,7 +86,7 @@ public class TableDataSourceFormatsTest {
     @Test
     @DisplayName("Create a TableDataSource from a safe path and ensure no exception is thrown")
     public void testSafePathCreationCsv() throws Exception {
-        TableDataSource ds = TableDataSource.fromSource(new File ("data/population.csv"), TestHelper.getTestDataDirectory());
+        TableDataSource ds = TableDataSource.fromSource(new File ("data/population.csv"), TestHelper.getTestDataDirectory(), Charset.defaultCharset());
         Assertions.assertNotNull(ds);
     }
 
@@ -162,7 +163,7 @@ public class TableDataSourceFormatsTest {
         TableDataSource ds;
         File basePath = new File(TestHelper.getTestDataDirectory(),"data/population.zip");
         File inFile = new File("population.csv");
-        ds = TableDataSource.fromSource(inFile,basePath);
+        ds = TableDataSource.fromSource(inFile,basePath, null);
         List<String[]> data = ds.getDataAsStringArray();
         Assertions.assertNotNull(data);
         byte[] bytes = Files.readAllBytes(new File(TestHelper.getTestDataDirectory(), "data/population.csv").toPath());
