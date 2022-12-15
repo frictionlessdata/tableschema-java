@@ -66,7 +66,8 @@ public class BeanTableDataSourceTest {
                 inFile,
                 testDataDir,
                 schema,
-                TableDataSource.getDefaultCsvFormat());
+                TableDataSource.getDefaultCsvFormat(),
+                TableDataSource.getDefaultEncoding());
 
         List<EmployeeBeanWithAnnotation> employees = new ArrayList<>();
         BeanIterator<EmployeeBeanWithAnnotation> bit = new BeanIterator<>(inTable, EmployeeBeanWithAnnotation.class, false);

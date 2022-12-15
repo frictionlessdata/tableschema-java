@@ -404,7 +404,11 @@ class FieldCastTest {
         try (FileInputStream fis = new FileInputStream(schemaFile)) {
             schema = Schema.fromJson (fis, false);
         }
-        Table table = Table.fromSource(f, TestHelper.getTestDataDirectory(), schema, TableDataSource.getDefaultCsvFormat());
+        Table table = Table.fromSource(f,
+                TestHelper.getTestDataDirectory(),
+                schema,
+                TableDataSource.getDefaultCsvFormat(),
+                TableDataSource.getDefaultEncoding());
         Iterator iter = table.iterator(true, false, true, false);
         Object obj = null;
         int cnt = 0;

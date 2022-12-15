@@ -6,9 +6,13 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Iterators;
+import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.annotations.FieldFormat;
 import io.frictionlessdata.tableschema.field.Field;
+import io.frictionlessdata.tableschema.iterator.BeanIterator;
+import io.frictionlessdata.tableschema.iterator.TableIterator;
 import io.frictionlessdata.tableschema.schema.BeanSchema;
+import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import java.io.BufferedReader;
@@ -24,6 +28,11 @@ import java.util.stream.Collectors;
 
 /**
  * Implements a {@link TableDataSource} based on a Java Bean class.
+ *
+ * Since this operates on existing Java objects, it ignores any {@link Schema} set on the {@link Table}
+ * for the Iterator but generates (infers) an own Schema based on the Bean class. It also
+ * does not work with the normal {@link TableIterator} but creates its own {@link BeanIterator}.
+ * Since it does not read from Files or URLs, it also disregards the `encoding` property.
  */
 public class BeanTableDataSource<C> extends AbstractTableDataSource<C> {
 	private final Class<C> type;
@@ -52,8 +61,7 @@ public class BeanTableDataSource<C> extends AbstractTableDataSource<C> {
     public boolean hasReliableHeaders() {
         return true;
     }
-
-
+	
 	@Override
 	public Iterator<String[]> iterator() {
 		String[] headers = getHeaders();

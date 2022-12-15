@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,6 +18,7 @@ public abstract class AbstractTableDataSource<T> implements TableDataSource {
     String[] headers;
     T dataSource = null;
     File workDir;
+
 
     AbstractTableDataSource(){}
 
@@ -36,4 +38,8 @@ public abstract class AbstractTableDataSource<T> implements TableDataSource {
         return TableDataSource.getFileContents(path, workDir, Charset.defaultCharset());
     }
 
+    @Override
+    public Charset getEncoding() {
+        return encoding;
+    }
 }

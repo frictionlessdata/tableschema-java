@@ -99,10 +99,11 @@ public class Table{
      * @param schema InputStream for reading table schema from. Can be `null`
      * @param format The expected CSVFormat if data is a CSV-containing InputStream; ignored for JSON data.
      *               Can be `null`
+     * @param charset Character encoding of the file. Can be null for UTF-8
      */
-    public static Table fromSource(InputStream data, InputStream schema, CSVFormat format){
+    public static Table fromSource(InputStream data, InputStream schema, CSVFormat format, Charset charset){
         Table table = new Table();
-        table.dataSource = TableDataSource.fromSource(data);
+        table.dataSource = TableDataSource.fromSource(data, charset);
         if (null != schema) {
             try {
                 table.schema = Schema.fromJson(schema, true);
@@ -110,6 +111,37 @@ public class Table{
                 throw new TableIOException(ex);
             }
         }
+        if (null != format) {
+            table.setCsvFormat(format);
+        }
+        return table;
+    }
+
+    /**
+     * Create Table on an {@link java.io.InputStream} for reading both the CSV/JSON
+     * data and the table schema.
+     * @param data InputStream for reading the data from
+     * @param schema InputStream for reading table schema from. Can be `null`
+     * @param format The expected CSVFormat if data is a CSV-containing InputStream; ignored for JSON data.
+     *               Can be `null`
+     */
+    public static Table fromSource(InputStream data, InputStream schema, CSVFormat format){
+        return fromSource(data, schema, format, TableDataSource.getDefaultEncoding());
+    }
+
+    /**
+     * Create Table from a {@link java.io.File} containing the CSV/JSON
+     * data and with  a Schema and a CSVFormat.
+     * @param dataSource relative File for reading the data from. Must be inside `basePath`
+     * @param basePath Parent directory
+     * @param schema The table Schema. Can be `null`
+     * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data.
+     *               Can be `null`
+     * @param charset Character encoding of the file. Can be null for UTF-8
+     */
+    public static Table fromSource(File dataSource, File basePath, Schema schema, CSVFormat format, Charset charset) {
+        Table table = fromSource(dataSource, basePath, charset);
+        table.schema = schema;
         if (null != format) {
             table.setCsvFormat(format);
         }
@@ -125,26 +157,17 @@ public class Table{
      * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data.
      *               Can be `null`
      */
-    public static Table fromSource(File dataSource, File basePath, Schema schema, CSVFormat format, Charset charset) {
-        Table table = fromSource(dataSource, basePath, charset);
-        table.schema = schema;
-        if (null != format) {
-            table.setCsvFormat(format);
-        }
-        return table;
-    }
-
     public static Table fromSource(File dataSource, File basePath, Schema schema, CSVFormat format) {
-        return fromSource(dataSource, basePath, schema, format, null);
+        return fromSource(dataSource, basePath, schema, format, TableDataSource.getDefaultEncoding());
     }
 
-        /**
-         * Create Table from a {@link java.io.File} containing the CSV/JSON
-         * data and without either a Schema or a CSVFormat.
-         * @param dataSource relative File for reading the data from. Must be inside `basePath`
-         * @param basePath Parent directory
-         * @param charset Character encoding of the file
-         */
+    /**
+     * Create Table from a {@link java.io.File} containing the CSV/JSON
+     * data and without either a Schema or a CSVFormat.
+     * @param dataSource relative File for reading the data from. Must be inside `basePath`
+     * @param basePath Parent directory
+     * @param charset Character encoding of the file. Can be null for UTF-8
+     */
     public static Table fromSource(File dataSource, File basePath, Charset charset) {
         Table table = new Table();
         table.dataSource = TableDataSource.fromSource(dataSource, basePath, charset);
@@ -264,7 +287,7 @@ public class Table{
 
     /**
      * This is the most flexible way to read data from a Table referencing a file or URL. Each row of the table
-     * will be returned as an either an Object array or a Map<String, Object>, depending on Options.
+     * will be returned as an either an Object array or a Map&lt;String, Object&gt;, depending on Options.
      * Options allow you to tailor the behavior of the Iterator to your needs:
      *  <ul>
      *      <li> String arrays (parameter `cast` = false)</li>
@@ -274,7 +297,7 @@ public class Table{
      *      <li> or in an "extended" form (parameter `extended` = true) that returns an Object array where the first
      *      entry is the row number, the second is a String array holding the headers, and the third is an Object
      *      array holding the row data converted to Java objects.</li>
-     *   <  li> Resolving references to other data sources (parameter `relations` = true)</li>
+     *      <li> Resolving references to other data sources (parameter `relations` = true)</li>
      *  </ul>
      *
      * The following rules apply:
@@ -654,6 +677,10 @@ public class Table{
         return this.schema;
     }
 
+    public Charset getEncoding() {
+        return (null == dataSource) ? null : dataSource.getEncoding();
+    }
+
     /**
      * Set a Schema for this Table. If the Table is connected to a TableDataSource, ie. holds data,
      * then the data will be validated against the new Schema.
@@ -671,7 +698,7 @@ public class Table{
      * @return the active TableDataSource
      */
     public TableDataSource getTableDataSource(){
-        return this.dataSource;
+        return dataSource;
     }
 
     /**

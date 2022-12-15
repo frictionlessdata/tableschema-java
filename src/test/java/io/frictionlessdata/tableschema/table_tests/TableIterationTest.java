@@ -60,7 +60,12 @@ public class TableIterationTest {
 
         // Fetch the data and apply the schema
         File file = new File("data/employee_data.csv");
-        Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, TableDataSource.getDefaultCsvFormat());
+        Table employeeTable = Table.fromSource(
+                file,
+                testDataDir,
+                employeeTableSchema,
+                TableDataSource.getDefaultCsvFormat(),
+                TableDataSource.getDefaultEncoding());
 
         // We will iterate the rows and these are the values classes we expect:
         Class[] expectedTypes = new Class[]{

@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,11 +41,6 @@ public class CsvTableDataSource extends AbstractTableDataSource<String> {
 
     CsvTableDataSource(URL dataSource){
         dataResource = dataSource;
-    }
-
-    CsvTableDataSource(File dataSource, File workDir){
-        dataResource = dataSource;
-        this.workDir = workDir;
     }
 
     CsvTableDataSource(String dataSource){

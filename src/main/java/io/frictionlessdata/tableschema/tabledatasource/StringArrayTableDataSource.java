@@ -15,8 +15,7 @@ public class StringArrayTableDataSource extends AbstractTableDataSource<Collecti
     }
 
     public StringArrayTableDataSource(String[][] data, String[] headers){
-        this.dataSource = Arrays.asList(data);
-        this.headers = headers;
+        this(Arrays.asList(data), headers);
     }
 
     @Override

@@ -25,19 +25,8 @@ import java.util.stream.Collectors;
  */
 public class JsonArrayTableDataSource extends AbstractTableDataSource<ArrayNode> {
 
-    public JsonArrayTableDataSource (InputStream inStream) throws IOException {
-        try (InputStreamReader inputStreamReader = new InputStreamReader(inStream, StandardCharsets.UTF_8);
-        BufferedReader br = new BufferedReader(inputStreamReader)) {
-            String content = br.lines().collect(Collectors.joining("\n"));
-            dataSource = JsonUtil.getInstance().createArrayNode(TableDataSource.trimBOM(content));
-        }
-    }
-	protected JsonArrayTableDataSource (ArrayNode json){
-		dataSource = json;
-	}
-
 	public JsonArrayTableDataSource (String json){
-		this(JsonUtil.getInstance().createArrayNode(TableDataSource.trimBOM(json)));
+		dataSource = JsonUtil.getInstance().createArrayNode(TableDataSource.trimBOM(json));
 	}
 
     @Override

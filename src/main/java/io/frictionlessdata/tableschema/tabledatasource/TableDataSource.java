@@ -1,7 +1,6 @@
 package io.frictionlessdata.tableschema.tabledatasource;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.common.primitives.Chars;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.exception.TableIOException;
 import io.frictionlessdata.tableschema.inputstream.ByteOrderMarkStrippingInputStream;
@@ -9,7 +8,9 @@ import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.apache.commons.csv.CSVFormat;
 
 import java.io.*;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -35,9 +36,12 @@ import java.util.zip.ZipFile;
 public interface TableDataSource {
     String UTF16_BOM = "\ufeff";
     String UTF8_BOM = "\u00ef\u00bb\u00bf";
+
+    Charset encoding = StandardCharsets.UTF_8;
     /**
      * Returns an Iterator that returns String arrays containing
      * one row of data each.
+     *
      * @return Iterator over the data
      */
     Iterator<String[]> iterator();
@@ -51,6 +55,7 @@ public interface TableDataSource {
     /**
      * Returns the whole data as a List of String arrays, each List entry is one row
      * @return List containing the data
+     *
      * @throws Exception thrown if reading the data fails
      */
     List<String[]> getDataAsStringArray() throws Exception;
@@ -58,20 +63,26 @@ public interface TableDataSource {
     /**
      * Signals whether extracted headers can be trusted (CSV with header row) or not
      * (JSON array of JSON objects where null values are omitted).
+     *
      * @return true if extracted headers can be trusted, false otherwise
      */
     boolean hasReliableHeaders();
 
+    Charset getEncoding();
+
     /**
      * Factory method to instantiate either a JsonArrayDataSource or a
-     * CsvDataSource based on input format
+     * {@link CsvTableDataSource} based on input format. The method will guess
+     * whether `input` is CSV or JSON data.
+     *
+     * @param input The text input
      * @return DataSource created from input String
      */
     static TableDataSource fromSource(String input) {
         try {
             // JSON array generation. If an exception is thrown -> probably CSV data
             ArrayNode json = JsonUtil.getInstance().createArrayNode(input);
-            return new JsonArrayTableDataSource(json);
+            return new JsonArrayTableDataSource(input);
         } catch (Exception ex) {
             // JSON parsing failed, treat it as a CSV
             return new CsvTableDataSource(input);
@@ -80,12 +91,15 @@ public interface TableDataSource {
 
     /**
      * Factory method to instantiate either a {@link JsonArrayTableDataSource} or a
-     * {@link CsvTableDataSource} based on input format
+     * {@link CsvTableDataSource} based on input format. The method will guess
+     * whether `input` is CSV or JSON data
+     *
      * @return DataSource created from input File
      */
     static TableDataSource fromSource(File input, File workDir, Charset charset) {
         try {
-            String content = getFileContents(input.getPath(), workDir, charset);
+            Charset cs = (null == charset) ? getDefaultEncoding() : charset;
+            String content = getFileContents(input.getPath(), workDir, cs);
             return fromSource(content);
         } catch (IOException ex) {
             throw new TableIOException(ex);
@@ -94,13 +108,27 @@ public interface TableDataSource {
 
     /**
      * Factory method to instantiate either a {@link JsonArrayTableDataSource} or a
-     * {@link CsvTableDataSource}  based on input format
+     * {@link CsvTableDataSource} based on input format and with the default charset.
+     *
      * @return DataSource created from input String
      */
     static TableDataSource fromSource(InputStream input) {
+        return fromSource(input, getDefaultEncoding());
+    }
+
+
+    /**
+     * Factory method to instantiate either a {@link JsonArrayTableDataSource} or a
+     * {@link CsvTableDataSource}  based on input format
+     *
+     * @param charset the encoding to read data with
+     * @return DataSource created from input String
+     */
+    static TableDataSource fromSource(InputStream input, Charset charset) {
         String content;
 
-        try (Reader fr = new InputStreamReader(input)) {
+        Charset cs = (null == charset) ? getDefaultEncoding() : charset;
+        try (Reader fr = new InputStreamReader(input, cs)) {
             try (BufferedReader rdr = new BufferedReader(fr)) {
                 content = rdr.lines().collect(Collectors.joining("\n"));
             }
@@ -155,6 +183,20 @@ public interface TableDataSource {
         return content;
     }
 
+    /**
+     * Return the default CSV format to use for Table data. It has the following features:
+     * <ul>
+     *     <li>Has a header row</li>
+     *     <li>Will trim whitespace around cell content</li>
+     *     <li>Will ignore empty rows</li>
+     *     <li>Does not throw if duplicate column names are encountered</li>
+     *     <li>Delimiter: ','</li>
+     *     <li>Quote character: '"'</li>
+     *     <li>Record separator": '\r\n'</li>
+     * </ul>
+     *
+     * @return the default CSV format
+     */
     static CSVFormat getDefaultCsvFormat() {
         return CSVFormat.RFC4180
                 .builder()
@@ -173,6 +215,21 @@ public interface TableDataSource {
             input = input.substring(3);
         }
         return input;
+    }
+
+    /**
+     * Get the standard {@link Charset} (encoding) to use if none is specified. According to the Datapackage
+     * specs, this should not be the platform default, but UTF-8: "specify the character encoding of the
+     * resource’s data file. The values should be one of the “Preferred MIME Names” for a character encoding
+     * registered with IANA . If no value for this key is specified then the default is UTF-8."
+     * From: https://specs.frictionlessdata.io/data-resource/#metadata-properties
+     *
+     * We assume the same should apply for Tables.
+     *
+     * @return the default Charset
+     */
+    public static Charset getDefaultEncoding() {
+        return StandardCharsets.UTF_8;
     }
 
     //https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html

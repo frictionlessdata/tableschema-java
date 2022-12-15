@@ -26,8 +26,12 @@ public class TestHelper {
 
     public static File getResourceFile(String fileName) throws URISyntaxException {
         try {
+            String locFileName = fileName;
+            if (!fileName.startsWith("/")) {
+                locFileName = "/" + fileName;
+            }
             // Create file-URL of source file:
-            URL sourceFileUrl = TestHelper.class.getResource(fileName);
+            URL sourceFileUrl = TestHelper.class.getResource(locFileName);
             // normal case: resolve against resources path
             Path path = Paths.get(sourceFileUrl.toURI());
             return path.toFile();

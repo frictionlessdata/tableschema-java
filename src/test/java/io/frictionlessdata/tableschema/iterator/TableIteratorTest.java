@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -148,8 +149,10 @@ class TableIteratorTest {
         Schema validSimpleSchema = Schema.fromJson(f, true);
         File file = new File("data/simple_data_utf16le_trailing_nulls.tsv");
         Table table = Table.fromSource(
-                file, getTestDataDirectory(), validSimpleSchema,
-                TableDataSource.getDefaultCsvFormat().withDelimiter('\t'));
+                file, getTestDataDirectory(),
+                validSimpleSchema,
+                TableDataSource.getDefaultCsvFormat().builder().setDelimiter('\t').build(),
+                StandardCharsets.UTF_16LE);
 
         // Expected data.
         List<String[]> expectedData  = new ArrayList<>();

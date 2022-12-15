@@ -109,25 +109,20 @@ class JsonArrayTableDataSourceTest {
     @Test
     @DisplayName("Validate creating a JsonArrayTableDataSource from InputStream containing JSON")
     void testSafePathInputStreamCreationJson() throws Exception {
-        TableDataSource ds;
-        File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.json");
-        try (FileInputStream is = new FileInputStream(inFile)) {
-            ds = new JsonArrayTableDataSource(is);
-            Assertions.assertArrayEquals(populationHeaders, ds.getHeaders());
-        }
-        Assertions.assertNotNull(ds);
+        String content = TestHelper.getResourceFileContent("fixtures/data/population.json");
+        JsonArrayTableDataSource tds = new JsonArrayTableDataSource(content);
+        Assertions.assertArrayEquals(populationHeaders, tds.getHeaders());
+
+        Assertions.assertNotNull(tds);
     }
 
     @Test
     @DisplayName("Validate creating a JsonArrayTableDataSource from wrong input data (CSV) raises" +
             "an exception")
     void testWrongInputStreamCreationJson() throws Exception {
-        File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.csv");
+        String content = TestHelper.getResourceFileContent( "fixtures/data/population.csv");
         Assertions.assertThrows(Exception.class, () -> {
-            try (FileInputStream is = new FileInputStream(inFile)) {
-                TableDataSource ds = new JsonArrayTableDataSource(is);
-                Assertions.assertArrayEquals(populationHeaders, ds.getHeaders());
-            }
+            new JsonArrayTableDataSource(content);
         });
     }
 
@@ -138,7 +133,8 @@ class JsonArrayTableDataSourceTest {
         Schema schema = Schema.fromJson (schemaFile, true);
 
         File inFile = new File("data/employee_full.json");
-        Table table = Table.fromSource(inFile, getTestDataDirectory(), schema, null);
+        Table table = Table.fromSource(inFile, getTestDataDirectory(), schema, null,
+                TableDataSource.getDefaultEncoding());
         FileWriter fileWriter = new FileWriter("test.json");
         table.write(fileWriter, TableDataSource.Format.FORMAT_JSON);
         fileWriter.close();

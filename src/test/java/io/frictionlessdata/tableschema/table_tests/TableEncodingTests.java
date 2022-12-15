@@ -16,14 +16,17 @@ import static io.frictionlessdata.tableschema.TestHelper.getTestsuiteDataDirecto
 public class TableEncodingTests {
 
     // Test for https://github.com/frictionlessdata/tableschema-java/issues/77
-    // currently disabled
     @Test
     @DisplayName("Create a Table from a ISO-8859-1 encoded file")
     void createTableFromIso8859() throws Exception{
         File testDataDir = getTestDataDirectory();
 
-        Table table
-                = Table.fromSource(new File("csv/encodings/iso8859.csv"), testDataDir, null, null, StandardCharsets.ISO_8859_1);
+        Table table = Table.fromSource(
+                new File("csv/encodings/iso8859.csv"),
+                testDataDir,
+                null,
+                null,
+                StandardCharsets.ISO_8859_1);
 
         Iterator<Object[]> iter = table.iterator();
         Object[] row = iter.next();

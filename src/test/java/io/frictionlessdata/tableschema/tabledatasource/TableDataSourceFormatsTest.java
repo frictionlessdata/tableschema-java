@@ -125,9 +125,8 @@ public class TableDataSourceFormatsTest {
     @DisplayName("Create a CsvTableDataSource from File and validate content matches")
     public void testInputFileCreationCsv() throws Exception {
         TableDataSource ds;
-        File basePath = new File(TestHelper.getTestDataDirectory(),"data");
-        File inFile = new File("population.csv");
-        ds = new CsvTableDataSource(inFile,basePath);
+        String refContent = TestHelper.getResourceFileContent( "fixtures/data/population.csv");
+        ds = new CsvTableDataSource(refContent);
         List<String[]> data = ds.getDataAsStringArray();
         Assertions.assertNotNull(data);
         byte[] bytes = Files.readAllBytes(new File(TestHelper.getTestDataDirectory(), "data/population.csv").toPath());
@@ -145,35 +144,18 @@ public class TableDataSourceFormatsTest {
         TableDataSource ds;
         File basePath = new File(TestHelper.getTestDataDirectory(),"data/population.zip");
         File inFile = new File("population.csv");
-        ds = new CsvTableDataSource(inFile,basePath);
+        ds = TableDataSource.fromSource(inFile, basePath, TableDataSource.getDefaultEncoding());
         List<String[]> data = ds.getDataAsStringArray();
         Assertions.assertNotNull(data);
-        byte[] bytes = Files.readAllBytes(new File(TestHelper.getTestDataDirectory(), "data/population.csv").toPath());
-        String[] content = new String(bytes).split("[\n\r]+");
-        for (int i = 1; i < content.length; i++) {
-            String[] testArr = content[i].split(",");
+        List<String> lines = Files.readAllLines(new File(TestHelper.getTestDataDirectory(), "data/population.csv").toPath());
+        for (int i = 1; i < lines.size(); i++) {
+            String line = lines.get(i);
+            String[] testArr = line.split(",");
             Assertions.assertArrayEquals(testArr, data.get(i-1));
         }
         Assertions.assertNotNull(ds);
     }
 
-    @Test
-    @DisplayName("Create a CsvTableDataSource from zipped File and validate content matches")
-    public void testZipInputFileCreationCsv2() throws Exception {
-        TableDataSource ds;
-        File basePath = new File(TestHelper.getTestDataDirectory(),"data/population.zip");
-        File inFile = new File("population.csv");
-        ds = TableDataSource.fromSource(inFile,basePath, null);
-        List<String[]> data = ds.getDataAsStringArray();
-        Assertions.assertNotNull(data);
-        byte[] bytes = Files.readAllBytes(new File(TestHelper.getTestDataDirectory(), "data/population.csv").toPath());
-        String[] content = new String(bytes).split("[\n\r]+");
-        for (int i = 1; i < content.length; i++) {
-            String[] testArr = content[i].split(",");
-            Assertions.assertArrayEquals(testArr, data.get(i-1));
-        }
-        Assertions.assertNotNull(ds);
-    }
 
     @Test
     @DisplayName("Create a CsvTableDataSource from JSON data and ensure Exception is thrown")
