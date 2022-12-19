@@ -7,6 +7,7 @@ import io.frictionlessdata.tableschema.exception.TypeInferringException;
 
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BooleanField extends Field<Boolean> {
     @JsonIgnore
@@ -59,7 +60,9 @@ public class BooleanField extends Field<Boolean> {
             return false;
 
         }else{
-            throw new TypeInferringException("Value "+value+" not in 'trueValues' or 'falseValues'");
+            String trueStr = (null == trueValues) ? "" : " ("+String.join(", ", trueValues)+") ";
+            String falseStr = (null == falseValues) ? "" : " ("+String.join(", ", falseValues)+") ";
+            throw new TypeInferringException("Value '"+value+"' not in 'trueValues' "+ trueStr +" or 'falseValues' "+ falseStr + "");
         }
     }
 

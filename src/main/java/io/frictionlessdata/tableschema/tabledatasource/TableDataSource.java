@@ -8,6 +8,8 @@ import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.apache.commons.csv.CSVFormat;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -216,6 +218,21 @@ public interface TableDataSource {
         }
 
         return resolvedPath;
+    }
+
+    /**
+     * Get the standard {@link Charset} (encoding) to use if none is specified. According to the Datapackage
+     * specs, this should not be the platform default, but UTF-8: "specify the character encoding of the
+     * resource’s data file. The values should be one of the “Preferred MIME Names” for a character encoding
+     * registered with IANA . If no value for this key is specified then the default is UTF-8."
+     * From: https://specs.frictionlessdata.io/data-resource/#metadata-properties
+     *
+     * We assume the same should apply for Tables.
+     *
+     * @return the default Charset
+     */
+    public static Charset getDefaultEncoding() {
+        return StandardCharsets.UTF_8;
     }
 
     /**

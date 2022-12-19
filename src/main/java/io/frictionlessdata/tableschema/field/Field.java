@@ -627,10 +627,12 @@ public abstract class Field<T> {
 
                 return castValue;
 
-            }catch(ConstraintsException ce){
+            } catch(ConstraintsException ce){
                 throw ce;
 
-            }catch(Exception e){
+            } catch(TypeInferringException e){
+                throw new InvalidCastException(e.getMessage());
+            } catch(Exception e){
                 throw new InvalidCastException(e);
             }
         }
