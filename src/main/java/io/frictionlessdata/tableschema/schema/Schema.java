@@ -411,7 +411,7 @@ public class Schema {
      * @throws ValidationException If validation fails and validation is strict
      */
     @JsonIgnore
-    void validate() throws ValidationException{
+    public void validate() throws ValidationException{
         String json = this.getJson();
         Set<ValidationMessage> messages = tableFormalSchemaValidator.validate(json);
         if (!messages.isEmpty()) {

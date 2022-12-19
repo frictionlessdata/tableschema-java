@@ -564,6 +564,8 @@ public class Table{
                 throw new TableValidationException("Found undeclared column: "+col);
             }
         }
+        if (null != schema)
+            schema.validate();
     }
 
     /**

@@ -321,42 +321,6 @@ public class TableCreationTest {
         assertThrows(TableValidationException.class, table::validate);
     }
 
-    @Test
-    @DisplayName("Create a Table from CSV String data with BOM with Schema from Stream and with default CSVFormat")
-    public void testReadFileWithBOMAndSchema() throws Exception{
-        File testDataDir = getTestDataDirectory();
-        // get path of test CSV file
-        File file = new File("data/simple_data_bom2.tsv");
-        Table table = Table.fromSource(file, testDataDir);
-        table.setCsvFormat(CSVFormat.TDF.withRecordSeparator("\n").withHeader());
-        File f = new File(getTestDataDirectory(), "schema/simple_data_schema.json");
-        Schema schema = null;
-        try (FileInputStream fis = new FileInputStream(f)) {
-            schema = Schema.fromJson (fis, false);
-        }
-        // must not throw an exception
-        table.setSchema(schema);
-    }
-
-    @Test
-    @DisplayName("Create a Table from CSV String data with BOM without a Schema from Stream " +
-            "and with custom CSVFormat")
-    public void testReadFileWithBOM() throws Exception{
-        File testDataDir = getTestDataDirectory();
-        // get path of test CSV file
-        File file = new File("data/simple_data_bom2.tsv");
-        Table table = Table.fromSource(file, testDataDir);
-        CSVFormat csvFormat = CSVFormat
-                .TDF
-                .builder()
-                .setRecordSeparator("\n")
-                .setHeader(new String[0])
-                .build();
-        table.setCsvFormat(csvFormat);
-        Assertions.assertEquals(3, table.read().size());
-        // must not throw an exception
-        table.validate();
-    }
 
     // Ensure that a JSON array file with different ordering of properties between the
     // object records can be read into a consistent String array with the help of
