@@ -7,18 +7,27 @@
 [![Codebase](https://img.shields.io/badge/codebase-github-brightgreen)](https://github.com/frictionlessdata/tableschema-java)
 [![Support](https://img.shields.io/badge/support-discord-brightgreen)](https://discordapp.com/invite/Sewv6av)
 
-A Java library for working with Table Schema. Snapshots on [Jitpack](https://jitpack.io/#frictionlessdata/tableschema-java).
-tableschema-java is a library aimed at parsing CSV and JSON-Array documents into a tabular format according 
+A Java library for working with Table data. 
+**tableschema-java** is a library aimed at parsing CSV and JSON-Array documents into a live Java objects according 
 to [Table Schema](https://frictionlessdata.io/specs/table-schema/), a format definition based on 
 [JSON Schema](https://json-schema.org/understanding-json-schema/).
 
 It allows you to read and write tabular data with assurances to format integrity (it also allows reading and writing
-CSV free-form, ie. without a Schema).
+CSV free-form, ie. without a Schema). And finally, it converts Java POJOs to and from CSV, similar to Jackson for JSON 
+(mostly).
+
+It was conceived by the guys at [Frictionless Data](frictionlessdata.io)
+
+Please find releases on [Jitpack](https://jitpack.io/#frictionlessdata/tableschema-java)
 
 ## Usage
+
+OK, enough of the PR, how do I actually use that thing. It's not like you are the only CSV parser, 
+so show me the goods.
 - [Reading data](docs/table-reading.md) explains various ways of reading data
-  - [Via Java Beans](docs/table-reading.md#reading-tabular-data-the-java-way) via a Java Bean class
-  - [Without a Schema](docs/table-reading.md#reading-tabular-data-without-a-schema) Read as Object arrays and without 
+  - [Via Java Beans](docs/table-reading.md#reading-tabular-data-the-java-way) for minimal friction 
+       if you already have a domain model
+  - [Without a Schema](docs/table-reading.md#reading-tabular-data-without-a-schema) Read as String arrays and without 
          format integrity assurance
   - [With a Schema](docs/table-reading.md#reading-tabular-data-using-a-schema) Read as converted Java object arrays with
     format integrity assurance
@@ -30,8 +39,7 @@ CSV free-form, ie. without a Schema).
 - Validating data: Parsing string data to Field values (casting)
     - [Row Casting](docs/casting.md#row-casting) to check String arrays against a Schema
     - [Field Casting](docs/casting.md#field-casting) to check Strings  against a Field definition
-
-
+    
 ## Contributing
 
 Found a problem and would like to fix it? Have that great idea and would love to see it in the repository?
@@ -46,7 +54,7 @@ This project follows the [Open Knowledge International coding standards](https:/
 
 Get started:
 ```sh
-# install jabba and maven2
+# install Java 1.8 or higher (use Jabba if you need to test on different versions) and maven2
 $ cd tableschema-java
 $ jabba install 1.8
 $ jabba use 1.8
