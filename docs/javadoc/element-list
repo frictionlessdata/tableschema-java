@@ -1,0 +1,11 @@
+io.frictionlessdata.tableschema
+io.frictionlessdata.tableschema.annotations
+io.frictionlessdata.tableschema.exception
+io.frictionlessdata.tableschema.field
+io.frictionlessdata.tableschema.fk
+io.frictionlessdata.tableschema.inputstream
+io.frictionlessdata.tableschema.io
+io.frictionlessdata.tableschema.iterator
+io.frictionlessdata.tableschema.schema
+io.frictionlessdata.tableschema.tabledatasource
+io.frictionlessdata.tableschema.util
