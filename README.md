@@ -39,7 +39,8 @@ so show me the goods.
 - Validating data: Parsing string data to Field values (casting)
     - [Row Casting](docs/casting.md#row-casting) to check String arrays against a Schema
     - [Field Casting](docs/casting.md#field-casting) to check Strings  against a Field definition
-    
+- [Javadoc](docs/javadoc/allclasses-index.html)
+
 ## Contributing
 
 Found a problem and would like to fix it? Have that great idea and would love to see it in the repository?
