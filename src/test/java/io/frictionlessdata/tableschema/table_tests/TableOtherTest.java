@@ -10,9 +10,11 @@ import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.schema.Schema;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -179,8 +181,6 @@ public class TableOtherTest {
     @Test
     public void testInferTypesIntBoolAndGeopoints() throws Exception{
         Table table = Table.fromSource(new File ("int_bool_geopoint_data.csv"), getTestDataDirectory());
-        //String sourceFileAbsPath = TableOtherTest.class.getResource("/fixtures/int_bool_geopoint_data.csv").getPath();
-        //Table table = new Table(sourceFileAbsPath);
 
         // Infer
         Schema schema = table.inferSchema();
@@ -197,18 +197,17 @@ public class TableOtherTest {
         }
     }
 
-    // FIXME too slow
-/*
     @Test
+    @DisplayName("Infer Schema from huge Table")
     public void testInferSchemaFromHugeTable() throws Exception{
         File f = new File("data/gdp.csv");
-        Table table = new Table(f, getTestDataDirectory());
+        Table table = Table.fromSource(f, getTestDataDirectory());
         Assertions.assertEquals(11507, table.read().size());
         Schema schema = table.inferSchema(10);
         File schemaFile = new File(getTestDataDirectory(), "schema/gdp_schema.json");
         Schema expectedSchema = null;
         try (FileInputStream fis = new FileInputStream(schemaFile)) {
-            expectedSchema = new Schema(fis, false);
+            expectedSchema = Schema.fromJson(fis, false);
         }
 
         if (!expectedSchema.equals(schema)) {
@@ -219,7 +218,7 @@ public class TableOtherTest {
             }
         }
         Assertions.assertEquals(expectedSchema, schema);
-    }*/
+    }
 
     @Test
     public void testIterateCastKeyedData() throws Exception{
