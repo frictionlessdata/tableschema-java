@@ -1,6 +1,6 @@
 package io.frictionlessdata.tableschema.field;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ class NumberFieldTest {
     void formatNumberField() {
         NumberField field = new NumberField("test");
         String val = field.formatValueAsString(123123.123, null, null);
-        Assert.assertEquals("123123.123", val);
+        Assertions.assertEquals("123123.123", val);
     }
 
     @Test
@@ -32,7 +32,7 @@ class NumberFieldTest {
     void formatNumberField2() {
         NumberField field = new NumberField("test");
         String val = field.formatValueAsString(1234567890.123, null, germanOptions);
-        Assert.assertEquals("1.234.567.890,123", val);
+        Assertions.assertEquals("1.234.567.890,123", val);
     }
 
     @Test
@@ -41,7 +41,7 @@ class NumberFieldTest {
         NumberField field = new NumberField("test");
         String val = field.formatValueAsString(123.678f, null, germanOptions);
         // value is not exact due to floating point
-        Assert.assertEquals("123,6780014038086" , val);
+        Assertions.assertEquals("123,6780014038086" , val);
     }
 
     @Test
@@ -49,7 +49,7 @@ class NumberFieldTest {
     void formatNumberField3() {
         NumberField field = new NumberField("test");
         Number val = field.parseValue("123.234€", null, bareNumberOptions);
-        Assert.assertEquals(123.234, val.doubleValue(), 0);
+        Assertions.assertEquals(123.234, val.doubleValue(), 0);
     }
 
     @Test
@@ -57,11 +57,11 @@ class NumberFieldTest {
     void formatNumberFieldNan() {
         NumberField field = new NumberField("test");
         String val = field.formatValueAsString(Double.NaN, null, null);
-        Assert.assertEquals("NAN", val);
+        Assertions.assertEquals("NAN", val);
         val = field.formatValueAsString(Double.POSITIVE_INFINITY, null, null);
-        Assert.assertEquals("INF", val);
+        Assertions.assertEquals("INF", val);
         val = field.formatValueAsString(Double.NEGATIVE_INFINITY, null, null);
-        Assert.assertEquals("-INF", val);
+        Assertions.assertEquals("-INF", val);
     }
 
 
@@ -70,11 +70,11 @@ class NumberFieldTest {
     void formatNumberFieldNan2() {
         NumberField field = new NumberField("test");
         String val = field.formatValueAsString(Float.NaN, null, null);
-        Assert.assertEquals("NAN", val);
+        Assertions.assertEquals("NAN", val);
         val = field.formatValueAsString(Float.POSITIVE_INFINITY, null, null);
-        Assert.assertEquals("INF", val);
+        Assertions.assertEquals("INF", val);
         val = field.formatValueAsString(Float.NEGATIVE_INFINITY, null, null);
-        Assert.assertEquals("-INF", val);
+        Assertions.assertEquals("-INF", val);
     }
 
     @Test
@@ -82,6 +82,6 @@ class NumberFieldTest {
     void formatNumberField6() {
         NumberField field = new NumberField("test");
         String val = field.formatValueAsString(null, null, null);
-        Assert.assertNull( val);
+        Assertions.assertNull( val);
     }
 }

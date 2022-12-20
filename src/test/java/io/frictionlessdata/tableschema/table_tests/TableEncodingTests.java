@@ -33,7 +33,6 @@ public class TableEncodingTests {
 
     @Test
     @DisplayName("Create a Table from a UTF-8 encoded file with non-ASCII chars")
-    @Disabled
     void createTableFromUTF8() throws Exception{
         File testDataDir = getTestDataDirectory();
         Schema schema = Schema.fromJson(new File(testDataDir, "schema/units_schema.json"), true);

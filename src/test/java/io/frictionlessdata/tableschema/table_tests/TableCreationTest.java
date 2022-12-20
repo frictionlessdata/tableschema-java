@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -318,7 +317,7 @@ public class TableCreationTest {
         Table table = Table.fromSource(bis, fis, TableDataSource.getDefaultCsvFormat());
 
         // must throw an exception
-        assertThrows(TableValidationException.class, table::validate);
+        Assertions.assertThrows(TableValidationException.class, table::validate);
     }
 
 
