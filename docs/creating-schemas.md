@@ -20,7 +20,7 @@ schema.addField(nameField);
 Field coordinatesField = new GeopointField("coordinates");
 schema.addField(coordinatesField);
 
-System.out.println(schema.getJson());
+System.out.println(schema.asJson());
 
 // {"fields":[{"name":"name","format":"default","description":"","type":"string","title":""},{"name":"coordinates","format":"default","description":"","type":"geopoint","title":""}]}
 ```
@@ -51,7 +51,7 @@ coordinatesFieldJsonObject.put("type", Field.FIELD_TYPE_GEOPOINT);
 coordinatesFieldJsonObject.put("format", Field.FIELD_FORMAT_ARRAY);
 schema.addField(coordinatesFieldJsonObject);
 
-System.out.println(schema.getJson());
+System.out.println(schema.asJson());
 
 /* 
 {"fields":[
@@ -82,7 +82,7 @@ URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschem
 Table table = Table.fromSource(url);
 
 Schema schema = table.inferSchema();
-System.out.println(schema.getJson());
+System.out.println(schema.asJson());
 
 // {"fields":[{"name":"id","format":"","description":"","title":"","type":"integer","constraints":{}},{"name":"title","format":"","description":"","title":"","type":"string","constraints":{}}]}
 
@@ -119,7 +119,7 @@ To make sure a schema complies with [Table Schema specifications](https://specs.
 JSONObject schemaJsonObj = new JSONObject();
 Field nameField = new IntegerField("id");
 schemaJsonObj.put("fields", new JSONArray());
-schemaJsonObj.getJSONArray("fields").put(nameField.getJson());
+schemaJsonObj.asJsonArray("fields").put(nameField.asJson());
 
 Schema schema = Schema.fromJson(schemaJsonObj.toString(), true);
 

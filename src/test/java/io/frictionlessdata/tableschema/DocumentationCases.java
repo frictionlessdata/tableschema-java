@@ -171,7 +171,7 @@ class DocumentationCases {
         Field coordinatesField = new GeopointField("coordinates");
         schema.addField(coordinatesField);
 
-        System.out.println(schema.getJson());
+        System.out.println(schema.asJson());
 
         /*
         {"fields":[
@@ -218,7 +218,7 @@ class DocumentationCases {
         */
 
         ObjectMapper objectMapper = new ObjectMapper();
-        Object jsonObject = objectMapper.readValue(schema.getJson(), Object.class);
+        Object jsonObject = objectMapper.readValue(schema.asJson(), Object.class);
         String expectedString = TestHelper.getResourceFileContent(
                 "/fixtures/schema/documentation-cases/employee_schema_invalid.json");
         assertEquals(objectMapper.readValue(expectedString, Object.class), jsonObject);
@@ -232,7 +232,7 @@ class DocumentationCases {
         Table table = Table.fromSource(url);
 
         Schema schema = table.inferSchema();
-        System.out.println(schema.getJson());
+        System.out.println(schema.asJson());
 
         /*
          {"fields":[

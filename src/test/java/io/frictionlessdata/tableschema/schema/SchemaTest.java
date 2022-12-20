@@ -501,7 +501,7 @@ public class SchemaTest {
     public void testInferTypesComplexSchema() throws Exception {
         Table table = Table.fromSource(new File("data/employee_data.csv"), getTestDataDirectory());
 
-        String schemaObjStr = table.inferSchema().getJson();
+        String schemaObjStr = table.inferSchema().asJson();
         Schema schema = Schema.fromJson(schemaObjStr, true);
 
         File f = new File(getTestDataDirectory(), "schema/employee_schema.json");
@@ -572,7 +572,7 @@ public class SchemaTest {
         Table table = Table.fromSource(url);
 
         Schema schema = table.inferSchema();
-        String json = schema.getJson();
+        String json = schema.asJson();
         Schema newSchema = Schema.fromJson(json, true);
         Assertions.assertTrue(newSchema.isValid());
     }

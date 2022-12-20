@@ -212,7 +212,7 @@ public class Schema {
 
     public void writeJson(OutputStream output) throws IOException {
         try (BufferedWriter file = new BufferedWriter(new OutputStreamWriter(output))) {
-            file.write(this.getJson());
+            file.write(this.asJson());
         }
     }
 
@@ -322,8 +322,18 @@ public class Schema {
         return this.errors;
     }
 
+    /**
+     * For consistency, use {@link #asJson()} instead
+     * @return JSON-Representation
+     */
+    @Deprecated()
     @JsonIgnore
     public String getJson() {
+        return asJson();
+    }
+
+    @JsonIgnore
+    public String asJson() {
         return JsonUtil.getInstance().serialize(this);
     }
 
@@ -412,7 +422,7 @@ public class Schema {
      */
     @JsonIgnore
     public void validate() throws ValidationException{
-        String json = this.getJson();
+        String json = this.asJson();
         Set<ValidationMessage> messages = tableFormalSchemaValidator.validate(json);
         if (!messages.isEmpty()) {
             errors.add(new ValidationException(tableFormalSchemaValidator, messages));

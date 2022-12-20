@@ -28,7 +28,7 @@ public class SchemaInferralTests {
         Schema schema = table.inferSchema();
 
         ObjectMapper objectMapper = new ObjectMapper();
-        Object jsonObject = objectMapper.readValue(schema.getJson(), Object.class);
+        Object jsonObject = objectMapper.readValue(schema.asJson(), Object.class);
         String expectedString = TestHelper.getResourceFileContent(
                 "/fixtures/schema/employee_schema.json");
         assertEquals(objectMapper.readValue(expectedString, Object.class), jsonObject);
@@ -63,7 +63,7 @@ public class SchemaInferralTests {
 
         Schema schema = table.inferSchema();
 
-        Object jsonObject = objectMapper.readValue(schema.getJson(), Object.class);
+        Object jsonObject = objectMapper.readValue(schema.asJson(), Object.class);
         String expectedString = TestHelper.getResourceFileContent(
                 "/fixtures/schema/issue-72.json");
         assertEquals(objectMapper.readValue(expectedString, Object.class), jsonObject);
@@ -75,7 +75,7 @@ public class SchemaInferralTests {
 
         Schema schema2 = table2.inferSchema();
 
-        jsonObject = objectMapper.readValue(schema2.getJson(), Object.class);
+        jsonObject = objectMapper.readValue(schema2.asJson(), Object.class);
         assertEquals(objectMapper.readValue(expectedString, Object.class), jsonObject);
         Assertions.assertTrue(schema.isValid());
     }

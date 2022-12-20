@@ -170,7 +170,7 @@ public class TableOtherTest {
     public void testInferTypesIntAndDates() throws Exception{
         Table table = Table.fromSource(new File ("dates_data.csv"), getTestDataDirectory());
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode schema = objectMapper.readTree(table.inferSchema().getJson());
+        JsonNode schema = objectMapper.readTree(table.inferSchema().asJson());
         JsonNode schemaFiles = schema.get("fields");
 
         // The field names are the same as the name of the type we are expecting to be inferred.
