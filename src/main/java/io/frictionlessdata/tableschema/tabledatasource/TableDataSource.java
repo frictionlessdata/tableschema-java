@@ -68,30 +68,13 @@ public interface TableDataSource {
      * @return DataSource created from input String
      */
     static TableDataSource fromSource(String input) {
-        String cleanedInput = input;
-        try {
-            byte[] bytes = new byte[input.length()];
-            input.getBytes(0, input.length(), bytes, 0);
-            ByteOrderMarkStrippingInputStream is
-                    = new ByteOrderMarkStrippingInputStream(new ByteArrayInputStream(bytes));
-            is.skipBOM();
-
-            InputStreamReader rdr = new InputStreamReader(is);
-            BufferedReader bfr = new BufferedReader(rdr);
-            cleanedInput = bfr.lines().collect(Collectors.joining("\n"));
-            is.close();
-            rdr.close();
-            bfr.close();
-        } catch (Exception ex) {
-            throw new TableIOException(ex);
-        }
         try {
             // JSON array generation. If an exception is thrown -> probably CSV data
-            ArrayNode json = JsonUtil.getInstance().createArrayNode(cleanedInput);
+            ArrayNode json = JsonUtil.getInstance().createArrayNode(input);
             return new JsonArrayTableDataSource(input);
         } catch (Exception ex) {
             // JSON parsing failed, treat it as a CSV
-            return new CsvTableDataSource(cleanedInput);
+            return new CsvTableDataSource(input);
         }
     }
 

@@ -1,0 +1,19 @@
+{
+  "fields": [
+    {
+      "name": "id",
+      "format": "default",
+      "description": "primary key",
+      "type": "integer",
+      "title": "id"
+    },
+    {
+      "name": "unit",
+      "format": "default",
+      "description": "The unit.",
+      "type": "string",
+      "title": "The unit."
+    }
+  ],
+  "primaryKey": "id"
+}
