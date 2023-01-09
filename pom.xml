@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frictionlessdata</groupId>
     <artifactId>tableschema-java</artifactId>
-    <version>0.6.6-SNAPSHOT</version>
+    <version>0.6.7-SNAPSHOT</version>
     <packaging>jar</packaging>
     <issueManagement>
         <url>https://github.com/frictionlessdata/tableschema-java/issues</url>
@@ -39,7 +39,7 @@
         <maven-release-plugin.version>3.0.0-M7</maven-release-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
-        <dependency-check-maven.version>7.1.0</dependency-check-maven.version>
+        <dependency-check-maven.version>7.4.4</dependency-check-maven.version>
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
     </properties>
     <repositories>
