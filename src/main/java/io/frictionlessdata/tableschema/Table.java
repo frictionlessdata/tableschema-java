@@ -247,7 +247,7 @@ public class Table{
 
     /**
      * This is the most flexible way to read data from a Table referencing a file or URL. Each row of the table
-     * will be returned as an either an Object array or a Map<String, Object>, depending on Options.
+     * will be returned as an either an Object array or a Map&lt;String, Object&gt;, depending on Options.
      * Options allow you to tailor the behavior of the Iterator to your needs:
      *  <ul>
      *      <li> String arrays (parameter `cast` = false)</li>
@@ -257,7 +257,7 @@ public class Table{
      *      <li> or in an "extended" form (parameter `extended` = true) that returns an Object array where the first
      *      entry is the row number, the second is a String array holding the headers, and the third is an Object
      *      array holding the row data converted to Java objects.</li>
-     *   <  li> Resolving references to other data sources (parameter `relations` = true)</li>
+     *      <li> Resolving references to other data sources (parameter `relations` = true)</li>
      *  </ul>
      *
      * The following rules apply:

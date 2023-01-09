@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frictionlessdata</groupId>
     <artifactId>tableschema-java</artifactId>
-    <version>0.6.5-SNAPSHOT</version>
+    <version>0.6.6-SNAPSHOT</version>
     <packaging>jar</packaging>
     <issueManagement>
         <url>https://github.com/frictionlessdata/tableschema-java/issues</url>
@@ -28,7 +28,7 @@
         <jackson.version>2.14.1</jackson.version>
         <junit.version>5.9.1</junit.version>
         <locationtech-jts.version>1.19.0</locationtech-jts.version>
-        <networknt-validator-version>1.0.75</networknt-validator-version>
+        <networknt-validator-version>1.0.76</networknt-validator-version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
@@ -69,6 +69,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${maven-resources-plugin.version}</version>
+                <!--
                 <executions>
                     <execution>
                         <id>copy-javadoc</id>
@@ -87,6 +88,7 @@
                         </configuration>
                     </execution>
                 </executions>
+                -->
                 <configuration>
                     <encoding>UTF-8</encoding>
                 </configuration>
@@ -122,6 +124,7 @@
                     <quiet>true</quiet>
                     <encoding>UTF-8</encoding>
                     <source>${java.version}</source>
+
                 </configuration>
                 <executions>
                     <execution>
