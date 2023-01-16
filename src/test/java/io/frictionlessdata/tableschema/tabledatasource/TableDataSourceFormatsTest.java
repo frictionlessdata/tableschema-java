@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -95,7 +96,7 @@ public class TableDataSourceFormatsTest {
     @Test
     @DisplayName("Create a CsvTableDataSource from an URL containing CSV String data and ensure the data size is 3")
     public void testUrlCreationCsv() throws Exception {
-        TableDataSource ds = new CsvTableDataSource(new URL ("https://raw.githubusercontent.com/frictionlessdata" +
+        TableDataSource ds = TableDataSource.fromSource(new URL("https://raw.githubusercontent.com/frictionlessdata" +
                 "/tableschema-java/master/src/test/resources/fixtures/data/population.csv"), StandardCharsets.UTF_8);
         Assertions.assertNotNull(ds);
         List<String[]> data = ds.getDataAsStringArray();
@@ -109,7 +110,7 @@ public class TableDataSourceFormatsTest {
         TableDataSource ds;
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.csv");
         try (FileInputStream is = new FileInputStream(inFile)) {
-            ds = new CsvTableDataSource(is, StandardCharsets.UTF_8);
+            ds = TableDataSource.fromSource(is, StandardCharsets.UTF_8);
             List<String[]> data = ds.getDataAsStringArray();
             Assertions.assertNotNull(data);
             byte[] bytes = Files.readAllBytes(new File(TestHelper.getTestDataDirectory(), "data/population.csv").toPath());
@@ -159,16 +160,16 @@ public class TableDataSourceFormatsTest {
 
 
     @Test
-    @DisplayName("Create a CsvTableDataSource from JSON data and ensure Exception is thrown")
+    @DisplayName("Create a JsonArrayTableDataSource from JSON data")
     public void testWrongInputStreamCreationCsv() throws Exception {
-        final TableDataSource[] ds = new TableDataSource[1];
+        final TableDataSource ds;
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.json");
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            FileInputStream is = new FileInputStream(inFile);
-            ds[0] = new CsvTableDataSource(is, StandardCharsets.UTF_8);
-            is.close();
-        });
+        FileInputStream is = new FileInputStream(inFile);
+        ds = TableDataSource.fromSource(is, StandardCharsets.UTF_8);
+        is.close();
+
+        Assertions.assertTrue(ds instanceof JsonArrayTableDataSource);
     }
 
     @Test

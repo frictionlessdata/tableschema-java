@@ -108,6 +108,22 @@ public interface TableDataSource {
 
     /**
      * Factory method to instantiate either a {@link JsonArrayTableDataSource} or a
+     * {@link CsvTableDataSource} based on input format. The method will guess
+     * whether `input` is CSV or JSON data
+     *
+     * @return DataSource created from input URL
+     */
+    static TableDataSource fromSource(URL input, Charset charset) {
+        try {
+            Charset cs = (null == charset) ? getDefaultEncoding() : charset;
+            return fromSource(input.openStream(), cs);
+        } catch (IOException ex) {
+            throw new TableIOException(ex);
+        }
+    }
+
+    /**
+     * Factory method to instantiate either a {@link JsonArrayTableDataSource} or a
      * {@link CsvTableDataSource} based on input format and with the default charset.
      *
      * @return DataSource created from input String

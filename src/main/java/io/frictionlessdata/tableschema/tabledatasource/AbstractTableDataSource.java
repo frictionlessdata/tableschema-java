@@ -2,12 +2,9 @@ package io.frictionlessdata.tableschema.tabledatasource;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -22,11 +19,6 @@ public abstract class AbstractTableDataSource<T> implements TableDataSource {
     Charset encoding = StandardCharsets.UTF_8;
 
     AbstractTableDataSource(){}
-
-    AbstractTableDataSource(T dataSource){
-        this.dataSource = dataSource;
-    }
-
 
     @Override
     public List<String[]> getDataAsStringArray() {
