@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -318,7 +317,7 @@ public class TableCreationTest {
         Table table = Table.fromSource(bis, fis, TableDataSource.getDefaultCsvFormat());
 
         // must throw an exception
-        assertThrows(TableValidationException.class, table::validate);
+        Assertions.assertThrows(TableValidationException.class, table::validate);
     }
 
     @Test
@@ -328,7 +327,7 @@ public class TableCreationTest {
         // get path of test CSV file
         File file = new File("data/simple_data_bom2.tsv");
         Table table = Table.fromSource(file, testDataDir);
-        table.setCsvFormat(CSVFormat.TDF.withRecordSeparator("\n").withHeader());
+        table.setCsvFormat(CSVFormat.TDF.builder().setRecordSeparator("\n").setHeader().build());
         File f = new File(getTestDataDirectory(), "schema/simple_data_schema.json");
         Schema schema = null;
         try (FileInputStream fis = new FileInputStream(f)) {
