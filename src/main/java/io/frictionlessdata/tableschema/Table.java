@@ -149,7 +149,7 @@ public class Table{
     }
 
     /**
-     * Create Table from a {@link java.io.File} containing the CSV/JSON
+     * Create Table from a {@link java.io.File} containing the CSV/JSON as UTF-8
      * data and with  a Schema and a CSVFormat.
      * @param dataSource relative File for reading the data from. Must be inside `basePath`
      * @param basePath Parent directory
@@ -175,7 +175,7 @@ public class Table{
     }
 
     /**
-     * Create Table from a {@link java.io.File} containing the CSV/JSON
+     * Create Table from a {@link java.io.File} containing the CSV/JSON< as UTF-8>
      * data and without either a Schema or a CSVFormat.
      * @param dataSource relative File for reading the data from. Must be inside `basePath`
      * @param basePath Parent directory
@@ -212,7 +212,8 @@ public class Table{
     }
 
     /**
-     * Create Table from a URL containing either CSV or JSON and without either a Schema or a CSVFormat.
+     * Create Table from a URL containing either CSV or JSON as UTF-8
+     * and without either a Schema or a CSVFormat.
      * @param dataSource the URL for the CSV or JSON content
      */
     public static Table fromSource(URL dataSource)  {
@@ -233,13 +234,13 @@ public class Table{
      * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data.
      *               Can be `null`
      */
-    public static Table fromSource(URL dataSource, URL schemaUrl, CSVFormat format) {
+    public static Table fromSource(URL dataSource, URL schemaUrl, CSVFormat format, Charset charset) {
         try {
             Schema schema = null;
             if (null != schemaUrl) {
                 schema = Schema.fromJson(schemaUrl, true);
             }
-            return fromSource(dataSource, schema, format);
+            return fromSource(dataSource, schema, format, charset);
         } catch (IOException ex) {
             throw new TableIOException(ex);
         }
@@ -252,13 +253,18 @@ public class Table{
      * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data.
      *               Can be `null`
      */
-    public static Table fromSource(URL dataSource, Schema schema, CSVFormat format) {
-        Table table = fromSource(dataSource);
-        table.schema = schema;
-        if (null != format) {
-            table.setCsvFormat(format);
+    public static Table fromSource(URL dataSource, Schema schema, CSVFormat format, Charset charset) {
+        try {
+            Table table = new Table();
+            table.dataSource = TableDataSource.fromSource(dataSource.openStream(), charset);
+            table.schema = schema;
+            if (null != format) {
+                table.setCsvFormat(format);
+            }
+        return table;} catch (IOException ex) {
+            throw new TableIOException(ex);
         }
-        return table;
+
     }
 
     /**

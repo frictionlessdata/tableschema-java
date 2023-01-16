@@ -179,14 +179,14 @@ public class TableCreationTest {
 
 
     @Test
-    @DisplayName("Create a Table from URL with Schema and with default CSVFormat")
+    @DisplayName("Create a Table from URL with Schema and with default CSVFormat and UTF-8 encoding")
     public void testReadFromValidUrlAndValidSchemaURL() throws Exception{
         // get path of test CSV file
         URL tableUrl = new URL("https://raw.githubusercontent.com/frictionlessdata" +
                 "/tableschema-java/master/src/test/resources/fixtures/data/population.csv");
         URL schemaUrl = new URL("https://raw.githubusercontent.com/frictionlessdata" +
                 "/tableschema-java/master/src/test/resources/fixtures/schema/population_schema.json");
-        Table table = Table.fromSource(tableUrl, schemaUrl, null);
+        Table table = Table.fromSource(tableUrl, schemaUrl, null, null);
 
         File schemaFile = new File(getTestDataDirectory(), "schema/population_schema.json");
         Schema testSchema = Schema.fromJson (schemaFile, true);
@@ -389,13 +389,13 @@ public class TableCreationTest {
     }
 
     @Test
-    @DisplayName("Create a Table from URL without Schema or CSVFormat")
+    @DisplayName("Create a Table from URL as UTF-8 without Schema or CSVFormat")
     void csvParsingWithSchemaNullAndCsvFormatNullFromURL() throws Exception{
 
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
                 "/src/test/resources/fixtures/data/simple_data.csv");
         // Load the data from URL without a schema.
-        Table table = Table.fromSource(url, (Schema)null, null);
+        Table table = Table.fromSource(url, (Schema)null, null, null);
 
         List<Object[]> data = new ArrayList<>();
         Iterator<Object[]> iterator = table.iterator();

@@ -39,7 +39,7 @@ public class JsonArrayTableDataSource extends AbstractTableDataSource<ArrayNode>
 	public Iterator<String[]> iterator() {
 		String[] headers = getHeaders();
 
-		return Iterators.transform(((ArrayNode)dataSource).iterator(), (JsonNode input) -> {
+		return Iterators.transform(dataSource.iterator(), (JsonNode input) -> {
 			List<String> values = new ArrayList<>();
 			for (String header : headers) {
 				JsonNode val = input.get(header);

@@ -19,6 +19,7 @@ public abstract class AbstractTableDataSource<T> implements TableDataSource {
     T dataSource = null;
     File workDir;
 
+    Charset encoding = StandardCharsets.UTF_8;
 
     AbstractTableDataSource(){}
 
@@ -35,7 +36,7 @@ public abstract class AbstractTableDataSource<T> implements TableDataSource {
     }
 
     String getFileContents(String path) throws IOException {
-        return TableDataSource.getFileContents(path, workDir, Charset.defaultCharset());
+        return TableDataSource.getFileContents(path, workDir, encoding);
     }
 
     @Override

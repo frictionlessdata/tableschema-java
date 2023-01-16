@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.math.BigInteger;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
@@ -36,7 +37,7 @@ class DocumentationCases {
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
                 "/src/test/resources/fixtures/data/simple_data.csv");
 // Load the data from URL without a schema.
-        Table table = Table.fromSource(url, (Schema)null, TableDataSource.getDefaultCsvFormat());
+        Table table = Table.fromSource(url, (Schema)null, TableDataSource.getDefaultCsvFormat(), StandardCharsets.UTF_8);
 
         List<SimpleDataBean> data = new ArrayList<>();
         Iterator<SimpleDataBean> bit = new BeanIterator<>(table, SimpleDataBean.class, false);
@@ -76,7 +77,9 @@ class DocumentationCases {
         Table table = Table.fromSource(
             new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
                 "/src/test/resources/fixtures/data/simple_data.csv"),
-            schema, TableDataSource.getDefaultCsvFormat());
+            schema,
+            TableDataSource.getDefaultCsvFormat(),
+            StandardCharsets.UTF_8);
 
         List<Object[]> allData = table.read();
 
@@ -294,7 +297,7 @@ class DocumentationCases {
         // Load the data from URL with the schema.
         URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
             "/src/test/resources/fixtures/data/employee_data.csv");
-        Table table = Table.fromSource(url, schema, TableDataSource.getDefaultCsvFormat());
+        Table table = Table.fromSource(url, schema, TableDataSource.getDefaultCsvFormat(), StandardCharsets.UTF_8);
 
         Iterator<Object> iter = table.iterator(false, false, true, false);
         while(iter.hasNext()){

@@ -39,8 +39,10 @@ public class CsvTableDataSource extends AbstractTableDataSource<String> {
 
     private Object dataResource;
 
-    CsvTableDataSource(URL dataSource){
+    CsvTableDataSource(URL dataSource, Charset encoding){
         dataResource = dataSource;
+        if (null != encoding)
+            super.encoding = encoding;
     }
 
     CsvTableDataSource(String dataSource){
@@ -55,8 +57,10 @@ public class CsvTableDataSource extends AbstractTableDataSource<String> {
      * @param inStream the stream to read from
      * @throws Exception if an IOException occurs
      */
-    CsvTableDataSource(InputStream inStream){
-        try (InputStreamReader is = new InputStreamReader(inStream, StandardCharsets.UTF_8);
+    CsvTableDataSource(InputStream inStream, Charset encoding){
+        if (null != encoding)
+            this.encoding = encoding;
+        try (InputStreamReader is = new InputStreamReader(inStream, this.encoding);
                 BufferedReader br = new BufferedReader(is)) {
             String content = br.lines().collect(Collectors.joining("\n"));
             this.dataSource = TableDataSource.trimBOM(content);
@@ -157,7 +161,7 @@ public class CsvTableDataSource extends AbstractTableDataSource<String> {
             return CSVParser.parse(lines, format);
 
         } else if(dataResource instanceof URL){
-            return CSVParser.parse((URL)dataResource, StandardCharsets.UTF_8, format);
+            return CSVParser.parse((URL)dataResource, encoding, format);
 
         } else{
             throw new TableSchemaException("Data source is of invalid type.");

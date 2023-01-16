@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -95,7 +96,7 @@ public class TableDataSourceFormatsTest {
     @DisplayName("Create a CsvTableDataSource from an URL containing CSV String data and ensure the data size is 3")
     public void testUrlCreationCsv() throws Exception {
         TableDataSource ds = new CsvTableDataSource(new URL ("https://raw.githubusercontent.com/frictionlessdata" +
-                "/tableschema-java/master/src/test/resources/fixtures/data/population.csv"));
+                "/tableschema-java/master/src/test/resources/fixtures/data/population.csv"), StandardCharsets.UTF_8);
         Assertions.assertNotNull(ds);
         List<String[]> data = ds.getDataAsStringArray();
         Assertions.assertEquals(3, data.size());
@@ -108,7 +109,7 @@ public class TableDataSourceFormatsTest {
         TableDataSource ds;
         File inFile = new File(TestHelper.getTestDataDirectory(), "data/population.csv");
         try (FileInputStream is = new FileInputStream(inFile)) {
-            ds = new CsvTableDataSource(is);
+            ds = new CsvTableDataSource(is, StandardCharsets.UTF_8);
             List<String[]> data = ds.getDataAsStringArray();
             Assertions.assertNotNull(data);
             byte[] bytes = Files.readAllBytes(new File(TestHelper.getTestDataDirectory(), "data/population.csv").toPath());
@@ -165,7 +166,7 @@ public class TableDataSourceFormatsTest {
 
         assertThrows(IllegalArgumentException.class, () -> {
             FileInputStream is = new FileInputStream(inFile);
-            ds[0] = new CsvTableDataSource(is);
+            ds[0] = new CsvTableDataSource(is, StandardCharsets.UTF_8);
             is.close();
         });
     }

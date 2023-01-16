@@ -28,6 +28,7 @@ import java.util.zip.ZipFile;
  * <ul>
  *     <li>JSON-encoded array data</li>
  *     <li>CSV-encoded data</li>
+ *     <li>Bean collections</li>
  *     <li>String arrays</li>
  * </ul>
  *
@@ -37,7 +38,6 @@ public interface TableDataSource {
     String UTF16_BOM = "\ufeff";
     String UTF8_BOM = "\u00ef\u00bb\u00bf";
 
-    Charset encoding = StandardCharsets.UTF_8;
     /**
      * Returns an Iterator that returns String arrays containing
      * one row of data each.
