@@ -8,6 +8,8 @@ import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This implements a reference from one Table to another. Weirdly, this is in tableschema as per
@@ -25,14 +27,23 @@ public class Reference {
     public Reference(){
     }
     
-    public Reference(String resource, Object fields) throws ForeignKeyException{
+    public Reference(String resource, JsonNode fields) throws ForeignKeyException{
         this(resource, fields, false);
     }
     
-    public Reference(String resource, Object fields, boolean strict) throws ForeignKeyException{
+    public Reference(String resource, JsonNode fields, boolean strict) throws ForeignKeyException{
         this.resource = resource;
-        this.fields = fields;
+        this.fields =  resolveFields (fields);
         
+        if(strict){
+            this.validate();
+        }
+    }
+
+    public Reference(String resource, String fields, boolean strict) throws ForeignKeyException{
+        this.resource = resource;
+        this.fields =  fields;
+
         if(strict){
             this.validate();
         }
@@ -45,12 +56,8 @@ public class Reference {
             this.resource = refJsonObject.get(JSON_KEY_RESOURCE).asText();
         }
         
-        if(refJsonObject.has(JSON_KEY_FIELDS)){
-        	if(refJsonObject.get(JSON_KEY_FIELDS).isArray()) {
-        		this.fields = refJsonObject.get(JSON_KEY_FIELDS);
-        	} else {
-        		this.fields = refJsonObject.get(JSON_KEY_FIELDS).asText();
-        	}
+        if (refJsonObject.has(JSON_KEY_FIELDS)){
+            this.fields = resolveFields (refJsonObject.get(JSON_KEY_FIELDS));
         }
         
         if(strict){
@@ -78,7 +85,7 @@ public class Reference {
         if(this.resource == null || this.fields == null){
             throw new ForeignKeyException("A foreign key's reference must have the fields and resource properties.");
             
-        }else if(!(this.fields instanceof String) && !(ArrayNode.class.isAssignableFrom(this.fields.getClass()))){
+        }else if(!(this.fields instanceof String) && !(this.fields instanceof String[])){
             throw new ForeignKeyException("The foreign key's reference fields property must be a string or an array.");
         }
     }
@@ -86,5 +93,16 @@ public class Reference {
     @JsonIgnore
     public String getJson(){
         return JsonUtil.getInstance().serialize(this);
+    }
+
+    private static Object resolveFields (JsonNode refJsonObject) {
+        if(refJsonObject.isArray()) {
+            ArrayNode node = (ArrayNode) refJsonObject;
+            List<String> entries = new ArrayList<>();
+            node.elements().forEachRemaining((e) -> entries.add(e.asText()));
+            return entries.toArray(new String[]{});
+        } else {
+            return refJsonObject.asText();
+        }
     }
 }

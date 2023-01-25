@@ -187,4 +187,16 @@ class JsonArrayTableDataSourceTest {
                 .replaceAll(" ]", "]");
         Assertions.assertEquals(referenceContentCsv, testContentCsv);
     }
+
+    @Test
+    @DisplayName("Validate creating a JsonArrayTableDataSource from JSON array file")
+    void testJsonArrayData() throws Exception {
+        TableDataSource ds = TableDataSource.fromSource(new File("data/cities.json"),
+                TestHelper.getTestDataDirectory());
+        Assertions.assertNotNull(ds);
+        String[] headers = ds.getHeaders();
+        Assertions.assertNotNull(headers);
+        Assertions.assertTrue(headers.length > 0);
+        Assertions.assertArrayEquals(new String[]{"name", "country"}, headers);
+    }
 }

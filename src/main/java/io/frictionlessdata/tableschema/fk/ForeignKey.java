@@ -30,11 +30,15 @@ public class ForeignKey {
         this.strictValidation = strict;
     }
 
-    public ForeignKey(Object fields, Reference reference, boolean strict) throws ForeignKeyException{
+    public ForeignKey(JsonNode fields, Reference reference, boolean strict) throws ForeignKeyException{
         this.fields = fields;
         this.reference = reference;
         this.strictValidation = strict;
         this.validate();
+    }
+
+    public ForeignKey(String json, Reference reference, boolean strict) throws ForeignKeyException{
+        this(json, strict);
     }
     
     public ForeignKey(String json, boolean strict) throws ForeignKeyException{
@@ -43,7 +47,10 @@ public class ForeignKey {
         
         if(fkJsonObject.has(JSON_KEY_FIELDS)){
         	if(fkJsonObject.get(JSON_KEY_FIELDS).isArray()) {
-        		fields = fkJsonObject.get(JSON_KEY_FIELDS);
+                ArrayNode node = (ArrayNode) fkJsonObject.get(JSON_KEY_FIELDS);
+                List<String> entries = new ArrayList<>();
+                node.elements().forEachRemaining((e) -> entries.add(e.asText()));
+                this.fields = entries.toArray(new String[]{});
         	} else {
         		fields = fkJsonObject.get(JSON_KEY_FIELDS).asText();
         	}
@@ -79,20 +86,20 @@ public class ForeignKey {
         if(this.fields == null || this.reference == null){
             fke = new ForeignKeyException("A foreign key must have the fields and reference properties.");
             
-        }else if(!(this.fields instanceof String) && !(this.fields instanceof ArrayNode)){
+        }else if(!(this.fields instanceof String) && !(this.fields instanceof String[])){
             fke = new ForeignKeyException("The foreign key's fields property must be a string or an array.");
             
-        }else if(this.fields instanceof ArrayNode && !(this.reference.getFields() instanceof ArrayNode)){
+        }else if(this.fields instanceof String[] && !(this.reference.getFields() instanceof String[])){
             fke = new ForeignKeyException("The reference's fields property must be an array if the outer fields is an array.");
             
         }else if(this.fields instanceof String && !(this.reference.getFields() instanceof String)){
             fke = new ForeignKeyException("The reference's fields property must be a string if the outer fields is a string.");
             
-        }else if(this.fields instanceof ArrayNode && this.reference.getFields() instanceof ArrayNode){
-        	ArrayNode fkFields = (ArrayNode)fields;
-        	ArrayNode refFields = reference.getFields();
+        }else if(this.fields instanceof String[] && this.reference.getFields() instanceof String[]){
+            String[] fkFields = (String[])fields;
+            String[] refFields = reference.getFields();
             
-            if(fkFields.size() != refFields.size()){
+            if(fkFields.length != refFields.length){
                 fke = new ForeignKeyException("The reference's fields property must be an array of the same length as that of the outer fields' array.");
             }
         }

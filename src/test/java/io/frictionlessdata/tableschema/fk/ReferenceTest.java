@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema.fk;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.junit.jupiter.api.Assertions;
@@ -17,7 +18,7 @@ public class ReferenceTest {
     @Test
     @DisplayName("Create a Reference with resource and field properties")
     public void testValidStringFieldsReference() throws ForeignKeyException{
-        Reference ref = new Reference("resource", "field");
+        Reference ref = new Reference("resource", "field", true);
 
         // Validation set to strict=true and no exception has been thrown.
         // Test passes.
@@ -70,18 +71,12 @@ public class ReferenceTest {
         Assertions.assertEquals(
                 "A foreign key's reference must have the fields and resource properties.",
                 fke.getMessage());
-        //exception.expectMessage("A foreign key's reference must have the fields and resource properties.");
-        //ref.validate();
     }
 
     @Test
-    @DisplayName("Create a Reference with invalid field type -> must throw")
+    @DisplayName("Create a Reference with int array")
     public void testInvalidFieldsType() throws ForeignKeyException{
-        ForeignKeyException fke = Assertions.assertThrows(ForeignKeyException.class,
-                ()-> {new Reference("resource", 123, true);});
-        Assertions.assertEquals(
-                "The foreign key's reference fields property must be a string or an array.",
-                fke.getMessage());
-
+        ArrayNode node = JsonUtil.getInstance().createArrayNode(new int[]{123});
+        new Reference("resource", node, true);
     }
 }

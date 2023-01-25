@@ -2,6 +2,7 @@ package io.frictionlessdata.tableschema.tabledatasource;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Iterators;
 import io.frictionlessdata.tableschema.util.JsonUtil;
@@ -50,35 +51,61 @@ public class JsonArrayTableDataSource extends AbstractTableDataSource<ArrayNode>
 	public Iterator<String[]> iterator() {
 		String[] headers = getHeaders();
 
-		return Iterators.transform(((ArrayNode)dataSource).iterator(), (JsonNode input) -> {
-			List<String> values = new ArrayList<>();
-			for (String header : headers) {
-				JsonNode val = input.get(header);
-				if (null == val) {
-					values.add(null);
-				} else if ((val instanceof ObjectNode) || (val instanceof ArrayNode)) {
-					values.add(val.toString());
-				} else
-					values.add(val.asText(""));
-			}
+		JsonNode firstObject = dataSource.get(0);
+		JsonNodeType nodeType = firstObject.getNodeType();
+		if (nodeType.equals(JsonNodeType.OBJECT)) {
+			return Iterators.transform(((ArrayNode) dataSource).iterator(), (JsonNode input) -> {
+				List<String> values = new ArrayList<>();
+				for (String header : headers) {
+					JsonNode val = input.get(header);
+					if (null == val) {
+						values.add(null);
+					} else if ((val instanceof ObjectNode) || (val instanceof ArrayNode)) {
+						values.add(val.toString());
+					} else
+						values.add(val.asText(""));
+				}
 
-			return values.toArray(new String[0]);
-		});
+				return values.toArray(new String[0]);
+			});
+		} else if (nodeType.equals(JsonNodeType.ARRAY)) {
+			Set<String> row = new LinkedHashSet<>();
+			firstObject.iterator().forEachRemaining((n) -> row.add(n.asText()));
+			String[] strings = row.toArray(new String[]{});
+			Iterator iter =((ArrayNode) dataSource).iterator();
+			if (Arrays.equals(strings, headers)) {
+				iter.next();
+			}
+			return Iterators.transform(iter, (JsonNode input) -> {
+				List<String> values = new ArrayList<>();
+				input.iterator().forEachRemaining((n) -> values.add(n.asText()));
+				return values.toArray(new String[0]);
+			});
+		};
+		return null;
 	}
 
 	/**
-	 * This is a very costly operation that iterates through the whole data to find the headers. See
+	 * This is a potentially very costly operation that iterates through the whole data to find the headers. See
 	 * https://github.com/frictionlessdata/specs/issues/656#issuecomment-574386328 for the background: missing
 	 * (== null) entries in the first entry sets of a JSON Table could lead to us missing header names.
 	 * @return the union of keys for each entry in the JSON array
 	 */
 	public String[] getHeaders() {
 		Set<String> headers = new LinkedHashSet<>();
-		dataSource.elements().forEachRemaining((firstObject) -> {
-			firstObject.fields().forEachRemaining(f -> {
-				headers.add(f.getKey());
+
+		JsonNode firstObject = dataSource.get(0);
+		JsonNodeType nodeType = firstObject.getNodeType();
+		if (nodeType.equals(JsonNodeType.OBJECT)) {
+			dataSource.elements().forEachRemaining((rowObject) -> {
+				rowObject.fields().forEachRemaining(f -> {
+					headers.add(f.getKey());
+				});
+				
 			});
-		});
+		} else if (nodeType.equals(JsonNodeType.ARRAY)) {
+			firstObject.iterator().forEachRemaining((n) -> headers.add(n.asText()));
+		};
 		return headers.toArray(new String[]{});
 	}
 }

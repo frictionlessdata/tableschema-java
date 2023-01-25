@@ -1,6 +1,7 @@
 package io.frictionlessdata.tableschema.fk;
 
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
@@ -68,12 +69,9 @@ public class ForeignKeyTest {
 
     @Test
     public void testValidArrayFields() throws ForeignKeyException {
-        String refFields = "[\"refField1\", \"refField2\"]";
-        // TODO: Reference validator checks for JSONArray instance
-        // we must enhance this test after jackson refactoring
-        // so we can validate with other types, for now, let's check only with String
+        ArrayNode refFields = JsonUtil.getInstance().createArrayNode("[\"refField1\", \"refField2\"]");
         Reference ref = new Reference("aResource", refFields, true);
-        String fkFields = "[\"fkField1\", \"fkField2\"]";
+        ArrayNode fkFields = JsonUtil.getInstance().createArrayNode("[\"fkField1\", \"fkField2\"]");
         ForeignKey fk = new ForeignKey(fkFields, ref, true);
 
         // Validation set to strict=true and no exception has been thrown.
