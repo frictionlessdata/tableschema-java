@@ -492,7 +492,7 @@ public class Schema {
         if (schemaObj.has(JSON_KEY_FOREIGN_KEYS)) {
             JsonNode fkJsonArray = schemaObj.withArray(JSON_KEY_FOREIGN_KEYS);
             fkJsonArray.forEach((f) -> {
-                ForeignKey fk = new ForeignKey(f.toString(), strictValidation);
+                ForeignKey fk = ForeignKey.fromJson(f.toString(), strictValidation);
                 this.addForeignKey(fk);
 
                 if (!strictValidation) {

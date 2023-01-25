@@ -32,10 +32,7 @@ public class ReferenceTest {
         fields.add("field1");
         fields.add("field2");
 
-        Reference ref = new Reference("resource", JsonUtil.getInstance().createArrayNode(fields));
-
-        // Validation set to strict=true and no exception has been thrown.
-        // Test passes.
+        Reference ref = new Reference("resource", fields.toArray(new String[]{}), true);
         Assertions.assertNotNull(ref);
     }
 
@@ -46,7 +43,7 @@ public class ReferenceTest {
             new Reference(null, "resource", true);
         });
         Assertions.assertEquals(
-                "A foreign key's reference must have the fields and resource properties.",
+                "A foreign key's reference must have fields and resource properties.",
                 fke.getMessage());
     }
 
@@ -55,10 +52,11 @@ public class ReferenceTest {
     public void testNullResource() throws ForeignKeyException{
         Reference ref = new Reference();
         ref.setFields("aField");
+        ref.setResource(null);
 
         ForeignKeyException fke = Assertions.assertThrows(ForeignKeyException.class, ref::validate);
         Assertions.assertEquals(
-                "A foreign key's reference must have the fields and resource properties.",
+                "A foreign key's reference must have fields and resource properties.",
                 fke.getMessage());
     }
 
@@ -69,14 +67,13 @@ public class ReferenceTest {
 
         ForeignKeyException fke = Assertions.assertThrows(ForeignKeyException.class, ref::validate);
         Assertions.assertEquals(
-                "A foreign key's reference must have the fields and resource properties.",
+                "A foreign key's reference must have fields and resource properties.",
                 fke.getMessage());
     }
 
     @Test
     @DisplayName("Create a Reference with int array")
     public void testInvalidFieldsType() throws ForeignKeyException{
-        ArrayNode node = JsonUtil.getInstance().createArrayNode(new int[]{123});
-        new Reference("resource", node, true);
+        Reference.fromJson("{\"resource\": \"the-resource\", \"fields\": [\"123\"]}", true);
     }
 }

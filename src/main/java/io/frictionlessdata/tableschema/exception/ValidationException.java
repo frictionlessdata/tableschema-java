@@ -4,7 +4,6 @@ import com.networknt.schema.ValidationMessage;
 import io.frictionlessdata.tableschema.schema.FormalSchemaValidator;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ValidationException extends TableSchemaException {

@@ -69,9 +69,9 @@ public class ForeignKeyTest {
 
     @Test
     public void testValidArrayFields() throws ForeignKeyException {
-        ArrayNode refFields = JsonUtil.getInstance().createArrayNode("[\"refField1\", \"refField2\"]");
+        String[] refFields =  new String[]{"refField1", "refField2"};
         Reference ref = new Reference("aResource", refFields, true);
-        ArrayNode fkFields = JsonUtil.getInstance().createArrayNode("[\"fkField1\", \"fkField2\"]");
+        String[] fkFields = new String[]{"fkField1", "fkField2"};
         ForeignKey fk = new ForeignKey(fkFields, ref, true);
 
         // Validation set to strict=true and no exception has been thrown.
@@ -85,9 +85,9 @@ public class ForeignKeyTest {
 
 
         ForeignKeyException ex = assertThrows(ForeignKeyException.class, () -> {
-            new ForeignKey(null, ref, true);
+            new ForeignKey((String[])null, ref, true);
         });
-        Assertions.assertEquals("A foreign key must have the fields and reference properties.", ex.getMessage());
+        Assertions.assertEquals("A foreign key must have fields and reference properties.", ex.getMessage());
     }
 
     @Test
@@ -95,22 +95,14 @@ public class ForeignKeyTest {
         ForeignKey fk = new ForeignKey(true);
         fk.setFields("aField");
         ForeignKeyException ex = assertThrows(ForeignKeyException.class, fk::validate);
-        Assertions.assertEquals("A foreign key must have the fields and reference properties.", ex.getMessage());
+        Assertions.assertEquals("A foreign key must have fields and reference properties.", ex.getMessage());
     }
 
     @Test
     public void testNullFieldsAndReference() throws ForeignKeyException{
         ForeignKey fk = new ForeignKey(true);
         ForeignKeyException ex = assertThrows(ForeignKeyException.class, fk::validate);
-        Assertions.assertEquals("A foreign key must have the fields and reference properties.", ex.getMessage());
-    }
-
-    @Test
-    public void testFieldsNotStringOrArray() throws ForeignKeyException{
-        Reference ref = new Reference("aResource", "aField", true);
-
-        ForeignKeyException ex = assertThrows(ForeignKeyException.class, () -> new ForeignKey(25, ref, true));
-        Assertions.assertEquals("The foreign key's fields property must be a string or an array.", ex.getMessage());
+        Assertions.assertEquals("A foreign key must have fields and reference properties.", ex.getMessage());
     }
 
     @Test
@@ -120,7 +112,7 @@ public class ForeignKeyTest {
         refFields.add("field2");
         refFields.add("field3");
 
-        Reference ref = new Reference("aResource", JsonUtil.getInstance().createArrayNode(refFields), true);
+        Reference ref = new Reference("aResource", refFields.toArray(new String[]{}), true);
 
         ForeignKeyException ex = assertThrows(ForeignKeyException.class, () -> new ForeignKey("aStringField", ref, true));
         Assertions.assertEquals("The reference's fields property must be a string if the outer fields is a string.", ex.getMessage());
@@ -136,7 +128,7 @@ public class ForeignKeyTest {
         fkFields.add("field3");
 
         ForeignKeyException ex = assertThrows(ForeignKeyException.class,
-                () -> new ForeignKey(JsonUtil.getInstance().createArrayNode(fkFields), ref, true));
+                () -> new ForeignKey(fkFields.toArray(new String[]{}), ref, true));
         Assertions.assertEquals("The reference's fields property must be an array " +
                 "if the outer fields is an array.", ex.getMessage());
     }
@@ -148,14 +140,14 @@ public class ForeignKeyTest {
         refFields.add("refField2");
         refFields.add("refField3");
 
-        Reference ref = new Reference("aResource", JsonUtil.getInstance().createArrayNode(refFields), true);
+        Reference ref = new Reference("aResource", refFields.toArray(new String[]{}), true);
 
         List<String> fkFields = new ArrayList<>();
         fkFields.add("field1");
         fkFields.add("field2");
 
         ForeignKeyException ex = assertThrows(ForeignKeyException.class,
-                () -> new ForeignKey(JsonUtil.getInstance().createArrayNode(fkFields), ref, true));
+                () -> new ForeignKey(fkFields.toArray(new String[]{}), ref, true));
         Assertions.assertEquals("The reference's fields property must be an array" +
                 " of the same length as that of the outer fields' array.", ex.getMessage());
     }

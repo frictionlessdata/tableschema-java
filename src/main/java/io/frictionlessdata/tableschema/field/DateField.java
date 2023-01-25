@@ -7,7 +7,6 @@ import io.frictionlessdata.tableschema.exception.TypeInferringException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
 import java.util.Map;
 import java.util.regex.Matcher;

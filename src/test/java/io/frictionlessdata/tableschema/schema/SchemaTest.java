@@ -451,7 +451,7 @@ public class SchemaTest {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_no_reference.json");
 
         Throwable t = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
-        Assertions.assertEquals("A foreign key must have the fields and reference properties.", t.getMessage());
+        Assertions.assertEquals("A foreign key must have fields and reference properties.", t.getMessage());
     }
 
     @Test
@@ -478,13 +478,13 @@ public class SchemaTest {
         File source = getResourceFile("/fixtures/foreignkeys/schema_valid_fk_array.json");
         Schema schema = Schema.fromJson(source, true);
 
-        ArrayNode parsedFields = schema.getForeignKeys().get(0).getFields();
-        Assertions.assertEquals("id", parsedFields.get(0).asText());
-        Assertions.assertEquals("title", parsedFields.get(1).asText());
+        List<String> parsedFields = schema.getForeignKeys().get(0).getFields();
+        Assertions.assertEquals("id", parsedFields.get(0));
+        Assertions.assertEquals("title", parsedFields.get(1));
 
-        ArrayNode refFields = schema.getForeignKeys().get(0).getReference().getFields();
-        Assertions.assertEquals("fk_id", refFields.get(0).asText());
-        Assertions.assertEquals("title_id", refFields.get(1).asText());
+        List<String> refFields = schema.getForeignKeys().get(0).getReference().getFields();
+        Assertions.assertEquals("fk_id", refFields.get(0));
+        Assertions.assertEquals("title_id", refFields.get(1));
     }
 
     @Test

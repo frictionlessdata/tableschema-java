@@ -1,16 +1,16 @@
 package io.frictionlessdata.tableschema;
 
-import io.frictionlessdata.tableschema.schema.BeanSchema;
-import io.frictionlessdata.tableschema.tabledatasource.BeanTableDataSource;
-import io.frictionlessdata.tableschema.tabledatasource.CsvTableDataSource;
-import io.frictionlessdata.tableschema.tabledatasource.StringArrayTableDataSource;
-import io.frictionlessdata.tableschema.tabledatasource.TableDataSource;
 import io.frictionlessdata.tableschema.exception.*;
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.iterator.BeanIterator;
 import io.frictionlessdata.tableschema.iterator.SimpleTableIterator;
 import io.frictionlessdata.tableschema.iterator.TableIterator;
+import io.frictionlessdata.tableschema.schema.BeanSchema;
 import io.frictionlessdata.tableschema.schema.Schema;
+import io.frictionlessdata.tableschema.tabledatasource.BeanTableDataSource;
+import io.frictionlessdata.tableschema.tabledatasource.CsvTableDataSource;
+import io.frictionlessdata.tableschema.tabledatasource.StringArrayTableDataSource;
+import io.frictionlessdata.tableschema.tabledatasource.TableDataSource;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 import io.frictionlessdata.tableschema.util.TableSchemaUtil;
 import org.apache.commons.csv.CSVFormat;

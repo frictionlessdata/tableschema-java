@@ -7,7 +7,6 @@ import io.frictionlessdata.tableschema.exception.TypeInferringException;
 
 import java.net.URI;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class BooleanField extends Field<Boolean> {
     @JsonIgnore

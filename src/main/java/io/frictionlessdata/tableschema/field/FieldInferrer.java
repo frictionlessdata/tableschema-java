@@ -2,7 +2,6 @@ package io.frictionlessdata.tableschema.field;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.util.concurrent.AtomicDouble;
-import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.locationtech.jts.geom.Coordinate;
 
 import java.lang.reflect.Array;
@@ -10,8 +9,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
