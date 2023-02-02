@@ -98,16 +98,7 @@ public interface TableDataSource {
      * @return DataSource created from input String
      */
     static TableDataSource fromSource(InputStream input) {
-        String content;
-
-        try (Reader fr = new InputStreamReader(input)) {
-            try (BufferedReader rdr = new BufferedReader(fr)) {
-                content = rdr.lines().collect(Collectors.joining("\n"));
-            }
-        } catch (IOException ex) {
-            throw new TableIOException(ex);
-        }
-
+        String content = readSkippingBOM(input);
         return fromSource(content);
     }
 
