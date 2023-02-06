@@ -45,6 +45,19 @@ public class TableBOMTests {
     }
 
     @Test
+    @DisplayName("Create a Table from CSV File with BOM with Schema from Stream and with default CSVFormat")
+    public void testReadFileWithBOMAndSchemafromInputStream() throws Exception{
+        File testDataDir = getTestDataDirectory();
+        // get path of test CSV file
+        InputStream inputStream = TableBOMTests.class.getClassLoader().getResourceAsStream("fixtures/data/simple_data_bom2.tsv");
+        File f = new File(getTestDataDirectory(), "schema/simple_data_schema.json");
+        FileInputStream schemaIs = new FileInputStream(f);
+
+        Table table = Table.fromSource(inputStream, schemaIs, csvFormat);
+        table.validate();
+    }
+
+    @Test
     @DisplayName("Create a Table from CSV File with BOM without a Schema from Stream " +
             "and with custom CSVFormat")
     public void testReadFileWithBOM() throws Exception{
