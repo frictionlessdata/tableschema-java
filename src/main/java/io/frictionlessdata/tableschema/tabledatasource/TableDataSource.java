@@ -71,7 +71,7 @@ public interface TableDataSource {
         try {
             // JSON array generation. If an exception is thrown -> probably CSV data
             ArrayNode json = JsonUtil.getInstance().createArrayNode(input);
-            return new JsonArrayTableDataSource(input);
+            return new JsonArrayTableDataSource(json);
         } catch (Exception ex) {
             // JSON parsing failed, treat it as a CSV
             return new CsvTableDataSource(input);
