@@ -61,11 +61,10 @@ public class BeanTableDataSourceTest {
     private static Collection<EmployeeBeanWithAnnotation> getEmployees() throws Exception {
         File testDataDir = getTestDataDirectory();
         File inFile = new File("data/employee_full.csv");
-        Schema schema = BeanSchema.infer(EmployeeBeanWithAnnotation.class);
         Table inTable = Table.fromSource(
                 inFile,
                 testDataDir,
-                schema,
+                null,
                 TableDataSource.getDefaultCsvFormat());
 
         List<EmployeeBeanWithAnnotation> employees = new ArrayList<>();

@@ -28,8 +28,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
 class TableBeanIteratorTest {
-    private static Schema employeeSchema = null;
-    private static Schema employeeSchemaAlternateDateForma = null;
     private static Schema gdpSchema = null;
     private static Table employeeTable = null;
     private static Table employeeTableAlternateDateFormat = null;
@@ -39,28 +37,6 @@ class TableBeanIteratorTest {
     @BeforeEach
     void setUp() throws Exception {
         testDataDir = getTestDataDirectory();
-        File f = new File(getTestDataDirectory(), "schema/population_schema.json");
-        Schema validPopulationSchema = null;
-        try (FileInputStream fis = new FileInputStream(f)) {
-            validPopulationSchema = Schema.fromJson (fis, false);
-        }
-
-
-        File file = new File("data/employee_data.csv");
-        employeeSchema = BeanSchema.infer(EmployeeBean.class);
-        employeeTable = Table.fromSource(file, testDataDir, employeeSchema, TableDataSource.getDefaultCsvFormat());
-
-        file = new File("data/employee_alternate_date_format.csv");
-        employeeSchemaAlternateDateForma = BeanSchema.infer(EmployeeBeanWithAnnotation.class);
-        employeeTableAlternateDateFormat = Table.fromSource(
-                file,
-                testDataDir,
-                employeeSchemaAlternateDateForma,
-                TableDataSource.getDefaultCsvFormat());
-
-        file = new File("data/gdp.csv");
-        gdpSchema = BeanSchema.infer(GrossDomesticProductBean.class);
-        gdpTable = Table.fromSource(file, testDataDir, gdpSchema, TableDataSource.getDefaultCsvFormat());
 
     }
 
@@ -68,6 +44,10 @@ class TableBeanIteratorTest {
     @Test
     @DisplayName("Test deserialization of EmployeeBean")
     void testBeanDeserialization() throws Exception {
+
+        File file = new File("data/employee_data.csv");
+        employeeTable = Table.fromSource(file, testDataDir, null, TableDataSource.getDefaultCsvFormat());
+
         List<EmployeeBean> employees = new ArrayList<>();
         BeanIterator<EmployeeBean> bit = new BeanIterator<>(employeeTable, EmployeeBean.class, false);
         while (bit.hasNext()) {
@@ -91,11 +71,10 @@ class TableBeanIteratorTest {
     @DisplayName("Test deserialization of EmployeeBean with Annotation")
     void testBeanDeserialization2() throws Exception {
         File inFile = new File("data/employee_full.csv");
-        employeeSchemaAlternateDateForma = BeanSchema.infer(EmployeeBeanWithAnnotation.class);
-        employeeTableAlternateDateFormat = Table.fromSource(
+        Table employeeTableAlternateDateFormat = Table.fromSource(
                 inFile,
                 testDataDir,
-                employeeSchemaAlternateDateForma,
+                null,
                 TableDataSource.getDefaultCsvFormat());
         List<EmployeeBeanWithAnnotation> employees = new ArrayList<>();
         BeanIterator<EmployeeBeanWithAnnotation> bit = new BeanIterator<>(employeeTableAlternateDateFormat, EmployeeBeanWithAnnotation.class, false);
@@ -119,11 +98,14 @@ class TableBeanIteratorTest {
         /*Assertions.assertEquals(45, info.get("pin"));
         Assertions.assertEquals(83.23, info.get("rate"));
         Assertions.assertEquals(90, info.get("ssn"));*/
+        System.out.println(info);
     }
 
     @Test
     @DisplayName("Test deserialization of big floats (GrossDomesticProductBean)")
     void testBeanDeserialization3() throws Exception {
+        File file = new File("data/gdp.csv");
+        gdpTable = Table.fromSource(file, testDataDir, null, TableDataSource.getDefaultCsvFormat());
         List<GrossDomesticProductBean> records = new ArrayList<>();
         BeanIterator<GrossDomesticProductBean> bit
                 = new BeanIterator<>(gdpTable, GrossDomesticProductBean.class, false);

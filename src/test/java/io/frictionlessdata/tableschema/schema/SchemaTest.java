@@ -577,7 +577,8 @@ public class SchemaTest {
         Assertions.assertTrue(newSchema.isValid());
     }
 
-
+    // Test for https://github.com/frictionlessdata/tableschema-java/issues/14
+    // "schema_valid_full.json" from the Python version is named "employee_full_schema.json" here
     @Test
     public void testIssue14() throws Exception {
         Schema schema = Schema.fromJson(new File(getTestDataDirectory()

@@ -232,8 +232,9 @@ public class Table{
     public BeanIterator<?> iterator(Class<?> beanType, boolean relations){
         return new BeanIterator(this,  beanType, relations);
     }
+
     /**
-     * This is the simplest case to read data from a Table referencing a file or URL.
+     * This is the simplest case to read Object data from a Table referencing a file or URL.
      *
      * If a Schema is set on a table, each row will be returned as an Object array. Values in each column
      * are parsed and converted ("cast") to Java objects based on the Field definitions of the Schema. If no Schema is
