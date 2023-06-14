@@ -20,7 +20,7 @@
         <java.version>8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <google-guava.version>31.1-jre</google-guava.version>
+        <google-guava.version>32.0.0-jre</google-guava.version>
         <apache-commons-lang3.version>3.12.0</apache-commons-lang3.version>
         <apache-commons-csv.version>1.9.0</apache-commons-csv.version>
         <apache-commons-validator.version>1.7</apache-commons-validator.version>
