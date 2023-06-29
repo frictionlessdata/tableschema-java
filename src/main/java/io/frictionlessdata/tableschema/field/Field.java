@@ -551,13 +551,25 @@ public abstract class Field<T> {
         return this.title;
     }
 
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
     public String getDescription(){
         return this.description;
     }
 
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
     public Map<String, Object> getConstraints(){
         return this.constraints;
     }
+
+  public void setConstraints(Map<String, Object> constraints) {
+    this.constraints = constraints;
+  }
 
     public URI getRdfType() {
         return rdfType;
