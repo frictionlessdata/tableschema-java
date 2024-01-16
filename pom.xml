@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frictionlessdata</groupId>
     <artifactId>tableschema-java</artifactId>
-    <version>0.6.14-SNAPSHOT</version>
+    <version>0.6.15-SNAPSHOT</version>
     <packaging>jar</packaging>
     <issueManagement>
         <url>https://github.com/frictionlessdata/tableschema-java/issues</url>
@@ -22,10 +22,10 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <google-guava.version>31.1-jre</google-guava.version>
         <apache-commons-lang3.version>3.12.0</apache-commons-lang3.version>
-        <apache-commons-csv.version>1.9.0</apache-commons-csv.version>
+        <apache-commons-csv.version>1.10.0</apache-commons-csv.version>
         <apache-commons-validator.version>1.7</apache-commons-validator.version>
         <geotools.version>24.6</geotools.version>
-        <jackson.version>2.14.1</jackson.version>
+        <jackson.version>2.15.1</jackson.version>
         <junit.version>5.9.1</junit.version>
         <locationtech-jts.version>1.19.0</locationtech-jts.version>
         <networknt-validator-version>1.0.76</networknt-validator-version>
