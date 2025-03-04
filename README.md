@@ -55,10 +55,10 @@ This project follows the [Open Knowledge International coding standards](https:/
 
 Get started:
 ```sh
-# install Java 1.8 or higher (use Jabba if you need to test on different versions) and maven2
+# install Java 17 or higher (use Jabba if you need to test on different versions) and maven2
 $ cd tableschema-java
-$ jabba install 1.8
-$ jabba use 1.8
+$ jabba install 17
+$ jabba use 17
 $ mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 $ mvn test -B
 ```

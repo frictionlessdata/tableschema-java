@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frictionlessdata</groupId>
     <artifactId>tableschema-java-isnow</artifactId>
-    <version>0.6.18-SNAPSHOT</version>
+    <version>0.6.19-SNAPSHOT</version>
     <packaging>jar</packaging>
     <issueManagement>
         <url>https://github.com/frictionlessdata/tableschema-java/issues</url>
@@ -17,10 +17,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>8</java.version>
+        <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <maven.compiler.compiler>17</maven.compiler.compiler>
+        <maven.compiler.compiler>${java.version}</maven.compiler.compiler>
         <google-guava.version>33.4.0-jre</google-guava.version>
         <apache-commons-lang3.version>3.17.0</apache-commons-lang3.version>
         <apache-commons-csv.version>1.13.0</apache-commons-csv.version>
