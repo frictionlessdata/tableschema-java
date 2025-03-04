@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frictionlessdata</groupId>
-    <artifactId>tableschema-java</artifactId>
+    <artifactId>tableschema-java-isnow</artifactId>
     <version>0.6.17-SNAPSHOT</version>
     <packaging>jar</packaging>
     <issueManagement>
@@ -30,7 +30,7 @@
         <junit.version>5.12.0</junit.version>
         <locationtech-jts.version>1.19.0</locationtech-jts.version>
         <networknt-validator-version>1.0.76</networknt-validator-version>
-        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
         <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
@@ -118,19 +118,19 @@
                 </executions>
             </plugin>
             <!--
-                        <plugin>
-                            <artifactId>maven-deploy-plugin</artifactId>
-                            <version>${maven-deploy-plugin.version}</version>
-                            <executions>
-                                <execution>
-                                    <id>default-deploy</id>
-                                    <phase>deploy</phase>
-                                    <goals>
-                                        <goal>deploy</goal>
-                                    </goals>
-                                </execution>
-                            </executions>
-                        </plugin>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven-deploy-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -159,6 +159,7 @@
                 </configuration>
             </plugin>
 
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -177,6 +178,7 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            -->
 
             <!-- Test Coverage: https://github.com/trautonen/coveralls-maven-plugin -->
             <plugin>
