@@ -14,7 +14,7 @@ import io.frictionlessdata.tableschema.exception.TableSchemaException;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.geotools.geometry.DirectPosition2D;
+import org.geotools.geometry.Position2D;
 import org.locationtech.jts.geom.Coordinate;
 
 import java.math.BigDecimal;
@@ -143,7 +143,7 @@ public class BeanSchema extends Schema {
                                 || (declaredClass.equals(OffsetTime.class)))
                             field = new TimeField(name);
                         else if ((declaredClass.equals(Coordinate.class))
-                                || (declaredClass.equals(DirectPosition2D.class)))
+                                || (declaredClass.equals(Position2D.class)))
                             field = new GeopointField(name);
                         else if (declaredClass.equals(JsonNode.class))
                             field = new ObjectField(name);
