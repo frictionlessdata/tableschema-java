@@ -26,3 +26,5 @@ jobs:
       run: mvn -B package --file pom.xml
     - name: Run test and coverage report
       run: mvn clean test jacoco:report
+    - name: Run dependency check
+      run: mvn org.owasp:dependency-check-maven:check
