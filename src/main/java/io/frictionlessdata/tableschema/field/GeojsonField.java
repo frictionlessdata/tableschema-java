@@ -1,6 +1,7 @@
 package io.frictionlessdata.tableschema.field;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.ValidationMessage;
 import io.frictionlessdata.tableschema.exception.*;
 import io.frictionlessdata.tableschema.schema.FormalSchemaValidator;
 import io.frictionlessdata.tableschema.schema.TypeInferrer;
@@ -9,10 +10,21 @@ import io.frictionlessdata.tableschema.util.JsonUtil;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
+import java.util.Set;
 
 public class GeojsonField extends Field<JsonNode> {
-    private FormalSchemaValidator geoFormalSchemaValidator = null;
-    private FormalSchemaValidator topoFormalSchemaValidator = null;
+    private static FormalSchemaValidator geoFormalSchemaValidator;
+    private static FormalSchemaValidator topoFormalSchemaValidator;
+
+    static {
+        // FIXME: Maybe this inferring against geojson and topojson scheme is too much.
+        // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
+        InputStream geoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson-schema/geojson.json");
+        geoFormalSchemaValidator = FormalSchemaValidator.fromJson(geoJsonSchemaInputStream);
+        // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema
+        InputStream topoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/topojson-schema/topojson.json");
+        topoFormalSchemaValidator = FormalSchemaValidator.fromJson(topoJsonSchemaInputStream);
+    }
 
     GeojsonField(){
         super();
@@ -71,13 +83,10 @@ public class GeojsonField extends Field<JsonNode> {
      */
     private void validateGeoJsonSchema(String json) throws ValidationException {
         try {
-            if(this.geoFormalSchemaValidator == null){
-                // FIXME: Maybe this inferring against geojson scheme is too much.
-                // Grabbed geojson schema from here: https://github.com/fge/sample-json-schemas/tree/master/geojson
-                InputStream geoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/geojson-schema/geojson.json");
-                geoFormalSchemaValidator = FormalSchemaValidator.fromJson(geoJsonSchemaInputStream, true);
+            Set<ValidationMessage> errors = geoFormalSchemaValidator.validate(json);
+            if (!errors.isEmpty()) {
+                throw new ValidationException("Geojson field validation failed", geoFormalSchemaValidator.getName(), errors);
             }
-            geoFormalSchemaValidator.validate(json);
         } catch (JsonParsingException ex) {
             throw new ValidationException(ex);
         }
@@ -93,13 +102,10 @@ public class GeojsonField extends Field<JsonNode> {
      */
     private void validateTopoJsonSchema(String json) throws ValidationException {
         try {
-            if (topoFormalSchemaValidator == null) {
-                // FIXME: Maybe this infering against topojson scheme is too much.
-                // Grabbed topojson schema from here: https://github.com/nhuebel/TopoJSON_schema
-                InputStream topoJsonSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/topojson-schema/topojson.json");
-                topoFormalSchemaValidator = FormalSchemaValidator.fromJson(topoJsonSchemaInputStream, true);
+            Set<ValidationMessage> errors = topoFormalSchemaValidator.validate(json);
+            if (!errors.isEmpty()) {
+                throw new ValidationException("Geojson field validation failed", geoFormalSchemaValidator.getName(), errors);
             }
-            topoFormalSchemaValidator.validate(json);
         } catch (JsonParsingException ex) {
             throw new ValidationException(ex);
         }

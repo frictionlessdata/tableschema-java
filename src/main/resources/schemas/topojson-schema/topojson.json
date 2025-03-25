@@ -6,10 +6,10 @@
     "type": "object",
     "required": [ "type" ],
     "properties": {
-        "bbox": { "$ref": "bbox.json" }
+        "bbox": { "$ref": "resource:/schemas/topojson-schema/bbox.json" }
     },
     "oneOf": [
-        { "$ref": "topology.json"  },
-        { "$ref": "geometry.json" }
+        { "$ref": "resource:/schemas/topojson-schema/topology.json"  },
+        { "$ref": "resource:/schemas/topojson-schema/geometry.json" }
     ]
 }

@@ -8,7 +8,7 @@
 [![Support](https://img.shields.io/badge/support-discord-brightgreen)](https://discordapp.com/invite/Sewv6av)
 
 A Java library for working with Table data. 
-**tableschema-java** is a library aimed at parsing CSV and JSON-Array documents into a live Java objects according 
+**tableschema-java** is a library aimed at parsing CSV and JSON-Array documents into live Java objects according 
 to [Table Schema](https://frictionlessdata.io/specs/table-schema/), a format definition based on 
 [JSON Schema](https://json-schema.org/understanding-json-schema/).
 

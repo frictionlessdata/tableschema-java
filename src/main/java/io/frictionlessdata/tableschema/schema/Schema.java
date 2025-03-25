@@ -15,6 +15,8 @@ import io.frictionlessdata.tableschema.io.FileReference;
 import io.frictionlessdata.tableschema.io.LocalFileReference;
 import io.frictionlessdata.tableschema.io.URLFileReference;
 import io.frictionlessdata.tableschema.util.JsonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URL;
@@ -43,17 +45,34 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(value = Include.NON_EMPTY)
 public class Schema {
+    private static final Logger log = LoggerFactory.getLogger(Schema.class);
+
     public static final String JSON_KEY_FIELDS = "fields";
     public static final String JSON_KEY_PRIMARY_KEY = "primaryKey";
     public static final String JSON_KEY_FOREIGN_KEYS = "foreignKeys";
 
+    // the schema validator
     private FormalSchemaValidator tableFormalSchemaValidator = null;
+
+    /**
+     * List of {@link Field}s of this schema
+     */
+
     List<Field<?>> fields = new ArrayList<>();
 
-    private FormalSchemaValidator tableJsonSchema = null;
+    /**
+     * The primary key of this schema, if any
+     */
     private Object primaryKey = null;
+
+    /**
+     * List of {@link ForeignKey}s of this schema
+     */
     private final List<ForeignKey> foreignKeys = new ArrayList<>();
 
+    /**
+     * Whether validation errors should be thrown as exceptions or only reported
+     */
     boolean strictValidation = true;
 
     @JsonIgnore
@@ -415,8 +434,9 @@ public class Schema {
      * Validate the loaded Schema. First do a formal validation via JSON schema,
      * then check foreign keys match to existing fields.
      * <p>
-     * Validation is strict or lenient depending on how the package was
-     * instantiated with the strict flag.
+     * Validation is strict or lenient depending on how the Schema was
+     * instantiated with the `strictValidation` flag. With strict validation, all validation
+     * errors will lead to a ValidationException thrown.
      *
      * @throws ValidationException If validation fails and validation is strict
      */
@@ -447,8 +467,12 @@ public class Schema {
                 }
             }
         }
-        if (strictValidation && !errors.isEmpty()) {
-            throw new ValidationException(tableFormalSchemaValidator.getName(), errors);
+        if (!errors.isEmpty()) {
+            if (strictValidation) {
+                throw new ValidationException(tableFormalSchemaValidator.getName(), errors);
+            } else {
+                log.warn("Schema validation failed: {}", errors);
+            }
         }
     }
 
@@ -507,7 +531,7 @@ public class Schema {
     private void initValidator() {
         // Init for validation
         InputStream tableSchemaInputStream = TypeInferrer.class.getResourceAsStream("/schemas/table-schema.json");
-        this.tableFormalSchemaValidator = FormalSchemaValidator.fromJson(tableSchemaInputStream, strictValidation);
+        this.tableFormalSchemaValidator = FormalSchemaValidator.fromJson(tableSchemaInputStream);
     }
 
 

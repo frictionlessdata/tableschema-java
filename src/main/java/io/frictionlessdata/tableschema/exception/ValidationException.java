@@ -25,6 +25,11 @@ public class ValidationException extends TableSchemaException {
 		this.validationMessages.addAll(messages);
 	}
 
+	public ValidationException(String message, String schemaName, Collection<ValidationMessage> messages) {
+		this(String.format("%s: %s",  "validation failed: "+message, schemaName));
+		this.validationMessages.addAll(messages);
+	}
+
 	public ValidationException(String schemaName, Collection<ValidationException> exceptions) {
 		this(String.format("%s: %s", schemaName, "validation failed: "));
 		otherMessages.addAll(exceptions

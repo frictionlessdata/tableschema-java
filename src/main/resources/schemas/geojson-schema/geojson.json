@@ -6,11 +6,11 @@
     "type": "object",
     "required": [ "type" ],
     "properties": {
-        "crs": { "$ref": "crs.json" },
-        "bbox": { "$ref": "bbox.json" }
+        "crs": { "$ref": "resource:/schemas/geojson-schema/crs.json" },
+        "bbox": { "$ref": "resource:/schemas/geojson-schema/bbox.json" }
     },
     "oneOf": [
-        { "$ref": "geometry.json" },
+        { "$ref": "resource:/schemas/geojson-schema/geometry.json" },
         { "$ref": "#/definitions/geometryCollection" },
         { "$ref": "#/definitions/feature" },
         { "$ref": "#/definitions/featureCollection" }
@@ -24,7 +24,7 @@
                 "type": { "enum": [ "GeometryCollection" ] },
                 "geometries": {
                     "type": "array",
-                    "items": { "$ref": "geometry.json" }
+                    "items": { "$ref": "resource:/schemas/geojson-schema/geometry.json" }
                 }
             }
         },
@@ -37,7 +37,7 @@
                 "geometry": {
                     "oneOf": [
                         { "type": "null" },
-                        { "$ref": "geometry.json" }
+                        { "$ref": "resource:/schemas/geojson-schema/geometry.json" }
                     ]
                 },
                 "properties": { "type": [ "object", "null" ] },

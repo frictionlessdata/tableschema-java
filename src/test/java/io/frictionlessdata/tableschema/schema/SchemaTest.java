@@ -617,4 +617,12 @@ public class SchemaTest {
                 = new TreeMap<>(objectMapper.readValue(expectedString, new TypeReference<Map<String, String>>() {}));
         Assertions.assertEquals(expectedFieldMap, fieldNameMapping);
     }
+
+    @Test
+    @DisplayName("Validate the networknt lib can validate our schema")
+    void testSchemaValidator() throws Exception {
+        String schemaStr = TestHelper.getResourceFileContent(
+                "/schemas/table-schema.json");
+        FormalSchemaValidator.fromJson(schemaStr);
+    }
 }

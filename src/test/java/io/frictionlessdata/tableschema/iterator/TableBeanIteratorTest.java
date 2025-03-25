@@ -93,12 +93,6 @@ class TableBeanIteratorTest {
         Assertions.assertEquals(2, interests.size());
         Assertions.assertEquals("sports", interests.get(0));
         Assertions.assertEquals("reading", interests.get(1));
-
-        Object info = frank.getInfo();
-        /*Assertions.assertEquals(45, info.get("pin"));
-        Assertions.assertEquals(83.23, info.get("rate"));
-        Assertions.assertEquals(90, info.get("ssn"));*/
-        System.out.println(info);
     }
 
     @Test
