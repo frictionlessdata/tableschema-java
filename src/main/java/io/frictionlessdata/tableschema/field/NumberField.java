@@ -87,6 +87,7 @@ public class NumberField extends Field<Number> {
             throw new TypeInferringException();
         }
     }
+    @Override
     public Object formatValueForJson(Number value) throws InvalidCastException, ConstraintsException {
         return formatValueAsString(value, null, options);
     }

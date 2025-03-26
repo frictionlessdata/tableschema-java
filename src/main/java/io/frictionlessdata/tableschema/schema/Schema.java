@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(value = Include.NON_EMPTY)
-public class Schema {
+public class Schema implements SchemaInterface{
     private static final Logger log = LoggerFactory.getLogger(Schema.class);
 
     public static final String JSON_KEY_FIELDS = "fields";
@@ -213,6 +213,7 @@ public class Schema {
      *
      * @return true if schema is valid
      */
+    @Override
     @JsonIgnore
     public boolean isValid() {
         try {
@@ -229,12 +230,13 @@ public class Schema {
         }
     }
 
-    public void writeJson(OutputStream output) throws IOException {
+    private void writeJson(OutputStream output) throws IOException {
         try (BufferedWriter file = new BufferedWriter(new OutputStreamWriter(output))) {
             file.write(this.asJson());
         }
     }
 
+    @Override
     public void addField(Field<?> field) {
         this.fields.add(field);
         this.validate();
@@ -250,6 +252,7 @@ public class Schema {
         this.addField(field);
     }
 
+    @Override
     public List<Field<?>> getFields() {
         return this.fields;
     }
@@ -259,7 +262,8 @@ public class Schema {
      *
      * @return the matching Field or null if no name matches
      */
-    public Field getField(String name) {
+    @Override
+    public Field<?> getField(String name) {
         for (Field<?> field : this.fields) {
             if (field.getName().equalsIgnoreCase(name)) {
                 return field;
@@ -269,13 +273,14 @@ public class Schema {
     }
 
     @JsonIgnore
-    public List<String> getFieldNames() {
+    List<String> getFieldNames() {
         return fields
                 .stream()
                 .map(Field::getName)
                 .collect(Collectors.toList());
     }
 
+    @Override
     @JsonIgnore
     public String[] getHeaders() {
          return getFieldNames().toArray(new String[0]);
@@ -286,7 +291,7 @@ public class Schema {
      *
      * @return true if a field with the given names exists or false if no name matches
      */
-    public boolean hasField(String name) {
+    boolean hasField(String name) {
         Field<?> field = fields
                 .stream()
                 .filter((f) -> f.getName().equals(name))
@@ -295,10 +300,16 @@ public class Schema {
         return (null != field);
     }
 
-    public boolean hasFields() {
+    @Deprecated
+    boolean hasFields() {
         return !this.getFields().isEmpty();
     }
 
+    @Override
+    @JsonIgnore
+    public boolean isEmpty() {
+        return this.getFields().isEmpty();
+    }
 
     @SuppressWarnings("unchecked")
     public <Any> Any getPrimaryKey() {
@@ -321,7 +332,7 @@ public class Schema {
     }
 
     @JsonIgnore
-    public List<String> getPrimaryKeyParts() {
+    List<String> getPrimaryKeyParts() {
         if (primaryKey instanceof String)
             return Collections.singletonList((String) primaryKey);
         if (primaryKey instanceof ArrayNode) {
@@ -332,11 +343,12 @@ public class Schema {
         throw new TableSchemaException("Unknown PrimaryKey type: " + primaryKey.getClass());
     }
 
+    @Override
     public List<ForeignKey> getForeignKeys() {
         return this.foreignKeys;
     }
 
-
+    @Override
     public List<ValidationException> getErrors(){
         return this.errors;
     }
@@ -354,10 +366,6 @@ public class Schema {
     @JsonIgnore
     public String asJson() {
         return JsonUtil.getInstance().serialize(this);
-    }
-
-    public FileReference<?> getReference() {
-        return reference;
     }
 
     /**
@@ -383,12 +391,12 @@ public class Schema {
      * @throws PrimaryKeyException if this Schema does not contain fields listed in the `compositeKey` and
      *                             validation is set to strict
      */
-    public void setPrimaryKey(ArrayNode compositeKey) throws PrimaryKeyException {
+    private void setPrimaryKey(ArrayNode compositeKey) throws PrimaryKeyException {
         compositeKey.forEach(k -> checkKey(k.asText()));
         this.primaryKey = compositeKey;
     }
 
-    public void addForeignKey(ForeignKey foreignKey) {
+    void addForeignKey(ForeignKey foreignKey) {
         this.foreignKeys.add(foreignKey);
     }
 
@@ -440,6 +448,7 @@ public class Schema {
      *
      * @throws ValidationException If validation fails and validation is strict
      */
+    @Override
     @JsonIgnore
     public void validate() throws ValidationException{
         String json = this.asJson();

@@ -366,7 +366,7 @@ public class Table{
         if(cast && (null == schema)){
             throw new TableSchemaException("Cannot cast without a schema");
         }
-        if(cast && !this.schema.hasFields()){
+        if(cast && this.schema.isEmpty()){
             throw new InvalidCastException("Schema has no fields");
         }
         
@@ -475,7 +475,7 @@ public class Table{
                 try {
                     String[] headers;
                     if (null != schema) {
-                        List<String> fieldNames = schema.getFieldNames();
+                        List<String> fieldNames = schema.getFields().stream().map(Field::getName).toList();
                         headers = fieldNames.toArray(new String[0]);
                     } else {
                         headers = dataSource.getHeaders();
@@ -550,7 +550,7 @@ public class Table{
         if (null == headers) {
             return;
         }
-        List<String> declaredHeaders = schema.getFieldNames();
+        List<String> declaredHeaders = schema.getFields().stream().map(Field::getName).toList();
         List<String> foundHeaders = Arrays.asList(headers);
         //If we have JSON data, fields with `null` values might be omitted, therefore do not do a strict check
         if (dataSource.hasReliableHeaders()) {

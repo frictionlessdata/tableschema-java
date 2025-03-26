@@ -138,6 +138,10 @@ public final class JsonUtil {
 			throw new JsonParsingException(e);
 		}
 	}
+
+	public <T> T convertValue(Object value, TypeReference<T> ref) {
+		return mapper.convertValue(value, ref);
+	}
 	
 	public <T> T convertValue(Object value, Class<T> clazz) {
 		return mapper.convertValue(value, clazz);

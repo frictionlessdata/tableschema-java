@@ -202,17 +202,17 @@ public class SchemaTest {
     @Test
     public void hasField() {
         Schema schema = new Schema();
-        Assertions.assertFalse(schema.hasFields());
+        Assertions.assertTrue(schema.isEmpty());
 
         Field<?> idField = new IntegerField("id");
         schema.addField(idField);
-        Assertions.assertTrue(schema.hasFields());
+        Assertions.assertFalse(schema.isEmpty());
     }
 
     @Test
     public void hasSetField() {
         Schema schema = new Schema();
-        Assertions.assertFalse(schema.hasFields());
+        Assertions.assertTrue(schema.isEmpty());
 
         Field<?> idField = new IntegerField("id");
         schema.addField(idField);
@@ -533,10 +533,11 @@ public class SchemaTest {
         Schema readSchema = Schema.fromJson(createdFile, true);
         Assertions.assertEquals(createdSchema, readSchema);
 
-        Assertions.assertEquals("true", readSchema.getField("isAdmin").formatValueAsString(true));
-        Assertions.assertEquals("false", readSchema.getField("isAdmin").formatValueAsString(false));
-        Assertions.assertEquals("true", createdSchema.getField("isAdmin").formatValueAsString(true));
-        Assertions.assertEquals("false", createdSchema.getField("isAdmin").formatValueAsString(false));
+        BooleanField adminField = ((BooleanField)readSchema.getField("isAdmin"));
+        Assertions.assertEquals("true", adminField.formatValueAsString(true));
+        Assertions.assertEquals("false", adminField.formatValueAsString(false));
+        Assertions.assertEquals("true", adminField.formatValueAsString(true));
+        Assertions.assertEquals("false", adminField.formatValueAsString(false));
     }
 
 
@@ -551,10 +552,11 @@ public class SchemaTest {
         Schema readSchema = Schema.fromJson(createdFile, true);
         Assertions.assertEquals(createdSchema, readSchema);
 
-        Assertions.assertEquals("TRUE", readSchema.getField("isAdmin").formatValueAsString(true));
-        Assertions.assertEquals("FALSE", readSchema.getField("isAdmin").formatValueAsString(false));
-        Assertions.assertEquals("TRUE", createdSchema.getField("isAdmin").formatValueAsString(true));
-        Assertions.assertEquals("FALSE", createdSchema.getField("isAdmin").formatValueAsString(false));
+        BooleanField adminField = ((BooleanField)readSchema.getField("isAdmin"));
+        Assertions.assertEquals("TRUE", adminField.formatValueAsString(true));
+        Assertions.assertEquals("FALSE", adminField.formatValueAsString(false));
+        Assertions.assertEquals("TRUE", adminField.formatValueAsString(true));
+        Assertions.assertEquals("FALSE", adminField.formatValueAsString(false));
     }
 
 

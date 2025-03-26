@@ -26,6 +26,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static io.frictionlessdata.tableschema.util.ReflectionUtil.getBeanDescription;
 
+/**
+ * This replaces the normal Schema for reading a Table. It creates a Schema based on a Java Bean class.
+ */
 public class BeanSchema extends Schema {
 
     @JsonIgnore
@@ -46,6 +49,7 @@ public class BeanSchema extends Schema {
     }
 
     @JsonIgnore
+    @Override
     public String[] getHeaders() {
         List<String> retVal = new ArrayList<>();
         Iterator<CsvSchema.Column> iterator = csvSchema.iterator();
@@ -55,6 +59,7 @@ public class BeanSchema extends Schema {
         return retVal.toArray(new String[]{});
     }
 
+    @Override
     public Field<?> getField(String name) {
         return fieldMap.get(name);
     }
