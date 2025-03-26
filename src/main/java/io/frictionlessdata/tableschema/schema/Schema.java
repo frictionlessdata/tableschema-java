@@ -78,6 +78,7 @@ public class Schema implements SchemaInterface{
     @JsonIgnore
     private final List<ValidationException> errors = new ArrayList<>();
 
+
     @JsonIgnore
     FileReference<?> reference;
 
@@ -284,6 +285,10 @@ public class Schema implements SchemaInterface{
     @JsonIgnore
     public String[] getHeaders() {
          return getFieldNames().toArray(new String[0]);
+    }
+
+    public FileReference<?> getReference() {
+        return reference;
     }
 
     /**
