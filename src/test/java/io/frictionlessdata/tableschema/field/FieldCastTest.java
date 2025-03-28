@@ -188,7 +188,7 @@ class FieldCastTest {
     @Test
     void testCastNumberDecimalChar() throws Exception{
         String testValue = "1020,123";
-        Map<String, Object> options = new HashMap();
+        Map<String, Object> options = new HashMap<>();
         options.put("decimalChar", ",");
         NumberField field = new NumberField("int field");
         Number num = field.castValue(testValue, false, options);
@@ -391,7 +391,7 @@ class FieldCastTest {
 
         BigInteger intVal = intField.castValue("16289212000");
         Number floatVal = floatField.castValue("16289212000.0");
-        Assertions.assertTrue(floatVal instanceof BigDecimal);
+        Assertions.assertInstanceOf(BigDecimal.class, floatVal);
         Assertions.assertEquals(((BigDecimal)floatVal).toBigInteger(), intVal);
     }
 
@@ -405,7 +405,7 @@ class FieldCastTest {
             schema = Schema.fromJson (fis, false);
         }
         Table table = Table.fromSource(f, TestHelper.getTestDataDirectory(), schema, TableDataSource.getDefaultCsvFormat());
-        Iterator iter = table.iterator(true, false, true, false);
+        Iterator<?> iter = table.iterator(true, false, true, false);
         Object obj = null;
         int cnt = 0;
         while (iter.hasNext()) {
@@ -415,8 +415,8 @@ class FieldCastTest {
                 break;
             }
         }
-        Object valueObj = ((Map)obj).get("Value");
-        Assertions.assertTrue(valueObj instanceof BigInteger);
+        Object valueObj = ((Map<String, Object>)obj).get("Value");
+        Assertions.assertInstanceOf(BigInteger.class, valueObj);
         BigInteger val = (BigInteger)valueObj;
         Assertions.assertEquals(18624475000000L, val.longValue());
     }

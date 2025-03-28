@@ -43,7 +43,7 @@ public class DatetimeField extends Field<ZonedDateTime> {
 
             return ZonedDateTime.from(dt);
         }else{
-            throw new TypeInferringException("DateTime field not in ISO 8601 format yyyy-MM-dd'T'HH:mm:ss[.SSS]Z");
+            throw new TypeInferringException("DateTime field value [" + value + "] not in ISO 8601 format yyyy-MM-dd'T'HH:mm:ss[.SSS]Z");
         }
     }
 

@@ -659,9 +659,8 @@ public abstract class Field<T> {
 
             } catch(ConstraintsException ce){
                 throw ce;
-
-            } catch(TypeInferringException e){
-                throw new InvalidCastException(e.getMessage());
+            } catch (TypeInferringException e) {
+                throw new InvalidCastException("Field [" + this.name + "] provided value [" + value + "] is not of [" + type + "] type.");
             } catch(Exception e){
                 throw new InvalidCastException(e);
             }
