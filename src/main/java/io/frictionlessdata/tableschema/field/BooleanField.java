@@ -29,8 +29,8 @@ public class BooleanField extends Field<Boolean> {
     }
 
     public BooleanField(String name, String format, String title, String description,
-                        URI rdfType, Map<String, Object> constraints, Map<String, Object> options){
-        super(name, FIELD_TYPE_BOOLEAN, format, title, description, rdfType, constraints, options);
+                        URI rdfType, Map<String, Object> constraints, Map<String, Object> options, String example){
+        super(name, FIELD_TYPE_BOOLEAN, format, title, description, rdfType, constraints, options, example);
     }
 
     public void setTrueValues(List<String> newValues) {

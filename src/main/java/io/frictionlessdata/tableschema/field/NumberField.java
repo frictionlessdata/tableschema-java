@@ -44,8 +44,8 @@ public class NumberField extends Field<Number> {
     }
 
     public NumberField(String name, String format, String title, String description,
-                       URI rdfType, Map constraints, Map options){
-        super(name, FIELD_TYPE_NUMBER, format, title, description, rdfType, constraints, options);
+                       URI rdfType, Map constraints, Map options, String example){
+        super(name, FIELD_TYPE_NUMBER, format, title, description, rdfType, constraints, options,  example);
     }
 
     @Override

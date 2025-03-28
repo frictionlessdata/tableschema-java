@@ -373,7 +373,7 @@ public class TableOtherTest {
         schema.addField(isAdminField);
 
         Field<?> addressCoordinatesField
-            = new GeopointField("addressCoordinates", Field.FIELD_FORMAT_OBJECT, null, null, null, null, null);
+            = new GeopointField("addressCoordinates", Field.FIELD_FORMAT_OBJECT, null, null, null, null, null, null);
         schema.addField(addressCoordinatesField);
 
         Field<?> contractLengthField = new DurationField("contractLength");

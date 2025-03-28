@@ -30,7 +30,7 @@ class FieldCastTest {
 
     @Test
     void testFieldCastGeopointDefault() throws Exception{
-        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_DEFAULT, "title", "description", null, null, null);
+        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_DEFAULT, "title", "description", null, null, null, null);
         double[] val = field.castValue("0.00012,21");
         Assertions.assertEquals(0.00012, val[0]);
         Assertions.assertEquals(21, val[1]);
@@ -38,7 +38,7 @@ class FieldCastTest {
 
     @Test
     void testFieldCastGeopointArray() throws Exception{
-        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_ARRAY, "title", "description", null, null, null);
+        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_ARRAY, "title", "description", null, null, null, null);
         double[] val = field.castValue("[45,32.54]");
         Assertions.assertEquals(45, val[0]);
         Assertions.assertEquals(32.54, val[1]);
@@ -46,7 +46,7 @@ class FieldCastTest {
 
     @Test
     void testFieldCastGeopointObject() throws Exception{
-        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_OBJECT, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+        GeopointField field = new GeopointField("test", Field.FIELD_FORMAT_OBJECT, Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
         double[] val = field.castValue("{\"lon\": 67.123, \"lat\": 19}");
         Assertions.assertEquals(67.123, val[0]);
         Assertions.assertEquals(19, val[1]);
@@ -68,7 +68,7 @@ class FieldCastTest {
 
     @Test
     void testFieldCastValidGeojson() throws Exception{
-        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
         JsonNode val = field.castValue("{\n" +
             "    \"type\": \"Feature\",\n" +
             "    \"properties\": {\n" +
@@ -90,7 +90,7 @@ class FieldCastTest {
 
     @Test
     void testFieldCastInvalidGeojson() throws Exception{
-        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_DEFAULT, Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
         assertThrows(InvalidCastException.class, () -> {
             field.castValue("{\n" +
                 "    \"type\": \"INVALID_TYPE\",\n" + // The invalidity is here.
@@ -110,7 +110,7 @@ class FieldCastTest {
 
     @Test
     void testFieldCastValidTopojson() throws Exception{
-        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
 
         JsonNode val = field.castValue("{\n" +
             "  \"type\": \"Topology\",\n" +
@@ -157,7 +157,7 @@ class FieldCastTest {
 
     @Test
     void testFieldCastInvalidTopojson() throws Exception{
-        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, Field.FIELD_FORMAT_DEFAULT, null, null, null, null);
+        GeojsonField field = new GeojsonField("test", Field.FIELD_FORMAT_TOPOJSON, Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
 
         // This is an invalid Topojson, it's a Geojson:
         assertThrows(InvalidCastException.class, () -> {

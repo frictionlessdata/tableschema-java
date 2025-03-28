@@ -239,7 +239,7 @@ public class SchemaTest {
                 null,
                 null,
                 intFieldConstraints,
-                null);
+                null, null);
         createdSchema.addField(intField);
 
         Map<String, Object> stringFieldConstraints = new HashMap<>();
@@ -253,7 +253,7 @@ public class SchemaTest {
                 "the description",
                 null,
                 stringFieldConstraints,
-                null);
+                null, null);
         createdSchema.addField(stringField);
 
         // Save schema
@@ -283,10 +283,10 @@ public class SchemaTest {
 
         Schema createdSchema = new Schema(true);
 
-        Field<?> intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
+        Field<?> intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null, null);
         createdSchema.addField(intField);
 
-        Field<?> stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
+        Field<?> stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null, null);
         createdSchema.addField(stringField);
 
         // Primary Key
@@ -307,10 +307,10 @@ public class SchemaTest {
 
         Schema createdSchema = new Schema();
 
-        Field<?> intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
+        Field<?> intField = new IntegerField("id", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null, null);
         createdSchema.addField(intField);
 
-        Field<?> stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null);
+        Field<?> stringField = new StringField("name", Field.FIELD_FORMAT_DEFAULT, null, null, null, null, null, null);
         createdSchema.addField(stringField);
 
         // Foreign Keys

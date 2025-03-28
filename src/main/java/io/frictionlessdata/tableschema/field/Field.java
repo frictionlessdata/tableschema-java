@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 @JsonInclude(value = Include.NON_EMPTY)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = AnyField.class,
         include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
+@JsonPropertyOrder({"name", "title", "type", "format", "example", "description", "rdfType", "constraints"})
 @JsonSubTypes({
         @JsonSubTypes.Type(value = StringField.class, name = Field.FIELD_TYPE_STRING),
         @JsonSubTypes.Type(value = IntegerField.class, name = Field.FIELD_TYPE_INTEGER),
@@ -126,6 +127,12 @@ public abstract class Field<T> {
     private String description = null;
 
     /**
+     * An example value for the field"
+     */
+    private String example = null;
+
+
+    /**
      * A field's `type` property is a string indicating the type of this field.
      * http://frictionlessdata.io/specs/table-schema/index.html#field-descriptors
      */
@@ -149,6 +156,7 @@ public abstract class Field<T> {
 
     Map<String, Object> constraints = null;
 
+    @JsonIgnore
     Map<String, Object> options = new HashMap<>();
 
     @JsonAnyGetter
@@ -179,7 +187,8 @@ public abstract class Field<T> {
             String description,
             URI rdfType,
             Map<String, Object> constraints,
-            Map<String, Object> options){
+            Map<String, Object> options,
+            String example){
         this.name = name;
         this.type = type;
         this.format = format;
@@ -188,6 +197,7 @@ public abstract class Field<T> {
         this.description = description;
         this.constraints = constraints;
         this.options = options;
+        this.example = example;
     }
 
     public static Field<?> fromJson (String json) {
@@ -577,6 +587,14 @@ public abstract class Field<T> {
 
     public void setRdfType(URI rdfType) {
         this.rdfType = rdfType;
+    }
+
+    public String getExample() {
+        return example;
+    }
+
+    public void setExample(String example) {
+        this.example = example;
     }
 
     public Map<String, Object> getOptions() {

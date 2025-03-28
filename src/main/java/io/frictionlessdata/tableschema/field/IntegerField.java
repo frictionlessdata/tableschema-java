@@ -24,8 +24,8 @@ public class IntegerField extends Field<BigInteger> {
     }
 
     public IntegerField(String name, String format, String title, String description,
-                        URI rdfType, Map<String, Object> constraints, Map<String, Object> options) {
-        super(name, FIELD_TYPE_INTEGER, format, title, description, rdfType, constraints, options);
+                        URI rdfType, Map<String, Object> constraints, Map<String, Object> options, String example) {
+        super(name, FIELD_TYPE_INTEGER, format, title, description, rdfType, constraints, options, example);
     }
 
     @Override

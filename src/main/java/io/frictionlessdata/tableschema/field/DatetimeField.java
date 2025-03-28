@@ -27,8 +27,8 @@ public class DatetimeField extends Field<ZonedDateTime> {
     }
 
     public DatetimeField(String name, String format, String title, String description,
-                         URI rdfType, Map<String, Object> constraints, Map<String, Object> options){
-        super(name, FIELD_TYPE_DATETIME, format, title, description, rdfType, constraints, options);
+                         URI rdfType, Map<String, Object> constraints, Map<String, Object> options, String example){
+        super(name, FIELD_TYPE_DATETIME, format, title, description, rdfType, constraints, options, example);
     }
 
     @Override
