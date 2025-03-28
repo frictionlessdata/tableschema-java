@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
@@ -95,7 +96,8 @@ public class FieldConstraintsTest {
         violatedConstraints = field.checkConstraintViolations(valueLength49);
         Assertions.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAX_LENGTH));
 
-        assertThrows(ConstraintsException.class, () -> {field.castValue("This string length is greater than 45 characters.");});
+        ConstraintsException ex = assertThrows(ConstraintsException.class, () -> {field.castValue("This string length is greater than 45 characters.");});
+        Assertions.assertEquals("Field 'test' value 'This string length is greater than 45 characters.' violates constraint(s) [maxLength]", ex.getMessage());
     }
 
     @Test
@@ -782,6 +784,26 @@ public class FieldConstraintsTest {
         Assertions.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_ENUM));
     }
 
+
+    @Test
+    @DisplayName("Test our validation message shows both pattern and maxLength constraints violated")
+    public void testPatternAndMaxlength(){
+        Map<String, Object> violatedConstraints = null;
+
+        Map<String, Object> constraints = new HashMap<>();
+        constraints.put(Field.CONSTRAINT_KEY_PATTERN, "testing[0-9]+");
+        constraints.put(Field.CONSTRAINT_KEY_MAX_LENGTH, 45);
+
+        StringField field = new StringField("test", null, null, null, null, constraints, null, null);
+
+        String valueLength49 = field.castValue("This string length is greater than 45 characters.", false, null);
+        violatedConstraints = field.checkConstraintViolations(valueLength49);
+        Assertions.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_MAX_LENGTH));
+        Assertions.assertTrue(violatedConstraints.containsKey(Field.CONSTRAINT_KEY_PATTERN));
+
+        ConstraintsException ex = assertThrows(ConstraintsException.class, () -> {field.castValue("This string length is greater than 45 characters.");});
+        Assertions.assertEquals("Field 'test' value 'This string length is greater than 45 characters.' violates constraint(s) [pattern, maxLength]", ex.getMessage());
+    }
 
     private JsonNode createJsonNode(Object obj) {
     	return JsonUtil.getInstance().createNode(obj);

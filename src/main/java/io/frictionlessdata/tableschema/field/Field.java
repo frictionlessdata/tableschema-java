@@ -15,6 +15,7 @@ import java.time.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Definition of a field in a data table. Doesn't hold values
@@ -651,7 +652,8 @@ public abstract class Field<T> {
                 if(enforceConstraints && this.constraints != null){
                     Map<String, Object> violatedConstraints = checkConstraintViolations(castValue);
                     if(!violatedConstraints.isEmpty()){
-                        throw new ConstraintsException("Violated "+ violatedConstraints.size()+" constraints");
+                        String violatedConstraintNames = String.join(", ", violatedConstraints.keySet());
+                        throw new ConstraintsException("Field '" + this.name + "' value '" + value + "' violates constraint(s) [" + violatedConstraintNames+"]");
                     }
                 }
 
@@ -660,7 +662,7 @@ public abstract class Field<T> {
             } catch(ConstraintsException ce){
                 throw ce;
             } catch (TypeInferringException e) {
-                throw new InvalidCastException("Field [" + this.name + "] provided value [" + value + "] is not of [" + type + "] type.");
+                throw new InvalidCastException("Field '" + this.name + "' provided value '" + value + "' is not of '" + type + "' type.");
             } catch(Exception e){
                 throw new InvalidCastException(e);
             }
