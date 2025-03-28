@@ -152,7 +152,7 @@ public interface TableDataSource {
                 .setHeader()
                 .setIgnoreSurroundingSpaces(true)
                 .setRecordSeparator("\n")
-                .build();
+                .get();
     }
 
     static String trimBOM(String input) {

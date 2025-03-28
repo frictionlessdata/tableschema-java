@@ -15,7 +15,6 @@
         {
             "fields": "id",
             "reference": {
-                "datapackage": "http://data.okfn.org/data/mydatapackage/",
                 "resource": "the-resource",
                 "fields": ["id_1", "title_id"]
             }

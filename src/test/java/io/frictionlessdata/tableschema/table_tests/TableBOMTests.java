@@ -24,7 +24,7 @@ public class TableBOMTests {
             .builder()
             .setRecordSeparator("\n")
             .setHeader(new String[0])
-            .build();
+            .get();
 
 
     @Test

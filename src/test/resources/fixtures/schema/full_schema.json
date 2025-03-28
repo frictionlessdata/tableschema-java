@@ -1,0 +1,129 @@
+{
+  "fields" : [ {
+    "name" : "first_name",
+    "title" : "First Name",
+    "description" : "The first name of the person",
+    "type" : "string",
+    "format" : "default",
+    "constraints" : {
+      "required" : true
+    }
+  }, {
+    "name" : "last_name",
+    "title" : "Last Name",
+    "description" : "The last name of the person",
+    "type" : "string",
+    "format" : "default",
+    "constraints" : {
+      "minLength" : 2,
+      "maxLength" : 20,
+      "unique" : true
+    }
+  }, {
+    "name" : "gender",
+    "title" : "Gender",
+    "description" : "The gender of the person.",
+    "type" : "string",
+    "format" : "default",
+    "constraints" : {
+      "enum" : [ "male", "female" ]
+    }
+  }, {
+    "name" : "dateOfBirth",
+    "title" : "dateOfBirth",
+    "description" : "The day of birth.",
+    "type" : "date",
+    "format" : "%m/%d/%Y",
+    "constraints" : {
+      "minimum" : "1900-01-01",
+      "maximum" : "2023-01-01"
+    }
+  }, {
+    "name" : "age",
+    "title" : "Age",
+    "description" : "The age of this person.",
+    "type" : "integer",
+    "format" : "default"
+  }, {
+    "name" : "period_employed",
+    "title" : "Period Employed",
+    "description" : "The period of employment, in years (eg: 2.6 Y).",
+    "type" : "number",
+    "format" : "default"
+  }, {
+    "name" : "employment_start",
+    "title" : "Employment Start",
+    "description" : "The date this person started employment.",
+    "type" : "date",
+    "format" : "default"
+  }, {
+    "name" : "daily_start",
+    "title" : "Daily Start",
+    "description" : "Usual start time for this person.",
+    "type" : "time",
+    "format" : "default"
+  }, {
+    "name" : "daily_end",
+    "title" : "Daily End",
+    "description" : "Usual end time for this person.",
+    "type" : "time",
+    "format" : "default"
+  }, {
+    "name" : "is_management",
+    "title" : "Is Management",
+    "description" : "Is this person part of upper management.",
+    "type" : "boolean",
+    "format" : "default"
+  }, {
+    "name" : "photo",
+    "title" : "Photo",
+    "description" : "A photo of this person.",
+    "type" : "string",
+    "format" : "binary"
+  }, {
+    "name" : "interests",
+    "title" : "Interests",
+    "description" : "Declared interests of this person (work-related).",
+    "type" : "array",
+    "format" : "default"
+  }, {
+    "name" : "home_location",
+    "title" : "Home Location",
+    "description" : "A geopoint for this person's home address.",
+    "type" : "geopoint",
+    "format" : "default"
+  }, {
+    "name" : "position_title",
+    "title" : "Position Title",
+    "description" : "This person's position in the company.",
+    "type" : "string",
+    "format" : "default"
+  }, {
+    "name" : "extra",
+    "title" : "Extra",
+    "description" : "Extra information about this person.",
+    "type" : "object",
+    "format" : "default"
+  }, {
+    "name" : "notes",
+    "title" : "Notes",
+    "description" : "Add any relevant notes for HR.",
+    "type" : "any",
+    "format" : "default"
+  } ],
+  "missingValues" : [ "NaN", "-" ],
+  "primaryKey" : [ "first_name", "last_name", "period_employed", "home_location" ],
+  "foreignKeys" : [ {
+    "fields" : "position_title",
+    "reference" : {
+      "resource" : "positions",
+      "fields" : "name"
+    }
+  }, {
+    "fields" : [ "first_name", "last_name" ],
+    "reference" : {
+      "resource" : "employees",
+      "fields" : [ "name", "lastName" ]
+    }
+  } ]
+}

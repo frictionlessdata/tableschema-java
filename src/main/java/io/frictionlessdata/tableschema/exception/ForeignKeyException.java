@@ -3,7 +3,7 @@ package io.frictionlessdata.tableschema.exception;
 /**
  *
  */
-public class ForeignKeyException extends TableSchemaException {
+public class ForeignKeyException extends ValidationException {
 
     /**
      * Constructs an instance of <code>ForeignKeyException</code> with the

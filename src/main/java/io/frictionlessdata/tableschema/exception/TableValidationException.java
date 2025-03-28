@@ -4,7 +4,7 @@ package io.frictionlessdata.tableschema.exception;
  *
  *
  */
-public class TableValidationException extends TableSchemaException {
+public class TableValidationException extends ValidationException {
 
 
     /**
@@ -17,12 +17,4 @@ public class TableValidationException extends TableSchemaException {
         super(msg);
     }
 
-    /**
-     * Constructs an instance of <code>TableSchemaException</code> by wrapping a Throwable
-     *
-     * @param t the wrapped exception.
-     */
-    public TableValidationException(Throwable t) {
-        super(t);
-    }
 }

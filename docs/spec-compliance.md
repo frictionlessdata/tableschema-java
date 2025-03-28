@@ -45,7 +45,7 @@ Documents compliance with the [specifications](https://frictionlessdata.io/specs
 - Both type and format are optional: in a field descriptor, the absence of a type property indicates that the field 
     is of the type "string", and the absence of a format property indicates that the field's type format is "default".
     
-    - implemented in Fild#fromJson(String) as `String type = fieldDef.has(JSON_KEY_TYPE) 
+    - implemented in `Field#fromJson(String) as `String type = fieldDef.has(JSON_KEY_TYPE) 
     ? fieldDef.getString(JSON_KEY_TYPE) : "string";` and `field.format = (!StringUtils.isEmpty(format)) 
     ? format.trim() : FIELD_FORMAT_DEFAULT`;
    

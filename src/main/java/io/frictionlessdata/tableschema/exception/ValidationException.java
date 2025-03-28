@@ -8,16 +8,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ValidationException extends TableSchemaException {
-
 	List<ValidationMessage> validationMessages = new ArrayList<>();
-	List<String> otherMessages = new ArrayList<>();
+	List<Exception> wrappedExceptions = new ArrayList<>();
 
 	public ValidationException(String msg) {
 		super(msg);
 	}
 	
 	public ValidationException(Exception ex) {
-		String message = ex.getClass()+": "+ex.getMessage();
+		wrappedExceptions.add(ex);
 	}
 
 	public ValidationException(FormalSchemaValidator schema, Collection<ValidationMessage> messages) {
@@ -32,19 +31,30 @@ public class ValidationException extends TableSchemaException {
 
 	public ValidationException(String schemaName, Collection<ValidationException> exceptions) {
 		this(String.format("%s: %s", schemaName, "validation failed: "));
-		otherMessages.addAll(exceptions
-				.stream().map((Throwable::getMessage)).collect(Collectors.toList()));
+		wrappedExceptions.addAll(exceptions);
 		final Set<ValidationMessage> messages = new LinkedHashSet<>();
 		exceptions.forEach((m) -> {
-			messages.addAll(m.validationMessages);
+			if (m instanceof ValidationException) {
+				messages.addAll(((ValidationException)m).validationMessages);
+			}
 		});
 		this.validationMessages.addAll(messages);
+	}
+
+	public List<Exception> getWrappedExceptions() {
+		return wrappedExceptions;
+	}
+
+	public List<ValidationMessage> getValidationMessages() {
+		return validationMessages;
 	}
 
 	public List<Object> getMessages() {
 		List<Object> retVal = new ArrayList<>();
 		retVal.addAll(validationMessages);
-		retVal.addAll(otherMessages);
+		for (Exception ex : wrappedExceptions) {
+			retVal.add(ex.getMessage());
+		}
 		return retVal;
 	}
 }

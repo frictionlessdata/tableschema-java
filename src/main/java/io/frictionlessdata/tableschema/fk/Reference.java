@@ -1,13 +1,19 @@
 package io.frictionlessdata.tableschema.fk;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
+import io.frictionlessdata.tableschema.exception.ValidationException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This implements a reference from one Table to another. Weirdly, this is in tableschema as per
@@ -15,76 +21,99 @@ import java.net.URL;
  * the datapackage standard (Tables have no notion of resources).
  * 
  */
+
 public class Reference {
     private static final String JSON_KEY_RESOURCE = "resource";
     private static final String JSON_KEY_FIELDS = "fields";
 
-    private String resource = null;
+    @JsonProperty(JSON_KEY_RESOURCE)
+    private String resourceName = null;
+
+    @JsonProperty(JSON_KEY_FIELDS)
     private Object fields = null;
-    
-    public Reference(){
-    }
-    
-    public Reference(String resource, Object fields) throws ForeignKeyException{
-        this(resource, fields, false);
-    }
-    
+
+    @JsonIgnore
+    private boolean strictValidation = true;
+
+    @JsonIgnore
+    private final ArrayList<ValidationException> errors = new ArrayList<>();
+
+    public Reference(){}
+
     public Reference(String resource, Object fields, boolean strict) throws ForeignKeyException{
-        this.resource = resource;
+        this.resourceName = resource;
         this.fields = fields;
-        
-        if(strict){
-            this.validate();
-        }
-    }
-    
-    public Reference(String json, boolean strict) throws ForeignKeyException{
-        JsonNode refJsonObject = JsonUtil.getInstance().createNode(json);
-        
-        if(refJsonObject.has(JSON_KEY_RESOURCE)){
-            this.resource = refJsonObject.get(JSON_KEY_RESOURCE).asText();
-        }
-        
-        if(refJsonObject.has(JSON_KEY_FIELDS)){
-        	if(refJsonObject.get(JSON_KEY_FIELDS).isArray()) {
-        		this.fields = refJsonObject.get(JSON_KEY_FIELDS);
-        	} else {
-        		this.fields = refJsonObject.get(JSON_KEY_FIELDS).asText();
-        	}
-        }
-        
-        if(strict){
-            this.validate();
-        }
+        this.strictValidation = strict;
+        this.validate();
     }
 
+
+    @JsonIgnore
     public String getResource(){
-        return this.resource;
+        return this.resourceName;
     }
-    
+
+    @JsonIgnore
     public void setResource(String resource){
-        this.resource = resource;
+        this.resourceName = resource;
     }
-    
+
+    @JsonIgnore
     public <Any> Any getFields(){
         return (Any)this.fields;
     }
-    
+
+    @JsonIgnore
     public void setFields(Object fields){
         this.fields = fields;
     }
+
+    @JsonIgnore
+    public boolean isStrictValidation() {
+        return strictValidation;
+    }
+
+    @JsonIgnore
+    public void setStrictValidation(boolean strictValidation) {
+        this.strictValidation = strictValidation;
+    }
+
+
+    @JsonIgnore
+    public List<String> getFieldNames(){
+        if (this.fields instanceof String){
+            return Collections.singletonList((String)this.fields);
+        } else if (this.fields instanceof Collection){
+            return new ArrayList<>( (Collection<String>)this.fields);
+        } else {
+            throw new IllegalArgumentException("Invalid fields type in reference: "+this.fields.getClass().getName());
+        }
+    }
     
     public final void validate() throws ForeignKeyException{
-        if(this.resource == null || this.fields == null){
-            throw new ForeignKeyException("A foreign key's reference must have the fields and resource properties.");
+        ForeignKeyException fke = null;
+        if(this.resourceName == null || this.fields == null){
+            fke = new ForeignKeyException("A foreign key's reference must have the fields and resource properties.");
             
-        }else if(!(this.fields instanceof String) && !(ArrayNode.class.isAssignableFrom(this.fields.getClass()))){
-            throw new ForeignKeyException("The foreign key's reference fields property must be a string or an array.");
+        }else if(!(this.fields instanceof String) && !(this.fields instanceof Collection)){
+            fke = new ForeignKeyException("The foreign key's reference fields property must be a string or an array.");
+        }
+        if(fke != null){
+            if(this.strictValidation){
+                throw fke;
+            }else{
+                errors.add(fke);
+            }
         }
     }
     
     @JsonIgnore
     public String getJson(){
         return JsonUtil.getInstance().serialize(this);
+    }
+
+    @JsonIgnore
+    public ArrayList<ValidationException> getErrors(){
+        return errors;
     }
 }

@@ -1,8 +1,6 @@
 package io.frictionlessdata.tableschema.schema;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,35 +42,47 @@ import java.util.stream.Collectors;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(value = Include.NON_EMPTY)
+@JsonPropertyOrder({"fields", "missingValues", "primaryKey", "foreignKeys"})
 public class Schema implements SchemaInterface{
     private static final Logger log = LoggerFactory.getLogger(Schema.class);
 
     public static final String JSON_KEY_FIELDS = "fields";
+    public static final String JSON_KEY_MISSING_VALUES = "missingValues";
     public static final String JSON_KEY_PRIMARY_KEY = "primaryKey";
     public static final String JSON_KEY_FOREIGN_KEYS = "foreignKeys";
 
     // the schema validator
+    @JsonIgnore
     private FormalSchemaValidator tableFormalSchemaValidator = null;
 
     /**
      * List of {@link Field}s of this schema
      */
-
+    @JsonProperty(JSON_KEY_FIELDS)
     List<Field<?>> fields = new ArrayList<>();
+
+    /**
+     * List of mssing value definitions of this schema
+     */
+    @JsonProperty(JSON_KEY_MISSING_VALUES)
+    List<String> missingValues = new ArrayList<>();
 
     /**
      * The primary key of this schema, if any
      */
+    @JsonProperty(JSON_KEY_PRIMARY_KEY)
     private Object primaryKey = null;
 
     /**
      * List of {@link ForeignKey}s of this schema
      */
+    @JsonProperty(JSON_KEY_FOREIGN_KEYS)
     private final List<ForeignKey> foreignKeys = new ArrayList<>();
 
     /**
      * Whether validation errors should be thrown as exceptions or only reported
      */
+    @JsonIgnore
     boolean strictValidation = true;
 
     @JsonIgnore
@@ -274,11 +284,20 @@ public class Schema implements SchemaInterface{
     }
 
     @JsonIgnore
-    List<String> getFieldNames() {
+    public List<String> getFieldNames() {
         return fields
                 .stream()
                 .map(Field::getName)
                 .collect(Collectors.toList());
+    }
+
+
+    public List<String> getMissingValues() {
+        return missingValues;
+    }
+
+    public void setMissingValues(List<String> missingValues) {
+        this.missingValues = missingValues;
     }
 
     @Override
@@ -462,21 +481,11 @@ public class Schema implements SchemaInterface{
             errors.add(new ValidationException(tableFormalSchemaValidator, messages));
         }
         for (ForeignKey fk : foreignKeys) {
-            Object fields = fk.getFields();
-            if (fields instanceof ArrayNode) {
-                List<Object> subFields = new ArrayList<>();
-                ((ArrayNode) fields).elements().forEachRemaining(f->subFields.add(f.asText()));
-                for (Object subField : subFields) {
-                    try{
-                        validate((String) subField);
-                    } catch (ValidationException ve) {
-                        errors.add(ve);
-                    }
-                }
-            } else if (fields instanceof String) {
+            errors.addAll(fk.getErrors());
+            for (String fieldName : fk.getFieldNames()) {
                 try{
-                    validate((String) fields);
-                } catch(ValidationException ve){
+                    validate(fieldName);
+                } catch (ValidationException ve) {
                     errors.add(ve);
                 }
             }
@@ -511,10 +520,15 @@ public class Schema implements SchemaInterface{
         JsonNode schemaObj = JsonUtil.getInstance().readValue(json);
         // Set Fields
         if (schemaObj.has(JSON_KEY_FIELDS)) {
-            TypeReference<List<Field<?>>> fieldsTypeRef = new TypeReference<List<Field<?>>>() {
-            };
+            TypeReference<List<Field<?>>> fieldsTypeRef = new TypeReference<>() {};
             String fieldsJson = schemaObj.withArray(JSON_KEY_FIELDS).toString();
             this.fields.addAll(JsonUtil.getInstance().deserialize(fieldsJson, fieldsTypeRef));
+        }
+
+        // Set Missing Values
+        if (schemaObj.has(JSON_KEY_MISSING_VALUES)) {
+            this.missingValues
+                    = JsonUtil.getInstance().deserialize(schemaObj.withArray(JSON_KEY_MISSING_VALUES), new TypeReference<>() {});
         }
 
         // Set Primary Key
@@ -530,7 +544,8 @@ public class Schema implements SchemaInterface{
         if (schemaObj.has(JSON_KEY_FOREIGN_KEYS)) {
             JsonNode fkJsonArray = schemaObj.withArray(JSON_KEY_FOREIGN_KEYS);
             fkJsonArray.forEach((f) -> {
-                ForeignKey fk = new ForeignKey(f.toString(), strictValidation);
+                ForeignKey fk = JsonUtil.getInstance().deserialize(f, new TypeReference<>() {});
+                fk.validate();
                 this.addForeignKey(fk);
 
                 if (!strictValidation) {
@@ -548,10 +563,8 @@ public class Schema implements SchemaInterface{
         this.tableFormalSchemaValidator = FormalSchemaValidator.fromJson(tableSchemaInputStream);
     }
 
-
-    @SuppressWarnings("rawtypes")
     private void validate(String foundFieldName) throws ValidationException {
-        Field foundField = fields
+        Field<?> foundField = fields
                 .stream()
                 .filter((f) -> f.getName().equals(foundFieldName))
                 .findFirst()

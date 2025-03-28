@@ -9,7 +9,7 @@ package io.frictionlessdata.tableschema.exception;
  *
  * @author pechorin
  */
-public class ConstraintsException extends TableSchemaException {
+public class ConstraintsException extends ValidationException {
 
     /**
      * Constructs an instance of <code>ConstraintsException</code> with the

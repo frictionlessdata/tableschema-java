@@ -13,6 +13,7 @@ import io.frictionlessdata.tableschema.exception.ValidationException;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.fk.ForeignKey;
 import io.frictionlessdata.tableschema.fk.Reference;
+import io.frictionlessdata.tableschema.util.JsonUtil;
 import io.frictionlessdata.tableschema.util.ReflectionUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -415,43 +416,45 @@ public class SchemaTest {
     public void testInvalidForeignKeyArray() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_array.json");
 
-        Throwable t = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
-        Assertions.assertEquals("The reference's fields property must be an array if the outer fields is an array.", t.getMessage());
+        ForeignKeyException fke = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertEquals("The reference's fields property must be an array if the outer fields is an array.", fke.getMessage());
     }
 
     @Test
     public void testInvalidForeignKeyArrayString() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_array_string.json");
 
-        Throwable t = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
+        ForeignKeyException fke = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
         Assertions.assertEquals("The reference's fields property must be a string if " +
-                "the outer fields is a string.", t.getMessage());
+                "the outer fields is a string.", fke.getMessage());
     }
 
     @Test
     public void testInvalidForeignKeyArrayStringRef() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_array_string_ref.json");
 
-        Throwable t = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
+        ForeignKeyException fke = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertNotNull(fke);
         Assertions.assertEquals("The reference's fields property must be an array if the outer fields " +
-                "is an array.", t.getMessage());
+                "is an array.", fke.getMessage());
     }
 
     @Test
     public void testInvalidForeignKeyArrayWrongNumber() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_array_wrong_number.json");
 
-        Throwable t =Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
+        ForeignKeyException fke =Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertNotNull(fke);
         Assertions.assertEquals("The reference's fields property must be an array of the same length as that" +
-                        " of the outer fields' array.", t.getMessage());
+                        " of the outer fields' array.", fke.getMessage());
     }
 
     @Test
     public void testInvalidForeignKeyNoReference() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_no_reference.json");
 
-        Throwable t = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
-        Assertions.assertEquals("A foreign key must have the fields and reference properties.", t.getMessage());
+        ForeignKeyException fke = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertEquals("A foreign key must have the fields and reference properties.", fke.getMessage());
     }
 
     @Test
@@ -468,9 +471,9 @@ public class SchemaTest {
     public void testInvalidForeignKeyStringArrayRef() throws Exception {
         File source = getResourceFile("/fixtures/foreignkeys/schema_invalid_fk_string_array_ref.json");
 
-        Throwable t = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
+        ForeignKeyException fke = Assertions.assertThrows(ForeignKeyException.class, () -> Schema.fromJson(source, true));
         Assertions.assertEquals("The reference's fields property must be a string if " +
-                "the outer fields is a string.", t.getMessage());
+                "the outer fields is a string.", fke.getMessage());
     }
 
     @Test
@@ -478,13 +481,13 @@ public class SchemaTest {
         File source = getResourceFile("/fixtures/foreignkeys/schema_valid_fk_array.json");
         Schema schema = Schema.fromJson(source, true);
 
-        ArrayNode parsedFields = schema.getForeignKeys().get(0).getFields();
-        Assertions.assertEquals("id", parsedFields.get(0).asText());
-        Assertions.assertEquals("title", parsedFields.get(1).asText());
+        List<String> parsedFields = schema.getForeignKeys().get(0).getFieldNames();
+        Assertions.assertEquals("id", parsedFields.get(0));
+        Assertions.assertEquals("title", parsedFields.get(1));
 
-        ArrayNode refFields = schema.getForeignKeys().get(0).getReference().getFields();
-        Assertions.assertEquals("fk_id", refFields.get(0).asText());
-        Assertions.assertEquals("title_id", refFields.get(1).asText());
+        List<String> refFields = schema.getForeignKeys().get(0).getReference().getFieldNames();
+        Assertions.assertEquals("fk_id", refFields.get(0));
+        Assertions.assertEquals("title_id", refFields.get(1));
     }
 
     @Test
@@ -626,5 +629,15 @@ public class SchemaTest {
         String schemaStr = TestHelper.getResourceFileContent(
                 "/schemas/table-schema.json");
         FormalSchemaValidator.fromJson(schemaStr);
+    }
+
+    @Test
+    @DisplayName("Roundtrip: Validate creating a Schema from JSON with all properties, serialize to JSON and compare")
+    public void testCreateFullSchemaFromSchemaJson() throws Exception {
+        String expectedString = TestHelper.getResourceFileContent(
+                "/fixtures/schema/full_schema.json");
+        Schema schema = Schema.fromJson(expectedString, true);
+        String serialized = JsonUtil.getInstance().serialize(schema);
+        Assertions.assertEquals(expectedString.replaceAll("\r\n","\n"), serialized.replaceAll("\r\n","\n"));
     }
 }

@@ -17,10 +17,8 @@ public class ReferenceTest {
     @Test
     @DisplayName("Create a Reference with resource and field properties")
     public void testValidStringFieldsReference() throws ForeignKeyException{
-        Reference ref = new Reference("resource", "field");
-
+        Reference ref = new Reference("resource", "field", true);
         // Validation set to strict=true and no exception has been thrown.
-        // Test passes.
         Assertions.assertNotNull(ref);
     }
 
@@ -31,10 +29,8 @@ public class ReferenceTest {
         fields.add("field1");
         fields.add("field2");
 
-        Reference ref = new Reference("resource", JsonUtil.getInstance().createArrayNode(fields));
-
+        Reference ref = new Reference("resource", fields, true);
         // Validation set to strict=true and no exception has been thrown.
-        // Test passes.
         Assertions.assertNotNull(ref);
     }
 
@@ -70,18 +66,35 @@ public class ReferenceTest {
         Assertions.assertEquals(
                 "A foreign key's reference must have the fields and resource properties.",
                 fke.getMessage());
-        //exception.expectMessage("A foreign key's reference must have the fields and resource properties.");
-        //ref.validate();
     }
 
     @Test
-    @DisplayName("Create a Reference with invalid field type -> must throw")
+    @DisplayName("Create a Reference with invalid field type -> must throw in validation")
     public void testInvalidFieldsType() throws ForeignKeyException{
         ForeignKeyException fke = Assertions.assertThrows(ForeignKeyException.class,
                 ()-> {new Reference("resource", 123, true);});
         Assertions.assertEquals(
                 "The foreign key's reference fields property must be a string or an array.",
                 fke.getMessage());
+
+    }
+
+    @Test
+    @DisplayName("Create a Reference without fields with lenient validation -> must not throw")
+    public void testNullFieldsAndResourceLenient() throws ForeignKeyException{
+        Reference ref = new Reference();
+        ref.setStrictValidation(false);
+
+        ref.validate();
+        Assertions.assertEquals(1, ref.getErrors().size());
+    }
+
+    @Test
+    @DisplayName("Create a Reference with invalid field type with lenient validation -> must not throw")
+    public void testInvalidFieldsTypeLenient() throws ForeignKeyException{
+        Reference ref = new Reference("resource", 123, false);
+
+        Assertions.assertEquals(1, ref.getErrors().size());
 
     }
 }

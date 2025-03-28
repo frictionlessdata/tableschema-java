@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ForeignKeyTest {
 
     @Test
-    @DisplayName("Check ForeignKey against matching data, good case")
+    @DisplayName("data validation. Check ForeignKey against matching data, good case")
     public void testValidFkReference() throws Exception {
         File testDataDir = TestHelper.getTestDataDirectory();
         File source = TestHelper.getResourceFile("/fixtures/schema/population_schema_for_fk_check.json");
@@ -32,12 +33,12 @@ public class ForeignKeyTest {
                 file,
                 testDataDir,
                 schema,
-                CSVFormat.DEFAULT.builder().setHeader().build());
+                CSVFormat.DEFAULT.builder().setHeader().get());
         schema.getForeignKeys().get(0).validate(table);
     }
 
     @Test
-    @DisplayName("Check ForeignKey against not matching data -> must throw")
+    @DisplayName("data validation. Check ForeignKey against not matching data -> must throw")
     public void testInvalidFkReference() throws Exception {
         File testDataDir = TestHelper.getTestDataDirectory();
         File source = TestHelper.getResourceFile("/fixtures/schema/population_schema_for_fk_check.json");
@@ -49,7 +50,7 @@ public class ForeignKeyTest {
                 file,
                 testDataDir,
                 schema,
-                CSVFormat.DEFAULT.builder().setHeader().build());
+                CSVFormat.DEFAULT.builder().setHeader().get());
         ForeignKeyException fke = assertThrows(ForeignKeyException.class, ()
                 -> schema.getForeignKeys().get(0).validate(table));
         Assertions.assertEquals("Foreign key [check_year-> year] violation : expected: 2018 found: 2017",
@@ -57,6 +58,7 @@ public class ForeignKeyTest {
     }
 
     @Test
+    @DisplayName("formal validation, both fk fields and reference fields are strings")
     public void testValidStringFields() throws ForeignKeyException {
         Reference ref = new Reference("aResource", "refField", true);
         ForeignKey fk = new ForeignKey("fkField", ref, true);
@@ -67,24 +69,21 @@ public class ForeignKeyTest {
     }
 
     @Test
+    @DisplayName("formal validation, both fk fields and reference fields are collections (arrays in tableschema spec)")
     public void testValidArrayFields() throws ForeignKeyException {
-        String refFields = "[\"refField1\", \"refField2\"]";
-        // TODO: Reference validator checks for JSONArray instance
-        // we must enhance this test after jackson refactoring
-        // so we can validate with other types, for now, let's check only with String
+        List<String> refFields = Arrays.asList("field1", "field2");
         Reference ref = new Reference("aResource", refFields, true);
-        String fkFields = "[\"fkField1\", \"fkField2\"]";
+        List<String> fkFields = Arrays.asList("field1", "field2");
         ForeignKey fk = new ForeignKey(fkFields, ref, true);
 
         // Validation set to strict=true and no exception has been thrown.
-        // Test passes.
         Assertions.assertNotNull(fk);
     }
 
     @Test
+    @DisplayName("formal validation, a fk without fields must throw an exception")
     public void testNullFields() throws ForeignKeyException {
         Reference ref = new Reference("aResource", "aField", true);
-
 
         ForeignKeyException ex = assertThrows(ForeignKeyException.class, () -> {
             new ForeignKey(null, ref, true);
@@ -93,21 +92,25 @@ public class ForeignKeyTest {
     }
 
     @Test
+    @DisplayName("formal validation, a fk without reference  must throw an exception")
     public void testNullReference() throws ForeignKeyException{
-        ForeignKey fk = new ForeignKey(true);
-        fk.setFields("aField");
-        ForeignKeyException ex = assertThrows(ForeignKeyException.class, fk::validate);
+        ForeignKeyException ex = assertThrows(ForeignKeyException.class, () -> {
+            new ForeignKey("aField", null, true);
+        });
         Assertions.assertEquals("A foreign key must have the fields and reference properties.", ex.getMessage());
     }
 
     @Test
+    @DisplayName("formal validation, a fk without fields and without reference must throw an exception")
     public void testNullFieldsAndReference() throws ForeignKeyException{
-        ForeignKey fk = new ForeignKey(true);
-        ForeignKeyException ex = assertThrows(ForeignKeyException.class, fk::validate);
+        ForeignKeyException ex = assertThrows(ForeignKeyException.class, () -> {
+            new ForeignKey(null, null, true);
+        });
         Assertions.assertEquals("A foreign key must have the fields and reference properties.", ex.getMessage());
     }
 
     @Test
+    @DisplayName("formal validation, a fk without fields other than string or array must throw an exception")
     public void testFieldsNotStringOrArray() throws ForeignKeyException{
         Reference ref = new Reference("aResource", "aField", true);
 
@@ -116,19 +119,21 @@ public class ForeignKeyTest {
     }
 
     @Test
+    @DisplayName("formal validation, a fk with a single string field and reference with  array fields must throw an exception")
     public void testFkFieldsIsStringAndRefFieldsIsArray() throws ForeignKeyException{
         List<String> refFields = new ArrayList<>();
         refFields.add("field1");
         refFields.add("field2");
         refFields.add("field3");
 
-        Reference ref = new Reference("aResource", JsonUtil.getInstance().createArrayNode(refFields), true);
+        Reference ref = new Reference("aResource", refFields, true);
 
         ForeignKeyException ex = assertThrows(ForeignKeyException.class, () -> new ForeignKey("aStringField", ref, true));
         Assertions.assertEquals("The reference's fields property must be a string if the outer fields is a string.", ex.getMessage());
     }
 
     @Test
+    @DisplayName("formal validation, a fk with array fields and reference with a single string field must throw an exception")
     public void testFkFieldsIsArrayAndRefFieldsIsString() throws ForeignKeyException{
         Reference ref = new Reference("aResource", "aStringField", true);
 
@@ -138,26 +143,27 @@ public class ForeignKeyTest {
         fkFields.add("field3");
 
         ForeignKeyException ex = assertThrows(ForeignKeyException.class,
-                () -> new ForeignKey(JsonUtil.getInstance().createArrayNode(fkFields), ref, true));
+                () -> new ForeignKey(fkFields, ref, true));
         Assertions.assertEquals("The reference's fields property must be an array " +
                 "if the outer fields is an array.", ex.getMessage());
     }
 
     @Test
+    @DisplayName("formal validation, a fk with array fields and reference with array fields of difference length must throw an exception")
     public void testFkAndRefFieldsDifferentSizeArray() throws ForeignKeyException{
     	List<String> refFields = new ArrayList<>();
         refFields.add("refField1");
         refFields.add("refField2");
         refFields.add("refField3");
 
-        Reference ref = new Reference("aResource", JsonUtil.getInstance().createArrayNode(refFields), true);
+        Reference ref = new Reference("aResource", refFields, true);
 
         List<String> fkFields = new ArrayList<>();
         fkFields.add("field1");
         fkFields.add("field2");
 
         ForeignKeyException ex = assertThrows(ForeignKeyException.class,
-                () -> new ForeignKey(JsonUtil.getInstance().createArrayNode(fkFields), ref, true));
+                () -> new ForeignKey(fkFields, ref, true));
         Assertions.assertEquals("The reference's fields property must be an array" +
                 " of the same length as that of the outer fields' array.", ex.getMessage());
     }

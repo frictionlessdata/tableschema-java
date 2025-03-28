@@ -83,6 +83,11 @@ public class Table{
             validate();
     }
 
+    /**
+     * Constructor for a Table from a {@link BeanTableDataSource} instance holding a collection
+     * of instances of a certain Bean class. The Schema is inferred from the Bean class.
+     * @param dataSource the input data
+     */
     public static Table fromSource(BeanTableDataSource dataSource) {
         Table table = new Table();
         table.dataSource = dataSource;
@@ -146,25 +151,25 @@ public class Table{
 
     /**
      * Create Table using either a CSV or JSON array-containing string and without either a Schema or a CSVFormat.
-     * @param dataSource the CSV or JSON content for the Table
+     * @param data the CSV or JSON content for the Table
      */
-    public static Table fromSource(String dataSource) {
+    public static Table fromSource(String data) {
         Table table = new Table();
-        table.dataSource = TableDataSource.fromSource(dataSource);
+        table.dataSource = TableDataSource.fromSource(data);
         return table;
     }
 
     /**
      * Create Table using either a CSV or JSON array-containing string and with  a Schema and a CSVFormat.
-     * @param dataSource the CSV or JSON content for the Table
+     * @param data the CSV or JSON content for the Table
      * @param schema table schema. Can be `null`
      * @param format The expected CSVFormat if dataSource is a CSV-containing InputStream; ignored for JSON data.
      *               Can be `null`
      */
-    public static Table fromSource(String dataSource, Schema schema, CSVFormat format) {
+    public static Table fromSource(String data, Schema schema, CSVFormat format) {
         Table table = new Table();
         table.schema = schema;
-        table.dataSource = TableDataSource.fromSource(dataSource);
+        table.dataSource = TableDataSource.fromSource(data);
         if (null != format) {
             table.setCsvFormat(format);
         }
@@ -450,7 +455,7 @@ public class Table{
                     ? format
                     : TableDataSource.getDefaultCsvFormat();
 
-            locFormat = locFormat.builder().setHeader(sortedHeaders).build();
+            locFormat = locFormat.builder().setHeader(sortedHeaders).get();
             CSVPrinter csvPrinter = new CSVPrinter(out, locFormat);
 
             String[] headers = getHeaders();

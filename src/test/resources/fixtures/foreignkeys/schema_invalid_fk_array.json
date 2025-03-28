@@ -10,7 +10,6 @@
         {
             "fields": ["id", "title"],
             "reference": {
-                "datapackage": "http://data.okfn.org/data/mydatapackage/",
                 "resource": "the-resource",
                 "fields": "no" 
             }
