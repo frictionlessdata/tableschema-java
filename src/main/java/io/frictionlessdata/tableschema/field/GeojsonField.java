@@ -85,7 +85,7 @@ public class GeojsonField extends Field<JsonNode> {
         try {
             Set<ValidationMessage> errors = geoFormalSchemaValidator.validate(json);
             if (!errors.isEmpty()) {
-                throw new ValidationException("Geojson field validation failed", geoFormalSchemaValidator.getName(), errors);
+                throw new ValidationException("Geojson field validation failed", errors);
             }
         } catch (JsonParsingException ex) {
             throw new ValidationException(ex);
@@ -104,7 +104,7 @@ public class GeojsonField extends Field<JsonNode> {
         try {
             Set<ValidationMessage> errors = topoFormalSchemaValidator.validate(json);
             if (!errors.isEmpty()) {
-                throw new ValidationException("Geojson field validation failed", geoFormalSchemaValidator.getName(), errors);
+                throw new ValidationException("Topojson field validation failed", errors);
             }
         } catch (JsonParsingException ex) {
             throw new ValidationException(ex);

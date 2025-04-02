@@ -91,6 +91,7 @@ public class Reference {
     }
     
     public final void validate() throws ForeignKeyException{
+        errors.clear();
         ForeignKeyException fke = null;
         if(this.resourceName == null || this.fields == null){
             fke = new ForeignKeyException("A foreign key's reference must have the fields and resource properties.");

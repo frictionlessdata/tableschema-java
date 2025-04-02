@@ -262,7 +262,7 @@ public class TableIterationTest {
         Assertions.assertEquals(3, table.read().size());
         List<Object[]> actualData = table.read(true);
         for (int i = 0; i < actualData.size(); i++) {
-            Assertions.assertTrue(actualData.get(i)[2] instanceof Number, "Expected Number " +
+            Assertions.assertInstanceOf(Number.class, actualData.get(i)[2], "Expected Number " +
                     "for population figures, CR/LF problem");
         }
     }

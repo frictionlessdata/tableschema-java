@@ -571,7 +571,7 @@ public class Table{
             }
         }
         if (null != schema)
-            schema.validate();
+            schema.validate(this);
     }
 
     /**

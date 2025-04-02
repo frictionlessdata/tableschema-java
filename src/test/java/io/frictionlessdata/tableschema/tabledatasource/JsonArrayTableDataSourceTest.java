@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
@@ -68,6 +70,16 @@ class JsonArrayTableDataSourceTest {
         TableDataSource ds = TableDataSource.fromSource(populationJson);
         String[] headers = ds.getHeaders();
         Assertions.assertArrayEquals(populationHeaders, headers);
+    }
+
+    @Test
+    @DisplayName("Validate Header extraction from a JsonArrayTableDataSource where entries are missing properties")
+    void testJsonArrayDataSourceHeadersMissingProps() throws Exception{
+        TableDataSource ds = TableDataSource.fromSource(populationJsonMissingEntry);
+        List<String> headers = Arrays.asList(ds.getHeaders());
+        for (String key : populationHeaders) {
+            Assertions.assertTrue(headers.contains(key));
+        }
     }
 
     @Test

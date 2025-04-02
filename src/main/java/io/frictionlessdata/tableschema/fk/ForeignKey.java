@@ -63,6 +63,7 @@ public class ForeignKey {
     
     public final void validate() throws ForeignKeyException{
         ForeignKeyException fke = null;
+        this.errors.clear();
 
         if(this.fields == null || this.reference == null){
             fke = new ForeignKeyException("A foreign key must have the fields and reference properties.");
@@ -115,16 +116,12 @@ public class ForeignKey {
         if (reference.getResource().equals("")) {
             List<String> fieldNames = new ArrayList<>();
             List<String> foreignFieldNames = new ArrayList<>();
-            if (fields instanceof String) {
-                fieldNames.add((String) fields);
-                foreignFieldNames.add(reference.getFields());
-            } else  if (fields instanceof Collection) {
-                List<String> lFields = getFieldNames();
-                for (int i = 0; i < lFields.size(); i++) {
-                    fieldNames.add(lFields.get(i));
-                    foreignFieldNames.add(reference.getFieldNames().get(i));
-                }
+            List<String> lFields = getFieldNames();
+            for (int i = 0; i < lFields.size(); i++) {
+                fieldNames.add(lFields.get(i));
+                foreignFieldNames.add(reference.getFieldNames().get(i));
             }
+
             Iterator<Object> iterator = table.iterator(true, false, false, false);
             while (iterator.hasNext()) {
                 Map<String, Object> next = (Map<String, Object>)iterator.next();

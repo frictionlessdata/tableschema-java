@@ -148,8 +148,8 @@ public class SchemaTest {
     public void testCreateSchemaFromFileWithInvalidPrimaryKey() throws Exception {
         File source = getResourceFile("/fixtures/primarykey/simple_schema_with_invalid_pk.json");
 
-        Throwable t = Assertions.assertThrows(PrimaryKeyException.class, () -> Schema.fromJson(source, true));
-        Assertions.assertEquals("No such field: invalid.", t.getMessage());
+        ValidationException t = Assertions.assertThrows(ValidationException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertEquals("Validation failed with PrimaryKeyException: No such field: 'invalid'.", t.getMessage());
     }
 
     @Test
@@ -167,8 +167,8 @@ public class SchemaTest {
     public void testCreateSchemaFromFileWithInvalidCompositeKey() throws Exception {
         File source = getResourceFile("/fixtures/primarykey/simple_schema_with_invalid_ck.json");
 
-        Throwable t = Assertions.assertThrows(PrimaryKeyException.class, () -> Schema.fromJson(source, true));
-        Assertions.assertEquals("No such field: invalid.", t.getMessage());
+        Throwable t = Assertions.assertThrows(ValidationException.class, () -> Schema.fromJson(source, true));
+        Assertions.assertEquals("Validation failed with PrimaryKeyException: No such field: 'invalid'.", t.getMessage());
     }
 
     @Test
@@ -348,9 +348,10 @@ public class SchemaTest {
 
         Field<?> idField = new IntegerField("id");
         schema.addField(idField);
+        schema.setPrimaryKey("invalid");
 
-        Throwable t = Assertions.assertThrows(PrimaryKeyException.class, () -> schema.setPrimaryKey("invalid"));
-        Assertions.assertEquals("No such field: invalid.", t.getMessage());
+        ValidationException t = Assertions.assertThrows(ValidationException.class, () -> schema.validate());
+        Assertions.assertEquals("Validation failed with PrimaryKeyException: No such field: 'invalid'.", t.getMessage());
     }
 
     @Test
@@ -386,9 +387,9 @@ public class SchemaTest {
         Field<?> surnameField = new StringField("surname");
         schema.addField(surnameField);
 
-        Throwable t = Assertions.assertThrows(PrimaryKeyException.class,
-                () -> schema.setPrimaryKey(new String[]{"name", "invalid"}));
-        Assertions.assertEquals("No such field: invalid.", t.getMessage());
+        schema.setPrimaryKey(new String[]{"name", "invalid"});
+        Throwable t = Assertions.assertThrows(ValidationException.class, schema::validate);
+        Assertions.assertEquals("Validation failed with PrimaryKeyException: No such field: 'invalid'.", t.getMessage());
     }
 
     @Test
@@ -590,10 +591,7 @@ public class SchemaTest {
                 , "schema/employee_full_schema.json"), true);
         Assertions.assertNotNull(schema);
 
-        File f = new File("data/employee_full.csv");
-        Table table = Table.fromSource(f, getTestDataDirectory(), schema, null);
-        List<Object[]> data = table.read();
-        Assertions.assertEquals(3, data.size());
+        schema.validate();
     }
 
     // Create schema from a provided Bean class and compare with

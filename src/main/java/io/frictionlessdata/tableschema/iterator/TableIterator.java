@@ -14,14 +14,45 @@ import java.util.Map;
  *
  */
 public class TableIterator<T> implements Iterator<T> {
+    /**
+     * The table's headers
+     */
     String[] headers = null;
+
+    /**
+     * The table's Schema
+     */
     Schema schema = null;
     Iterator<String[]> wrappedIterator = null;
+
+    /**
+     * If true, return rows of Map objects, otherwise rows of Arrays
+     */
     boolean keyed = false;
+
+    /**
+     * If true, return rows of entries in the extended format
+     */
     boolean extended = false;
+
+    /**
+     * If true, case values to Java objects
+     */
     boolean cast = true;
+
+    /**
+     * follow relations to other tables
+     */
     boolean relations = false;
+
+    /**
+     * Mapping of column indices between Schema and CSV file
+     */
     Map<Integer, Integer> mapping = null;
+
+    /**
+     * The index of the row when reading in `extended` mode
+     */
     int index = 0;
 
 
@@ -49,7 +80,6 @@ public class TableIterator<T> implements Iterator<T> {
         this.mapping = table.getSchemaHeaderMapping();
         this.headers = table.getHeaders();
         this.schema = table.getSchema();
-        table.validate();
         this.wrappedIterator = table.getTableDataSource().iterator();
     }
 
@@ -67,6 +97,7 @@ public class TableIterator<T> implements Iterator<T> {
     @Override
     public T next() {
         String[] row = this.wrappedIterator.next();
+        String rawVal = null;
         int rowLength = row.length;
         if (null != this.schema) {
             rowLength = Math.max(row.length, this.schema.getFields().size());
@@ -96,13 +127,15 @@ public class TableIterator<T> implements Iterator<T> {
                 if (null != mappedKey) {
                     // if the last column(s) contain nulls, prevent an ArrayIndexOutOfBoundsException
                     if (mappedKey < row.length) {
-                        String rawVal = row[mappedKey];
+                        rawVal = row[mappedKey];
                         val = field.castValue(rawVal);
                     }
                 }
                 if (!extended && keyed) {
                     keyedRow.put(this.headers[i], val);
-                } else if (cast || extended){
+                } else if (cast) {
+                    castRow[i] = val;
+                } else if (extended){
                     castRow[i] = val;
                 } else {
                     plainRow[i] = field.formatValueAsString(val);
