@@ -328,10 +328,10 @@ public class Table{
     public Map<Integer, Integer> getSchemaHeaderMapping() {
         if (null == schema) {
             return TableSchemaUtil
-                    .createSchemaHeaderMapping(dataSource.getHeaders(), dataSource.getHeaders());
+                    .createSchemaHeaderMapping(dataSource.getHeaders(), dataSource.getHeaders(), true);
         } else {
             return TableSchemaUtil
-                    .createSchemaHeaderMapping(dataSource.getHeaders(), schema.getHeaders());
+                    .createSchemaHeaderMapping(dataSource.getHeaders(), schema.getHeaders(), dataSource.hasReliableHeaders());
         }
     }
 
@@ -460,8 +460,12 @@ public class Table{
 
             String[] headers = getHeaders();
             Map<Integer, Integer> mapping
-                    = TableSchemaUtil.createSchemaHeaderMapping(headers, sortedHeaders);
-            writeCSVData( mapping, csvPrinter);
+                    = TableSchemaUtil.createSchemaHeaderMapping(headers, sortedHeaders, dataSource.hasReliableHeaders());
+            if (null != schema) {
+                writeCSVData(mapping, schema, csvPrinter);
+            } else {
+                writeCSVData(mapping, csvPrinter);
+            }
             csvPrinter.close();
         } catch (IOException ex) {
             throw new TableIOException(ex);
@@ -616,8 +620,7 @@ public class Table{
     public Schema inferSchema(String[] headers, int rowLimit) throws TypeInferringException{
         try{
             List<Object[]> data = read();
-            schema = Schema.infer(data, headers, rowLimit);
-            return schema;
+            return Schema.infer(data, headers, rowLimit);
 
         } catch(Exception e){
             throw new TypeInferringException(e);
@@ -712,10 +715,7 @@ public class Table{
     }
 
 
-    private void writeCSVData(Map<Integer, Integer> mapping, CSVPrinter csvPrinter) {
-        List<Map<String, Object>> rows = new ArrayList<>();
-        Schema schema = (null != this.schema) ? this.schema : this.inferSchema();
-
+    private void writeCSVData(Map<Integer, Integer> mapping, Schema schema, CSVPrinter csvPrinter) {
         Iterator<Object> iter = this.iterator(false, false, true, false);
         iter.forEachRemaining((rec) -> {
             Object[] row = (Object[])rec;
@@ -730,6 +730,30 @@ public class Table{
                 obj.add(field.formatValueAsString(s));
                 i++;
             }
+
+            try {
+                csvPrinter.printRecord(obj);
+            } catch (Exception ex) {
+                throw new TableIOException(ex);
+            }
+        });
+    }
+
+    private void writeCSVData(Map<Integer, Integer> mapping, CSVPrinter csvPrinter) {
+        Iterator<Object> iter = this.iterator(false, false, false, false);
+        iter.forEachRemaining((rec) -> {
+            Object[] row = (Object[])rec;
+            Object[] sortedRec = new Object[row.length];
+            for (int i = 0; i < row.length; i++) {
+                sortedRec[mapping.get(i)] = row[i];
+            }
+            List<String> obj = new ArrayList<>();
+
+            for (int j = 0; j < sortedRec.length; j++) {
+                Object s = sortedRec[j];
+                obj.add((null != s) ? s.toString() : "");
+            }
+
             try {
                 csvPrinter.printRecord(obj);
             } catch (Exception ex) {

@@ -49,9 +49,10 @@ public class JsonArrayTableDataSource extends AbstractTableDataSource<ArrayNode>
 
 	@Override
 	public Iterator<String[]> iterator() {
-		String[] headers = getHeaders();
+		boolean deleteHeaderRow = (null == this.headers);
+		this.headers = getHeaders();
 		JsonNode firstRow = dataSource.get(0);
-		if (firstRow instanceof ArrayNode) {
+		if ((deleteHeaderRow) && (firstRow instanceof ArrayNode)) {
 			dataSource.remove(0);
 		}
 
@@ -87,6 +88,9 @@ public class JsonArrayTableDataSource extends AbstractTableDataSource<ArrayNode>
 	 */
 	@Override
     public String[] getHeaders() {
+		if (null != this.headers) {
+			return this.headers;
+		}
 		Set<String> headers = new LinkedHashSet<>();
 		Iterator<JsonNode> iterator = dataSource.elements();
 		if (iterator.hasNext()) {

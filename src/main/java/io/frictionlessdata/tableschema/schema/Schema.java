@@ -495,10 +495,12 @@ public class Schema implements SchemaInterface{
                 errors.add(ve);
             }
         }
-        if (strictValidation && !errors.isEmpty()) {
-            throw new ValidationException(errors);
-        } else {
-            log.warn("Schema validation failed: {}", errors);
+        if (!errors.isEmpty()) {
+            if (strictValidation) {
+                throw new ValidationException(errors);
+            } else {
+                log.warn("Schema validation failed: {}", errors);
+            }
         }
     }
 

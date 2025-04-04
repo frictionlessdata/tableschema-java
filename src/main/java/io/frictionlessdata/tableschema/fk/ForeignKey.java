@@ -52,7 +52,17 @@ public class ForeignKey {
             throw new IllegalArgumentException("Invalid fields type in reference: "+this.fields.getClass().getName());
         }
     }
-    
+
+    @JsonIgnore
+    public Map<String, String> getFieldMapping() {
+        Map<String, String> fieldMapping = new HashMap<>();
+        List<String> fieldNames1 = getFieldNames();
+        for (int i = 0; i < fieldNames1.size(); i++) {
+            fieldMapping.put(fieldNames1.get(i), reference.getFieldNames().get(i));
+        }
+        return fieldMapping;
+    }
+
     public void setReference(Reference reference){
         this.reference = reference;
     }

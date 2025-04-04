@@ -1,16 +1,15 @@
 package io.frictionlessdata.tableschema.iterator;
 
 import io.frictionlessdata.tableschema.Table;
+import io.frictionlessdata.tableschema.exception.TableValidationException;
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.schema.Schema;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
- *
+ * Iterator that can read data from a Table in the various permutations
+ * of the `keyed`, `extended`, `cast`, `relations` flags.
  *
  */
 public class TableIterator<T> implements Iterator<T> {
@@ -23,6 +22,10 @@ public class TableIterator<T> implements Iterator<T> {
      * The table's Schema
      */
     Schema schema = null;
+
+    /**
+     * the underlying iterator
+     */
     Iterator<String[]> wrappedIterator = null;
 
     /**
@@ -46,7 +49,7 @@ public class TableIterator<T> implements Iterator<T> {
     boolean relations = false;
 
     /**
-     * Mapping of column indices between Schema and CSV file
+     * Mapping of column indices between Schema and CSV file headers
      */
     Map<Integer, Integer> mapping = null;
 

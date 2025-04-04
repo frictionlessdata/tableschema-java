@@ -43,6 +43,9 @@ public final class JsonUtil {
 		return instance;
 	}
 
+	public ObjectMapper getMapper(){return mapper;}
+
+
 	public ObjectNode createNode() {
 		return mapper.createObjectNode();
 	}
