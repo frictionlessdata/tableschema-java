@@ -149,9 +149,23 @@ public class ForeignKey {
         }
 
     }
-    
+
+    /**
+     * Get the JSON representation of the ForeignKey.
+     * @return String-serialized JSON Object containing the properties of this foreign key
+     */
     @JsonIgnore
+    @Deprecated
     public String getJson(){
+        return asJson();
+    }
+
+    /**
+     * Get the JSON representation of the ForeignKey.
+     * @return String-serialized JSON Object containing the properties of this  foreign key
+     */
+    @JsonIgnore
+    public String asJson(){
         return JsonUtil.getInstance().serialize(this);
     }
 

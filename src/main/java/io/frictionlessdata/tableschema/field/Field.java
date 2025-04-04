@@ -530,10 +530,19 @@ public abstract class Field<T> {
      * @return String-serialized JSON Object containing the properties of this field
      */
     @JsonIgnore
+    @Deprecated
     public String getJson(){
-        return JsonUtil.getInstance().serialize(this);
+        return asJson();
     }
 
+    /**
+     * Get the JSON representation of the Field.
+     * @return String-serialized JSON Object containing the properties of this field
+     */
+    @JsonIgnore
+    public String asJson(){
+        return JsonUtil.getInstance().serialize(this);
+    }
 
     @JsonIgnore
     public String getCastMethodName() {

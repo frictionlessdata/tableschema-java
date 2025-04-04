@@ -107,9 +107,23 @@ public class Reference {
             }
         }
     }
-    
+
+    /**
+     * Get the JSON representation of the Reference.
+     * @return String-serialized JSON Object containing the properties of this foreign key reference
+     */
     @JsonIgnore
+    @Deprecated
     public String getJson(){
+        return asJson();
+    }
+
+    /**
+     * Get the JSON representation of the Reference.
+     * @return String-serialized JSON Object containing the properties of this  foreign key reference
+     */
+    @JsonIgnore
+    public String asJson(){
         return JsonUtil.getInstance().serialize(this);
     }
 
