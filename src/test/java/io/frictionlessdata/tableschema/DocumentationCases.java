@@ -2,10 +2,10 @@ package io.frictionlessdata.tableschema;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.beans.SimpleDataBean;
-import io.frictionlessdata.tableschema.tabledatasource.TableDataSource;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.iterator.BeanIterator;
 import io.frictionlessdata.tableschema.schema.Schema;
+import io.frictionlessdata.tableschema.tabledatasource.TableDataSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

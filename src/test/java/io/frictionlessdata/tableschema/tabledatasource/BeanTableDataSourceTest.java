@@ -1,12 +1,9 @@
 package io.frictionlessdata.tableschema.tabledatasource;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.beans.EmployeeBeanWithAnnotation;
 import io.frictionlessdata.tableschema.iterator.BeanIterator;
-import io.frictionlessdata.tableschema.schema.BeanSchema;
-import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

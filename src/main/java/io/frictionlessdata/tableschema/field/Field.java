@@ -15,7 +15,6 @@ import java.time.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Definition of a field in a data table. Doesn't hold values

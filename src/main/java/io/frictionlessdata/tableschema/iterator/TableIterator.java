@@ -1,11 +1,13 @@
 package io.frictionlessdata.tableschema.iterator;
 
 import io.frictionlessdata.tableschema.Table;
-import io.frictionlessdata.tableschema.exception.TableValidationException;
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.schema.Schema;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Iterator that can read data from a Table in the various permutations

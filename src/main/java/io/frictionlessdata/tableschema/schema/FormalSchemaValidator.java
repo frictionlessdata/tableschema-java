@@ -1,16 +1,13 @@
 package io.frictionlessdata.tableschema.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.networknt.schema.*;
+import com.networknt.schema.JsonSchema;
+import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion.VersionFlag;
-import com.networknt.schema.serialization.JsonNodeReader;
-import io.frictionlessdata.tableschema.exception.ValidationException;
+import com.networknt.schema.ValidationMessage;
 import io.frictionlessdata.tableschema.util.JsonUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
