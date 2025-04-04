@@ -25,7 +25,7 @@ public class TableSchemaUtil {
             // - if no header row in CSV data (throw)
             // - with JSON Arrays of JSON objects as they will not have keys for null values (accept, but don't map)
             if (!mapping.containsKey(i)) {
-                if (reliableHeaders) {
+                if (reliableHeaders ) {
                     throw new TableValidationException("Field '" + sortedHeaders[i] + "' not found in table headers or table has no headers.");
                 } else {
                     mapping.put(i, null);

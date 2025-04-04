@@ -461,7 +461,7 @@ public class Table{
             String[] headers = getHeaders();
             Map<Integer, Integer> mapping
                     = TableSchemaUtil.createSchemaHeaderMapping(headers, sortedHeaders, dataSource.hasReliableHeaders());
-            if (null != schema) {
+            if ((null != schema)) {
                 writeCSVData(mapping, schema, csvPrinter);
             } else {
                 writeCSVData(mapping, csvPrinter);

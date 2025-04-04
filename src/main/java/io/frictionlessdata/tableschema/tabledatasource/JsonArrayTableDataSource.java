@@ -43,7 +43,17 @@ public class JsonArrayTableDataSource extends AbstractTableDataSource<ArrayNode>
 
     @Override
     public boolean hasReliableHeaders() {
-        return false;
+		if (dataSource == null) {
+			return false;
+		}
+		Iterator iter = dataSource.elements();
+		if (!iter.hasNext()) {
+			return false;
+		}
+		JsonNode first = (JsonNode) iter.next();
+		if (first instanceof ObjectNode) {
+			return false;
+		} else return first instanceof ArrayNode;
     }
 
 

@@ -4,6 +4,7 @@ package io.frictionlessdata.tableschema.fk;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.exception.ForeignKeyException;
+import io.frictionlessdata.tableschema.exception.ValidationException;
 import io.frictionlessdata.tableschema.schema.Schema;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.apache.commons.csv.CSVFormat;
@@ -55,6 +56,32 @@ public class ForeignKeyTest {
                 -> schema.getForeignKeys().get(0).validate(table));
         Assertions.assertEquals("Foreign key [check_year-> year] violation : expected: 2018 found: 2017",
                 fke.getMessage());
+    }
+
+    @Test
+    @DisplayName("data validation. Check Schema with ForeignKey against not matching data -> must throw")
+    public void testInvalidFkReferenceFromSchema() throws Exception {
+        File testDataDir = TestHelper.getTestDataDirectory();
+        File source = TestHelper.getResourceFile("/fixtures/schema/population_schema_for_fk_check.json");
+
+        Schema schema = Schema.fromJson(source, true);
+        // get path of test CSV file
+        File file = new File("data/population_for_fk_check_invalid.csv");
+        Table table = Table.fromSource(
+                file,
+                testDataDir,
+                schema,
+                CSVFormat.DEFAULT.builder().setHeader().get());
+        ValidationException valE = assertThrows(ValidationException.class, ()
+                -> schema.validate(table));
+        Assertions.assertFalse(valE.getWrappedExceptions().isEmpty());
+        Exception fke = valE.getWrappedExceptions().get(0);
+        Assertions.assertInstanceOf(ForeignKeyException.class, fke);
+        Assertions.assertEquals("Foreign key [check_year-> year] violation : expected: 2018 found: 2017",
+                fke.getMessage());
+        Assertions.assertEquals("Validation failed with ForeignKeyException: Foreign key [check_year-> year] violation : expected: 2018 found: 2017",
+                valE.getMessage());
+
     }
 
     @Test
