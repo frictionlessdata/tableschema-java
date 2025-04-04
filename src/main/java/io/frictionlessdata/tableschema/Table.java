@@ -1,5 +1,7 @@
 package io.frictionlessdata.tableschema;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.exception.*;
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.iterator.BeanIterator;
@@ -411,7 +413,7 @@ public class Table{
     /**
      * Read all data from the Table and return it as JSON. If no Schema is set on the table, one will be inferred.
      * This can be used for smaller data tables but for huge or unknown sizes, there will be performance considerations,
-     * as this method loads all data into RAM *and* does a costly schema inferral.
+     * as this method loads all data into RAM *and* does a costly schema inferal.
      *
      * It ignores relations to other data sources.
      *
@@ -434,33 +436,57 @@ public class Table{
             rows.add(obj);
         });
 
-        return JsonUtil.getInstance().serialize(rows);
+        String retVal = null;
+        ObjectMapper mapper = JsonUtil.getInstance().getMapper();
+        try {
+            retVal = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rows);
+        } catch (JsonProcessingException ex) {
+            throw new JsonSerializingException(ex);
+        }
+        return retVal;
     }
 
     /**
-     * Write as CSV file, the `format` parameter decides on the CSV options. If it is
-     * null, then the file will be written as RFC 4180 compliant CSV
-     * @param out the Writer to write to
-     * @param format the CSV format to use
-     * @param sortedHeaders the header row names in the order in which data should be
-     *                      exported
+     * Read all data from the Table and return it as a RFC 4180 compliant CSV string.
+     * Column order will be deducted from the table data source.
+     *
+     * @return A CSV representation of the data as a String.
      */
-    private void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders) {
+    public String asCsv() {
+        return asCsv(null, null);
+    }
+
+    /**
+     * Return the data as a CSV string,
+     *
+     * - the `format` parameter decides on the CSV options. If it is null, then the file will
+     *    be written as RFC 4180 compliant CSV
+     * - the `headerNames` parameter decides on the order of the headers in the CSV file. If it is null,
+     *    the order of the columns will be the same as in the data source.
+     *
+     * It ignores relations to other data sources.
+     *
+     * @param format the CSV format to use
+     * @param headerNames the header row names in the order in which data should be exported
+     *
+     * @return A CSV representation of the data as a String.
+     */
+    public String asCsv(CSVFormat format, String[] headerNames) {
+        StringBuilder out = new StringBuilder();
         try {
-            if (null == sortedHeaders) {
-                writeCsv(out, format, getHeaders());
-                return;
+            if (null == headerNames) {
+                return asCsv(format, getHeaders());
             }
             CSVFormat locFormat = (null != format)
                     ? format
                     : TableDataSource.getDefaultCsvFormat();
 
-            locFormat = locFormat.builder().setHeader(sortedHeaders).get();
+            locFormat = locFormat.builder().setHeader(headerNames).get();
             CSVPrinter csvPrinter = new CSVPrinter(out, locFormat);
 
             String[] headers = getHeaders();
             Map<Integer, Integer> mapping
-                    = TableSchemaUtil.createSchemaHeaderMapping(headers, sortedHeaders, dataSource.hasReliableHeaders());
+                    = TableSchemaUtil.createSchemaHeaderMapping(headers, headerNames, dataSource.hasReliableHeaders());
             if ((null != schema)) {
                 writeCSVData(mapping, schema, csvPrinter);
             } else {
@@ -470,6 +496,14 @@ public class Table{
         } catch (IOException ex) {
             throw new TableIOException(ex);
         }
+        String result = out.toString();
+        if (result.endsWith("\n")) {
+            result = result.substring(0, result.length() - 1);
+        }
+        if (result.endsWith("\r")) {
+            result = result.substring(0, result.length() - 1);
+        }
+        return result;
     }
 
     /**
@@ -715,6 +749,49 @@ public class Table{
     }
 
 
+
+    /**
+     * Write as CSV file, the `format` parameter decides on the CSV options. If it is
+     * null, then the file will be written as RFC 4180 compliant CSV
+     * @param out the Writer to write to
+     * @param format the CSV format to use
+     * @param sortedHeaders the header row names in the order in which data should be
+     *                      exported
+     */
+    private void writeCsv(Writer out, CSVFormat format, String[] sortedHeaders) {
+        try {
+            if (null == sortedHeaders) {
+                writeCsv(out, format, getHeaders());
+                return;
+            }
+            CSVFormat locFormat = (null != format)
+                    ? format
+                    : TableDataSource.getDefaultCsvFormat();
+
+            locFormat = locFormat.builder().setHeader(sortedHeaders).get();
+            CSVPrinter csvPrinter = new CSVPrinter(out, locFormat);
+
+            String[] headers = getHeaders();
+            Map<Integer, Integer> mapping
+                    = TableSchemaUtil.createSchemaHeaderMapping(headers, sortedHeaders, dataSource.hasReliableHeaders());
+            if ((null != schema)) {
+                writeCSVData(mapping, schema, csvPrinter);
+            } else {
+                writeCSVData(mapping, csvPrinter);
+            }
+            csvPrinter.close();
+        } catch (IOException ex) {
+            throw new TableIOException(ex);
+        }
+    }
+
+
+    /**
+     * Append the data to a {@link org.apache.commons.csv.CSVPrinter}. Column sorting is according to the mapping
+     * @param mapping the mapping of the column numbers in the CSV file to the column numbers in the data source
+     * @param schema the Schema to use for formatting the data
+     * @param csvPrinter the CSVPrinter to write to
+     */
     private void writeCSVData(Map<Integer, Integer> mapping, Schema schema, CSVPrinter csvPrinter) {
         Iterator<Object> iter = this.iterator(false, false, true, false);
         iter.forEachRemaining((rec) -> {

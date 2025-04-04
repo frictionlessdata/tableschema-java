@@ -109,8 +109,7 @@ public class TableIterator<T> implements Iterator<T> {
         }
         Map<String, Object> keyedRow = new LinkedHashMap<>();
         Object[] extendedRow;
-        Object[] castRow = new Object[rowLength];
-        Object[] plainRow = new Object[rowLength];
+        Object[] resultRow = new Object[rowLength];
 
         // If there's a schema, attempt to cast the row.
         if(this.schema != null){
@@ -136,27 +135,24 @@ public class TableIterator<T> implements Iterator<T> {
                         val = field.castValue(rawVal);
                     }
                 }
-                if (!extended && keyed) {
-                    keyedRow.put(this.headers[i], val);
-                } else if (cast) {
-                    castRow[i] = val;
-                } else if (extended){
-                    castRow[i] = val;
+
+                Object endVal = cast ? val : field.formatValueAsString(val);
+
+                if (keyed) {
+                    keyedRow.put(this.headers[i], endVal);
                 } else {
-                    plainRow[i] = field.formatValueAsString(val);
+                    resultRow[i] = endVal;
                 }
             }
 
             if (extended){
-                extendedRow = new Object[]{index, this.headers, castRow};
+                extendedRow = new Object[]{index, this.headers, resultRow};
                 index++;
                 return (T)extendedRow;
             } else if(keyed){
                 return (T)keyedRow;
-            } else if(cast){
-                return (T)castRow;
             } else{
-                return (T)plainRow;
+                return (T)resultRow;
             }
         }else{
             // Enter here if no Schema has been defined.

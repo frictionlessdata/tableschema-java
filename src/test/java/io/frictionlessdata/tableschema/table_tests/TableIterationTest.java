@@ -88,7 +88,7 @@ public class TableIterationTest {
         File file = new File("data/employee_data.csv");
         Table employeeTable = Table.fromSource(file, testDataDir, employeeTableSchema, null);
 
-        Iterator iter = employeeTable.iterator(false, true, false, false);
+        Iterator iter = employeeTable.iterator(false, true, true, false);
 
         String referenceContent =
                 String.join("", Files.readAllLines(new File(testDataDir, "data/employee_data_string.json").toPath()));
