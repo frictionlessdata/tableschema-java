@@ -43,6 +43,7 @@ so show me the goods.
 
 Found a problem and would like to fix it? Have that great idea and would love to see it in the repository?
 
+> [!NOTE]
 > Please open an issue before you start working.
 
 It  saves a lot of time for everyone, and we are super happy to answer questions and help you along the way. 

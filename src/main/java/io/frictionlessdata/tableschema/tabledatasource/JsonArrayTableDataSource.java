@@ -81,7 +81,7 @@ public class JsonArrayTableDataSource extends AbstractTableDataSource<ArrayNode>
 						values.add(val.asText(""));
 				}
 			} else if (input instanceof ArrayNode) {
-				Iterator<JsonNode> elements = ((ArrayNode) input).elements();
+				Iterator<JsonNode> elements = input.elements();
 				while (elements.hasNext()) {
 					values.add(elements.next().asText(""));
 				}
