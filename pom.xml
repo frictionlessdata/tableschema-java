@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frictionlessdata</groupId>
     <artifactId>tableschema-java</artifactId>
-    <version>0.8.1-SNAPSHOT</version>
+    <version>0.8.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <issueManagement>
         <url>https://github.com/frictionlessdata/tableschema-java/issues</url>
@@ -37,9 +37,7 @@
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
         <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
         <maven-deploy-plugin.version>3.0.0</maven-deploy-plugin.version>
-        <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
         <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
-        <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
         <dependency-check-maven.version>12.1.0</dependency-check-maven.version>
         <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
     </properties>
@@ -133,33 +131,6 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>${maven-gpg-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>${nexus-staging-maven-plugin.version}</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco-maven-plugin.version}</version>
@@ -175,21 +146,6 @@
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>${dependency-check-maven.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                        <!--
-                            <goal>check</goal>
-                        -->
                         </goals>
                     </execution>
                 </executions>
