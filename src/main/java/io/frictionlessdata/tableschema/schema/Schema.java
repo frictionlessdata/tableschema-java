@@ -57,6 +57,7 @@ public class Schema implements SchemaInterface{
     /**
      * The charset or encoding of the schema
      */
+    @JsonIgnore
     private Charset charset = StandardCharsets.UTF_8;
 
     // the schema validator

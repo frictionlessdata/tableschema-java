@@ -1,5 +1,6 @@
 package io.frictionlessdata.tableschema;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.exception.*;
@@ -56,6 +57,7 @@ public class Table{
     private Schema schema = null;
     private CSVFormat format = TableDataSource.getDefaultCsvFormat();
 
+    @JsonIgnore
     private Charset charset = StandardCharsets.UTF_8;
 
     /**
