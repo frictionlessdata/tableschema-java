@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,6 +53,11 @@ public class Schema implements SchemaInterface{
     public static final String JSON_KEY_MISSING_VALUES = "missingValues";
     public static final String JSON_KEY_PRIMARY_KEY = "primaryKey";
     public static final String JSON_KEY_FOREIGN_KEYS = "foreignKeys";
+
+    /**
+     * The charset or encoding of the schema
+     */
+    private Charset charset = StandardCharsets.UTF_8;
 
     // the schema validator
     @JsonIgnore
@@ -244,7 +250,7 @@ public class Schema implements SchemaInterface{
     }
 
     private void writeJson(OutputStream output) throws IOException {
-        try (BufferedWriter file = new BufferedWriter(new OutputStreamWriter(output))) {
+        try (BufferedWriter file = new BufferedWriter(new OutputStreamWriter(output, charset))) {
             file.write(this.asJson());
         }
     }

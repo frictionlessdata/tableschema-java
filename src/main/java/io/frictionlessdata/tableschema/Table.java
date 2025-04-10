@@ -20,6 +20,8 @@ import org.apache.commons.csv.CSVPrinter;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -53,6 +55,8 @@ public class Table{
     private TableDataSource dataSource = null;
     private Schema schema = null;
     private CSVFormat format = TableDataSource.getDefaultCsvFormat();
+
+    private Charset charset = StandardCharsets.UTF_8;
 
     /**
      * Constructor for an empty Table. It contains neither data nor is it controlled by a Schema
@@ -327,6 +331,22 @@ public class Table{
         return new TableIterator<>(this, true, extended, cast, relations);
     }
 
+    /**
+     * returns the charset or encoding to use when writing CSV files.
+     * @return the used charset
+     */
+    public Charset getCharset() {
+        return charset;
+    }
+
+    /**
+     * Sets the charset or encoding to use when writing CSV files.
+     * @param charset the charset to use
+     */
+    public void setCharset(Charset charset) {
+        this.charset = charset;
+    }
+
     public Map<Integer, Integer> getSchemaHeaderMapping() {
         if (null == schema) {
             return TableSchemaUtil
@@ -562,7 +582,7 @@ public class Table{
      * @param format the CSV format to use
      */
     public void writeCsv(File outputFile, CSVFormat format){
-        try (FileWriter fw = new FileWriter(outputFile)) {
+        try (FileWriter fw = new FileWriter(outputFile, charset)) {
             writeCsv(fw, format);
         } catch (IOException ex) {
             throw new TableIOException(ex);

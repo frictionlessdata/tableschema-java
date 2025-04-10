@@ -36,7 +36,7 @@ public class Reference {
 
     public Reference(){}
 
-    public Reference(String resource, Object fields, boolean strict) throws ForeignKeyException{
+    public Reference(String resource, Object fields, boolean strict) {
         this.resourceName = resource;
         this.fields = fields;
         this.strictValidation = strict;

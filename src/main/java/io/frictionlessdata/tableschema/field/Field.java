@@ -570,7 +570,7 @@ public abstract class Field<T> {
         return this.title;
     }
 
-  public void setTitle(String title) {
+    public void setTitle(String title) {
     this.title = title;
   }
 
@@ -578,7 +578,7 @@ public abstract class Field<T> {
         return this.description;
     }
 
-  public void setDescription(String description) {
+    public void setDescription(String description) {
     this.description = description;
   }
 
@@ -586,7 +586,7 @@ public abstract class Field<T> {
         return this.constraints;
     }
 
-  public void setConstraints(Map<String, Object> constraints) {
+    public void setConstraints(Map<String, Object> constraints) {
     this.constraints = constraints;
   }
 

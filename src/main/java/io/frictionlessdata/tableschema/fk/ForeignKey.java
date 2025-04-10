@@ -27,7 +27,7 @@ public class ForeignKey {
     
     public ForeignKey(){}
 
-    public ForeignKey(Object fields, Reference reference, boolean strict) throws ForeignKeyException{
+    public ForeignKey(Object fields, Reference reference, boolean strict) {
         this.fields = fields;
         this.reference = reference;
         this.strictValidation = strict;
