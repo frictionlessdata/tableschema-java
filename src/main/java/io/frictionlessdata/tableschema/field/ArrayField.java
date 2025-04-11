@@ -88,7 +88,7 @@ public class ArrayField extends Field<Object[]> {
     }
 
     @Override
-    Object[] checkMinimumContraintViolated(Object[] value) {
+    Object[] checkMinimumConstraintViolated(Object[] value) {
         return null;
     }
 

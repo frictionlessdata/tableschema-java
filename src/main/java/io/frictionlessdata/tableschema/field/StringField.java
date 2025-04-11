@@ -7,7 +7,6 @@ import org.apache.commons.validator.routines.EmailValidator;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
@@ -105,7 +104,7 @@ public class StringField extends Field<String> {
     }
 
     @Override
-    String checkMinimumContraintViolated(String value) {
+    String checkMinimumConstraintViolated(String value) {
         return null;
     }
 }

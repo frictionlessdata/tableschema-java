@@ -66,7 +66,7 @@ public class YearField extends Field<Year> {
     }
 
     @Override
-    Year checkMinimumContraintViolated(Year value) {
+    Year checkMinimumConstraintViolated(Year value) {
         int minYear = (int)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
         if(value.isBefore(Year.of(minYear))) {
             return Year.of(minYear);

@@ -66,7 +66,7 @@ public class TimeField extends Field<LocalTime> {
     }
 
     @Override
-    LocalTime checkMinimumContraintViolated(LocalTime value) {
+    LocalTime checkMinimumConstraintViolated(LocalTime value) {
         LocalTime minTime = (LocalTime)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
         if(value.isBefore(minTime)){
            return minTime;

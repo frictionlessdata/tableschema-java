@@ -143,7 +143,7 @@ public class GeopointField extends Field<double[]> {
     }
 
     @Override
-    double[] checkMinimumContraintViolated(double[] value) {
+    double[] checkMinimumConstraintViolated(double[] value) {
         return null;
     }
 

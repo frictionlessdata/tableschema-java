@@ -51,7 +51,7 @@ public class DurationField extends Field<Duration> {
     }
 
     @Override
-    Duration checkMinimumContraintViolated(Duration value) {
+    Duration checkMinimumConstraintViolated(Duration value) {
         Duration minDuration = (Duration)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
         if(value.compareTo(minDuration) < 0){
             return minDuration;

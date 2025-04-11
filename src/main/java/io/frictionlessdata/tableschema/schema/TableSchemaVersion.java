@@ -5,7 +5,7 @@ import com.networknt.schema.*;
 import java.util.Arrays;
 
 /**
- * The frictionless table-schema.json does not really adher to the V4 JSON schema specification.
+ * The frictionless table-schema.json does not really follow the V4 JSON schema specification.
  * This class tells the networknt validator to ignore a couple of keywords that are not part of the V4 spec.
  */
 public class TableSchemaVersion implements JsonSchemaVersion {

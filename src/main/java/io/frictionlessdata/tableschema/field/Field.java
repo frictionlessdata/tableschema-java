@@ -270,7 +270,7 @@ public abstract class Field<T> {
         return castValue(value, true, options);
     }
 
-    abstract T checkMinimumContraintViolated(T value);
+    abstract T checkMinimumConstraintViolated(T value);
 
     /**
      * Returns a Map with all the constraints that have been violated.
@@ -289,8 +289,7 @@ public abstract class Field<T> {
         }
 
         // All values for that field MUST be unique within the data file in which it is found.
-        // Can't check UNIQUE constraint when operating with only one value.
-        // TODO: Implement a method that takes List<Object> value as argument.
+        // TODO: Implement
         /*
         if(this.constraints.containsKey(CONSTRAINT_KEY_UNIQUE)){
     
@@ -339,7 +338,7 @@ public abstract class Field<T> {
          * If a minimum value constraint is specified then the field descriptor MUST contain a type key.
          **/
         if(this.constraints.containsKey(CONSTRAINT_KEY_MINIMUM)){
-            T violatedContraint = checkMinimumContraintViolated((T)value);
+            T violatedContraint = checkMinimumConstraintViolated((T)value);
             if (null != violatedContraint) {
                 violatedConstraints.put(CONSTRAINT_KEY_MINIMUM, violatedContraint);
             }

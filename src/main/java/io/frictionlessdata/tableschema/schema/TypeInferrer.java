@@ -51,7 +51,7 @@ public class TypeInferrer {
 
     
     private TypeInferrer(){
-        // Private to inforce use of Singleton pattern.
+        // Private to enforce use of Singleton pattern.
     }
     
     static TypeInferrer getInstance() {
@@ -129,8 +129,8 @@ public class TypeInferrer {
         // as the final type for the field.
         for(int j=0; j < fieldArray.size(); j++){
             String fieldName = fieldArray.get(j).get(Field.JSON_KEY_NAME).toString();
-            HashMap<String, Integer> typeInferralCountMap = (HashMap<String, Integer>)this.getTypeInferralMap().get(fieldName);
-            TreeMap<String, Integer> typeInferralCountMapSortedByCount = sortMapByValue(typeInferralCountMap); 
+            Map<String, Integer> typeInferralCountMap = this.getTypeInferralMap().get(fieldName);
+            NavigableMap<String, Integer> typeInferralCountMapSortedByCount = sortMapByValue(typeInferralCountMap);
            
             if(!typeInferralCountMapSortedByCount.isEmpty()){
                 String inferredType = typeInferralCountMapSortedByCount.firstEntry().getKey();
@@ -202,9 +202,9 @@ public class TypeInferrer {
      * @param map the mapping of types to score to sort
      * @return sorted mapping of types to score
      */
-    private TreeMap<String, Integer> sortMapByValue(Map<String, Integer> map){
+    private NavigableMap<String, Integer> sortMapByValue(Map<String, Integer> map){
         Comparator<String> comparator = new MapValueComparator(map);
-        TreeMap<String, Integer> result = new TreeMap<>(comparator);
+        NavigableMap<String, Integer> result = new TreeMap<>(comparator);
         result.putAll(map);
 
         return result;

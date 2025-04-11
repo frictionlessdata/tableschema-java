@@ -809,7 +809,9 @@ public class Table{
 
 
     /**
-     * Append the data to a {@link org.apache.commons.csv.CSVPrinter}. Column sorting is according to the mapping
+     * Append the data to a {@link org.apache.commons.csv.CSVPrinter}. Each cell is formatted via the corresponding
+     * {@link Field}, which takes into account possible Field options. Column sorting is according to the mapping.
+     *
      * @param mapping the mapping of the column numbers in the CSV file to the column numbers in the data source
      * @param schema the Schema to use for formatting the data
      * @param csvPrinter the CSVPrinter to write to
@@ -838,6 +840,13 @@ public class Table{
         });
     }
 
+    /**
+     * Append the data to a {@link org.apache.commons.csv.CSVPrinter}. In absence of a Schema, each cell is formatted
+     * via a simple call to `toString()`. Column sorting is according to the mapping.
+     *
+     * @param mapping the mapping of the column numbers in the CSV file to the column numbers in the data source
+     * @param csvPrinter the CSVPrinter to write to
+     */
     private void writeCSVData(Map<Integer, Integer> mapping, CSVPrinter csvPrinter) {
         Iterator<Object> iter = this.iterator(false, false, false, false);
         iter.forEachRemaining((rec) -> {
@@ -848,8 +857,7 @@ public class Table{
             }
             List<String> obj = new ArrayList<>();
 
-            for (int j = 0; j < sortedRec.length; j++) {
-                Object s = sortedRec[j];
+            for (Object s : sortedRec) {
                 obj.add((null != s) ? s.toString() : "");
             }
 

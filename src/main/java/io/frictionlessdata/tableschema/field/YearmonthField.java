@@ -64,7 +64,7 @@ public class YearmonthField extends Field<YearMonth> {
     }
 
     @Override
-    YearMonth checkMinimumContraintViolated(YearMonth value) {
+    YearMonth checkMinimumConstraintViolated(YearMonth value) {
         YearMonth minDate = (YearMonth)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
         if(value.isBefore(minDate)){
             return minDate;

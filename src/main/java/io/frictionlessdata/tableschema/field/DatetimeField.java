@@ -65,7 +65,7 @@ public class DatetimeField extends Field<ZonedDateTime> {
     }
 
     @Override
-    ZonedDateTime checkMinimumContraintViolated(ZonedDateTime value) {
+    ZonedDateTime checkMinimumConstraintViolated(ZonedDateTime value) {
         ZonedDateTime minTime = (ZonedDateTime)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
         if(value.isBefore(minTime)){
             return minTime;

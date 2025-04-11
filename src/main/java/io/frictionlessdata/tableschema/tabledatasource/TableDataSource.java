@@ -28,6 +28,7 @@ import java.util.zip.ZipFile;
  *     <li>JSON-encoded array data</li>
  *     <li>CSV-encoded data</li>
  *     <li>String arrays</li>
+ *     <li>Instances of a Java Bean class</li>
  * </ul>
  *
  * This class and its subclasses will strip Unicode BOMs from the input data

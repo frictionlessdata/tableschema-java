@@ -130,7 +130,7 @@ public class GeojsonField extends Field<JsonNode> {
     }
 
     @Override
-    JsonNode checkMinimumContraintViolated(JsonNode value) {
+    JsonNode checkMinimumConstraintViolated(JsonNode value) {
         return null;
     }
 

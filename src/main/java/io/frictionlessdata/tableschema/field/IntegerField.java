@@ -54,7 +54,7 @@ public class IntegerField extends Field<BigInteger> {
     }
 
     @Override
-    BigInteger checkMinimumContraintViolated(BigInteger value) {
+    BigInteger checkMinimumConstraintViolated(BigInteger value) {
         BigInteger minNumber = new BigInteger(this.constraints.get(CONSTRAINT_KEY_MINIMUM).toString());
         if( new BigInteger(value.toString()).compareTo(minNumber) < 0 ) {
             return minNumber;

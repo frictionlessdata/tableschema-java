@@ -93,7 +93,7 @@ public class DateField extends Field<LocalDate> {
     }
 
     @Override
-    LocalDate checkMinimumContraintViolated(LocalDate value) {
+    LocalDate checkMinimumConstraintViolated(LocalDate value) {
         LocalDate minDate = (LocalDate)this.constraints.get(CONSTRAINT_KEY_MINIMUM);
         if(value.isBefore(minDate)){
             return minDate;

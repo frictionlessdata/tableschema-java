@@ -100,7 +100,7 @@ public class BooleanField extends Field<Boolean> {
     }
 
     @Override
-    Boolean checkMinimumContraintViolated(Boolean value) {
+    Boolean checkMinimumConstraintViolated(Boolean value) {
         return null;
     }
 
