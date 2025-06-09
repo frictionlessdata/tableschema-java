@@ -27,7 +27,7 @@
         <apache-commons-validator.version>1.9.0</apache-commons-validator.version>
         <geotools.version>33.1</geotools.version>
         <jackson.version>2.19.0</jackson.version>
-        <junit.version>5.12.2</junit.version>
+        <junit.version>5.13.1</junit.version>
         <locationtech-jts.version>1.20.0</locationtech-jts.version>
         <networknt-validator-version>1.5.7</networknt-validator-version>
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
