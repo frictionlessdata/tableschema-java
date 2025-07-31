@@ -159,17 +159,8 @@ public class SchemaInferralTests {
     @Test
     @DisplayName("Test infer from List containing File objects")
     void testInferFromListWithFiles() throws Exception {
-        String testFileContent = TestHelper.getResourceFileContent("/testsuite-data/files/csv/1mb.csv");
-        String testFile2Content = TestHelper.getResourceFileContent("/testsuite-data/files/csv/10mb.csv");
-        File tempDirPath = Files.createTempDirectory("datapackage-").toFile();
-
-        // Write content to temporary files
-        File testFile = new File(tempDirPath, "test1.csv");
-        Files.write(testFile.toPath(), testFileContent.getBytes(StandardCharsets.UTF_8));
-
-        File testFile2 = new File(tempDirPath, "test2.csv");
-        Files.write(testFile2.toPath(), testFile2Content.getBytes(StandardCharsets.UTF_8));
-
+        File testFile = TestHelper.getResourceFile("/fixtures/data/AW_229_000001_000002.csv");
+        File testFile2 = TestHelper.getResourceFile("/fixtures/data/AW_229_000001_000002_1Row.csv");
         List<File> fileList = Arrays.asList(testFile, testFile2);
 
         Schema schema = Schema.infer(fileList, StandardCharsets.UTF_8);
@@ -177,11 +168,6 @@ public class SchemaInferralTests {
         Assertions.assertNotNull(schema);
         Assertions.assertTrue(schema.getFields().size() > 0);
         Assertions.assertTrue(schema.isValid());
-
-        // Clean up
-        testFile.deleteOnExit();
-        testFile2.deleteOnExit();
-        tempDirPath.deleteOnExit();
     }
 
     @Test
