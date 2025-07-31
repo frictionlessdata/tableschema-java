@@ -1,17 +1,9 @@
-MainTest.java
-nbproject
 
 # Compiled class file
 *.class
 
 # Log file
 *.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
 
 # Package Files #
 *.jar
@@ -33,7 +25,7 @@ hs_err_pid*
 .project
 .settings/
 
-
-
 /bin/
 /schema.json
+/test.csv
+/test.json

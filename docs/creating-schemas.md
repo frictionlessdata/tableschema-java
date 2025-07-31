@@ -2,7 +2,7 @@
 
 - [Creating from scratch via Java methods](#via-java-methods)
 - [Creating from a serialized JSON representation](#from-json)
-- [Creating from sample data (inferring)](#inferring-a-schema-from-data)
+- [Creating from sample data (inferring)](#auto-generating-a-schema-from-data-inferring)
 - [Schema validation](#schema-validation)
 - [Writing a Schema to a File](#writing-a-schema-to-a-file)
 
@@ -72,9 +72,41 @@ String schemaFilePath = "/path/to/schema/file/shema.json";
 Schema schema = new Schema(schemaFilePath, true); // enforce validation with strict=true.
 ```
 
-## Inferring a Schema from data
+## Auto-generating a Schema from data (inferring)
 
-If you don't have a schema for a CSV and don't want to manually define one then you can generate it:
+If you don't have a schema for a CSV and don't want to manually define one then you can auto-generate it:
+
+```java
+String csvData = "id,name,age\n1,John,30\n2,Jane,25\n3,Bob,35";
+Schema schema = Schema.infer(csvData, StandardCharsets.UTF_8);
+```
+The type inferral algorithm tries to cast to available types and each successful type casting increments a popularity score for the successful type cast in question. At the end, the best score so far is returned.
+The inferral algorithm traverses all of the table's rows and attempts to cast every single value of the table.
+
+You can  infer a schema from 
+- a CSV file 
+- a URL pointing to a CSV file
+- a CSV containing String
+- a JSON array node
+- a String array containing multiple CSV data sets
+- a File List
+- a URL List
+- mixed data types (CSV, JSON, etc.)
+
+If you have more than one CSV file, you can use `infer()` to check that all files have the same schema:
+
+```java
+File testFile = getResourceFile("/testsuite-data/files/csv/1mb.csv");
+File testFile2 = getResourceFile("/testsuite-data/files/csv/10mb.csv");
+List<File> fileList = Arrays.asList(testFile, testFile2);
+
+Schema schema = Schema.infer(fileList, StandardCharsets.UTF_8);
+```
+
+If the CSV files have different headers, the `Schema.infer()` call will throw an Exception.
+
+In case you want to infer a schema and then use the data, it can be helpful to not use the static `Schema.infer()` 
+method, but first create a `Table` instance and then infer the schema from it. 
 
 ```java
 URL url = new URL("https://raw.githubusercontent.com/frictionlessdata/tableschema-java/master" +
@@ -88,8 +120,7 @@ System.out.println(schema.asJson());
 
 ```
 
-The type inferral algorithm tries to cast to available types and each successful type casting increments a popularity score for the successful type cast in question. At the end, the best score so far is returned.
-The inferral algorithm traverses all of the table's rows and attempts to cast every single value of the table. When dealing with large tables, you might want to limit the number of rows that the inferral algorithm processes:
+When dealing with large tables, you might want to limit the number of rows that the inferral algorithm processes:
 
 ```java
 // Only process the first 25 rows for type inferral.

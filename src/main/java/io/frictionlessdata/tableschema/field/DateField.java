@@ -52,8 +52,12 @@ public class DateField extends Field<LocalDate> {
                     would correspond to dates like: 30/11/14
                  */
                 String regex = parseDateFormat(format);
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(regex);
-                return LocalDate.from(formatter.parse(value));
+                try {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(regex);
+                    return LocalDate.from(formatter.parse(value));
+                } catch (Exception ex) {
+                    throw new TypeInferringException("Invalid date format: " + format);
+                }
             }
             throw new TypeInferringException();
         }

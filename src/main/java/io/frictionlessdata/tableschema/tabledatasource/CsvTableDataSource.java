@@ -42,7 +42,7 @@ public class CsvTableDataSource extends AbstractTableDataSource<String> {
 
     CsvTableDataSource(File dataSource, File workDir){
         dataResource = dataSource;
-        this.workDir = workDir;
+        super.workDir = workDir;
     }
 
     CsvTableDataSource(String dataSource){

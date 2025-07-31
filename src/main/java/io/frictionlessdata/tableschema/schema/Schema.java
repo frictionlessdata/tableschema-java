@@ -3,6 +3,7 @@ package io.frictionlessdata.tableschema.schema;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.networknt.schema.ValidationMessage;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.exception.PrimaryKeyException;
@@ -22,6 +23,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -226,6 +228,141 @@ public class Schema implements SchemaInterface{
      */
     public static Schema infer(List<Object[]> data, String[] headers, int rowLimit) throws TypeInferringException, IOException {
         return fromJson(TypeInferrer.getInstance().infer(data, headers, rowLimit), true);
+    }
+
+    /**
+     * Infers a table schema from various data sources.
+     *
+     * This method attempts to infer a schema by reading data from one or more sources
+     * (direct data, files, or URLs), creating tables from each source, and then inferring
+     * schemas from those tables. All inferred schemas must be equal, otherwise an exception
+     * is thrown.
+     *
+     * @param data    Direct data source - can be a String containing table data or an ArrayNode
+     *                containing JSON representation of table data. May be null if using file or URL sources.
+     * @param charset The character encoding to use when reading from URLs. Used for URL streams only.
+     * @return        The inferred Schema that is consistent across all provided data sources
+     * @throws IllegalStateException if no valid data source is provided, if the data type is not supported,
+     *                              or if schemas inferred from different sources are not equal
+     * @throws RuntimeException     if an IOException occurs while reading from files or URLs
+     */
+    public static Schema infer(
+            Object data,
+            Charset charset) {
+        List<File> paths = new ArrayList<>();
+        List<URL> urls = new ArrayList<>();
+        // Infer schema from data source
+        List<String> s = new ArrayList<>();
+        if (data != null) {
+            if (data instanceof String) {
+                s.add((String)data);
+            } else if (data instanceof ArrayNode) {
+                s.add(JsonUtil.getInstance().serialize(data));
+            } else if (data instanceof List) {
+                // check to see wehther the list contains URLs or file paths for later processing
+                for (Object row : (List<?>) data) {
+                    if (row instanceof String) {
+                        try {
+                           URL url = new URL((String) row); // Check if it's a valid URL
+                            urls.add(url);
+                        } catch (Exception e) {
+                            // Not a valid URL, treat as local file path
+                            try {
+                                Files.readString(new File((String)row).toPath()); // Check if it's a valid file path
+                                paths.add(new File((String)row));
+                            } catch (Exception e2) {
+                                // Not a valid file path, treat as string data
+                                s.add((String)row);
+                            }
+                        }
+
+                    } else if (row instanceof File) {
+                        paths.add((File) row);
+                    } else if (row instanceof URL) {
+                        urls.add((URL) row);
+                    } else if (row != null) {
+                        throw new TypeInferringException("Unsupported data type for inferring schema: " + row.getClass().getSimpleName());
+                    }
+                }
+            } else if (data instanceof String[]) {
+                // check to see wehther the list contains URLs or file paths for later processing
+                for (String row : (String[]) data) {
+                    if (row != null) {
+                        try {
+                            URL url = new URL(row); // Check if it's a valid URL
+                            urls.add(url);
+                        } catch (Exception e) {
+                            // Not a valid URL, treat as local file path
+                            try {
+                                Files.readString(new File(row).toPath()); // Check if it's a valid file path
+                                paths.add(new File(row));
+                            } catch (Exception e2) {
+                                // Not a valid file path, treat as string data
+                                s.add(row);
+                            }
+                        }
+
+                    }
+                }
+            } else if (data instanceof File[]) {
+                for (File row : (File[]) data) {
+                    if (row != null) {
+                        paths.add(row);
+                    }
+                }
+            } else if (data instanceof URL[]) {
+                for (URL row : (URL[]) data) {
+                    if (row != null) {
+                        urls.add(row);
+                    }
+                }
+            } else {
+                throw new IllegalStateException("Cannot infer schema from provided data type");
+            }
+        }
+        if (paths != null && !paths.isEmpty()) {
+            paths.forEach((f) -> {
+                try {
+                    s.add(Files.readString(f.toPath()));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+        if (urls != null && !urls.isEmpty()) {
+            urls.forEach((url) -> {
+                try {
+                    InputStream str = url.openStream();
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(str, charset))) {
+                        s.add(reader.lines().collect(Collectors.joining("\n")));
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+            });
+        }
+        if (s.isEmpty()){
+            throw new IllegalStateException("No valid data source provided for schema inference");
+        }
+        List<Schema> schemas = new ArrayList<>();
+        for (String str : s) {
+            Table table = Table.fromSource(str);
+            String[] headers = table.getHeaders();
+            Schema schema = table.inferSchema(headers, -1);
+            schemas.add(schema);
+        }
+        Schema lastSchema = null;
+        for (Schema schema: schemas) {
+            if (null == lastSchema) {
+                lastSchema = schema;
+            } else {
+                if (!lastSchema.equals(schema)) {
+                    throw new IllegalStateException("Inferred schemas are not equal: " + lastSchema + " != " + schema);
+                }
+            }
+        }
+        return lastSchema;
     }
 
     /**

@@ -6,6 +6,7 @@ import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.frictionlessdata.tableschema.field.Field.FIELD_TYPE_ANY;
 
@@ -130,10 +131,9 @@ public class TypeInferrer {
         for(int j=0; j < fieldArray.size(); j++){
             String fieldName = fieldArray.get(j).get(Field.JSON_KEY_NAME).toString();
             Map<String, Integer> typeInferralCountMap = this.getTypeInferralMap().get(fieldName);
-            NavigableMap<String, Integer> typeInferralCountMapSortedByCount = sortMapByValue(typeInferralCountMap);
+            String inferredType = sortMapByValue(typeInferralCountMap);
            
-            if(!typeInferralCountMapSortedByCount.isEmpty()){
-                String inferredType = typeInferralCountMapSortedByCount.firstEntry().getKey();
+            if(!StringUtils.isEmpty(inferredType)){
                 fieldArray.get(j).put(Field.JSON_KEY_TYPE, inferredType);
                 fieldArray.get(j).put(Field.JSON_KEY_FORMAT, formatMap.get(headers[j]));
             }
@@ -200,14 +200,19 @@ public class TypeInferrer {
      * Once we are done inferring, we settle for the type with that was inferred
      * the most for the same field. Here we sort by score
      * @param map the mapping of types to score to sort
-     * @return sorted mapping of types to score
+     * @return Type with the highest score
      */
-    private NavigableMap<String, Integer> sortMapByValue(Map<String, Integer> map){
-        Comparator<String> comparator = new MapValueComparator(map);
-        NavigableMap<String, Integer> result = new TreeMap<>(comparator);
-        result.putAll(map);
+    private String sortMapByValue(Map<String, Integer> map){
+        int count = 0;
+        String key = null;
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+            if (entry.getValue() > count) {
+                count = entry.getValue();
+                key = entry.getKey();
+            }
+        }
 
-        return result;
+        return key;
     }
 
     private Map<String, Map<String, Integer>> getTypeInferralMap(){

@@ -220,7 +220,7 @@ public class TableOtherTest {
         Iterator<Field<?>> iter = schema.getFields().iterator();
 
         // The field names are the same as the name of the type we are expecting to be inferred.
-        // So if type is set then in means that inferral worked.
+        // So if type is set then it means that inferral worked.
         while(iter.hasNext()){
             Field<?> field = iter.next();
             String name = field.getName();

@@ -35,7 +35,7 @@ public class JsonArrayTableDataSource extends AbstractTableDataSource<ArrayNode>
             dataSource = JsonUtil.getInstance().createArrayNode(TableDataSource.trimBOM(content));
         }
     }
-	protected JsonArrayTableDataSource (ArrayNode json){
+	public JsonArrayTableDataSource (ArrayNode json){
 		dataSource = json;
 	}
 

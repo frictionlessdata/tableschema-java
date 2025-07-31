@@ -31,63 +31,90 @@ public class GeopointField extends Field<double[]> {
     public double[] parseValue(String value, String format, Map<String, Object> options)
             throws TypeInferringException {
         try{
-            if(format.equalsIgnoreCase(Field.FIELD_FORMAT_DEFAULT)){
-                String[] geopoint = value.split(", *");
-
-                if(geopoint.length == 2){
-                    double lon = Double.parseDouble(geopoint[0]);
-                    double lat = Double.parseDouble(geopoint[1]);
-
-                    // No exception? It's a valid geopoint object.
-                    return new double[]{lon, lat};
-
-                }else{
-                    throw new TypeInferringException("Geo points must have two coordinates");
-                }
-
-            }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_ARRAY)){
-
-                // This will throw an exception if the value is not an array.
-                ArrayNode jsonArray = JsonUtil.getInstance().createArrayNode(value);
-
-                if (jsonArray.size() == 2){
-                    double lon = jsonArray.get(0).asDouble();
-                    double lat = jsonArray.get(1).asDouble();
-
-                    // No exception? It's a valid geopoint object.
-                    return new double[]{lon, lat};
-
-                }else{
-                    throw new TypeInferringException("Geo points must have two coordinates");
-                }
-
-            }else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_OBJECT)){
-
-                // This will throw an exception if the value is not an object.
-                JsonNode jsonObj = JsonUtil.getInstance().createNode(value);
-
-                if (jsonObj.size() == 2 && jsonObj.has("lon") && jsonObj.has("lat")){
-                    double lon = jsonObj.get("lon").asDouble();
-                    double lat = jsonObj.get("lat").asDouble();
-
-                    // No exception? It's a valid geopoint object.
-                    return new double[]{lon, lat};
-
-                }else{
-                    throw new TypeInferringException();
-                }
-
-            }else{
-                throw new TypeInferringException();
+            if (format.equalsIgnoreCase(Field.FIELD_FORMAT_DEFAULT)){
+                return parseDefaultString(value);
+            } else if (format.equalsIgnoreCase(Field.FIELD_FORMAT_ARRAY)){
+                return parseArrayString(value);
+            } else if(format.equalsIgnoreCase(Field.FIELD_FORMAT_OBJECT)) {
+                return parseObjectString(value);
             }
-
-        }catch(Exception e){
+        } catch(Exception e){
             if (e instanceof TypeInferringException) {
                 throw e;
             }
             throw new TypeInferringException(e);
         }
+        throw new TypeInferringException("Invalid format for geopoint field: " + format);
     }
+
+    @Override
+    public boolean isCompatibleValue(String value, String format) {
+        try {
+            parseDefaultString(value);
+            return true;
+        } catch (Exception ex) {
+            try {
+                parseArrayString(value);
+                return true;
+            } catch (Exception ex2) {
+                try {
+                    parseObjectString(value);
+                    return true;
+                } catch (Exception ex3) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    private static double[] parseDefaultString(String value) throws TypeInferringException {
+        String[] geopoint = value.split(", *");
+
+        if(geopoint.length == 2){
+            double lon = Double.parseDouble(geopoint[0]);
+            double lat = Double.parseDouble(geopoint[1]);
+
+            // No exception? It's a valid geopoint object.
+            return new double[]{lon, lat};
+
+        }else{
+            throw new TypeInferringException("Geo points must have two coordinates");
+        }
+    }
+
+    private static double[] parseArrayString(String value) throws TypeInferringException {
+        // This will throw an exception if the value is not an array.
+        ArrayNode jsonArray = JsonUtil.getInstance().createArrayNode(value);
+
+        if (jsonArray.size() == 2){
+            double lon = jsonArray.get(0).asDouble();
+            double lat = jsonArray.get(1).asDouble();
+
+            // No exception? It's a valid geopoint object.
+            return new double[]{lon, lat};
+
+        }else{
+            throw new TypeInferringException("Geo points must have two coordinates");
+        }
+    }
+
+    private static double[] parseObjectString(String value) throws TypeInferringException {
+        // This will throw an exception if the value is not an object.
+        JsonNode jsonObj = JsonUtil.getInstance().createNode(value);
+
+        if (jsonObj.size() == 2 && jsonObj.has("lon") && jsonObj.has("lat")){
+            double lon = jsonObj.get("lon").asDouble();
+            double lat = jsonObj.get("lat").asDouble();
+
+            // No exception? It's a valid geopoint object.
+            return new double[]{lon, lat};
+
+        }else{
+            throw new TypeInferringException();
+        }
+
+    }
+
 
     @Override
     public String formatValueAsString(double[] value, String format, Map<String, Object> options) throws InvalidCastException, ConstraintsException {
