@@ -640,7 +640,7 @@ public class Table{
      * for the Field in question. At the end, the best score so far is returned.
      *
      * This method iterates through the whole data set, which can be very costly for huge
-     * CSV/JSON files
+     * CSV/JSON files. In that case, use the {@link #inferSchema(int)} method to set a row limit
      *
      * For {@link BeanSchema}, the operation is much less costly, it is simply done via reflection
      * on the Bean class.
@@ -661,6 +661,8 @@ public class Table{
      *
      * For {@link BeanSchema}, the operation is simply done via reflection
      * on the Bean class, so the `rowLimit`does not have any effect.
+     *
+     * @param rowLimit The max numer of rows to scan. Huge input files can take a considerable time to infer.
      *
      * @return the created Schema
      *

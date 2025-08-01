@@ -237,21 +237,45 @@ public class Schema implements SchemaInterface{
      * (direct data, files, or URLs), creating tables from each source, and then inferring
      * schemas from those tables. All inferred schemas must be equal, otherwise an exception
      * is thrown.
+     * This method can incur a significant performance penalty for large data sets, in that case use the
+     * overloaded method with a row limit.
      *
      * @param data    Direct data source - can be a String containing table data or an ArrayNode
      *                containing JSON representation of table data. May be null if using file or URL sources.
-     * @param charset The character encoding to use when reading from URLs. Used for URL streams only.
-     * @return        The inferred Schema that is consistent across all provided data sources
+     * @param charset  The character encoding to use when reading from URLs. Used for URL streams only.
+     *
+     * @return         The inferred Schema that is consistent across all provided data sources
+     * @throws IllegalStateException if no valid data source is provided, if the data type is not supported,
+     *                              or if schemas inferred from different sources are not equal
+     * @throws RuntimeException     if an IOException occurs while reading from files or URLs
+     */
+    public static Schema infer(Object data, Charset charset) {
+        return infer(data, charset, -1);
+    }
+
+    /**
+     * Infers a table schema from various data sources.
+     *
+     * This method attempts to infer a schema by reading data from one or more sources
+     * (direct data, files, or URLs), creating tables from each source, and then inferring
+     * schemas from those tables. All inferred schemas must be equal, otherwise an exception
+     * is thrown.
+     *
+     * @param data    Direct data source - can be a String containing table data or an ArrayNode
+     *                containing JSON representation of table data. May be null if using file or URL sources.
+     * @param charset  The character encoding to use when reading from URLs. Used for URL streams only.
+     * @param rowLimit The max numer of rows to scan. Huge input files can take a considerable time    to infer.
+     * @return         The inferred Schema that is consistent across all provided data sources
      * @throws IllegalStateException if no valid data source is provided, if the data type is not supported,
      *                              or if schemas inferred from different sources are not equal
      * @throws RuntimeException     if an IOException occurs while reading from files or URLs
      */
     public static Schema infer(
             Object data,
-            Charset charset) {
+            Charset charset,
+            int rowLimit) {
         List<File> paths = new ArrayList<>();
         List<URL> urls = new ArrayList<>();
-        // Infer schema from data source
         List<String> s = new ArrayList<>();
         if (data != null) {
             if (data instanceof String) {
@@ -349,7 +373,7 @@ public class Schema implements SchemaInterface{
         for (String str : s) {
             Table table = Table.fromSource(str);
             String[] headers = table.getHeaders();
-            Schema schema = table.inferSchema(headers, -1);
+            Schema schema = table.inferSchema(headers, rowLimit);
             schemas.add(schema);
         }
         Schema lastSchema = null;

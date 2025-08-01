@@ -93,7 +93,7 @@ You can  infer a schema from
 - a URL List
 - mixed data types (CSV, JSON, etc.)
 
-If you have more than one CSV file, you can use `infer()` to check that all files have the same schema:
+If you have more than one CSV file, you can use `Schema.infer()` to check that all files have the same schema:
 
 ```java
 File testFile = getResourceFile("/testsuite-data/files/csv/1mb.csv");
@@ -103,9 +103,10 @@ List<File> fileList = Arrays.asList(testFile, testFile2);
 Schema schema = Schema.infer(fileList, StandardCharsets.UTF_8);
 ```
 
-If the CSV files have different headers, the `Schema.infer()` call will throw an Exception.
+If the CSV files have different headers, the `Schema.infer()` call will throw an Exception because there 
+is no common schema that can be inferred from the files.
 
-In case you want to infer a schema and then use the data, it can be helpful to not use the static `Schema.infer()` 
+In case you want to infer a schema from a file and then use the data, it can be helpful to not use the static `Schema.infer()` 
 method, but first create a `Table` instance and then infer the schema from it. 
 
 ```java
