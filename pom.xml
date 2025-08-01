@@ -26,7 +26,7 @@
         <apache-commons-csv.version>1.14.0</apache-commons-csv.version>
         <apache-commons-validator.version>1.10.0</apache-commons-validator.version>
         <geotools.version>33.2</geotools.version>
-        <jackson.version>2.19.1</jackson.version>
+        <jackson.version>2.19.2</jackson.version>
         <junit.version>5.13.4</junit.version>
         <locationtech-jts.version>1.20.0</locationtech-jts.version>
         <networknt-validator-version>1.5.8</networknt-validator-version>
