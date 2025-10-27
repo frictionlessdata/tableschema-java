@@ -29,7 +29,7 @@
         <jackson.version>2.20.0</jackson.version>
         <junit.version>6.0.0</junit.version>
         <locationtech-jts.version>1.20.0</locationtech-jts.version>
-        <networknt-validator-version>1.5.9</networknt-validator-version>
+        <networknt-validator-version>2.0.0</networknt-validator-version>
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.9.0</maven-dependency-plugin.version>
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
