@@ -24,7 +24,7 @@
         <google-guava.version>33.5.0-jre</google-guava.version>
         <apache-commons-lang3.version>3.19.0</apache-commons-lang3.version>
         <apache-commons-csv.version>1.14.1</apache-commons-csv.version>
-        <apache-commons-validator.version>1.10.0</apache-commons-validator.version>
+        <apache-commons-validator.version>1.10.1</apache-commons-validator.version>
         <geotools.version>34.0</geotools.version>
         <jackson.version>2.20.1</jackson.version>
         <junit.version>6.0.1</junit.version>
