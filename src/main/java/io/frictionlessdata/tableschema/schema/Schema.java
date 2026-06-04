@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.networknt.schema.ValidationMessage;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.exception.PrimaryKeyException;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
@@ -689,7 +688,7 @@ public class Schema implements SchemaInterface{
     @JsonIgnore
     public void validate() throws ValidationException{
         String json = this.asJson();
-        Set<ValidationMessage> messages = tableFormalSchemaValidator.validate(json);
+        List<String> messages = tableFormalSchemaValidator.validate(json);
         if (!messages.isEmpty()) {
             errors.add(new ValidationException(tableFormalSchemaValidator.getName(), messages));
         }

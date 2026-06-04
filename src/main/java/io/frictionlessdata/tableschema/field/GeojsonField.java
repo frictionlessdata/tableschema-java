@@ -1,7 +1,6 @@
 package io.frictionlessdata.tableschema.field;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.networknt.schema.ValidationMessage;
 import io.frictionlessdata.tableschema.exception.*;
 import io.frictionlessdata.tableschema.schema.FormalSchemaValidator;
 import io.frictionlessdata.tableschema.schema.TypeInferrer;
@@ -9,8 +8,8 @@ import io.frictionlessdata.tableschema.util.JsonUtil;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class GeojsonField extends Field<JsonNode> {
     private static FormalSchemaValidator geoFormalSchemaValidator;
@@ -83,7 +82,7 @@ public class GeojsonField extends Field<JsonNode> {
      */
     private void validateGeoJsonSchema(String json) throws ValidationException {
         try {
-            Set<ValidationMessage> errors = geoFormalSchemaValidator.validate(json);
+            List<String> errors = geoFormalSchemaValidator.validate(json);
             if (!errors.isEmpty()) {
                 throw new ValidationException("Geojson field validation failed", errors);
             }
@@ -102,7 +101,7 @@ public class GeojsonField extends Field<JsonNode> {
      */
     private void validateTopoJsonSchema(String json) throws ValidationException {
         try {
-            Set<ValidationMessage> errors = topoFormalSchemaValidator.validate(json);
+            List<String> errors = topoFormalSchemaValidator.validate(json);
             if (!errors.isEmpty()) {
                 throw new ValidationException("Topojson field validation failed", errors);
             }

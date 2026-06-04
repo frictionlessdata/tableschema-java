@@ -1,15 +1,16 @@
 package io.frictionlessdata.tableschema.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion.VersionFlag;
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.SchemaRegistry;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
-import java.util.function.Consumer;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A class to validate a JSON document against a JSON schema (https://json-schema.org/).
@@ -21,7 +22,9 @@ import java.util.function.Consumer;
  */
 public class FormalSchemaValidator {
 
-	private final JsonSchema jsonSchema;
+	private static final Map<String, String> LOCAL_SCHEMA_MAPPINGS = buildLocalSchemaMappings();
+
+	private final com.networknt.schema.Schema jsonSchema;
 
 	/**
 	 * Instantiate a new FormalSchemaValidator with a JSON Schema.
@@ -30,9 +33,35 @@ public class FormalSchemaValidator {
 	 * @param schemaNode the schema to validate against as a JsonNode
 	 */
 	private FormalSchemaValidator(JsonNode schemaNode) {
-		Consumer<JsonSchemaFactory.Builder> customizer = builder -> builder.metaSchema(new TableSchemaVersion().getInstance());
-		JsonSchemaFactory factory = JsonSchemaFactory.getInstance(VersionFlag.V4, customizer);
-		this.jsonSchema = factory.getSchema(schemaNode);
+		SchemaRegistry registry = SchemaRegistry.withDefaultDialect(
+				new TableSchemaVersion().getInstance(),
+				builder -> builder.schemas(LOCAL_SCHEMA_MAPPINGS));
+		this.jsonSchema = registry.getSchema(schemaNode);
+	}
+
+	private static Map<String, String> buildLocalSchemaMappings() {
+		Map<String, String> mappings = new LinkedHashMap<>();
+		mapLocalSchema(mappings,
+				"https://raw.githubusercontent.com/nhuebel/TopoJSON_schema/master/bbox.json",
+				"/schemas/topojson-schema/bbox.json");
+		mapLocalSchema(mappings,
+				"https://raw.githubusercontent.com/nhuebel/TopoJSON_schema/master/geometry.json",
+				"/schemas/topojson-schema/geometry.json");
+		mapLocalSchema(mappings,
+				"https://raw.githubusercontent.com/nhuebel/TopoJSON_schema/master/topology.json",
+				"/schemas/topojson-schema/topology.json");
+		return mappings;
+	}
+
+	private static void mapLocalSchema(Map<String, String> mappings, String iri, String resourcePath) {
+		try (InputStream stream = FormalSchemaValidator.class.getResourceAsStream(resourcePath)) {
+			if (stream == null) {
+				throw new IllegalStateException("Schema resource not found: " + resourcePath);
+			}
+			mappings.put(iri, new String(stream.readAllBytes(), StandardCharsets.UTF_8));
+		} catch (IOException e) {
+			throw new IllegalStateException("Unable to read schema resource: " + resourcePath, e);
+		}
 	}
 
 	public static FormalSchemaValidator fromJson(String jsonSchema) {
@@ -44,25 +73,28 @@ public class FormalSchemaValidator {
 	}
 
 	/**
-	 * Validate the given JSON document against the schema and return a set of {@link ValidationMessage} objects.
-	 * If the document is valid, an empty set is returned.
-	 * If the document is invalid, a set of ValidationMessages is returned.
+	 * Validate the given JSON document against the schema and return validation messages.
+	 * If the document is valid, an empty list is returned.
+	 * If the document is invalid, a list of validation messages is returned.
 	 * @param json the JSON document to validate
-	 * @return a set of ValidationMessages if the document is invalid, an empty set otherwise
+	 * @return validation messages if the document is invalid, an empty list otherwise
 	 */
-	public Set<ValidationMessage> validate(String json) {
+	public List<String> validate(String json) {
 		return validate(JsonUtil.getInstance().readValue(json));
 	}
 
 	/**
-	 * Validate the given JSON document against the schema and return a set of {@link ValidationMessage} objects.
-	 * If the document is valid, an empty set is returned.
-	 * If the document is invalid, a set of ValidationMessages is returned.
+	 * Validate the given JSON document against the schema and return validation messages.
+	 * If the document is valid, an empty list is returned.
+	 * If the document is invalid, a list of validation messages is returned.
 	 * @param json the JSON document to validate
-	 * @return a set of ValidationMessages if the document is invalid, an empty set otherwise
+	 * @return validation messages if the document is invalid, an empty list otherwise
 	 */
-	public Set<ValidationMessage> validate(JsonNode json) {
-        return jsonSchema.validate(json);
+	public List<String> validate(JsonNode json) {
+        return jsonSchema.validate(json)
+                .stream()
+                .map(com.networknt.schema.Error::getMessage)
+                .collect(Collectors.toList());
 
 	}
 

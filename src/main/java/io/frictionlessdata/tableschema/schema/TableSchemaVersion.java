@@ -1,6 +1,10 @@
 package io.frictionlessdata.tableschema.schema;
 
-import com.networknt.schema.*;
+import com.networknt.schema.SpecificationVersion;
+import com.networknt.schema.dialect.Dialect;
+import com.networknt.schema.dialect.Draft4;
+import com.networknt.schema.keyword.AnnotationKeyword;
+import com.networknt.schema.keyword.NonValidationKeyword;
 
 import java.util.Arrays;
 
@@ -8,18 +12,16 @@ import java.util.Arrays;
  * The frictionless table-schema.json does not really follow the V4 JSON schema specification.
  * This class tells the networknt validator to ignore a couple of keywords that are not part of the V4 spec.
  */
-public class TableSchemaVersion implements JsonSchemaVersion {
-    private static final String IRI = SchemaId.V4;
+public class TableSchemaVersion {
+    private static final String IRI = SpecificationVersion.DRAFT_4.getDialectId();
     private static final String ID = "$id";
 
     private static class Holder {
-        private static final JsonMetaSchema INSTANCE;
+        private static final Dialect INSTANCE;
         static {
-            JsonMetaSchema.Builder builder = JsonMetaSchema.builder(IRI);
-            builder.specification(SpecVersion.VersionFlag.V4);
+            Dialect.Builder builder = Dialect.builder(IRI, Draft4.getInstance());
+            builder.specificationVersion(SpecificationVersion.DRAFT_4);
             builder.idKeyword(ID);
-            builder.formats(Formats.DEFAULT);
-            builder.keywords(ValidatorTypeCode.getKeywords(SpecVersion.VersionFlag.V4));
             builder.keywords(Arrays.asList(
                     new NonValidationKeyword("$schema"),
                     new NonValidationKeyword("id"),
@@ -43,8 +45,7 @@ public class TableSchemaVersion implements JsonSchemaVersion {
         }
     }
 
-    @Override
-    public JsonMetaSchema getInstance() {
+    public Dialect getInstance() {
         return Holder.INSTANCE;
     }
 }

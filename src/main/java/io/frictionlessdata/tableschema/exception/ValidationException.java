@@ -1,7 +1,5 @@
 package io.frictionlessdata.tableschema.exception;
 
-import com.networknt.schema.ValidationMessage;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -18,7 +16,7 @@ public class ValidationException extends TableSchemaException {
 		wrappedExceptions.add(ex);
 	}
 
-	public ValidationException(String schemaName, Collection<ValidationMessage> messages) {
+	public ValidationException(String schemaName, Collection<String> messages) {
 		this("Formal validation failed for Schema "+ schemaName);
 		addValidationMessages(messages);
 	}
@@ -34,11 +32,11 @@ public class ValidationException extends TableSchemaException {
 	}
 
 
-	void addValidationMessage(ValidationMessage message) {
-		validationMessages.add(message.getMessage());
+	void addValidationMessage(String message) {
+		validationMessages.add(message);
 	}
 
-	void addValidationMessages(Collection<ValidationMessage> messages) {
+	void addValidationMessages(Collection<String> messages) {
 		messages.forEach(this::addValidationMessage);
 	}
 
