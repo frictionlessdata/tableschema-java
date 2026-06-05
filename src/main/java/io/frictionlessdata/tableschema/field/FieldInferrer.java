@@ -1,6 +1,6 @@
 package io.frictionlessdata.tableschema.field;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.google.common.util.concurrent.AtomicDouble;
 import org.locationtech.jts.geom.Coordinate;
 

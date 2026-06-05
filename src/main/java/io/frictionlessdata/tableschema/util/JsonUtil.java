@@ -1,21 +1,20 @@
 package io.frictionlessdata.tableschema.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.json.JsonReadFeature;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.core.util.MinimalPrettyPrinter;
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import io.frictionlessdata.tableschema.exception.JsonParsingException;
 import io.frictionlessdata.tableschema.exception.JsonSerializingException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.json.JsonReadFeature;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 
@@ -26,12 +25,14 @@ public final class JsonUtil {
 	private JsonUtil() {
 		this.mapper = JsonMapper.builder()
 			.enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS)
-			.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES)
+			.enable(JsonReadFeature.ALLOW_SINGLE_QUOTES)
 			.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+			.disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+			.changeDefaultPropertyInclusion(i -> i
+				.withValueInclusion(JsonInclude.Include.NON_NULL)
+				.withContentInclusion(JsonInclude.Include.NON_NULL))
 			.findAndAddModules()
-			.build()
-			.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-			//.setDefaultSetterInfo(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY));;
+			.build();
 	}
 	
 	public static JsonUtil getInstance() {
@@ -48,14 +49,14 @@ public final class JsonUtil {
 		return mapper.createObjectNode();
 	}
 	
-	public TextNode createTextNode(String value) {
-		return new TextNode(value);
+	public StringNode createStringNode(String value) {
+		return new StringNode(value);
 	}
 	
 	public JsonNode createNode(String content) {
 		try {
 			return mapper.readTree(content);
-		} catch (JsonProcessingException e) {
+		} catch (JacksonException e) {
 			throw new JsonParsingException(e);
 		}
 	}
@@ -65,10 +66,10 @@ public final class JsonUtil {
 			String json = mapper.writeValueAsString(content);
 			try {
 				return mapper.readTree(json);
-			} catch (JsonMappingException e) {
+			} catch (JacksonException e) {
 				throw new JsonParsingException(e);
 			} 
-		} catch (JsonProcessingException e) {
+		} catch (JacksonException e) {
 			throw new JsonSerializingException(e);
 		}
 	}
@@ -80,7 +81,7 @@ public final class JsonUtil {
 	public ArrayNode createArrayNode(String content) {
 		try {
 			return (ArrayNode)mapper.readTree(content);
-		} catch (JsonProcessingException e) {
+		} catch (JacksonException e) {
 			throw new JsonParsingException(e);
 		}
 	}
@@ -92,10 +93,10 @@ public final class JsonUtil {
 	public String serialize(Object value) {
 		return serialize (value, true);
 	}
-	public String serialize(Object value, boolean indent) {
+	public String serialize(Object value, boolean multiline) {
 		try {
-			return _getWriter(indent).writeValueAsString(value);
-		} catch (JsonProcessingException e) {
+			return _getWriter(multiline).writeValueAsString(value);
+		} catch (JacksonException e) {
 			throw new JsonSerializingException(e);
 		}
 	}
@@ -103,7 +104,7 @@ public final class JsonUtil {
 	public <T> T deserialize(String value, Class<T> clazz) {
 		try {
 			return mapper.readValue(sanitize(value), clazz);
-		} catch (JsonProcessingException e) {
+		} catch (JacksonException e) {
 			throw new JsonParsingException(e);
 		}
 	}
@@ -111,7 +112,7 @@ public final class JsonUtil {
 	public <T> T deserialize(String value, TypeReference<T> typeRef) {
 		try {
 			return mapper.readValue(sanitize(value), typeRef);
-		} catch (JsonProcessingException e) {
+		} catch (JacksonException e) {
 			throw new JsonParsingException(e);
 		}
 	}
@@ -127,7 +128,7 @@ public final class JsonUtil {
 	public JsonNode readValue(String value) {
 		try {
 			return mapper.readTree(sanitize(value));
-		} catch (JsonProcessingException e) {
+		} catch (JacksonException e) {
 			throw new JsonParsingException(e);
 		}
 	}
@@ -135,7 +136,7 @@ public final class JsonUtil {
 	public JsonNode readValue(InputStream value) {
 		try {
 			return mapper.readTree(value);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new JsonParsingException(e);
 		}
 	}
@@ -156,8 +157,8 @@ public final class JsonUtil {
     	} else return string;
 	}
 
-	private ObjectWriter _getWriter(boolean indent) {
-		return (indent) ? mapper.writer(new DefaultPrettyPrinter()) : mapper.writer(new MinimalPrettyPrinter());
+	private ObjectWriter _getWriter(boolean multiline) {
+		return (multiline) ? mapper.writerWithDefaultPrettyPrinter() : mapper.writer();
 	}
 	
 }

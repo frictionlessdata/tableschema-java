@@ -1,6 +1,6 @@
 package io.frictionlessdata.tableschema;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.beans.SimpleDataBean;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.iterator.BeanIterator;

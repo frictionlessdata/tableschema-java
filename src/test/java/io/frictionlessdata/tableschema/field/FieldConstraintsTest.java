@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema.field;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 import org.junit.jupiter.api.Assertions;
@@ -803,6 +803,28 @@ public class FieldConstraintsTest {
 
         ConstraintsException ex = assertThrows(ConstraintsException.class, () -> {field.castValue("This string length is greater than 45 characters.");});
         Assertions.assertEquals("Field 'test' value 'This string length is greater than 45 characters.' violates constraint(s) [pattern, maxLength]", ex.getMessage());
+    }
+
+
+    // test https://github.com/frictionlessdata/tableschema-java/issues/134
+    @Test
+    @DisplayName("Test that if no constraints are specified, then no constraints are violated")
+    public void testNoConstraints() throws Exception{
+        Map<String, Object> violatedConstraints = null;
+
+        List<Duration> enumDurations = new ArrayList<>();
+
+        Duration duration1 = Duration.parse("P2DT3H4M");
+        enumDurations.add(duration1);
+
+        Duration duration2 = Duration.parse("P3DT3H4M");
+        enumDurations.add(duration2);
+
+        DurationField field = new DurationField("test", null, null, null, null, null, null, null);
+
+        violatedConstraints = field.checkConstraintViolations(duration1);
+
+        Assertions.assertTrue(violatedConstraints.isEmpty());
     }
 
     private JsonNode createJsonNode(Object obj) {

@@ -1,8 +1,8 @@
 package io.frictionlessdata.tableschema.tabledatasource;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Iterators;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 
@@ -48,7 +48,7 @@ public class JsonArrayTableDataSource extends AbstractTableDataSource<ArrayNode>
 		if (dataSource == null) {
 			return false;
 		}
-		Iterator iter = dataSource.elements();
+		Iterator iter = dataSource.elements().iterator();
 		if (!iter.hasNext()) {
 			return false;
 		}
@@ -81,7 +81,7 @@ public class JsonArrayTableDataSource extends AbstractTableDataSource<ArrayNode>
 						values.add(val.asText(""));
 				}
 			} else if (input instanceof ArrayNode) {
-				Iterator<JsonNode> elements = input.elements();
+				Iterator<JsonNode> elements = ((ArrayNode)input).elements().iterator();
 				while (elements.hasNext()) {
 					values.add(elements.next().asText(""));
 				}
@@ -104,7 +104,7 @@ public class JsonArrayTableDataSource extends AbstractTableDataSource<ArrayNode>
 			return this.headers;
 		}
 		Set<String> headers = new LinkedHashSet<>();
-		Iterator<JsonNode> iterator = dataSource.elements();
+		Iterator<JsonNode> iterator = dataSource.elements().iterator();
 		if (iterator.hasNext()) {
 			JsonNode first = iterator.next();
 			if (first instanceof ObjectNode) {
@@ -113,8 +113,8 @@ public class JsonArrayTableDataSource extends AbstractTableDataSource<ArrayNode>
 					headers.addAll(getColumnNames((ObjectNode) nextObject));
 				});
 			} else if (first instanceof ArrayNode) {
-				((ArrayNode) first).elements().forEachRemaining(f -> {
-					headers.add(f.asText());
+				((ArrayNode) first).elements().iterator().forEachRemaining(f -> {
+					headers.add(f.asString());
 				});
 			}
 		}
@@ -124,7 +124,7 @@ public class JsonArrayTableDataSource extends AbstractTableDataSource<ArrayNode>
 
 	private Set<String> getColumnNames(ObjectNode node) {
 		Set<String> columnNames = new LinkedHashSet<>();
-		node.fieldNames().forEachRemaining(columnNames::add);
+		node.propertyNames().iterator().forEachRemaining(columnNames::add);
 		return columnNames;
 	}
 }

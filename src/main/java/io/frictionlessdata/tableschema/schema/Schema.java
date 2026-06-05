@@ -2,8 +2,8 @@ package io.frictionlessdata.tableschema.schema;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.node.ArrayNode;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.exception.PrimaryKeyException;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;

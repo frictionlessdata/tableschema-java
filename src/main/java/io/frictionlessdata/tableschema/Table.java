@@ -1,8 +1,8 @@
 package io.frictionlessdata.tableschema;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.exception.*;
 import io.frictionlessdata.tableschema.field.Field;
 import io.frictionlessdata.tableschema.iterator.BeanIterator;
@@ -462,7 +462,7 @@ public class Table{
         ObjectMapper mapper = JsonUtil.getInstance().getMapper();
         try {
             retVal = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rows);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new JsonSerializingException(ex);
         }
         return retVal;

@@ -1,6 +1,6 @@
 package io.frictionlessdata.tableschema.schema;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.networknt.schema.SchemaRegistry;
 import io.frictionlessdata.tableschema.util.JsonUtil;
 

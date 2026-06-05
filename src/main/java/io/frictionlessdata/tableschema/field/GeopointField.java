@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema.field;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;

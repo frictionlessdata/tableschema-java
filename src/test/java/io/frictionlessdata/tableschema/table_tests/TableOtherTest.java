@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema.table_tests;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
@@ -28,6 +28,13 @@ import static io.frictionlessdata.tableschema.TestHelper.getTestDataDirectory;
 
 
 public class TableOtherTest {
+
+    private static final Comparator<JsonNode> JSON_NUMERIC_EQUIVALENCE = (left, right) -> {
+        if (left.isNumber() && right.isNumber()) {
+            return left.decimalValue().compareTo(right.decimalValue());
+        }
+        return left.equals(right) ? 0 : 1;
+    };
 
 
     private static final String populationTestJson =  "[" +
@@ -140,7 +147,7 @@ public class TableOtherTest {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode reference = objectMapper.readTree(referenceContent);
         JsonNode actual = objectMapper.readTree(s);
-        Assertions.assertEquals(reference.textValue(), actual.textValue());
+        Assertions.assertTrue(reference.equals(JSON_NUMERIC_EQUIVALENCE, actual));
     }
 
     @Test
@@ -157,7 +164,7 @@ public class TableOtherTest {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode reference = objectMapper.readTree(referenceContent);
         JsonNode actual = objectMapper.readTree(s);
-        Assertions.assertEquals(reference.textValue(), actual.textValue());
+        Assertions.assertTrue(reference.equals(JSON_NUMERIC_EQUIVALENCE, actual));
     }
 
 

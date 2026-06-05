@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frictionlessdata</groupId>
     <artifactId>tableschema-java</artifactId>
-    <version>0.9.10-SNAPSHOT</version>
+    <version>0.10.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <issueManagement>
         <url>https://github.com/frictionlessdata/tableschema-java/issues</url>
@@ -26,10 +26,11 @@
         <apache-commons-csv.version>1.14.1</apache-commons-csv.version>
         <apache-commons-validator.version>1.10.1</apache-commons-validator.version>
         <geotools.version>34.1</geotools.version>
-        <jackson.version>2.20.1</jackson.version>
+        <jackson.version>3.1.4</jackson.version>
+        <jackson-annotation.version>2.22</jackson-annotation.version>
         <junit.version>6.0.1</junit.version>
         <locationtech-jts.version>1.20.0</locationtech-jts.version>
-        <networknt-validator-version>2.0.0</networknt-validator-version>
+        <networknt-validator-version>3.0.3</networknt-validator-version>
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.9.0</maven-dependency-plugin.version>
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
@@ -192,22 +193,27 @@
     <dependencies>
         <!-- Dependencies for Bean-based Schema inferal -->
         <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <groupId>tools.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-csv</artifactId>
             <version>${jackson.version}</version>
         </dependency>
 
-        <!-- Jackson support for new Java data/time API. For Date/DateTime/Time ec. Fields -->
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
             <version>${jackson.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson-annotation.version}</version>
         </dependency>
 
         <!-- Dependencies for Geopoint/Geojson Fields -->

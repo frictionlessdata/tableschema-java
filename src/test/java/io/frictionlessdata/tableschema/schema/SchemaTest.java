@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema.schema;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.beans.EmployeeBean;
@@ -635,6 +635,8 @@ public class SchemaTest {
                 "/fixtures/schema/full_schema.json");
         Schema schema = Schema.fromJson(expectedString, true);
         String serialized = JsonUtil.getInstance().serialize(schema);
-        Assertions.assertEquals(expectedString.replaceAll("\r\n","\n"), serialized.replaceAll("\r\n","\n"));
+        Assertions.assertEquals(
+                JsonUtil.getInstance().readValue(expectedString),
+                JsonUtil.getInstance().readValue(serialized));
     }
 }

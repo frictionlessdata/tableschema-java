@@ -2,7 +2,7 @@ package io.frictionlessdata.tableschema.field;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import io.frictionlessdata.tableschema.exception.ConstraintsException;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;
 import io.frictionlessdata.tableschema.exception.TypeInferringException;
@@ -280,6 +280,9 @@ public abstract class Field<T> {
     public Map<String, Object> checkConstraintViolations(Object value){
 
         Map<String, Object> violatedConstraints = new HashMap<>();
+        if (null == this.constraints) {
+            return violatedConstraints;
+        }
 
         // Indicates whether this field is allowed to be null. If required is true, then null is disallowed. 
         if(this.constraints.containsKey(CONSTRAINT_KEY_REQUIRED)){

@@ -1,6 +1,6 @@
 package io.frictionlessdata.tableschema.iterator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.TestHelper;
 import io.frictionlessdata.tableschema.exception.InvalidCastException;

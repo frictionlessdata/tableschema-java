@@ -1,11 +1,11 @@
 package io.frictionlessdata.tableschema.util;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.introspect.AnnotatedField;
-import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import tools.jackson.databind.BeanDescription;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.introspect.AnnotatedField;
+import tools.jackson.databind.introspect.BeanPropertyDefinition;
+import tools.jackson.dataformat.csv.CsvMapper;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -15,14 +15,18 @@ import java.util.Map;
 public class ReflectionUtil {
 
     public static BeanDescription getBeanDescription(Class<?> type) {
-        CsvMapper mapper = new CsvMapper();
-        mapper.setVisibility(mapper.getSerializationConfig()
-                .getDefaultVisibilityChecker()
-                .withFieldVisibility(JsonAutoDetect.Visibility.ANY));
+        CsvMapper mapper = CsvMapper.builder()
+                .changeDefaultVisibility(v -> v.withFieldVisibility(JsonAutoDetect.Visibility.ANY))
+                .build();
+
         JavaType jType = mapper.constructType(type);
-        BeanDescription desc = mapper.getSerializationConfig()
-                .introspect(jType);
-        return desc;
+        var config = mapper.serializationConfig();
+        var introspector = config.classIntrospectorInstance().forOperation(config);
+
+        return introspector.introspectForSerialization(
+                jType,
+                introspector.introspectClassAnnotations(jType)
+        );
     }
 
     public static Map<String, String> getFieldNameMapping(Class<?> type) {

@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema.table_tests;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.field.*;
 import io.frictionlessdata.tableschema.schema.Schema;

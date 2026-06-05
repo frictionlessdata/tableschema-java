@@ -1,8 +1,8 @@
 package io.frictionlessdata.tableschema.tabledatasource;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.introspect.AnnotatedField;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.introspect.AnnotatedField;
+import tools.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Iterators;
 import io.frictionlessdata.tableschema.annotations.FieldFormat;
 import io.frictionlessdata.tableschema.field.Field;

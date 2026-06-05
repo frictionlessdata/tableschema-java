@@ -1,6 +1,6 @@
 package io.frictionlessdata.tableschema.field;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import io.frictionlessdata.tableschema.exception.*;
 import io.frictionlessdata.tableschema.schema.FormalSchemaValidator;
 import io.frictionlessdata.tableschema.schema.TypeInferrer;

@@ -1,6 +1,6 @@
 package io.frictionlessdata.tableschema.tabledatasource;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ArrayNode;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.exception.TableIOException;
 import io.frictionlessdata.tableschema.inputstream.ByteOrderMarkStrippingInputStream;

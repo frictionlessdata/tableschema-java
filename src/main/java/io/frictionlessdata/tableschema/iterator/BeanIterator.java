@@ -1,7 +1,7 @@
 package io.frictionlessdata.tableschema.iterator;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.introspect.AnnotatedField;
 import com.google.common.util.concurrent.AtomicDouble;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.annotations.FieldFormat;

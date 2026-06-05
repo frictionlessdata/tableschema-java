@@ -1,6 +1,6 @@
 package io.frictionlessdata.tableschema.tabledatasource;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ArrayNode;
 import io.frictionlessdata.tableschema.Table;
 import io.frictionlessdata.tableschema.beans.EmployeeBeanWithAnnotation;
 import io.frictionlessdata.tableschema.iterator.BeanIterator;

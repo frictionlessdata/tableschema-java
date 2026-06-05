@@ -2,12 +2,12 @@ package io.frictionlessdata.tableschema.schema;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.introspect.AnnotatedField;
-import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import tools.jackson.databind.BeanDescription;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.introspect.AnnotatedField;
+import tools.jackson.databind.introspect.BeanPropertyDefinition;
+import tools.jackson.dataformat.csv.CsvMapper;
+import tools.jackson.dataformat.csv.CsvSchema;
 import com.google.common.util.concurrent.AtomicDouble;
 import io.frictionlessdata.tableschema.annotations.FieldFormat;
 import io.frictionlessdata.tableschema.exception.TableSchemaException;
@@ -85,10 +85,9 @@ public class BeanSchema extends Schema {
     private void _infer(Class<?> beanClass) {
         strictValidation = true;
         fields = new ArrayList<>();
-        CsvMapper mapper = new CsvMapper();
-        mapper.setVisibility(mapper.getSerializationConfig()
-                .getDefaultVisibilityChecker()
-                .withFieldVisibility(JsonAutoDetect.Visibility.ANY));
+        CsvMapper mapper = CsvMapper.builder()
+                .changeDefaultVisibility(v -> v.withFieldVisibility(JsonAutoDetect.Visibility.ANY))
+                .build();
         CsvSchema csvSchema = mapper.typedSchemaFor(beanClass);
         Iterator<CsvSchema.Column> iterator = csvSchema.iterator();
         Map<String, String> fieldNames = ReflectionUtil.getFieldNameMapping(beanClass);
