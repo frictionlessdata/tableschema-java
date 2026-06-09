@@ -31,7 +31,7 @@
         <junit.version>6.0.1</junit.version>
         <locationtech-jts.version>1.20.0</locationtech-jts.version>
         <networknt-validator-version>3.0.3</networknt-validator-version>
-        <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.9.0</maven-dependency-plugin.version>
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
