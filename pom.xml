@@ -41,6 +41,7 @@
         <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
         <dependency-check-maven.version>12.1.0</dependency-check-maven.version>
         <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
+        <findsecbugs-plugin.version>1.13.0</findsecbugs-plugin.version>
     </properties>
     <repositories>
         <repository>
@@ -153,6 +154,23 @@
             </plugin>
 
             <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>${dependency-check-maven.version}</version>
+                <configuration>
+                    <ossindexAnalyzerEnabled>false</ossindexAnalyzerEnabled>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>${maven-dependency-plugin.version}</version>
@@ -174,6 +192,13 @@
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>4.9.8.2</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.h3xstream.findsecbugs</groupId>
+                        <artifactId>findsecbugs-plugin</artifactId>
+                        <version>${findsecbugs-plugin.version}</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <effort>Max</effort>
                     <threshold>High</threshold>
@@ -181,6 +206,7 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <phase>package</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
@@ -226,6 +252,10 @@
                     <groupId>org.eclipse.emf</groupId>
                     <artifactId>org.eclipse.emf.common</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.geotools.ogc</groupId>
+                    <artifactId>net.opengis.ows</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -253,6 +283,10 @@
                 <exclusion>
                     <groupId>commons-digester</groupId>
                     <artifactId>commons-digester</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
