@@ -41,7 +41,7 @@
         <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
         <dependency-check-maven.version>12.1.0</dependency-check-maven.version>
         <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
-        <findsecbugs-plugin.version>1.13.0</findsecbugs-plugin.version>
+        <findsecbugs-plugin.version>1.14.0</findsecbugs-plugin.version>
     </properties>
     <repositories>
         <repository>
